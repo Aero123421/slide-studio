@@ -1,6 +1,6 @@
 ---
 name: slide-studio
-description: Author, critique and repair original presentations from evidence. Write natural audience copy, design the whole canvas, build semantic SVG/data diagrams, animate deterministic states, add useful interactions and media, verify actual PDF fonts, and create editable PowerPoint or private brand templates. Use for slide creation, redesign, evaluation, animated HTML, research presentations and company template systems in any language. Not a template-filling or image-generation workflow.
+description: Author, redesign, and QA original presentations from evidence: copy, layouts, data diagrams, animation, PDF/PPTX export, brand templates. For slide creation, research talks, template systems, any language. Not template-filling.
 metadata:
   version: "3.4.0"
 ---
@@ -31,28 +31,21 @@ Do not personalize public examples from memory or copy private material into the
 
 ## 2. Read a small working set and act on it
 
-For new/revised decks read [the editorial pass](references/editorial-pass.md) and
-[density and rhythm](references/density-and-rhythm.md). Execute those edits on the
-actual pages; do not restate the advice in audience copy. Then choose relevant guides:
+For new/revised decks read [Writing and editing](references/writing-and-editing.md)
+(§1 editorial pass, §4 density). Execute those edits on the actual pages; do not
+restate the advice in audience copy. Then choose relevant guides:
 
 | Need | Read |
 |---|---|
-| Quantities, research results, comparisons, graph meaning | [Numbers and diagram truth](references/numbers-and-diagram-truth.md) |
-| Browser review, invisible marks, CSS/contrast/crop defects, final-file QA | [Rendered integrity](references/rendered-integrity.md) |
-| PDF or suspected font corruption | [PDF typography](references/pdf-typography.md) |
-| Concrete failures / less capable model needs a repair operation | [Field repair cases](references/field-repairs.md), [recovery](references/recovery.md) |
-| Original layout, awkward whitespace, SVG bounds | [Original design](references/original-design.md), [space budget](references/space-budget.md) |
-| Images, illustration, crop, evidence integrity | [Images](references/images.md) |
-| Type, scripts, RTL, long translations | [Typography and languages](references/typography-languages.md) |
-| Color/contrast and genuine design direction | [Color](references/color.md), [art direction](references/art-direction.md) |
-| SVG geometry, plots, diagrams, labels | [Diagrams](references/diagrams.md) |
-| Animation, reverse navigation, static meaning | [Motion](references/motion.md) |
-| Controls, simulation, filters and lifecycle | [Interactions](references/interactions.md) |
-| Video, audio, CAD-derived meshes | [Media/3D](references/media-3d.md) |
-| Trusted HTML authoring and player APIs | [Authoring API](references/creative-authoring.md) |
-| Native editable PowerPoint and exports | [Native authoring](references/authoring.md), [exports](references/exports.md) |
+| Quantities, research results, comparisons, diagrams, graph meaning | [Evidence and diagrams](references/evidence-and-diagrams.md) |
+| Rendered QA, PDF/fonts, exports, release gates | [Verification and delivery](references/verification-and-delivery.md) |
+| Concrete failures / repair operations | [Repair](references/repair.md) |
+| Layout, whitespace, color, type, images | [Visual design](references/visual-design.md) |
+| Animation, controls, media, 3D | [Motion and interaction](references/motion-and-interaction.md) |
+| Authoring APIs, studio scenes, story contract | [Authoring](references/authoring.md) |
+| Native editable PowerPoint | [Authoring](references/authoring.md), [Verification and delivery](references/verification-and-delivery.md) |
 | Existing company slides / reusable private templates | [Brand systems](references/brand.md) |
-| Rights, source trust and installation | [Security/rights](references/security-rights.md), [portability](references/portability.md) |
+| Rights, source trust, installation, autonomy | [Working agreements](references/working-agreements.md) |
 
 Search by the explanation needed, not a color or generic decorative style:
 `node "$SKILL_DIR/scripts/catalog.mjs" search "conditional branch" --limit 4`.
@@ -104,7 +97,10 @@ Check the meaning of every discrete choice, and boundary/changeover values for r
 ## 4. Build and inspect
 
 Resolve `SKILL_DIR` from this file's location. Work in the user's project, never by
-editing the installed skill. The default original-HTML route requires no layout ID:
+editing the installed skill. Match the loop to the host's capability tier
+(see [Working agreements](references/working-agreements.md)): when browser QA
+or installs are unavailable, skip those steps and report them as unrun.
+The default original-HTML route requires no layout ID:
 
 ```sh
 node "$SKILL_DIR/scripts/craft.mjs" init ./presentation --language en
@@ -126,7 +122,7 @@ false because an automated geometric/export check cannot grant editorial approva
 Check numbers, prose, diagram meaning, reading-mode density, optical hierarchy and
 the delivered format. Fix diagnosed defects; do not hide them with broad waivers.
 `--states all` covers slide builds, not every custom widget choice. Read the
-[rendered integrity guide](references/rendered-integrity.md) for checks and limits.
+[verification and delivery guide](references/verification-and-delivery.md) for checks and limits.
 If screenshots cannot be viewed, retain the review output and explicitly leave visual
 review pending; DOM measurements are not a replacement for seeing the slides.
 

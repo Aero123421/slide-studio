@@ -6,19 +6,24 @@
   ],
   "files": [
     {
+      "path": ".github/workflows/ci.yml",
+      "bytes": 835,
+      "sha256": "dcc2e9ce76254f6f8e251a5cff991e57bf637b2123f2596ae7894b0151dbf00a"
+    },
+    {
       "path": ".gitignore",
       "bytes": 101,
       "sha256": "97e98280e5084fb0ccaf559ff8e05f4f5fb94c773537783c8bfe17e9c4e72251"
     },
     {
       "path": "CHANGELOG.md",
-      "bytes": 3626,
-      "sha256": "78efdf77f2bdefc2ce1b9c1cea55c37ad998be2ec3e744f6877f362739117291"
+      "bytes": 4501,
+      "sha256": "6fe12b76e28339496af48c9ada2bc6bf1caf6419f69785a7772295a39665790e"
     },
     {
       "path": "CONTRIBUTING.md",
-      "bytes": 1080,
-      "sha256": "796695baec9306eed8da7592dc55c96147bb4a3c5a7cbccc3f40f4466421b960"
+      "bytes": 1356,
+      "sha256": "53ef7af98104bae91cebc2953a411356eb58019d65f3a448849da30a5d70c013"
     },
     {
       "path": "LICENSE",
@@ -27,18 +32,18 @@
     },
     {
       "path": "README.ja.md",
-      "bytes": 11393,
-      "sha256": "49a1c982df8720f0189d57c68b053169ec9cb05dc64759189733c1b2c615f6cf"
+      "bytes": 11413,
+      "sha256": "1f2ca80da384ed4f82c9e44183a3cbef0236920eb8eb26199c0df1c093492f37"
     },
     {
       "path": "README.md",
-      "bytes": 14964,
-      "sha256": "c45d3c7a321a99c475c54606da72c295560368e652a49f5e2088a87df31ed398"
+      "bytes": 15010,
+      "sha256": "9d05070be586a990058169333bfdbb2e4c7e35b1f21be4423ee9e50e70dcb14d"
     },
     {
       "path": "SKILL.md",
-      "bytes": 12326,
-      "sha256": "0b8e263b332f05a9726b9a3caaeaa3efaa8386ba430fc20c40f4a2e0b03b77e3"
+      "bytes": 11461,
+      "sha256": "5b1442634a79b682ac50c57a0d312abf60727a75270d4c8b08701a633eae2b1b"
     },
     {
       "path": "THIRD_PARTY_NOTICES.md",
@@ -327,8 +332,8 @@
     },
     {
       "path": "assets/gallery-index.html",
-      "bytes": 5516,
-      "sha256": "9b297bf8a57ebcf42f862c72a66d96716303ac60dfe255db0db7ce81c5594541"
+      "bytes": 5539,
+      "sha256": "bd230df68567c7a0f6eadee69c6823f3beafd4049c0dc1069b0e5327700fd33d"
     },
     {
       "path": "assets/gallery-specs.json",
@@ -872,8 +877,8 @@
     },
     {
       "path": "assets/runtime/mesh.js",
-      "bytes": 4824,
-      "sha256": "48563843944f9fc8b530ad4248014e6e246aeb416514cc762755d749c9cb5686"
+      "bytes": 4838,
+      "sha256": "a911301c9136bedd126dd1d8921776624496cb8610e8d254def2e9b030a44ad4"
     },
     {
       "path": "assets/runtime/player.css",
@@ -2082,13 +2087,13 @@
     },
     {
       "path": "gallery/index.html",
-      "bytes": 63064,
-      "sha256": "781337fd02002cf4849c4803f111a1093fee6b7358723f3ea446609f005f8542"
+      "bytes": 63087,
+      "sha256": "81f3617b72d221a061f95ba9b7234a11d06d215762cee75a8162e29627fdfdf1"
     },
     {
       "path": "gallery/interactions.html",
-      "bytes": 469370,
-      "sha256": "ee70cd78b50a10274a31d9621cac4a41b3e1b591d9deae9b1e7ea8b9f2144cb2"
+      "bytes": 469384,
+      "sha256": "04e3e3e0b056a6e0c5debea430f6bb0a43ebb0fe08b2fecf2cb12d408c5a8571"
     },
     {
       "path": "gallery/languages.html",
@@ -2112,8 +2117,8 @@
     },
     {
       "path": "gallery/research.html",
-      "bytes": 443373,
-      "sha256": "b3aad3e1c0c3926d2e425f73c9052ef98979485db33f5f30694648213a90c90a"
+      "bytes": 443387,
+      "sha256": "01e147f5d2688c22dc68e401e5f8c924538234181a0b4987cf53305a2da53f8b"
     },
     {
       "path": "gallery/transfer-talk.html",
@@ -2126,24 +2131,9 @@
       "sha256": "f9d73dad76568a4f8639df1caa36ce38381e52bc6e620a1999da0c07991fd0f6"
     },
     {
-      "path": "references/art-direction.md",
-      "bytes": 3952,
-      "sha256": "b0d2a55a00ddca66ae1051be740c2528ffa2234da2f7a8ae9698d38ee49218cf"
-    },
-    {
-      "path": "references/asset-surgery.md",
-      "bytes": 2274,
-      "sha256": "a97ffc239400fc9a770920d181bce1f9008311cf84eeb237dc932827b9335d39"
-    },
-    {
       "path": "references/authoring.md",
-      "bytes": 7033,
-      "sha256": "9a5d2ff873ec9b4a8d32274457c44f4c99c5506b957c13add916e988f5d8c544"
-    },
-    {
-      "path": "references/autonomy.md",
-      "bytes": 3009,
-      "sha256": "70eb8b199e7003ffc1231d15bda2a5b389d1b29ff91dd89a1e42c277e1b8f3f4"
+      "bytes": 14983,
+      "sha256": "488afd5907c5c637e7ff0ef7df0f77cf3f62f803d94db95addbb2a7f8e9ba666"
     },
     {
       "path": "references/brand.md",
@@ -2151,169 +2141,49 @@
       "sha256": "e59b5f022d8588f736d3677cab7588993962f9ddbca7a7219e32ba48527d50c2"
     },
     {
-      "path": "references/color.md",
-      "bytes": 2297,
-      "sha256": "afba6362e2387da20c885d7e9e0c45cbcca90cdf6806936aa15b950a1b54d3fc"
+      "path": "references/evidence-and-diagrams.md",
+      "bytes": 18460,
+      "sha256": "7c315464221927b71e2231c1cb564ea979582b95b40ef6f67fed63121ac46ff0"
     },
     {
-      "path": "references/composition.md",
-      "bytes": 3073,
-      "sha256": "b9bd9ae71cd9739ba2e72449ce63e751ea9b897ae98245973276c0bd2fa75638"
+      "path": "references/motion-and-interaction.md",
+      "bytes": 15723,
+      "sha256": "4b54a7cede6c2d2fb05815e8102e6e6aee4fdfd31bc7e36f089308585ed33437"
     },
     {
-      "path": "references/copy-channels.md",
-      "bytes": 3762,
-      "sha256": "646ff2ceabc5c67fe0a9270ec29d17e308bb9c9f4ed20e20d3b9faecaf41a18a"
+      "path": "references/repair.md",
+      "bytes": 16835,
+      "sha256": "fb78f489999017b68c85901ee45b0603542755525c25260d6113da761aa56b1f"
     },
     {
-      "path": "references/creative-authoring.md",
-      "bytes": 5086,
-      "sha256": "1359f3a3bff6379900c6be39530f7e53b72bdb3562f987707f43f5548f7228f7"
+      "path": "references/verification-and-delivery.md",
+      "bytes": 22053,
+      "sha256": "e2345fefb206b03aec0e6c3b3d39802111cdbe260c51dcf82f6e78c00577e6e1"
     },
     {
-      "path": "references/density-and-rhythm.md",
-      "bytes": 4321,
-      "sha256": "2674db3ff30e4ce355f35af4d2ecc916e2d264c8ad4880c16026f3952ebf3458"
+      "path": "references/visual-design.md",
+      "bytes": 29858,
+      "sha256": "521f5a015c21e93aa3cfc2c1020982ff271553b7f7391375bc07292cadd86ba6"
     },
     {
-      "path": "references/diagrams.md",
-      "bytes": 4155,
-      "sha256": "f4b89057f934237dc63f58988f3f3d93d02fe12d279f7ffcb1a2563fcff2a698"
+      "path": "references/working-agreements.md",
+      "bytes": 13084,
+      "sha256": "d83b154c5a19ab654f68475e7cb7bf2bdd12817f38647d5e309977853f6ba07d"
     },
     {
-      "path": "references/editorial-pass.md",
-      "bytes": 5977,
-      "sha256": "900d7c9b4d788402d707d60fedbc38bd32de8c2a51c56ecb15908f988486bc5c"
-    },
-    {
-      "path": "references/evaluation.md",
-      "bytes": 2377,
-      "sha256": "9733b7dff9df40aa24b23174fb4e62ffff688162844af197bdd20d64bf829fb3"
-    },
-    {
-      "path": "references/exports.md",
-      "bytes": 3251,
-      "sha256": "cec96fcbf88d09577d5a2ccb61683bfdcf2eae1feefaa9ddb58248402c99c172"
-    },
-    {
-      "path": "references/field-repairs.md",
-      "bytes": 4069,
-      "sha256": "979a07b4dbd80375720d1d1c3168afcf1d8a8dda6b009fe874755ff88d599f5d"
-    },
-    {
-      "path": "references/images.md",
-      "bytes": 4426,
-      "sha256": "25972312de876e77d4377b22aeed260b61528e1bdf11c39bfef88bd88863abed"
-    },
-    {
-      "path": "references/interactions.md",
-      "bytes": 6225,
-      "sha256": "a7d4eafe8dae8dd721477aaddd16ec6925d8849e58228ba391389c4923f639dc"
-    },
-    {
-      "path": "references/media-3d.md",
-      "bytes": 3875,
-      "sha256": "1682dbaaff93695ad1b08ff2db60e319cd63f383e4fccb25ec5316032c557fb1"
-    },
-    {
-      "path": "references/motion.md",
-      "bytes": 5298,
-      "sha256": "4d69fe5a387d34bd00c303427b4ecdeacf4f4c2d7da6bf152ad2e4ef7b72b98a"
-    },
-    {
-      "path": "references/numbers-and-diagram-truth.md",
-      "bytes": 7579,
-      "sha256": "aa481d2944ea1cf8063ec079028e41b42465168e67e5db37cd1c0a1864222215"
-    },
-    {
-      "path": "references/original-design.md",
-      "bytes": 4718,
-      "sha256": "1be919651ceaa2a3e4bc5c28062973ed0121b653af67656320acfe9960af3804"
-    },
-    {
-      "path": "references/pdf-typography.md",
-      "bytes": 4845,
-      "sha256": "962bdf27c4751b16e4ac9e6da022caadb150c54da2bf3ea118d6f31b9df1d9d7"
-    },
-    {
-      "path": "references/portability.md",
-      "bytes": 2918,
-      "sha256": "789444fc715e65a277f1aac8786bc49e7e4c0d10a78ae986862338acf4a47443"
-    },
-    {
-      "path": "references/quality.md",
-      "bytes": 5795,
-      "sha256": "6a8ca595e6e05526d293f0952e06a865f5f5931817f6c8e0b778cea9fba1e547"
-    },
-    {
-      "path": "references/recovery.md",
-      "bytes": 4244,
-      "sha256": "68ca6740aa7af97d258a95abc8e5807bb65ff90f74e39610e6f5488fe123bdd9"
-    },
-    {
-      "path": "references/rendered-integrity.md",
-      "bytes": 5301,
-      "sha256": "7e214c8ddf527aebbec364a85f3490934d8132d1feaa96b8d79d42d43cdbb4ae"
-    },
-    {
-      "path": "references/repair-clinic.md",
-      "bytes": 6155,
-      "sha256": "194ee292d0cbf8375727545a1bccff8e3c096c7adc6ff4d386ca44da6cf9fe14"
-    },
-    {
-      "path": "references/research.md",
-      "bytes": 3049,
-      "sha256": "be465cfd8b826d7583ccdcfffa9e334a78f15e5e963d5befaecb58b40cb9ed4b"
-    },
-    {
-      "path": "references/security-rights.md",
-      "bytes": 2728,
-      "sha256": "68bc03c063e411c821da79f2fdc3f21fbad89b64725fcb40a45ceb9d4e6eec12"
-    },
-    {
-      "path": "references/skill-design.md",
-      "bytes": 2919,
-      "sha256": "246d6af3eda144d778c23320aac55ddf89fd24c5409acaef8ccb5c8381a01c51"
-    },
-    {
-      "path": "references/sources.md",
-      "bytes": 3330,
-      "sha256": "de0c0c176661aeb375ac3caccfe6fe798ecb2514ec36d4e2c54c719c080581bd"
-    },
-    {
-      "path": "references/space-budget.md",
-      "bytes": 6054,
-      "sha256": "f10ded9067c23524e865cd9cb313541b52d9e5d47f1ed03f5d247835b05a08b4"
-    },
-    {
-      "path": "references/story-contract.md",
-      "bytes": 2539,
-      "sha256": "811b026471a1e8b5b0da81b2964ed6099503517b2c07ec9623fbd9410eaa5762"
-    },
-    {
-      "path": "references/typography-languages.md",
-      "bytes": 4213,
-      "sha256": "806c2271b48507409c3f123d667cf9262a70c08b62b75553b06de1f073a88780"
-    },
-    {
-      "path": "references/writing-clinic.md",
-      "bytes": 4342,
-      "sha256": "ca1d3d820b15c8578fa0b1b06274ea3ae5165b3890722b57560b6b4f43e64401"
-    },
-    {
-      "path": "references/writing.md",
-      "bytes": 8294,
-      "sha256": "944fb3d3c6d18d7bed3206887203533bdac4cbc346394f2499af54ebc3e2a8bf"
+      "path": "references/writing-and-editing.md",
+      "bytes": 26994,
+      "sha256": "06b837f77d9aed69abe79d3cd85463b6f66d822b81560f98d920f1e8412f2a36"
     },
     {
       "path": "requirements.txt",
-      "bytes": 231,
-      "sha256": "871fd68d38210a2be5b0ab6bdcf0204653e9a54480b848941bb2ee91ec34a4c7"
+      "bytes": 313,
+      "sha256": "57926661ccc92c8efe6fb868200c1cde2570173e2c06bea1d8263a0402e3d592"
     },
     {
       "path": "scripts/audit.py",
-      "bytes": 3960,
-      "sha256": "bf5e2b17a284cb2890857c48d224652a93032e5c6b412aff3e604d58394b2a51"
+      "bytes": 5037,
+      "sha256": "71b0aba8e346a338ab2139b1b749dd54c9606cff9a8e4e4820d8abe36f37e833"
     },
     {
       "path": "scripts/brand-capture.py",
@@ -2397,8 +2267,8 @@
     },
     {
       "path": "scripts/deps.mjs",
-      "bytes": 1006,
-      "sha256": "ad882438b887b925c9af5f18997214a3577896b9cd62f06dc61dafbe06b0be9b"
+      "bytes": 1024,
+      "sha256": "5481e7487e5eddcd7d6884e0681c4a84c25c48914d477e2fcf304ea89b9ef78c"
     },
     {
       "path": "scripts/editorial.py",
@@ -2472,8 +2342,8 @@
     },
     {
       "path": "scripts/studio.mjs",
-      "bytes": 3472,
-      "sha256": "4567b3150cf89a013f2853ad263f1774c4e9a626a715cf03b71b3e32e43049c0"
+      "bytes": 3490,
+      "sha256": "1c11dcce8a04a83e5a972d8da9b3c6789eb929a89217df76a55450c245003d76"
     },
     {
       "path": "scripts/svg-edit.py",
@@ -2487,8 +2357,8 @@
     },
     {
       "path": "tests/agent-evals.json",
-      "bytes": 5941,
-      "sha256": "43f60420a4a08d326b82d488e2bf7202765d6a280cd6e843b6933a6f6d8f0b9d"
+      "bytes": 6121,
+      "sha256": "b4b7b8896d403f04b8613badebfaa389a3eff3bdf4623a41cfaebf1365e0eb4e"
     },
     {
       "path": "tests/browser.py",

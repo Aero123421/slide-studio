@@ -24,7 +24,7 @@ Claude Code・Codex・Cursorなど[80以上のエージェント](https://github
 - 画像が見られない状態を目視済みとは扱わず、失敗した取得要求の無限リトライも避けます。
 
 機械で判定できる問題・要確認・未測定を区別し、デザインの一律な禁止事項は増やしません。
-[検査の範囲](references/rendered-integrity.md)と[実施した検証](VERIFICATION.md)を参照してください。
+[検査の範囲](references/verification-and-delivery.md)と[実施した検証](VERIFICATION.md)を参照してください。
 新しいSKILLSで各外部モデルに再制作させた結果は、まだ測定していません。
 
 ## 3.3から引き継いだ改修
@@ -42,8 +42,8 @@ Claude Code・Codex・Cursorなど[80以上のエージェント](https://github
 図104・動き64・操作24・全体構成36という既存ライブラリーも維持しています。
 新規作例のデータは架空で、利用者の原稿・企業情報・ログを転載していません。
 
-[文章の編集](references/editorial-pass.md)／[密度と構成](references/density-and-rhythm.md)／
-[数値と図の意味](references/numbers-and-diagram-truth.md)／[PDFの書体](references/pdf-typography.md)
+[文章の編集](references/writing-and-editing.md)／[密度と構成](references/writing-and-editing.md)／
+[数値と図の意味](references/evidence-and-diagrams.md)／[PDFの書体](references/verification-and-delivery.md)
 
 PDFは印刷状態を作ってから再度フォントを待ち、実際に描画された書体を確認します。
 納品時はプロジェクトの `fonts.json` と照合し、ページ数・文字回収も検査します。
@@ -67,7 +67,7 @@ PDFは印刷状態を作ってから再度フォントを待ち、実際に描�
 **余白を、埋める面積ではなく関係として扱います。** 主役の領域、実際の文字量、SVGの
 描画範囲、注釈との距離、読順から構図を作ります。広い空白、孤立した最終行、小さすぎる
 図などを診断しますが、装飾を足して数値を稼ぐことは勧めません。白紙から図を組み立てる
-例と、違和感の原因別に直す[修正ガイド](references/repair-clinic.md)を収録しています。
+例と、違和感の原因別に直す[修正ガイド](references/repair.md)を収録しています。
 
 **マウスとキーボードの動作をそろえました。** 「次へ」をクリックした後に右矢印が
 効かなくなる問題を修正し、入力欄・スライダー・IMEのキー操作は保護します。実際の
@@ -96,7 +96,7 @@ PDFは印刷状態を作ってから再度フォントを待ち、実際に描�
 
 `slide-studio`フォルダーを丸ごと、使用するAIエージェントが対応するskills
 ディレクトリへ配置してください。`SKILL.md`だけをコピーすると実装や参照文書が
-欠けます。[導入ガイド](references/portability.md)にホスト別の扱いを記載しています。
+欠けます。[導入ガイド](references/working-agreements.md)にホスト別の扱いを記載しています。
 
 > slide-studioを使って、添付資料から研究発表を作ってください。
 > 聴衆は分野の基礎を知っています。構成・デザインは判断し、主張・根拠・限界を区別してください。

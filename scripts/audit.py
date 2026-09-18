@@ -1,22 +1,43 @@
 #!/usr/bin/env python3
 """Distribution hygiene check, not a complete privacy/security/legal certification.
 Checks local docs/catalog paths, archives/caches/font files, and likely secrets/home paths.
+In a git work tree the distribution is the tracked-file set, so .git and local
+caches/venvs never fail the audit; plain directories are walked with .git skipped.
 Use --manifest to write a hash inventory after review; no files are deleted.
 """
 from pathlib import Path
-import argparse,hashlib,json,re,sys
+import argparse,hashlib,json,re,subprocess,sys
 BLOCK_DIRS={'node_modules','.venv','__pycache__','.git','.studio-review','.slide-studio-cache'}
 BLOCK_EXT={'.woff','.woff2','.ttf','.otf','.eot','.pyc','.zip','.log'}
 SECRET=re.compile(r'-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----|\b(?:ghp|github_pat)_[A-Za-z0-9_]{20,}|\bsk-[A-Za-z0-9_-]{24,}')
 HOME=re.compile(r'(?:/Users/[^/\s]+/|/home/(?!USER/|user/)[^/\s]+/|[A-Z]:\\Users\\[^\\\s]+\\)')
+def list_files(root):
+ if (root/'.git').is_dir():
+  try:
+   out=subprocess.run(['git','-C',str(root),'ls-files','-z'],capture_output=True,check=True).stdout
+   return sorted(root/p for p in out.decode('utf-8').split('\0') if p),True
+  except Exception:pass
+ return sorted(p for p in root.rglob('*') if not p.is_dir() and '.git' not in p.relative_to(root).parts),False
 def audit(root):
  root=Path(root).resolve();issues=[];warnings=[];inventory=[]
- for p in sorted(root.rglob('*')):
+ files,from_git=list_files(root)
+ flagged=set()
+ if not from_git:
+  for p in sorted(root.rglob('*')):
+   if '.git' in p.relative_to(root).parts:continue
+   if p.is_dir() and p.name in BLOCK_DIRS:
+    parts=p.relative_to(root).parts
+    if not any(part in BLOCK_DIRS for part in parts[:-1]):
+     flagged.add(p.relative_to(root).as_posix());issues.append({'file':p.relative_to(root).as_posix(),'problem':'Excluded cache/dependency directory'})
+ for p in files:
   rel=p.relative_to(root).as_posix()
-  if p.is_symlink():issues.append({'file':rel,'problem':'Symlink not allowed in distribution'});continue
-  if p.is_dir():
-   if p.name in BLOCK_DIRS:issues.append({'file':rel,'problem':'Excluded cache/dependency directory'})
+  parts=p.relative_to(root).parts
+  if any(part in BLOCK_DIRS for part in parts[:-1]):
+   if from_git:
+    d=parts[0]
+    if d not in flagged:flagged.add(d);issues.append({'file':d,'problem':'Excluded cache/dependency directory'})
    continue
+  if p.is_symlink():issues.append({'file':rel,'problem':'Symlink not allowed in distribution'});continue
   if p.suffix.lower() in BLOCK_EXT:issues.append({'file':rel,'problem':'Unwanted build/cache/font/archive file'})
   data=p.read_bytes()
   if rel!='MANIFEST.json':inventory.append({'path':rel,'bytes':len(data),'sha256':hashlib.sha256(data).hexdigest()})

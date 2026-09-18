@@ -152,7 +152,7 @@ body.overview .slide{display:block;transform-origin:top left;transform:scale(var
 </script><script>/* Geometry-only offline mesh inspection. Real vertices/triangles, not a mock 3D image.
  * OBJ groups retained; materials/textures deliberately ignored. Canvas painter sorting
  * is a lightweight teaching renderer, not a precision CAD kernel or full Z-buffer.
- * For production GLB use the optional model-viewer adapter described in media-3d.md. */
+ * For production GLB use the optional model-viewer adapter described in motion-and-interaction.md. */
 (()=>{'use strict';
 const finite=v=>Number.isFinite(v),MAX=40000;
 function validate(mesh){if(!mesh.vertices.length||!mesh.faces.length)throw Error('No triangle mesh found');if(mesh.faces.length>MAX)throw Error('Mesh exceeds 40,000 triangles; simplify before presenting');if(mesh.vertices.some(v=>v.length!==3||v.some(x=>!finite(x))))throw Error('Invalid vertex');if(mesh.faces.some(f=>f.indices.some(i=>!Number.isInteger(i)||i<0||i>=mesh.vertices.length)))throw Error('Face index outside vertex array');return mesh}

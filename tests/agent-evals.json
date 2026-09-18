@@ -21,7 +21,7 @@
         "evidence/claim record",
         "compact QA record"
       ],
-      "scorecard": "references/evaluation.md",
+      "scorecard": "references/verification-and-delivery.md",
       "status": "not executed with external AI models"
     },
     {
@@ -34,7 +34,7 @@
         "evidence/claim record",
         "compact QA record"
       ],
-      "scorecard": "references/evaluation.md",
+      "scorecard": "references/verification-and-delivery.md",
       "status": "not executed with external AI models"
     },
     {
@@ -47,7 +47,7 @@
         "evidence/claim record",
         "compact QA record"
       ],
-      "scorecard": "references/evaluation.md",
+      "scorecard": "references/verification-and-delivery.md",
       "status": "not executed with external AI models"
     },
     {
@@ -60,7 +60,7 @@
         "evidence/claim record",
         "compact QA record"
       ],
-      "scorecard": "references/evaluation.md",
+      "scorecard": "references/verification-and-delivery.md",
       "status": "not executed with external AI models"
     },
     {
@@ -73,7 +73,7 @@
         "evidence/claim record",
         "compact QA record"
       ],
-      "scorecard": "references/evaluation.md",
+      "scorecard": "references/verification-and-delivery.md",
       "status": "not executed with external AI models"
     },
     {
@@ -86,7 +86,7 @@
         "evidence/claim record",
         "compact QA record"
       ],
-      "scorecard": "references/evaluation.md",
+      "scorecard": "references/verification-and-delivery.md",
       "status": "not executed with external AI models"
     },
     {
@@ -99,7 +99,7 @@
         "evidence/claim record",
         "compact QA record"
       ],
-      "scorecard": "references/evaluation.md",
+      "scorecard": "references/verification-and-delivery.md",
       "status": "not executed with external AI models"
     },
     {
@@ -112,7 +112,7 @@
         "evidence/claim record",
         "compact QA record"
       ],
-      "scorecard": "references/evaluation.md",
+      "scorecard": "references/verification-and-delivery.md",
       "status": "not executed with external AI models"
     },
     {
@@ -125,7 +125,7 @@
         "evidence/claim record",
         "compact QA record"
       ],
-      "scorecard": "references/evaluation.md",
+      "scorecard": "references/verification-and-delivery.md",
       "status": "not executed with external AI models"
     },
     {
@@ -138,7 +138,7 @@
         "evidence/claim record",
         "compact QA record"
       ],
-      "scorecard": "references/evaluation.md",
+      "scorecard": "references/verification-and-delivery.md",
       "status": "not executed with external AI models"
     },
     {
@@ -151,7 +151,7 @@
         "evidence/claim record",
         "compact QA record"
       ],
-      "scorecard": "references/evaluation.md",
+      "scorecard": "references/verification-and-delivery.md",
       "status": "not executed with external AI models"
     },
     {
@@ -164,7 +164,7 @@
         "evidence/claim record",
         "compact QA record"
       ],
-      "scorecard": "references/evaluation.md",
+      "scorecard": "references/verification-and-delivery.md",
       "status": "not executed with external AI models"
     }
   ]

@@ -1,5 +1,19 @@
 # Changelog
 
+## Unreleased
+
+- Merged 36 reference guides into 9 (writing, authoring, evidence, design,
+  motion, verification, repair, brand, working agreements). All rules, steps,
+  commands, and code blocks preserved; SKILL.md routing table rewritten.
+- Compressed the SKILL.md description for cheaper, more precise skill triggers.
+- Documented host capability tiers (no-execution / stdlib-only / pip+Chromium /
+  npm native) so limited environments skip QA steps honestly instead of faking them.
+- `audit.py` now treats the git-tracked set as the distribution; `.git` and local
+  caches no longer fail the audit, and MANIFEST regeneration works in a checkout.
+- Added CI (Node 20/22 tests, Python unit tests, gallery and MANIFEST freshness).
+- Declared the missing `lxml` dependency in `requirements.txt`.
+- `gallery/*.html` documented as generated output; CI enforces a fresh build.
+
 ## 3.4.0 — 2026-09-07
 
 - Shared dependency-free structural CSS preflight in the build and rendered QA routes.

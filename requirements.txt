@@ -5,3 +5,6 @@ python-pptx==1.0.2
 
 # PDF postflight (text coverage, font inventory, page count); no font binaries.
 pypdf==5.9.0
+
+# Native template post-processing (brand-template.py) and its tests.
+lxml==6.1.3

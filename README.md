@@ -32,7 +32,7 @@ material; the agent may transform or ignore them.
 - Research explanations, physical diagrams, every meaningful control choice, source
   image crops and bounded tool recovery now have concrete review steps.
 
-Read [rendered integrity](references/rendered-integrity.md) for exact boundaries.
+Read [rendered integrity](references/verification-and-delivery.md) for exact boundaries.
 Warnings are not style bans; gradients, expressive compositions and dense references
 remain available. Automatic checks cannot authenticate sources or approve aesthetics.
 Observed tests and untested areas are in [verification](VERIFICATION.md). No fresh
@@ -44,9 +44,9 @@ Version 3.3 strengthened **copy, density, truthful diagrams and PDF typography**
 than asking the agent to imitate more decoration. A plausible headline is not evidence.
 An automated rendering pass is not a design approval.
 
-Read [editorial pass](references/editorial-pass.md), [density and rhythm](references/density-and-rhythm.md),
-[numbers and diagram truth](references/numbers-and-diagram-truth.md), and
-[PDF typography](references/pdf-typography.md) when relevant. The new material includes:
+Read [editorial pass](references/writing-and-editing.md), [density and rhythm](references/writing-and-editing.md),
+[numbers and diagram truth](references/evidence-and-diagrams.md), and
+[PDF typography](references/verification-and-delivery.md) when relevant. The new material includes:
 
 - **12 before/after pairs** ([repair lab](gallery/repair-lab.html)), with editable code
   and intentionally wrong BEFORE pages. These are teaching cases, not audience decks.
@@ -86,7 +86,7 @@ references relevant to the current job; do not load the entire library into cont
 
 Copy the **entire `slide-studio` folder** into the skill directory supported by your
 agent. For example `.agents/skills/slide-studio/` or `.claude/skills/slide-studio/`.
-See [portability](references/portability.md) for scope and current primary references.
+See [portability](references/working-agreements.md) for scope and current primary references.
 The host must have local file/code tools to execute production commands. A chat-only
 model can read the instructions but cannot run tools it does not have.
 
@@ -115,7 +115,7 @@ node scripts/craft.mjs build ./presentation/deck.mjs --out ./presentation/deck.h
 
 Node 20+ builds dependency-free self-contained HTML. Import helpers from the copied
 `studio-kit.mjs`, or write plain HTML/CSS/SVG. The source module is **trusted code**,
-not a sandbox for untrusted modules. See [authoring](references/creative-authoring.md).
+not a sandbox for untrusted modules. See [authoring](references/authoring.md).
 
 ### Find material without committing to a template
 
@@ -138,7 +138,7 @@ inspected/derived with `scripts/svg-edit.py`. Do not merely change numeric label
 The source and browser checks detect high-confidence stage directions and placeholders.
 They do not ban legitimate scientific terms or judge all prose. A real quotation can
 use an exact, reasoned exception. Gallery mode is for actual workshop material, not
-a shortcut around delivery checks. Read [copy channels](references/copy-channels.md).
+a shortcut around delivery checks. Read [copy channels](references/writing-and-editing.md).
 
 Notes remain readable in ordinary HTML source. Create a shareable copy without them:
 
@@ -162,7 +162,7 @@ files are protected. `--keep failures --max-failures 6` retains a bounded number
 individual failure frames; `--keep all` is explicit. `--review-states` includes all
 states in the same review HTML. Geometry checks do not certify design quality. Space diagnostics reveal large gaps,
 small drawing bounds and line-break issues; they are not an occupancy target. Use
-the [repair clinic](references/repair-clinic.md) rather than adding decorative filler.
+the [repair clinic](references/repair.md) rather than adding decorative filler.
 
 For animated decks, also exercise actual input routes:
 
@@ -191,7 +191,7 @@ node scripts/export-pptx.mjs presentation/native.html presentation/native.pptx -
 HTML supports interaction and motion. PDF and screenshot PPTX are static. Native
 PPTX keeps supported text/shapes editable but **does not translate CSS/WAAPI into
 PowerPoint animations**. A picture-per-slide PPTX is not native editability. See
-[format contracts](references/exports.md). OBJ/STL is mesh inspection, not STEP/CAD
+[format contracts](references/verification-and-delivery.md). OBJ/STL is mesh inspection, not STEP/CAD
 editing. GLB/model-viewer is an optional documented integration, not bundled support.
 
 ### Reuse a company identity or build a native template
@@ -274,7 +274,7 @@ a reviewed project-local contract; do not whitelist every fallback automatically
 
 ```sh
 python scripts/font_audit.py presentation/deck.html > presentation/font-observations.json
-# Create presentation/fonts.json as documented in references/pdf-typography.md.
+# Create presentation/fonts.json as documented in references/verification-and-delivery.md.
 python scripts/export.py presentation/deck.html presentation/deck.pdf \
   --font-contract presentation/fonts.json --require-font-contract
 ```

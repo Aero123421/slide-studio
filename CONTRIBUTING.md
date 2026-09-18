@@ -8,6 +8,10 @@ reset, reduced motion, missing assets and the delivered export.
 
 Never commit personal project data, credentials, local home paths, generated QA
 frames, node_modules, virtual environments or font binaries. Run the audit and tests.
+`gallery/*.html` is generated from `assets/` and `examples/` via
+`npm run build:galleries`; do not hand-edit it. `MANIFEST.json` is generated via
+`python scripts/audit.py . --manifest`; refresh it after touching release files.
+CI fails when either differs from a fresh build.
 Rights for borrowed media must be clear; do not silently relicense an upstream asset.
 No telemetry or external service should become required without explicit design review.
 

@@ -1,0 +1,17 @@
+// Original editable study. Read notes for purpose, modifications, and invariants.
+// Asset placeholders are embedded by scripts/craft-core.mjs. Change content and geometry freely.
+export default {
+  study: true,
+  "id": "dependency-dag",
+  "title": "Dependency graph",
+  "notes": "Purpose: Distinguish parallel and dependent work\nModify: Rewrite labels, recompute geometry from source data, adapt framing and orientation.\nInvariant: Do not add cycles or change dependency endpoints while beautifying.\nStatic: Already static; preserve semantic labels and readable strokes.",
+  "sources": [
+    {
+      "type": "original-example",
+      "file": "assets/svg/dependency-dag.svg"
+    }
+  ],
+  "exportPolicy": "final",
+  "className": "",
+  "content": "<h1 class=\"g-title\">Dependency graph</h1><p class=\"g-purpose\">Distinguish parallel and dependent work</p><div class=\"g-demo\"><svg aria-labelledby=\"g-dependency-dag-dependency-dag-title g-dependency-dag-dependency-dag-desc\" role=\"img\" viewbox=\"0 0 800 440\" xmlns=\"http://www.w3.org/2000/svg\"><title id=\"g-dependency-dag-dependency-dag-title\">Dependency graph</title><desc id=\"g-dependency-dag-dependency-dag-desc\">Distinguish parallel and dependent work. Original schematic. Values are illustrative, not measured.</desc><g data-part=\"drawing\"><rect fill=\"#ffffff\" height=\"56\" rx=\"6\" stroke=\"#17252d\" stroke-width=\"2\" width=\"120\" x=\"70\" y=\"195\"></rect><text fill=\"#17252d\" font-family=\"Arial, sans-serif\" font-size=\"18\" text-anchor=\"middle\" x=\"130.0\" y=\"229.0\">Start</text><rect fill=\"#ffffff\" height=\"56\" rx=\"6\" stroke=\"#17252d\" stroke-width=\"2\" width=\"120\" x=\"300\" y=\"80\"></rect><text fill=\"#17252d\" font-family=\"Arial, sans-serif\" font-size=\"18\" text-anchor=\"middle\" x=\"360.0\" y=\"114.0\">A</text><rect fill=\"#ffffff\" height=\"56\" rx=\"6\" stroke=\"#17252d\" stroke-width=\"2\" width=\"120\" x=\"300\" y=\"300\"></rect><text fill=\"#17252d\" font-family=\"Arial, sans-serif\" font-size=\"18\" text-anchor=\"middle\" x=\"360.0\" y=\"334.0\">B</text><rect fill=\"#ffffff\" height=\"56\" rx=\"6\" stroke=\"#17252d\" stroke-width=\"2\" width=\"120\" x=\"585\" y=\"195\"></rect><text fill=\"#17252d\" font-family=\"Arial, sans-serif\" font-size=\"18\" text-anchor=\"middle\" x=\"645.0\" y=\"229.0\">Join</text><path d=\"M190 223H245V108H294M245 223V328H294M420 108H515V223H579M420 328H515V223\" fill=\"none\" stroke=\"#28617b\" stroke-width=\"3\"></path></g></svg>\n</div><div class=\"g-footer\">Original instructional study · schematic / synthetic content <code>assets/svg/dependency-dag.svg</code></div>"
+};

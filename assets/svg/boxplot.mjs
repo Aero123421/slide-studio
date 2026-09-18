@@ -1,0 +1,17 @@
+// Original editable study. Read notes for purpose, modifications, and invariants.
+// Asset placeholders are embedded by scripts/craft-core.mjs. Change content and geometry freely.
+export default {
+  study: true,
+  "id": "boxplot",
+  "title": "Quartiles and spread",
+  "notes": "Purpose: Summarize median, interquartile range and whiskers\nModify: Rewrite labels, recompute geometry from source data, adapt framing and orientation.\nInvariant: Declare whisker convention and treatment of outliers.\nStatic: Already static; preserve semantic labels and readable strokes.",
+  "sources": [
+    {
+      "type": "original-example",
+      "file": "assets/svg/boxplot.svg"
+    }
+  ],
+  "exportPolicy": "final",
+  "className": "",
+  "content": "<h1 class=\"g-title\">Quartiles and spread</h1><p class=\"g-purpose\">Summarize median, interquartile range and whiskers</p><div class=\"g-demo\"><svg aria-labelledby=\"g-boxplot-boxplot-title g-boxplot-boxplot-desc\" role=\"img\" viewbox=\"0 0 800 440\" xmlns=\"http://www.w3.org/2000/svg\"><title id=\"g-boxplot-boxplot-title\">Quartiles and spread</title><desc id=\"g-boxplot-boxplot-desc\">Summarize median, interquartile range and whiskers. Original schematic. Values are illustrative, not measured.</desc><g data-part=\"drawing\"><text fill=\"#17252d\" font-family=\"Arial, sans-serif\" font-size=\"20\" text-anchor=\"start\" x=\"70\" y=\"128\">A</text><line stroke=\"#718594\" stroke-width=\"3\" x1=\"170\" x2=\"650\" y1=\"120\" y2=\"120\"></line><line stroke=\"#17252d\" stroke-width=\"2\" x1=\"170\" x2=\"170\" y1=\"98\" y2=\"142\"></line><rect fill=\"#dce6e8\" height=\"56\" rx=\"0\" stroke=\"#28617b\" stroke-width=\"2\" width=\"190\" x=\"290\" y=\"92\"></rect><line stroke=\"#ae4f31\" stroke-width=\"4\" x1=\"380\" x2=\"380\" y1=\"92\" y2=\"148\"></line><line stroke=\"#17252d\" stroke-width=\"2\" x1=\"650\" x2=\"650\" y1=\"98\" y2=\"142\"></line><text fill=\"#17252d\" font-family=\"Arial, sans-serif\" font-size=\"20\" text-anchor=\"start\" x=\"70\" y=\"218\">B</text><line stroke=\"#718594\" stroke-width=\"3\" x1=\"170\" x2=\"605\" y1=\"210\" y2=\"210\"></line><line stroke=\"#17252d\" stroke-width=\"2\" x1=\"170\" x2=\"170\" y1=\"188\" y2=\"232\"></line><rect fill=\"#dce6e8\" height=\"56\" rx=\"0\" stroke=\"#28617b\" stroke-width=\"2\" width=\"165\" x=\"315\" y=\"182\"></rect><line stroke=\"#ae4f31\" stroke-width=\"4\" x1=\"390\" x2=\"390\" y1=\"182\" y2=\"238\"></line><line stroke=\"#17252d\" stroke-width=\"2\" x1=\"605\" x2=\"605\" y1=\"188\" y2=\"232\"></line><text fill=\"#17252d\" font-family=\"Arial, sans-serif\" font-size=\"20\" text-anchor=\"start\" x=\"70\" y=\"308\">C</text><line stroke=\"#718594\" stroke-width=\"3\" x1=\"170\" x2=\"560\" y1=\"300\" y2=\"300\"></line><line stroke=\"#17252d\" stroke-width=\"2\" x1=\"170\" x2=\"170\" y1=\"278\" y2=\"322\"></line><rect fill=\"#dce6e8\" height=\"56\" rx=\"0\" stroke=\"#28617b\" stroke-width=\"2\" width=\"140\" x=\"340\" y=\"272\"></rect><line stroke=\"#ae4f31\" stroke-width=\"4\" x1=\"400\" x2=\"400\" y1=\"272\" y2=\"328\"></line><line stroke=\"#17252d\" stroke-width=\"2\" x1=\"560\" x2=\"560\" y1=\"278\" y2=\"322\"></line></g></svg>\n</div><div class=\"g-footer\">Original instructional study · schematic / synthetic content <code>assets/svg/boxplot.svg</code></div>"
+};

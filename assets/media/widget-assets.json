@@ -1,0 +1,26 @@
+{
+  "photo": {
+    "file": "photo.jpg",
+    "mime": "image/jpeg"
+  },
+  "video": {
+    "file": "video.webm",
+    "mime": "video/webm"
+  },
+  "poster": {
+    "file": "poster.svg",
+    "mime": "image/svg+xml"
+  },
+  "captions": {
+    "file": "captions.vtt",
+    "mime": "text/vtt"
+  },
+  "audio": {
+    "file": "audio.wav",
+    "mime": "audio/wav"
+  },
+  "obj": {
+    "file": "obj.obj",
+    "text": true
+  }
+}

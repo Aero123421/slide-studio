@@ -1,0 +1,12 @@
+{
+  "name": "Casual / 勉強会",
+  "paper": "#FFFAF2",
+  "ink": "#272B35",
+  "accent": "#BF472A",
+  "secondary": "#587793",
+  "font": "Noto Sans CJK JP",
+  "headingFont": "Noto Sans CJK JP",
+  "radius": 18,
+  "titleSize": 48,
+  "bodySize": 26
+}

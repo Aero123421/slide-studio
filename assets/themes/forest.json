@@ -1,0 +1,12 @@
+{
+  "name": "Forest / 方針",
+  "paper": "#F7FAF8",
+  "ink": "#18382B",
+  "accent": "#216D4B",
+  "secondary": "#718C7D",
+  "font": "Noto Sans CJK JP",
+  "headingFont": "Noto Serif CJK JP",
+  "radius": 0,
+  "titleSize": 48,
+  "bodySize": 24
+}

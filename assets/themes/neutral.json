@@ -1,0 +1,12 @@
+{
+  "name": "Neutral / 経営報告",
+  "paper": "#FFFFFF",
+  "ink": "#19232D",
+  "accent": "#2057BC",
+  "secondary": "#647A94",
+  "font": "Noto Sans CJK JP",
+  "headingFont": "Noto Sans CJK JP",
+  "radius": 0,
+  "titleSize": 48,
+  "bodySize": 24
+}

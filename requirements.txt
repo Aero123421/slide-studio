@@ -1,0 +1,7 @@
+# Versions used for release verification; install into a local virtual environment.
+playwright==1.57.0
+Pillow==12.3.0
+python-pptx==1.0.2
+
+# PDF postflight (text coverage, font inventory, page count); no font binaries.
+pypdf==5.9.0

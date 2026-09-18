@@ -1,0 +1,17 @@
+// Original editable study. Read notes for purpose, modifications, and invariants.
+// Asset placeholders are embedded by scripts/craft-core.mjs. Change content and geometry freely.
+export default {
+  study: true,
+  "id": "histogram",
+  "title": "Frequency distribution",
+  "notes": "Purpose: Show a binned numeric distribution\nModify: Rewrite labels, recompute geometry from source data, adapt framing and orientation.\nInvariant: Equal-width bins unless explicitly density-normalized; disclose binning.\nStatic: Already static; preserve semantic labels and readable strokes.",
+  "sources": [
+    {
+      "type": "original-example",
+      "file": "assets/svg/histogram.svg"
+    }
+  ],
+  "exportPolicy": "final",
+  "className": "",
+  "content": "<h1 class=\"g-title\">Frequency distribution</h1><p class=\"g-purpose\">Show a binned numeric distribution</p><div class=\"g-demo\"><svg aria-labelledby=\"g-histogram-histogram-title g-histogram-histogram-desc\" role=\"img\" viewbox=\"0 0 800 440\" xmlns=\"http://www.w3.org/2000/svg\"><title id=\"g-histogram-histogram-title\">Frequency distribution</title><desc id=\"g-histogram-histogram-desc\">Show a binned numeric distribution. Original schematic. Values are illustrative, not measured.</desc><g data-part=\"drawing\"><line stroke=\"#17252d\" stroke-width=\"2\" x1=\"90\" x2=\"720\" y1=\"350\" y2=\"350\"></line><line stroke=\"#17252d\" stroke-width=\"2\" x1=\"90\" x2=\"90\" y1=\"70\" y2=\"350\"></line><rect fill=\"#28617b\" height=\"35\" rx=\"0\" stroke=\"none\" stroke-width=\"2\" width=\"51\" x=\"110\" y=\"315\"></rect><rect fill=\"#28617b\" height=\"60\" rx=\"0\" stroke=\"none\" stroke-width=\"2\" width=\"51\" x=\"168\" y=\"290\"></rect><rect fill=\"#28617b\" height=\"115\" rx=\"0\" stroke=\"none\" stroke-width=\"2\" width=\"51\" x=\"226\" y=\"235\"></rect><rect fill=\"#28617b\" height=\"185\" rx=\"0\" stroke=\"none\" stroke-width=\"2\" width=\"51\" x=\"284\" y=\"165\"></rect><rect fill=\"#28617b\" height=\"230\" rx=\"0\" stroke=\"none\" stroke-width=\"2\" width=\"51\" x=\"342\" y=\"120\"></rect><rect fill=\"#28617b\" height=\"245\" rx=\"0\" stroke=\"none\" stroke-width=\"2\" width=\"51\" x=\"400\" y=\"105\"></rect><rect fill=\"#28617b\" height=\"190\" rx=\"0\" stroke=\"none\" stroke-width=\"2\" width=\"51\" x=\"458\" y=\"160\"></rect><rect fill=\"#28617b\" height=\"120\" rx=\"0\" stroke=\"none\" stroke-width=\"2\" width=\"51\" x=\"516\" y=\"230\"></rect><rect fill=\"#28617b\" height=\"60\" rx=\"0\" stroke=\"none\" stroke-width=\"2\" width=\"51\" x=\"574\" y=\"290\"></rect><rect fill=\"#28617b\" height=\"25\" rx=\"0\" stroke=\"none\" stroke-width=\"2\" width=\"51\" x=\"632\" y=\"325\"></rect></g></svg>\n</div><div class=\"g-footer\">Original instructional study · schematic / synthetic content <code>assets/svg/histogram.svg</code></div>"
+};

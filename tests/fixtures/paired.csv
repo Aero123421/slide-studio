@@ -1,0 +1,7 @@
+sample,label,before,after,unit
+1,Condition A,10,11,units
+2,Condition B,12,13,units
+3,Condition C,8,8.5,units
+4,Condition D,14,13,units
+5,Condition E,11,12,units
+6,Missing-after condition,9,,units

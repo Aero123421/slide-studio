@@ -1,0 +1,12 @@
+{
+  "name": "Indigo / 提案",
+  "paper": "#FCFCFF",
+  "ink": "#222541",
+  "accent": "#4D49B9",
+  "secondary": "#887EAA",
+  "font": "Noto Sans CJK JP",
+  "headingFont": "Noto Sans CJK JP",
+  "radius": 6,
+  "titleSize": 48,
+  "bodySize": 24
+}

@@ -1,0 +1,49 @@
+{
+  "version": 2,
+  "rules": [
+    {
+      "id": "ja-stage-direction",
+      "level": "error",
+      "pattern": "(?:学会|口頭|研究)?発表(?:時|中)(?:に|で|は)?[ 　]*(?:切[り]?替[え]?|切替|クリック|再生|操作)|ここで(?:クリック|切[り]?替[え]?|動画を再生)|(?:要差し替え|後で修正|仮置きのまま)"
+    },
+    {
+      "id": "en-stage-direction",
+      "level": "error",
+      "pattern": "\\b(?:switch|click|play|toggle) (?:here|during (?:the )?(?:conference|presentation|talk))\\b|\\b(?:replace this (?:text|title|image)|insert (?:your )?(?:title|content) here|speaker cue:)",
+      "flags": "i"
+    },
+    {
+      "id": "placeholder",
+      "level": "error",
+      "pattern": "\\b(?:Lorem ipsum|TODO|FIXME|TBD)\\b|(?:ここにタイトル|ここに本文|テキストを入力)",
+      "flags": "i"
+    },
+    {
+      "id": "ja-empty-claim",
+      "level": "warning",
+      "pattern": "(?:さらなる価値提供|革新的なソリューション|未来を切り拓く|シームレスな体験|圧倒的な価値)"
+    },
+    {
+      "id": "en-empty-claim",
+      "level": "warning",
+      "pattern": "\\b(?:unlock (?:the )?(?:full )?potential|revolutionary solution|seamless experience|game-changing|transform the future)\\b",
+      "flags": "i"
+    },
+    {
+      "id": "ja-export-production-cue",
+      "level": "error",
+      "pattern": "配布用メモ[：:]|(?:印刷[・／/]PDF|印刷・PDF|PDF・印刷)(?:では|時は)[^。\\n]{0,60}(?:表示が残|固定され|操作用)|(?:投影時|発表時)の操作用"
+    },
+    {
+      "id": "en-export-production-cue",
+      "level": "error",
+      "pattern": "\\b(?:presenter-only cue|production note|export-only instruction)\\s*:",
+      "flags": "i"
+    },
+    {
+      "id": "ja-performed-sincerity",
+      "level": "warning",
+      "pattern": "正直に(?:言います|お知らせ|お伝え)|本当の価値|価値を紡ぐ"
+    }
+  ]
+}

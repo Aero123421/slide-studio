@@ -1,0 +1,28 @@
+#!/usr/bin/env node
+/** Local brand tokens -> validation, CSS or six contrasting proof pages. */
+import fs from 'node:fs/promises';import path from 'node:path';
+import {validateBrand,brandCSS} from './brand-core.mjs';import {renderCraft} from './craft-core.mjs';
+const args=process.argv.slice(2),cmd=args.shift(),get=k=>{const i=args.indexOf(k);return i<0?undefined:args[i+1]};
+export function proofDeck(brand){
+ const sx=brand.canvas.width/1280,sy=brand.canvas.height/720;
+ const box=(x,y,w,h,body,role='primary')=>`<div data-region="${role}" style="position:absolute;left:${x*sx}px;top:${y*sy}px;width:${w*sx}px;height:${h*sy}px">${body}</div>`;
+ const title=t=>`<h1 data-region="title">${t}</h1>`;
+ const note=t=>`<p class="proof-source" data-region="source">${t}</p>`;
+ const bars=`<svg viewBox="0 0 760 300" role="img" aria-label="Illustrative values: A 42, B 66"><line x1="65" x2="725" y1="250" y2="250" stroke="var(--brand-line)"/>${[42,66].map((v,i)=>`<text x="10" y="${82+i*115}" font-size="24">${i?'B':'A'}</text><rect x="65" y="${45+i*115}" width="${v*8}" height="55" fill="var(--brand-accent)"/><text x="${83+v*8}" y="${82+i*115}" font-size="26">${v}</text>`).join('')}</svg>`;
+ return {title:'Identity proof',language:'en',mode:'workshop',brand,sample:true,draft:brand.status!=='approved',
+ css:`.slide{padding:${brand.spacing.margin}px}h1{font:var(--brand-heading-size)/var(--brand-heading-leading) var(--brand-heading-font);max-width:${brand.canvas.width-brand.spacing.margin*2}px;letter-spacing:-1px}h2{font:38px/1.2 var(--brand-heading-font)}p,li{font:var(--brand-body-size)/var(--brand-body-leading) var(--brand-body-font)}svg text{fill:var(--brand-text);font-family:var(--brand-body-font)}.proof-source{position:absolute;left:64px;bottom:35px;max-width:${brand.canvas.width-brand.spacing.margin*2}px;font:18px/1.35 var(--brand-caption-font);color:var(--brand-muted)}table{border-collapse:collapse;width:100%;font:26px/1.4 var(--brand-body-font)}td,th{padding:18px;text-align:left;border-bottom:1px solid var(--brand-line)}.large{font-size:76px;line-height:1.1;max-width:1030px}`,
+ slides:[
+ {id:'identity-opening',title:'A claim with room to breathe',content:box(80,185,1080,320,'<h1 class="large">Make the evidence<br>easy to compare.</h1><p style="margin-top:38px">A coherent identity does not require identical pages.</p>')+note('Fictional identity proof. No real organization or experimental result.')},
+ {id:'identity-evidence',title:'Compare on one shared scale',content:title('Compare on one shared scale')+box(64,215,820,350,bars)+box(936,235,280,300,'<h2>24 units</h2><p style="margin-top:22px">The absolute difference in this illustrative pair.</p>','support')+note('Illustrative values; a visual proportion test, not a measured finding.')},
+ {id:'identity-comparison',title:'One question, two alternatives',content:title('One question, two alternatives')+box(64,225,530,350,'<h2>Keep context</h2><p style="margin-top:32px">Preserve the same axis and source conditions in both views.</p>')+box(664,225,550,350,'<h2>Isolate change</h2><p style="margin-top:32px">Highlight only the variable the audience needs to compare.</p>','support')+note('Matched type roles and alignment; different content remains visible.')},
+ {id:'identity-image',title:'A subject can define the composition',content:title('A subject can define the composition')+box(64,210,760,380,'<svg viewBox="0 0 760 380" role="img" aria-label="Original abstract illustration"><path d="M35 330 L290 50 L490 255 L680 100 L725 330Z" fill="var(--brand-accent)"/><circle cx="582" cy="76" r="46" fill="var(--brand-surface)"/></svg>')+box(900,225,310,330,'<p>Leave the subject intact.</p><p style="margin-top:30px">Place the explanation beside the feature it describes.</p>','support')+note('Original illustration; substitute an authorized photograph when it is the evidence.')},
+ {id:'identity-dense',title:'Details stay readable when the grid does the work',content:title('Details stay readable when the grid does the work')+box(64,225,1152,330,'<table><thead><tr><th>Condition</th><th>Observation</th><th>Scope</th></tr></thead><tbody><tr><td>Matched input</td><td>Same baseline</td><td>Controlled comparison</td></tr><tr><td>Changed input</td><td>Recompute output</td><td>Keep the denominator</td></tr><tr><td>Unknown input</td><td>Report missingness</td><td>Do not substitute zero</td></tr></tbody></table>')+note('Fictional content used to test dense-page typography.')},
+ {id:'identity-close',title:'The next test follows from the uncertainty',content:box(110,210,1040,340,'<h1 class="large" style="font-size:68px">The next test follows<br>from the uncertainty.</h1><p style="margin-top:36px">Preserve what is known. Name what remains unresolved.</p>')+note('A quiet closing page is a deliberate change of pace.')}
+ ]};
+}
+if(process.argv[1]?.endsWith('brand.mjs'))try{
+ if(!args[0]||!['validate','css','proof'].includes(cmd))throw Error('brand.mjs validate|css|proof brand.json [--out FILE] [--allow-draft] [--force]');
+ const b=JSON.parse(await fs.readFile(args[0],'utf8'));validateBrand(b,{allowDraft:args.includes('--allow-draft')});
+ if(cmd==='validate')console.log(JSON.stringify({valid:true,status:b.status}));
+ else {const out=get('--out');if(!out)throw Error('--out required');await fs.mkdir(path.dirname(path.resolve(out)),{recursive:true});const text=cmd==='css'?brandCSS(b):await renderCraft(proofDeck(b),{assetBase:path.dirname(path.resolve(args[0])),allowDraft:args.includes('--allow-draft')});await fs.writeFile(out,text,{flag:args.includes('--force')?'w':'wx'});console.log(out)}
+}catch(e){console.error(e.message);process.exitCode=1}

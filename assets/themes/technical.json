@@ -1,0 +1,12 @@
+{
+  "name": "Technical / 技術解説",
+  "paper": "#FFFFFF",
+  "ink": "#142937",
+  "accent": "#006E87",
+  "secondary": "#617481",
+  "font": "Noto Sans CJK JP",
+  "headingFont": "Noto Sans CJK JP",
+  "radius": 0,
+  "titleSize": 46,
+  "bodySize": 24
+}

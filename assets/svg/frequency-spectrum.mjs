@@ -1,0 +1,17 @@
+// Original editable study. Read notes for purpose, modifications, and invariants.
+// Asset placeholders are embedded by scripts/craft-core.mjs. Change content and geometry freely.
+export default {
+  study: true,
+  "id": "frequency-spectrum",
+  "title": "Frequency spectrum",
+  "notes": "Purpose: Show spectral peaks and background\nModify: Rewrite labels, recompute geometry from source data, adapt framing and orientation.\nInvariant: State frequency units, transform/window and amplitude convention.\nStatic: Already static; preserve semantic labels and readable strokes.",
+  "sources": [
+    {
+      "type": "original-example",
+      "file": "assets/svg/frequency-spectrum.svg"
+    }
+  ],
+  "exportPolicy": "final",
+  "className": "",
+  "content": "<h1 class=\"g-title\">Frequency spectrum</h1><p class=\"g-purpose\">Show spectral peaks and background</p><div class=\"g-demo\"><svg aria-labelledby=\"g-frequency-spectrum-frequency-spectrum-title g-frequency-spectrum-frequency-spectrum-desc\" role=\"img\" viewbox=\"0 0 800 440\" xmlns=\"http://www.w3.org/2000/svg\"><title id=\"g-frequency-spectrum-frequency-spectrum-title\">Frequency spectrum</title><desc id=\"g-frequency-spectrum-frequency-spectrum-desc\">Show spectral peaks and background. Original schematic. Values are illustrative, not measured.</desc><g data-part=\"drawing\"><line stroke=\"#17252d\" stroke-width=\"2\" x1=\"90\" x2=\"720\" y1=\"350\" y2=\"350\"></line><line stroke=\"#17252d\" stroke-width=\"2\" x1=\"90\" x2=\"90\" y1=\"70\" y2=\"350\"></line><polyline fill=\"none\" points=\"100.0,321.0 108.0,314.3 116.0,329.9 124.0,315.8 132.0,319.0 140.0,328.9 148.0,312.5 156.0,324.4 164.0,324.9 172.0,312.3 180.0,328.6 188.0,319.4 196.0,314.7 204.0,327.2 212.0,305.3 220.0,295.1 228.0,272.9 236.0,216.0 244.0,191.5 252.0,173.5 260.0,178.7 268.0,233.1 276.0,262.9 284.0,291.3 292.0,320.5 300.0,310.9 308.0,321.3 316.0,326.9 324.0,312.0 332.0,327.0 340.0,322.0 348.0,313.6 356.0,329.8 364.0,316.7 372.0,318.0 380.0,329.3 388.0,312.9 396.0,323.3 404.0,325.2 412.0,310.4 420.0,323.6 428.0,310.5 436.0,294.7 444.0,295.0 452.0,261.3 460.0,245.5 468.0,239.4 476.0,217.4 484.0,235.6 492.0,250.5 500.0,258.4 508.0,293.9 516.0,299.1 524.0,305.7 532.0,325.5 540.0,312.6 548.0,320.4 556.0,327.6 564.0,312.0 572.0,326.2 580.0,323.1 588.0,313.1 596.0,329.5 604.0,317.6 612.0,317.0 620.0,329.7 628.0,313.4 636.0,322.5 644.0,326.7 652.0,312.0 660.0,327.3 668.0,321.6 676.0,313.9 684.0,329.9 692.0,316.3\" stroke=\"#28617b\" stroke-width=\"3\"></polyline><text fill=\"#17252d\" font-family=\"Arial, sans-serif\" font-size=\"20\" text-anchor=\"end\" x=\"700\" y=\"393\">Frequency</text></g></svg>\n</div><div class=\"g-footer\">Original instructional study · schematic / synthetic content <code>assets/svg/frequency-spectrum.svg</code></div>"
+};

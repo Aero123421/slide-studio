@@ -1,0 +1,12 @@
+{
+  "version": 1, "name": "Example identity", "status": "approved", "fictional": true,
+  "canvas": {"width":1280,"height":720},
+  "colors": {"background":"#F7F5EF","text":"#172B38","muted":"#485E69","accent":"#245B72","line":"#AEBFC4","surface":"#E3EBEB"},
+  "typography": {
+    "heading":{"family":["Arial","Noto Sans"],"size":52,"lineHeight":1.16},
+    "body":{"family":["Arial","Noto Sans"],"size":26,"lineHeight":1.45},
+    "caption":{"family":["Arial","Noto Sans"],"size":18,"lineHeight":1.4}
+  },
+  "spacing":{"margin":64,"gutter":40},
+  "rules":{"immutable":["Use explicit source scope","Preserve numerical scales"],"flexible":["Primary medium","Reading order","Region proportions"]}
+}

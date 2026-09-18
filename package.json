@@ -1,0 +1,22 @@
+{
+  "name": "slide-studio-skill",
+  "version": "3.4.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "build:galleries": "node scripts/build-gallery.mjs && node scripts/build-examples.mjs && node scripts/build-repair-lab.mjs && node scripts/build-index.mjs",
+    "test:browser": "python tests/browser.py",
+    "audit": "python scripts/audit.py .",
+    "test:navigation": "python tests/navigation.py",
+    "test:field": "python tests/field_browser.py",
+    "test:integrity": "python tests/integrity_browser.py"
+  },
+  "devDependencies": {
+    "pptxgenjs": "4.0.0"
+  }
+}

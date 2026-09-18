@@ -1,0 +1,104 @@
+{
+  "version": 1,
+  "title": "再試行を安全にする設計",
+  "language": "ja",
+  "sample": true,
+  "theme": "technical",
+  "slides": [
+    {
+      "layout": "cover",
+      "kicker": "ENGINEERING NOTE",
+      "title": "再試行しても、\n二重に処理しない。",
+      "body": "冪等性キーを使った設計例",
+      "notes": "この作例の数値・状況は架空。実務では検証した情報へ置き換える。"
+    },
+    {
+      "layout": "architecture",
+      "title": "成功したか不明なまま、通信が切れる",
+      "nodes": [
+        {
+          "id": "client",
+          "x": 72,
+          "y": 310,
+          "w": 250,
+          "h": 90,
+          "label": "クライアント"
+        },
+        {
+          "id": "api",
+          "x": 498,
+          "y": 310,
+          "w": 270,
+          "h": 90,
+          "label": "注文API",
+          "accent": true
+        },
+        {
+          "id": "db",
+          "x": 947,
+          "y": 310,
+          "w": 261,
+          "h": 90,
+          "label": "注文DB"
+        }
+      ],
+      "links": [
+        {
+          "from": "client",
+          "to": "api",
+          "label": "POST"
+        },
+        {
+          "from": "api",
+          "to": "db",
+          "label": "保存"
+        }
+      ],
+      "notes": "この作例の数値・状況は架空。実務では検証した情報へ置き換える。"
+    },
+    {
+      "layout": "code",
+      "title": "同じキーには、保存済みの結果を返す",
+      "code": "key = request.idempotency_key\nresult = store.find(key)\n\nif result:\n    return result\n\nreturn create_once(key)",
+      "explanation": "再送でもキーは変えない。\n\n処理結果とキーを同じトランザクションで保存する。",
+      "notes": "この作例の数値・状況は架空。実務では検証した情報へ置き換える。"
+    },
+    {
+      "layout": "table",
+      "title": "同時実行と期限切れも確認する",
+      "columns": [
+        "条件",
+        "期待する結果"
+      ],
+      "widths": [
+        1,
+        2
+      ],
+      "rows": [
+        [
+          "同じキーを再送",
+          "同じ結果を返す"
+        ],
+        [
+          "同じキーで内容が違う",
+          "競合として拒否する"
+        ],
+        [
+          "2件を同時に実行",
+          "作成は1件だけ"
+        ],
+        [
+          "キーの保持期限を過ぎる",
+          "仕様に沿って扱う"
+        ]
+      ],
+      "notes": "この作例の数値・状況は架空。実務では検証した情報へ置き換える。"
+    },
+    {
+      "layout": "closing",
+      "title": "再試行の前に、\n処理の一意性を決める。",
+      "body": "キーの範囲・保存期間・競合時の応答を、API仕様へ書く。",
+      "notes": "この作例の数値・状況は架空。実務では検証した情報へ置き換える。"
+    }
+  ]
+}

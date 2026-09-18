@@ -1,0 +1,17 @@
+// Original editable study. Read notes for purpose, modifications, and invariants.
+// Asset placeholders are embedded by scripts/craft-core.mjs. Change content and geometry freely.
+export default {
+  study: true,
+  "id": "dot-plot",
+  "title": "Position-only comparison",
+  "notes": "Purpose: Compare quantities without filled areas\nModify: Rewrite labels, recompute geometry from source data, adapt framing and orientation.\nInvariant: Do not change scale, labels, relationships or uncertainty silently.\nStatic: Already static; preserve semantic labels and readable strokes.",
+  "sources": [
+    {
+      "type": "original-example",
+      "file": "assets/svg/dot-plot.svg"
+    }
+  ],
+  "exportPolicy": "final",
+  "className": "",
+  "content": "<h1 class=\"g-title\">Position-only comparison</h1><p class=\"g-purpose\">Compare quantities without filled areas</p><div class=\"g-demo\"><svg aria-labelledby=\"g-dot-plot-dot-plot-title g-dot-plot-dot-plot-desc\" role=\"img\" viewbox=\"0 0 800 440\" xmlns=\"http://www.w3.org/2000/svg\"><title id=\"g-dot-plot-dot-plot-title\">Position-only comparison</title><desc id=\"g-dot-plot-dot-plot-desc\">Compare quantities without filled areas. Original schematic. Values are illustrative, not measured.</desc><g data-part=\"drawing\"><line stroke=\"#17252d\" stroke-width=\"2\" x1=\"90\" x2=\"720\" y1=\"350\" y2=\"350\"></line><line stroke=\"#17252d\" stroke-width=\"2\" x1=\"90\" x2=\"90\" y1=\"70\" y2=\"350\"></line><text fill=\"#17252d\" font-family=\"Arial, sans-serif\" font-size=\"19\" text-anchor=\"end\" x=\"72\" y=\"112\">A</text><line stroke=\"#dce6e8\" stroke-width=\"2\" x1=\"100\" x2=\"700\" y1=\"105\" y2=\"105\"></line><circle cx=\"430\" cy=\"105\" fill=\"#28617b\" r=\"11\"></circle><text fill=\"#17252d\" font-family=\"Arial, sans-serif\" font-size=\"19\" text-anchor=\"end\" x=\"72\" y=\"182\">B</text><line stroke=\"#dce6e8\" stroke-width=\"2\" x1=\"100\" x2=\"700\" y1=\"175\" y2=\"175\"></line><circle cx=\"630\" cy=\"175\" fill=\"#28617b\" r=\"11\"></circle><text fill=\"#17252d\" font-family=\"Arial, sans-serif\" font-size=\"19\" text-anchor=\"end\" x=\"72\" y=\"252\">C</text><line stroke=\"#dce6e8\" stroke-width=\"2\" x1=\"100\" x2=\"700\" y1=\"245\" y2=\"245\"></line><circle cx=\"300\" cy=\"245\" fill=\"#28617b\" r=\"11\"></circle><text fill=\"#17252d\" font-family=\"Arial, sans-serif\" font-size=\"19\" text-anchor=\"end\" x=\"72\" y=\"322\">D</text><line stroke=\"#dce6e8\" stroke-width=\"2\" x1=\"100\" x2=\"700\" y1=\"315\" y2=\"315\"></line><circle cx=\"510\" cy=\"315\" fill=\"#28617b\" r=\"11\"></circle></g></svg>\n</div><div class=\"g-footer\">Original instructional study · schematic / synthetic content <code>assets/svg/dot-plot.svg</code></div>"
+};

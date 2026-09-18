@@ -1,0 +1,148 @@
+<!doctype html><html lang="en" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="generator" content="Slide Studio 3.4.0"><title>Identity proof</title><style>/* Infrastructure only. Composition, typography and image use belong to the author. */
+:root{--studio-w:1280px;--studio-h:720px;--studio-scale:1;--studio-bar:52px;color-scheme:light}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:Arial,'Noto Sans',sans-serif}body{background:#181b20;color:#17252d}
+.studio-stage{position:fixed;inset:0 0 var(--studio-bar);display:grid;place-items:center;overflow:hidden}
+.slide{position:absolute;display:none;width:var(--studio-w);height:var(--studio-h);overflow:hidden;background:white;transform:scale(var(--studio-scale));transform-origin:center}
+.slide.is-current{display:block}.slide h1,.slide h2,.slide h3,.slide p,.slide figure{margin:0}.slide img,.slide svg,.slide video,.slide canvas{max-width:100%}
+[data-studio-hidden="true"]{visibility:hidden!important;pointer-events:none!important}[data-motion],[data-states]{transform-box:fill-box}
+.studio-controls{position:fixed;inset:auto 0 0;min-height:52px;padding:8px 12px;display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;background:#12171e;color:#fff;z-index:100;font:14px/1.2 Arial,sans-serif;direction:ltr}
+.studio-controls button,.studio-controls select{background:transparent;color:inherit;border:1px solid #8996a3;border-radius:3px;padding:6px 10px;font:inherit;cursor:pointer}
+.studio-controls option{color:#17252d;background:white}.studio-controls button:disabled{opacity:.4;cursor:default}.studio-controls button:hover:not(:disabled){background:#344355}
+:focus-visible{outline:3px solid #d28b13;outline-offset:4px}.studio-position{min-width:110px;text-align:center}
+.studio-notes{display:none;position:fixed;inset:auto 16px 70px auto;max-height:65vh;width:min(560px,calc(100vw - 32px));background:#fff;color:#1c2730;padding:26px;overflow:auto;white-space:pre-wrap;z-index:120;font:17px/1.6 sans-serif;border:1px solid #687985}
+.studio-notes.open{display:block}.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(100%)}
+[data-static="show"]{display:none!important}body[data-export="true"] [data-static="hide"]{display:none!important}body[data-export="true"] [data-static="show"]{display:revert!important;visibility:visible!important}
+body[data-export="true"] *{animation:none!important;transition:none!important;caret-color:transparent!important}
+body.overview .studio-stage{position:relative;inset:auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:22px;padding:24px 24px 100px;overflow:visible}
+.studio-thumb{position:relative;aspect-ratio:var(--studio-ratio);overflow:hidden;border:2px solid #8c99a6;cursor:pointer}
+body.overview .slide{display:block;transform-origin:top left;transform:scale(var(--thumb-scale,.25));pointer-events:none}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}}
+@media print{@page{size:13.333333in 7.5in;margin:0}html,body{margin:0!important;background:white}.studio-stage{position:static;display:block;overflow:visible}.studio-thumb{display:contents!important}.slide{position:relative!important;display:block!important;transform:none!important;margin:0!important;break-after:page;print-color-adjust:exact;-webkit-print-color-adjust:exact}.slide:last-child{break-after:auto}.studio-controls,.studio-notes,.studio-announcer{display:none!important}}
+
+.studio-controls select{max-width:min(300px,40vw);text-overflow:ellipsis}.studio-controls{flex-wrap:wrap}
+
+:root{--studio-w:1280px;--studio-h:720px;--studio-ratio:1280/720}@media print{@page{size:13.333333333333334in 7.5in}}
+:root{--brand-background:#F7F5EF;--brand-text:#172B38;--brand-muted:#485E69;--brand-accent:#245B72;--brand-line:#AEBFC4;--brand-surface:#E3EBEB;--brand-margin:64px;--brand-gutter:40px;--brand-heading-font:"Arial","Noto Sans",sans-serif;--brand-heading-size:52px;--brand-heading-leading:1.16;--brand-body-font:"Arial","Noto Sans",sans-serif;--brand-body-size:26px;--brand-body-leading:1.45;--brand-caption-font:"Arial","Noto Sans",sans-serif;--brand-caption-size:18px;--brand-caption-leading:1.4;}
+.slide{background:var(--brand-background);color:var(--brand-text);font-family:var(--brand-body-font)}.slide h1,.slide h2{font-family:var(--brand-heading-font)}.brand-logo{position:absolute;object-fit:contain}
+.slide{padding:64px}h1{font:var(--brand-heading-size)/var(--brand-heading-leading) var(--brand-heading-font);max-width:1152px;letter-spacing:-1px}h2{font:38px/1.2 var(--brand-heading-font)}p,li{font:var(--brand-body-size)/var(--brand-body-leading) var(--brand-body-font)}svg text{fill:var(--brand-text);font-family:var(--brand-body-font)}.proof-source{position:absolute;left:64px;bottom:35px;max-width:1152px;font:18px/1.35 var(--brand-caption-font);color:var(--brand-muted)}table{border-collapse:collapse;width:100%;font:26px/1.4 var(--brand-body-font)}td,th{padding:18px;text-align:left;border-bottom:1px solid var(--brand-line)}.large{font-size:76px;line-height:1.1;max-width:1030px}</style></head><body><main class="studio-stage"><section class="slide " id="identity-opening" role="group" aria-roledescription="slide" aria-label="A claim with room to breathe" aria-hidden="true"><div data-region="primary" style="position:absolute;left:80px;top:185px;width:1080px;height:320px"><h1 class="large">Make the evidence<br>easy to compare.</h1><p style="margin-top:38px">A coherent identity does not require identical pages.</p></div><p class="proof-source" data-region="source">Fictional identity proof. No real organization or experimental result.</p></section>
+<section class="slide " id="identity-evidence" role="group" aria-roledescription="slide" aria-label="Compare on one shared scale" aria-hidden="true"><h1 data-region="title">Compare on one shared scale</h1><div data-region="primary" style="position:absolute;left:64px;top:215px;width:820px;height:350px"><svg viewBox="0 0 760 300" role="img" aria-label="Illustrative values: A 42, B 66"><line x1="65" x2="725" y1="250" y2="250" stroke="var(--brand-line)"/><text x="10" y="82" font-size="24">A</text><rect x="65" y="45" width="336" height="55" fill="var(--brand-accent)"/><text x="419" y="82" font-size="26">42</text><text x="10" y="197" font-size="24">B</text><rect x="65" y="160" width="528" height="55" fill="var(--brand-accent)"/><text x="611" y="197" font-size="26">66</text></svg></div><div data-region="support" style="position:absolute;left:936px;top:235px;width:280px;height:300px"><h2>24 units</h2><p style="margin-top:22px">The absolute difference in this illustrative pair.</p></div><p class="proof-source" data-region="source">Illustrative values; a visual proportion test, not a measured finding.</p></section>
+<section class="slide " id="identity-comparison" role="group" aria-roledescription="slide" aria-label="One question, two alternatives" aria-hidden="true"><h1 data-region="title">One question, two alternatives</h1><div data-region="primary" style="position:absolute;left:64px;top:225px;width:530px;height:350px"><h2>Keep context</h2><p style="margin-top:32px">Preserve the same axis and source conditions in both views.</p></div><div data-region="support" style="position:absolute;left:664px;top:225px;width:550px;height:350px"><h2>Isolate change</h2><p style="margin-top:32px">Highlight only the variable the audience needs to compare.</p></div><p class="proof-source" data-region="source">Matched type roles and alignment; different content remains visible.</p></section>
+<section class="slide " id="identity-image" role="group" aria-roledescription="slide" aria-label="A subject can define the composition" aria-hidden="true"><h1 data-region="title">A subject can define the composition</h1><div data-region="primary" style="position:absolute;left:64px;top:210px;width:760px;height:380px"><svg viewBox="0 0 760 380" role="img" aria-label="Original abstract illustration"><path d="M35 330 L290 50 L490 255 L680 100 L725 330Z" fill="var(--brand-accent)"/><circle cx="582" cy="76" r="46" fill="var(--brand-surface)"/></svg></div><div data-region="support" style="position:absolute;left:900px;top:225px;width:310px;height:330px"><p>Leave the subject intact.</p><p style="margin-top:30px">Place the explanation beside the feature it describes.</p></div><p class="proof-source" data-region="source">Original illustration; substitute an authorized photograph when it is the evidence.</p></section>
+<section class="slide " id="identity-dense" role="group" aria-roledescription="slide" aria-label="Details stay readable when the grid does the work" aria-hidden="true"><h1 data-region="title">Details stay readable when the grid does the work</h1><div data-region="primary" style="position:absolute;left:64px;top:225px;width:1152px;height:330px"><table><thead><tr><th>Condition</th><th>Observation</th><th>Scope</th></tr></thead><tbody><tr><td>Matched input</td><td>Same baseline</td><td>Controlled comparison</td></tr><tr><td>Changed input</td><td>Recompute output</td><td>Keep the denominator</td></tr><tr><td>Unknown input</td><td>Report missingness</td><td>Do not substitute zero</td></tr></tbody></table></div><p class="proof-source" data-region="source">Fictional content used to test dense-page typography.</p></section>
+<section class="slide " id="identity-close" role="group" aria-roledescription="slide" aria-label="The next test follows from the uncertainty" aria-hidden="true"><div data-region="primary" style="position:absolute;left:110px;top:210px;width:1040px;height:340px"><h1 class="large" style="font-size:68px">The next test follows<br>from the uncertainty.</h1><p style="margin-top:36px">Preserve what is known. Name what remains unresolved.</p></div><p class="proof-source" data-region="source">A quiet closing page is a deliberate change of pace.</p></section></main><nav class="studio-controls" aria-label="Slide"><button id="studio-prev" type="button" aria-label="Previous" >←</button><span id="studio-position" class="studio-position"></span><button id="studio-next" type="button" aria-label="Next" >→</button><select id="studio-jump" aria-label="Slide"><option value="0">1. A claim with room to breathe</option><option value="1">2. Compare on one shared scale</option><option value="2">3. One question, two alternatives</option><option value="3">4. A subject can define the composition</option><option value="4">5. Details stay readable when the grid does the work</option><option value="5">6. The next test follows from the uncertainty</option></select><button id="studio-overview" type="button" aria-label="Overview" >Overview</button><button id="studio-notes-btn" type="button" aria-label="Notes" aria-expanded="false" aria-controls="studio-notes">Notes</button><button id="studio-reset" type="button" aria-label="Reset" >Reset</button><button id="studio-full" type="button" aria-label="Fullscreen" >Fullscreen</button></nav><aside id="studio-notes" class="studio-notes" aria-label="Notes"></aside><div id="studio-announcer" class="sr-only studio-announcer" aria-live="polite"></div><script type="application/json" id="slide-studio-meta">{"version":3,"width":1280,"height":720,"title":"Identity proof","language":"en","direction":"ltr","readingMode":"reference","sample":true,"mode":"workshop","copyRules":[{"id":"ja-stage-direction","level":"error","pattern":"(?:学会|口頭|研究)?発表(?:時|中)(?:に|で|は)?[ 　]*(?:切[り]?替[え]?|切替|クリック|再生|操作)|ここで(?:クリック|切[り]?替[え]?|動画を再生)|(?:要差し替え|後で修正|仮置きのまま)"},{"id":"en-stage-direction","level":"error","pattern":"\\b(?:switch|click|play|toggle) (?:here|during (?:the )?(?:conference|presentation|talk))\\b|\\b(?:replace this (?:text|title|image)|insert (?:your )?(?:title|content) here|speaker cue:)","flags":"i"},{"id":"placeholder","level":"error","pattern":"\\b(?:Lorem ipsum|TODO|FIXME|TBD)\\b|(?:ここにタイトル|ここに本文|テキストを入力)","flags":"i"},{"id":"ja-empty-claim","level":"warning","pattern":"(?:さらなる価値提供|革新的なソリューション|未来を切り拓く|シームレスな体験|圧倒的な価値)"},{"id":"en-empty-claim","level":"warning","pattern":"\\b(?:unlock (?:the )?(?:full )?potential|revolutionary solution|seamless experience|game-changing|transform the future)\\b","flags":"i"},{"id":"ja-export-production-cue","level":"error","pattern":"配布用メモ[：:]|(?:印刷[・／/]PDF|印刷・PDF|PDF・印刷)(?:では|時は)[^。\\n]{0,60}(?:表示が残|固定され|操作用)|(?:投影時|発表時)の操作用"},{"id":"en-export-production-cue","level":"error","pattern":"\\b(?:presenter-only cue|production note|export-only instruction)\\s*:","flags":"i"},{"id":"ja-performed-sincerity","level":"warning","pattern":"正直に(?:言います|お知らせ|お伝え)|本当の価値|価値を紡ぐ"}],"slides":[{"id":"identity-opening","title":"A claim with room to breathe","notes":"","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"identity-evidence","title":"Compare on one shared scale","notes":"","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"identity-comparison","title":"One question, two alternatives","notes":"","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"identity-image","title":"A subject can define the composition","notes":"","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"identity-dense","title":"Details stay readable when the grid does the work","notes":"","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"identity-close","title":"The next test follows from the uncertainty","notes":"","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""}]}</script><script>/* Deterministic presentation states. Widgets own their content, not global navigation.
+ * A transition never owns the final state: target styles are committed before animating.
+ * Exports and reduced-motion enter the same stable states without cosmetic movement. */
+(()=>{'use strict';
+ const meta=JSON.parse(document.getElementById('slide-studio-meta').textContent);
+ const slides=[...document.querySelectorAll('.slide')],mq=matchMedia('(prefers-reduced-motion: reduce)');
+ const warnings=[],widgets=new Map(),tracks=new WeakMap(),animations=new Set(),lastSteps=Array(slides.length).fill(0);
+ let current=0,step=0,exporting=new URLSearchParams(location.search).has('static'),overview=false,restore=null,enteredIndex=null;
+ const $=id=>document.getElementById(id),warn=e=>{warnings.push(String(e));console.warn('[Slide Studio]',e)};
+ const call=(widget,method,...args)=>{try{return widget?.[method]?.(...args)}catch(e){warn(`${method}: ${e.message}`)}};
+ const max=i=>Math.max(0,...[...slides[i].querySelectorAll('[data-step],[data-states]')].flatMap(el=>{
+  const v=[Number(el.dataset.step)||0];try{if(el.dataset.states)v.push(...Object.keys(JSON.parse(el.dataset.states)).map(Number))}catch{}return v.filter(Number.isFinite)}));
+ for(const slide of slides)for(const el of slide.querySelectorAll('[data-states]')){
+  try{const map=JSON.parse(el.dataset.states),keys=Object.keys(map).map(Number).sort((a,b)=>a-b);if(!map['0']||keys.some(k=>!Number.isInteger(k)||k<0))throw Error('state 0 and nonnegative integer keys required');const base={};for(const state of Object.values(map)){
+   if(!state||typeof state!=='object'||Array.isArray(state))throw Error('CSS property map required');
+   for(const key of Object.keys(state)){if(!(key in el.style)&&!key.startsWith('--'))throw Error(`unknown CSS property ${key}`);base[key]=key.startsWith('--')?el.style.getPropertyValue(key):el.style[key]||getComputedStyle(el)[key];}}
+   tracks.set(el,{map,keys,base});
+  }catch(e){warn(`${slide.id}: ${e.message}`)}
+ }
+ function finish(){for(const a of animations){try{a.finish();a.cancel()}catch{a.cancel()}}animations.clear()}
+ function transition(el,to,animate,entryFrom=null){
+  const from={};for(const [k,v]of Object.entries(to)){from[k]=k.startsWith('--')?getComputedStyle(el).getPropertyValue(k):getComputedStyle(el)[k];k.startsWith('--')?el.style.setProperty(k,String(v)):el.style[k]=String(v)}
+  if(!animate||mq.matches||exporting||!el.animate)return;
+  const requested=el.dataset.duration===undefined?500:Number(el.dataset.duration);const duration=Number.isFinite(requested)?Math.min(1600,Math.max(0,requested)):500;
+  try{const a=el.animate([entryFrom||from,to],{duration,easing:el.dataset.easing||'cubic-bezier(.22,.68,.2,1)',fill:'none'});animations.add(a);a.finished.then(()=>{animations.delete(a);a.cancel()}).catch(()=>animations.delete(a))}catch(e){warn(e.message)}
+ }
+ // Entry effects are a decoration on a committed state, never a second navigator.
+ const entryEffects={
+  reveal:[{opacity:0},{opacity:1}],
+  lift:[{opacity:0,transform:'translateY(20px)'},{opacity:1,transform:'translateY(0px)'}],
+  slide:[{opacity:0,transform:'translateX(-28px)'},{opacity:1,transform:'translateX(0px)'}],
+  wipe:[{clipPath:'inset(0 100% 0 0)'},{clipPath:'inset(0 0% 0 0)'}],
+  trace:[{strokeDashoffset:'1'},{strokeDashoffset:'0'}],
+  focus:[{opacity:0.2},{opacity:1}],
+  settle:[{opacity:0,transform:'scale(.96)'},{opacity:1,transform:'scale(1)'}]
+ };
+ function context(i=current){return {slide:slides[i],index:i,step:i===current?step:lastSteps[i],exporting,reducedMotion:mq.matches,active:i===current&&!overview&&!exporting}}
+ function apply(i,at,animate){
+  const slide=slides[i];
+  for(const el of slide.querySelectorAll('[data-step]')){
+   const on=at>=Number(el.dataset.step)&&(el.dataset.until===undefined||at<=Number(el.dataset.until));
+   const was=el.dataset.studioHidden==='false';
+   el.dataset.studioHidden=String(!on);el.setAttribute('aria-hidden',String(!on));el.inert=!on;
+   if(on&&el.dataset.motion&&!el.hasAttribute('data-states')){
+    const effect=entryEffects[el.dataset.motion];
+    if(effect)transition(el,effect[1],animate&&!was,effect[0]);
+    else if(!el.dataset.motionWarned){warn('Unknown entry effect: '+el.dataset.motion);el.dataset.motionWarned='true'}
+   }
+  }
+  for(const el of slide.querySelectorAll('[data-states]')){const track=tracks.get(el);if(!track)continue;const to={...track.base};for(const k of track.keys)if(k<=at)Object.assign(to,track.map[k]);transition(el,to,animate);const hidden=el.dataset.studioHidden==='true'||to.opacity===0||to.opacity==='0'||to.visibility==='hidden';el.setAttribute('aria-hidden',String(hidden));el.inert=hidden}
+  lastSteps[i]=at;slide.dataset.currentStep=String(at);for(const [id,w] of widgets)if(slide.contains($(id)))call(w,'onStep',{...context(i),step:at});
+ }
+ function scale(){const bar=document.querySelector('.studio-controls').getBoundingClientRect().height;document.documentElement.style.setProperty('--studio-bar',bar+'px');const r=Math.min(innerWidth/meta.width,Math.max(1,innerHeight-bar)/meta.height);document.documentElement.style.setProperty('--studio-scale',String(r));if(overview)document.querySelectorAll('.studio-thumb').forEach(w=>w.style.setProperty('--thumb-scale',w.clientWidth/meta.width))}
+ function pauseSlide(i){if(enteredIndex===i)enteredIndex=null;for(const el of slides[i].querySelectorAll('video,audio'))el.pause();for(const [id,w]of widgets)if(slides[i].contains($(id)))call(w,'onLeave',context(i))}
+ function show(i,n=0,{animate=false}={}){
+  finish();const previous=current;current=Math.max(0,Math.min(slides.length-1,Math.floor(Number(i)||0)));step=Math.max(0,Math.min(max(current),Math.floor(Number(n)||0)));if(exporting)step=max(current);
+  if(previous!==current){pauseSlide(previous);for(const el of slides[current].querySelectorAll('[data-step]'))el.dataset.studioHidden='true'}document.body.dataset.export=String(exporting);
+  slides.forEach((sl,j)=>{const active=j===current;sl.classList.toggle('is-current',active);sl.setAttribute('aria-hidden',String(!active));sl.inert=!active||overview;if(active||exporting)apply(j,exporting?max(j):step,animate&&active)});
+  $('studio-position').textContent=`${current+1} / ${slides.length} · ${step} / ${max(current)}`;$('studio-prev').disabled=!current&&!step;$('studio-next').disabled=current===slides.length-1&&(exporting||step===max(current));
+  const s=meta.slides[current];$('studio-notes').textContent=(s.notes||'')+(s.sources?.length?'\n\n'+s.sources.map(x=>typeof x==='string'?x:JSON.stringify(x)).join('\n'):'');$('studio-announcer').textContent=s.title;
+  $('studio-jump').value=String(current);history.replaceState(null,'','#'+encodeURIComponent(s.id));
+  for(const [id,w]of widgets)if(slides[current].contains($(id))){if(exporting)call(w,'onExport',context());else if(enteredIndex!==current&&!overview&&!document.hidden)call(w,'onEnter',context())}
+  enteredIndex=(!exporting&&!overview&&!document.hidden)?current:null;
+  window.dispatchEvent(new CustomEvent('studio:state',{detail:context()}));scale();
+ }
+ function next(){if(!exporting&&step<max(current))show(current,step+1,{animate:true});else if(current<slides.length-1)show(current+1,0,{animate:true})}
+ function prev(){if(!exporting&&step>0)show(current,step-1,{animate:true});else if(current)show(current-1,max(current-1),{animate:true})}
+ function toggleOverview(){
+  overview=!overview;document.body.classList.toggle('overview',overview);finish();
+  if(overview)pauseSlide(current);
+  slides.forEach((sl,i)=>{let w=sl.parentElement;if(overview){w=document.createElement('div');w.className='studio-thumb';w.tabIndex=0;w.setAttribute('role','button');w.setAttribute('aria-label',meta.slides[i].title);sl.before(w);w.append(sl);sl.inert=true;apply(i,max(i),false);w.onclick=()=>{toggleOverview();show(i)};w.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggleOverview();show(i)}}}else if(w.classList.contains('studio-thumb')){w.before(sl);w.remove()}});
+  if(!overview)show(current,step);scale();
+ }
+ function setExport(on){exporting=!!on;if(overview)toggleOverview();if(exporting)for(let i=0;i<slides.length;i++)pauseSlide(i);show(current,step)}
+ function prepareExport(){setExport(true);for(const [id,w] of widgets){const i=slides.findIndex(sl=>sl.contains($(id)));call(w,'onExport',context(i<0?current:i));}window.dispatchEvent(new CustomEvent('studio:export'))}
+ function reset(){for(const [id,w]of widgets)if(slides[current].contains($(id)))call(w,'reset');show(current,0)}
+ $('studio-prev').onclick=prev;$('studio-next').onclick=next;$('studio-overview').onclick=toggleOverview;$('studio-reset').onclick=reset;
+ $('studio-jump').onchange=e=>show(Number(e.target.value));
+ $('studio-notes-btn').onclick=()=>{const on=$('studio-notes').classList.toggle('open');$('studio-notes-btn').setAttribute('aria-expanded',String(on))};
+ $('studio-full').onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await document.documentElement.requestFullscreen()}catch{warn('Fullscreen unavailable')}};
+ // Navigation buttons are not content widgets. Arrow/Page keys still navigate when
+ // those buttons keep focus after a mouse click; Space/Enter retain native activation.
+ document.addEventListener('keydown',e=>{
+  if(e.defaultPrevented||e.ctrlKey||e.metaKey||e.altKey||e.isComposing||e.keyCode===229)return;
+  const target=e.composedPath().find(x=>x instanceof Element)||document.body;
+  if(e.key==='Escape'){
+   if(overview){e.preventDefault();toggleOverview();return}
+   if($('studio-notes').classList.contains('open')){e.preventDefault();$('studio-notes').classList.remove('open');$('studio-notes-btn').setAttribute('aria-expanded','false');return}
+  }
+  const navigationKey=['ArrowRight','ArrowLeft','PageDown','PageUp',' ','Enter','Home','End'].includes(e.key);
+  if(e.repeat&&navigationKey){
+   // Do not steal a slider's held arrow key. Only suppress presentation navigation.
+   if(!target.closest('input,textarea,select,[contenteditable],[data-interactive]'))e.preventDefault();
+   return;
+  }
+  if(overview)return;
+  const onNav=!!target.closest('.studio-controls');
+  if(target.closest('input,textarea,select,video,audio,[contenteditable],[data-interactive],[role="slider"],[role="textbox"],[role="combobox"],[role="grid"]'))return;
+  if(target.closest('button,a,summary,[role="button"]')&&(!onNav||[' ','Enter'].includes(e.key)))return;
+  if(['ArrowRight','PageDown',' ','Enter'].includes(e.key)){e.preventDefault();next()}
+  else if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();prev()}
+  else if(e.key==='Home'){e.preventDefault();show(0)}
+  else if(e.key==='End'){e.preventDefault();show(slides.length-1,max(slides.length-1))}
+  else if(e.key.toLowerCase()==='o'){e.preventDefault();toggleOverview()}
+  else if(e.key.toLowerCase()==='r'){e.preventDefault();reset()}
+  else if(e.key.toLowerCase()==='n'){e.preventDefault();$('studio-notes-btn').click()}
+ });
+ document.addEventListener('visibilitychange',()=>{if(document.hidden)pauseSlide(current);else show(current,step)});
+ window.addEventListener('resize',scale);mq.addEventListener('change',()=>{finish();for(let i=0;i<slides.length;i++)pauseSlide(i);show(current,step)});
+ window.addEventListener('beforeprint',()=>{restore={current,step,exporting,widgets:[...widgets].map(([id,w])=>[id,call(w,'snapshot')])};prepareExport()});
+ window.addEventListener('afterprint',()=>{if(!restore)return;exporting=restore.exporting;for(const [id,s]of restore.widgets)call(widgets.get(id),'restore',s);show(restore.current,restore.step);restore=null});
+ const api={kind:'craft',version:3,meta,show,next,prev,finish,reset,setExport,prepareExport,showAllBuilds:prepareExport,overview:toggleOverview,
+  register(id,widget){if(widgets.has(id))throw Error('Duplicate widget ID: '+id);if(!$(id))throw Error('Missing widget root: '+id);widgets.set(id,widget);if(slides[current].contains($(id)))call(widget,exporting?'onExport':'onEnter',context());return()=>{call(widget,'dispose');widgets.delete(id)}},
+  getWidgetState:id=>call(widgets.get(id),'snapshot'),getState:()=>({current,step,maxBuild:max(current),exporting,overview,reducedMotion:mq.matches,warnings:[...warnings],widgets:[...widgets.keys()]})};
+ window.slideStudio=window.SlideStudio=api;let id='';try{id=decodeURIComponent(location.hash.slice(1))}catch{}const initial=meta.slides.findIndex(s=>s.id===id);show(initial<0?0:initial);document.body.dataset.studioReady='true';
+})();
+</script></body></html>

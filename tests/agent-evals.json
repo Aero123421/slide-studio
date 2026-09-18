@@ -1,0 +1,171 @@
+{
+  "version": 1,
+  "purpose": "Comparable future evaluations, not claimed model results",
+  "record": [
+    "model/version",
+    "tools",
+    "prompt",
+    "elapsed/budget",
+    "output artifacts",
+    "human ratings by dimension",
+    "failures and repairs"
+  ],
+  "cases": [
+    {
+      "id": "uncertainty",
+      "prompt": "Create a 6-page research briefing from the provided synthetic paired measurements. Declare uncertainty correctly; invent no significance claim.",
+      "input": "tests/fixtures/paired.csv",
+      "deliverables": [
+        "editable source",
+        "HTML or explicitly requested PPTX",
+        "evidence/claim record",
+        "compact QA record"
+      ],
+      "scorecard": "references/evaluation.md",
+      "status": "not executed with external AI models"
+    },
+    {
+      "id": "image-essay",
+      "prompt": "Explain a photographic detail using the coffee source in three distinct crops, retaining provenance.",
+      "input": "assets/media/photo.jpg",
+      "deliverables": [
+        "editable source",
+        "HTML or explicitly requested PPTX",
+        "evidence/claim record",
+        "compact QA record"
+      ],
+      "scorecard": "references/evaluation.md",
+      "status": "not executed with external AI models"
+    },
+    {
+      "id": "rtl",
+      "prompt": "Create a 4-page Arabic explanation of a toy comparison. Keep Latin identifiers and units correctly isolated.",
+      "input": "tests/fixtures/paired.csv",
+      "deliverables": [
+        "editable source",
+        "HTML or explicitly requested PPTX",
+        "evidence/claim record",
+        "compact QA record"
+      ],
+      "scorecard": "references/evaluation.md",
+      "status": "not executed with external AI models"
+    },
+    {
+      "id": "dense-table",
+      "prompt": "Create a self-read report: preserve every provided row, missing value and unit, with readable hierarchy.",
+      "input": "tests/fixtures/paired.csv",
+      "deliverables": [
+        "editable source",
+        "HTML or explicitly requested PPTX",
+        "evidence/claim record",
+        "compact QA record"
+      ],
+      "scorecard": "references/evaluation.md",
+      "status": "not executed with external AI models"
+    },
+    {
+      "id": "new-diagram",
+      "prompt": "Create an original four-entity process with a conditional rejection route. Do not select a fixed layout.",
+      "input": "tests/fixtures/process.json",
+      "deliverables": [
+        "editable source",
+        "HTML or explicitly requested PPTX",
+        "evidence/claim record",
+        "compact QA record"
+      ],
+      "scorecard": "references/evaluation.md",
+      "status": "not executed with external AI models"
+    },
+    {
+      "id": "motion-invention",
+      "prompt": "Invent a new explanatory transition for the process. Reverse and direct jumps must preserve identity.",
+      "input": "tests/fixtures/process.json",
+      "deliverables": [
+        "editable source",
+        "HTML or explicitly requested PPTX",
+        "evidence/claim record",
+        "compact QA record"
+      ],
+      "scorecard": "references/evaluation.md",
+      "status": "not executed with external AI models"
+    },
+    {
+      "id": "interaction",
+      "prompt": "Make a recomputing paired-data view with reset and a static evidence summary.",
+      "input": "tests/fixtures/paired.csv",
+      "deliverables": [
+        "editable source",
+        "HTML or explicitly requested PPTX",
+        "evidence/claim record",
+        "compact QA record"
+      ],
+      "scorecard": "references/evaluation.md",
+      "status": "not executed with external AI models"
+    },
+    {
+      "id": "image-free",
+      "prompt": "Create a striking text-and-geometry presentation without stock icons or generated images.",
+      "input": "tests/fixtures/process.json",
+      "deliverables": [
+        "editable source",
+        "HTML or explicitly requested PPTX",
+        "evidence/claim record",
+        "compact QA record"
+      ],
+      "scorecard": "references/evaluation.md",
+      "status": "not executed with external AI models"
+    },
+    {
+      "id": "native-editability",
+      "prompt": "Deliver supported native text/shapes as PPTX; clearly distinguish picture assets.",
+      "input": "tests/fixtures/process.json",
+      "deliverables": [
+        "editable source",
+        "HTML or explicitly requested PPTX",
+        "evidence/claim record",
+        "compact QA record"
+      ],
+      "scorecard": "references/evaluation.md",
+      "status": "not executed with external AI models"
+    },
+    {
+      "id": "long-labels",
+      "prompt": "Use the provided long labels without truncation, body-type shrinkage or disconnected edges.",
+      "input": "tests/fixtures/process.json",
+      "deliverables": [
+        "editable source",
+        "HTML or explicitly requested PPTX",
+        "evidence/claim record",
+        "compact QA record"
+      ],
+      "scorecard": "references/evaluation.md",
+      "status": "not executed with external AI models"
+    },
+    {
+      "id": "missing-evidence",
+      "prompt": "Explain what the paired data cannot establish. Label unknowns; do not guess causes.",
+      "input": "tests/fixtures/paired.csv",
+      "deliverables": [
+        "editable source",
+        "HTML or explicitly requested PPTX",
+        "evidence/claim record",
+        "compact QA record"
+      ],
+      "scorecard": "references/evaluation.md",
+      "status": "not executed with external AI models"
+    },
+    {
+      "id": "cleanup",
+      "prompt": "Render all states twice to the same marked review directory. Preserve unrelated and edited files.",
+      "input": "examples/from-scratch/deck.mjs",
+      "deliverables": [
+        "editable source",
+        "HTML or explicitly requested PPTX",
+        "evidence/claim record",
+        "compact QA record"
+      ],
+      "scorecard": "references/evaluation.md",
+      "status": "not executed with external AI models"
+    }
+  ]
+}

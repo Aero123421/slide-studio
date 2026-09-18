@@ -1,0 +1,17 @@
+// Original editable study. Read notes for purpose, modifications, and invariants.
+// Asset placeholders are embedded by scripts/craft-core.mjs. Change content and geometry freely.
+export default {
+  study: true,
+  "id": "sequence-diagram",
+  "title": "Sequence exchanges",
+  "notes": "Purpose: Show messages ordered through time\nModify: Rewrite labels, recompute geometry from source data, adapt framing and orientation.\nInvariant: Keep time order and message direction; spatial distance is not latency unless scaled.\nStatic: Already static; preserve semantic labels and readable strokes.",
+  "sources": [
+    {
+      "type": "original-example",
+      "file": "assets/svg/sequence-diagram.svg"
+    }
+  ],
+  "exportPolicy": "final",
+  "className": "",
+  "content": "<h1 class=\"g-title\">Sequence exchanges</h1><p class=\"g-purpose\">Show messages ordered through time</p><div class=\"g-demo\"><svg aria-labelledby=\"g-sequence-diagram-sequence-diagram-title g-sequence-diagram-sequence-diagram-desc\" role=\"img\" viewbox=\"0 0 800 440\" xmlns=\"http://www.w3.org/2000/svg\"><title id=\"g-sequence-diagram-sequence-diagram-title\">Sequence exchanges</title><desc id=\"g-sequence-diagram-sequence-diagram-desc\">Show messages ordered through time. Original schematic. Values are illustrative, not measured.</desc><g data-part=\"drawing\"><rect fill=\"#ffffff\" height=\"56\" rx=\"6\" stroke=\"#17252d\" stroke-width=\"2\" width=\"130\" x=\"115\" y=\"50\"></rect><text fill=\"#17252d\" font-family=\"Arial, sans-serif\" font-size=\"18\" text-anchor=\"middle\" x=\"180.0\" y=\"84.0\">Client</text><line stroke=\"#718594\" stroke-dasharray=\"6 5\" stroke-width=\"2\" x1=\"180\" x2=\"180\" y1=\"110\" y2=\"355\"></line><rect fill=\"#ffffff\" height=\"56\" rx=\"6\" stroke=\"#17252d\" stroke-width=\"2\" width=\"130\" x=\"335\" y=\"50\"></rect><text fill=\"#17252d\" font-family=\"Arial, sans-serif\" font-size=\"18\" text-anchor=\"middle\" x=\"400.0\" y=\"84.0\">Service</text><line stroke=\"#718594\" stroke-dasharray=\"6 5\" stroke-width=\"2\" x1=\"400\" x2=\"400\" y1=\"110\" y2=\"355\"></line><rect fill=\"#ffffff\" height=\"56\" rx=\"6\" stroke=\"#17252d\" stroke-width=\"2\" width=\"130\" x=\"555\" y=\"50\"></rect><text fill=\"#17252d\" font-family=\"Arial, sans-serif\" font-size=\"18\" text-anchor=\"middle\" x=\"620.0\" y=\"84.0\">Store</text><line stroke=\"#718594\" stroke-dasharray=\"6 5\" stroke-width=\"2\" x1=\"620\" x2=\"620\" y1=\"110\" y2=\"355\"></line><line stroke=\"#28617b\" stroke-width=\"3\" x1=\"185\" x2=\"393\" y1=\"155\" y2=\"155\"></line><path d=\"M384 149L393 155L384 161\" fill=\"none\" stroke=\"#28617b\" stroke-width=\"2\"></path><line stroke=\"#28617b\" stroke-width=\"3\" x1=\"407\" x2=\"613\" y1=\"235\" y2=\"235\"></line><path d=\"M604 229L613 235L604 241\" fill=\"none\" stroke=\"#28617b\" stroke-width=\"2\"></path><line stroke=\"#ae4f31\" stroke-width=\"3\" x1=\"620\" x2=\"408\" y1=\"300\" y2=\"300\"></line><path d=\"M399 294L408 300L399 306\" fill=\"none\" stroke=\"#ae4f31\" stroke-width=\"2\"></path><text fill=\"#17252d\" font-family=\"Arial, sans-serif\" font-size=\"18\" text-anchor=\"middle\" x=\"270\" y=\"140\">Request</text><text fill=\"#17252d\" font-family=\"Arial, sans-serif\" font-size=\"18\" text-anchor=\"middle\" x=\"510\" y=\"220\">Read</text></g></svg>\n</div><div class=\"g-footer\">Original instructional study · schematic / synthetic content <code>assets/svg/sequence-diagram.svg</code></div>"
+};

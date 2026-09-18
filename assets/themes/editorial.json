@@ -1,0 +1,12 @@
+{
+  "name": "Editorial / 読み物",
+  "paper": "#F7F4ED",
+  "ink": "#27251F",
+  "accent": "#9B392C",
+  "secondary": "#8A785F",
+  "font": "Noto Sans CJK JP",
+  "headingFont": "Noto Serif CJK JP",
+  "radius": 0,
+  "titleSize": 48,
+  "bodySize": 24
+}

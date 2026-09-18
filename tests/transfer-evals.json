@@ -1,0 +1,178 @@
+{
+  "version": 1,
+  "purpose": "Held-out transfer tasks, not completed model benchmark results",
+  "tasks": [
+    {
+      "id": "amount-rate",
+      "readingMode": "live",
+      "brief": "A metric changes from 480 to 624 thousand units. Explain the result without confusing amount and percentage.",
+      "hardChecks": [
+        "144 thousand units and 30% are distinct",
+        "Chart and headline share values"
+      ],
+      "judgmentChecks": [
+        "Clear period and comparator",
+        "No fake correction slogan"
+      ],
+      "status": "not run on external models after 3.3.0"
+    },
+    {
+      "id": "paired-missing",
+      "readingMode": "live",
+      "brief": "Explain 6 complete pairs and 2 missing pairs; one complete pair worsens. Use synthetic data and one subtraction direction.",
+      "hardChecks": [
+        "Do not fill missing with zero",
+        "Plot and mean use same sign",
+        "Sample SD vs SE identified"
+      ],
+      "judgmentChecks": [
+        "Counterexample stays visible",
+        "No causal efficacy claim from ordered measurements"
+      ],
+      "status": "not run on external models after 3.3.0"
+    },
+    {
+      "id": "alternate-outcomes",
+      "readingMode": "read",
+      "brief": "An inspected object is either returned, repaired or retired. Design the decision explanation.",
+      "hardChecks": [
+        "Conditions label direct branches",
+        "No sequential chain of alternative outcomes"
+      ],
+      "judgmentChecks": [
+        "Labels readable",
+        "No decorative pseudo-3D hiding the decision"
+      ],
+      "status": "not run on external models after 3.3.0"
+    },
+    {
+      "id": "honest-sequence",
+      "readingMode": "live",
+      "brief": "Show a true three-step manufacturing sequence followed by a feedback loop.",
+      "hardChecks": [
+        "Preserve sequence and feedback",
+        "Do not turn every relation into a branch"
+      ],
+      "judgmentChecks": [
+        "Useful timing/identity",
+        "Negative control for overcorrecting the previous case"
+      ],
+      "status": "not run on external models after 3.3.0"
+    },
+    {
+      "id": "dense-reference",
+      "readingMode": "reference",
+      "brief": "Compare eight suppliers across six required fields. Preserve the fields and unknown entries.",
+      "hardChecks": [
+        "All comparison fields remain",
+        "Unknown is not filled with invented values"
+      ],
+      "judgmentChecks": [
+        "A readable aligned table is allowed",
+        "No forced brevity or card layout"
+      ],
+      "status": "not run on external models after 3.3.0"
+    },
+    {
+      "id": "quiet-statement",
+      "readingMode": "live",
+      "brief": "Create a page with one consequential sentence and a sourced image with deliberate negative space.",
+      "hardChecks": [
+        "Image not misrepresented",
+        "Scope survives editing"
+      ],
+      "judgmentChecks": [
+        "Do not fill space to satisfy occupancy hints",
+        "Optical placement and crop serve the subject"
+      ],
+      "status": "not run on external models after 3.3.0"
+    },
+    {
+      "id": "expressive-poster",
+      "readingMode": "read",
+      "brief": "Create an expressive design essay using geometry and a poetic opening, followed by concrete visual observations.",
+      "hardChecks": [
+        "Decorative geometry not framed as measured data"
+      ],
+      "judgmentChecks": [
+        "Expressiveness is permitted",
+        "Not every sentence repeats a metaphor"
+      ],
+      "status": "not run on external models after 3.3.0"
+    },
+    {
+      "id": "missing-font",
+      "readingMode": "hybrid",
+      "brief": "An approved font is unavailable in the export environment. Produce an honest PDF plan and test using a reviewed alternative.",
+      "hardChecks": [
+        "Do not silently approve fallback",
+        "Actual print-font audit",
+        "PDF text/page postflight"
+      ],
+      "judgmentChecks": [
+        "No proprietary font redistribution",
+        "Source text errors distinguished from font substitution"
+      ],
+      "status": "not run on external models after 3.3.0"
+    },
+    {
+      "id": "horizon-cost",
+      "readingMode": "read",
+      "brief": "Create a cost comparison whose cheapest option changes between 12 and 60 months.",
+      "hardChecks": [
+        "All slider endpoints recomputed",
+        "Static selected condition shown",
+        "Excluded costs visible"
+      ],
+      "judgmentChecks": [
+        "No always-cheapest claim",
+        "Control label is audience content, not production instruction"
+      ],
+      "status": "not run on external models after 3.3.0"
+    },
+    {
+      "id": "locale-layout",
+      "readingMode": "read",
+      "brief": "Create Japanese and Arabic variants with proper names and intentional English terminology.",
+      "hardChecks": [
+        "Do not erase valid scripts",
+        "RTL and units handled",
+        "Inspect actual faces"
+      ],
+      "judgmentChecks": [
+        "Long text changes region allocation",
+        "No literal marketing-rhythm translation"
+      ],
+      "status": "not run on external models after 3.3.0"
+    },
+    {
+      "id": "private-brand",
+      "readingMode": "hybrid",
+      "brief": "Derive a private brand kit with unusual but approved colors and alignment, and a usable company template.",
+      "hardChecks": [
+        "No source content copied into public skill",
+        "Respect immutable identity",
+        "Font availability checked"
+      ],
+      "judgmentChecks": [
+        "Do not normalize every company to the same beige editorial look",
+        "New composition fits dense and quiet pages"
+      ],
+      "status": "not run on external models after 3.3.0"
+    },
+    {
+      "id": "export-cue",
+      "readingMode": "live",
+      "brief": "A chart has a default print condition and interactive live controls.",
+      "hardChecks": [
+        "No presenter/export directions on audience canvas",
+        "Selected condition retained in PDF",
+        "Keyboard and mouse agree"
+      ],
+      "judgmentChecks": [
+        "Explain the parameter, not the production process"
+      ],
+      "status": "not run on external models after 3.3.0"
+    }
+  ]
+}

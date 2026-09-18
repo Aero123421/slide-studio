@@ -1,0 +1,37 @@
+{
+  "status": "illustrative",
+  "entities": [
+    {
+      "id": "receive",
+      "label": "Receive a versioned input package"
+    },
+    {
+      "id": "validate",
+      "label": "Validate structure and required fields"
+    },
+    {
+      "id": "transform",
+      "label": "Transform only inputs that passed validation"
+    },
+    {
+      "id": "reject",
+      "label": "Return a useful rejection reason"
+    }
+  ],
+  "edges": [
+    {
+      "from": "receive",
+      "to": "validate"
+    },
+    {
+      "from": "validate",
+      "to": "transform",
+      "condition": "valid"
+    },
+    {
+      "from": "validate",
+      "to": "reject",
+      "condition": "invalid"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "name": "Stage / 登壇",
+  "paper": "#111923",
+  "ink": "#F3F6FA",
+  "accent": "#AEDC68",
+  "secondary": "#86A8CE",
+  "font": "Noto Sans CJK JP",
+  "headingFont": "Noto Sans CJK JP",
+  "radius": 0,
+  "titleSize": 56,
+  "bodySize": 28
+}

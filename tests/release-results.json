@@ -1,0 +1,453 @@
+{
+  "version": "3.4.0",
+  "recorded": "2026-09-07",
+  "nodeTests": {
+    "passed": 69,
+    "failed": 0
+  },
+  "pythonTests": {
+    "passed": 53,
+    "failed": 0
+  },
+  "browserSuites": [
+    {
+      "suite": "integrity",
+      "passed": true,
+      "browser": "151.0.7922.34",
+      "checks": [
+        {
+          "name": "inherited white text on a pale card is a blocking defect",
+          "passed": true
+        },
+        {
+          "name": "readable dark text on a pale card is retained",
+          "passed": true
+        },
+        {
+          "name": "gradient text needs pixel review, not a fabricated ratio",
+          "passed": true
+        },
+        {
+          "name": "opacity compositing is explicitly unmeasured",
+          "passed": true
+        },
+        {
+          "name": "intentionally inactive controls do not create contrast failures",
+          "passed": true
+        },
+        {
+          "name": "SVG text uses a separate visual review rather than CSS color",
+          "passed": true
+        },
+        {
+          "name": "unmarked legacy transparent bar gets an advisory",
+          "passed": true
+        },
+        {
+          "name": "explicit nonzero mark without paint blocks QA",
+          "passed": true
+        },
+        {
+          "name": "filled marks and outlined marks remain legitimate",
+          "passed": true
+        },
+        {
+          "name": "wide-gamut and CSS-outline marks are not called unpainted",
+          "passed": true
+        },
+        {
+          "name": "transparent wrappers with painted child geometry are not missing marks",
+          "passed": true
+        },
+        {
+          "name": "zero-valued marks are not forced into false nonzero bars",
+          "passed": true
+        },
+        {
+          "name": "computed layout expectation catches ignored declarations",
+          "passed": true
+        },
+        {
+          "name": "correct computed layout expectation passes",
+          "passed": true
+        },
+        {
+          "name": "cover crop that removes declared subject blocks QA",
+          "passed": true
+        },
+        {
+          "name": "repositioned subject and contained image pass",
+          "passed": true
+        },
+        {
+          "name": "unannotated artistic crop is an advisory, not an automatic failure",
+          "passed": true
+        },
+        {
+          "name": "complex object-position is left to image review",
+          "passed": true
+        },
+        {
+          "name": "a text line hidden behind another element gets a stacking warning",
+          "passed": true
+        },
+        {
+          "name": "QA uses the same CSS preflight as the build gate",
+          "passed": true
+        },
+        {
+          "name": "real QA command covers final state without auto-approving design",
+          "passed": true
+        },
+        {
+          "name": "syntactically broken stylesheet fails real QA even without pageerror",
+          "passed": true
+        },
+        {
+          "name": "severe rendered contrast failure reaches the QA exit gate",
+          "passed": true
+        },
+        {
+          "name": "file-URL QA fingerprints actual linked CSS and image resources",
+          "passed": true
+        },
+        {
+          "name": "real final-review CLI accepts matching HTML and assets",
+          "passed": true
+        },
+        {
+          "name": "real final-review CLI rejects changed CSS with unchanged HTML",
+          "passed": true
+        }
+      ],
+      "limits": [
+        "Synthetic Chromium regressions, not a new multi-model generation batch.",
+        "No factual, photographic, artistic or full accessibility certification."
+      ]
+    },
+    {
+      "suite": "browser",
+      "browser": "151.0.7922.34",
+      "loadMode": "file-url",
+      "viewportChecks": [
+        [
+          1280,
+          780
+        ],
+        [
+          390,
+          844
+        ]
+      ],
+      "checks": [
+        {
+          "name": "page identity, content and registered 24 widgets",
+          "passed": true
+        },
+        {
+          "name": "range keyboard changes parameter without advancing slide; reset",
+          "passed": true
+        },
+        {
+          "name": "threshold counts recomputed exactly from 20 observations",
+          "passed": true
+        },
+        {
+          "name": "time scrubber reaches last observation",
+          "passed": true
+        },
+        {
+          "name": "registered image comparison changes clipping, not source identity",
+          "passed": true
+        },
+        {
+          "name": "component inspection updates explanation",
+          "passed": true
+        },
+        {
+          "name": "optional section changes actual content",
+          "passed": true
+        },
+        {
+          "name": "all layers off clears stale drawing; reset restores it",
+          "passed": true
+        },
+        {
+          "name": "table sort changes numeric order and preserves row identity",
+          "passed": true
+        },
+        {
+          "name": "linked selection conserves all observations at full range",
+          "passed": true
+        },
+        {
+          "name": "histogram recomputes bins and conserves total count",
+          "passed": true
+        },
+        {
+          "name": "seeded resampling changes sample and resets deterministically",
+          "passed": true
+        },
+        {
+          "name": "toy ablation computes from selected components",
+          "passed": true
+        },
+        {
+          "name": "local quiz supplies feedback without network",
+          "passed": true
+        },
+        {
+          "name": "decision branch follows actual selected condition",
+          "passed": true
+        },
+        {
+          "name": "graph recomputes reachability when edges change",
+          "passed": true
+        },
+        {
+          "name": "matrix control identifies exact row and column",
+          "passed": true
+        },
+        {
+          "name": "image focus changes declared crop with unchanged pixels",
+          "passed": true
+        },
+        {
+          "name": "real video duration, seek/frame change, play, leave-pause and reset",
+          "passed": true
+        },
+        {
+          "name": "real audio duration, deliberate playback and leave-pause",
+          "passed": true
+        },
+        {
+          "name": "mesh vertex rendering responds to yaw and keyboard without slide leakage",
+          "passed": true
+        },
+        {
+          "name": "assembly groups actually separate",
+          "passed": true
+        },
+        {
+          "name": "cut plane clips actual triangles",
+          "passed": true
+        },
+        {
+          "name": "local OBJ and binary STL import, invalid-file retention, fixture reset",
+          "passed": true
+        },
+        {
+          "name": "annotation reset does not mutate its initial array",
+          "passed": true
+        },
+        {
+          "name": "widget selection survives re-entry and static export mode",
+          "passed": true
+        },
+        {
+          "name": "overview is keyboard-operable and restores slide structure",
+          "passed": true
+        },
+        {
+          "name": "notes open/escape updates accessibility state",
+          "passed": true
+        },
+        {
+          "name": "390px viewport keeps fitted canvas and navigation in viewport",
+          "passed": true
+        },
+        {
+          "name": "project-owned data overrides toy fixture and recomputes actual counts",
+          "passed": true
+        },
+        {
+          "name": "offline workshop index filters actual source catalog",
+          "passed": true
+        },
+        {
+          "name": "64 motion studies: timed entry, finish, reverse and direct-final equivalence",
+          "passed": true
+        },
+        {
+          "name": "reduced motion reaches same state without active animations",
+          "passed": true
+        },
+        {
+          "name": "print lifecycle restores slide/step after export",
+          "passed": true
+        },
+        {
+          "name": "no page errors, player warnings or external network requests",
+          "passed": true
+        }
+      ],
+      "passed": true,
+      "errors": [],
+      "blockedNetwork": [],
+      "limits": [
+        "Chromium only.",
+        "Tests validate behavior, not artistic quality, native-speaker fluency or external-agent performance.",
+        "Screenshots used for frame-change comparisons were held in memory."
+      ]
+    },
+    {
+      "suite": "navigation",
+      "checks": [
+        {
+          "name": "ArrowRight still works after clicking Next",
+          "passed": true
+        },
+        {
+          "name": "ArrowLeft still works after clicking Previous",
+          "passed": true
+        },
+        {
+          "name": "PageDown and PageUp retain navigation-button focus semantics",
+          "passed": true
+        },
+        {
+          "name": "body Enter Space PageDown and ArrowRight use the same step transition",
+          "passed": true
+        },
+        {
+          "name": "native button Enter and Space activate once, not twice",
+          "passed": true
+        },
+        {
+          "name": "Home and End work from the control strip",
+          "passed": true
+        },
+        {
+          "name": "range and text inputs retain native keyboard behavior",
+          "passed": true
+        },
+        {
+          "name": "local widget button does not navigate the presentation",
+          "passed": true
+        },
+        {
+          "name": "IME composition and legacy composition keycode are ignored",
+          "passed": true
+        },
+        {
+          "name": "a held key does not skip additional semantic steps",
+          "passed": true
+        },
+        {
+          "name": "real keyboard input creates a measurable intermediate transform",
+          "passed": true
+        },
+        {
+          "name": "button keyboard and API commit identical final styles",
+          "passed": true
+        },
+        {
+          "name": "rapid next-next-previous has no stale animation overwrite",
+          "passed": true
+        },
+        {
+          "name": "data-step entry animation works on keyboard and replay",
+          "passed": true
+        },
+        {
+          "name": "onEnter is not called again for each intra-slide build",
+          "passed": true
+        },
+        {
+          "name": "reduced-motion input reaches the same stable state",
+          "passed": true
+        },
+        {
+          "name": "print lifecycle restores selected page and step",
+          "passed": true
+        },
+        {
+          "name": "overview Escape restores the actual tracked state",
+          "passed": true
+        },
+        {
+          "name": "notes Escape is available from a focused control",
+          "passed": true
+        },
+        {
+          "name": "no errors player warnings or unexpected network",
+          "passed": true
+        }
+      ],
+      "passed": true,
+      "browser": "151.0.7922.34",
+      "errors": [],
+      "loadMode": "self-contained inline fixture",
+      "limits": [
+        "Chromium only.",
+        "Synthetic regression scenarios; user-authored choreography requires separate review."
+      ]
+    },
+    {
+      "suite": "rendered",
+      "browser": "151.0.7922.34",
+      "checks": [
+        {
+          "name": "runtime stage cue is blocked",
+          "passed": true,
+          "observedBlocking": true
+        },
+        {
+          "name": "valid condition labels are not blocked",
+          "passed": true,
+          "observedBlocking": false
+        },
+        {
+          "name": "speaker notes stay outside visible copy",
+          "passed": true,
+          "observedBlocking": false
+        },
+        {
+          "name": "exact reviewed quotation is not blocked",
+          "passed": true,
+          "observedBlocking": false
+        },
+        {
+          "name": "quiet whitespace is diagnostic, never an automatic failure",
+          "passed": true,
+          "observedBlocking": false
+        }
+      ],
+      "passed": true,
+      "limits": [
+        "Heuristics are tested against explicit fixtures, not all languages or production phrasing."
+      ]
+    }
+  ],
+  "executedRegressionChecks": 208,
+  "environment": {
+    "os": "macOS 26.6.2 arm64",
+    "node": "22.23.1",
+    "python": "3.12.14",
+    "playwright": "1.57.0",
+    "chromium": "151.0.7922.34",
+    "pillow": "12.3.0",
+    "pythonPptx": "1.0.2",
+    "pypdf": "5.9.0"
+  },
+  "fieldRecheck": {
+    "decks": 17,
+    "pages": 227,
+    "scope": "read-only final live states; six selected visual checks; two selected full-QA commands; two stale-report checks",
+    "cssDefectiveDecks": 1,
+    "severeContrastTextRuns": 10,
+    "unpaintedMarkWarnings": 10
+  },
+  "notRerun": [
+    "External-model generation",
+    "CJK field/font browser suite",
+    "Strict-font PDF and native Office export rendering",
+    "All-page manual gallery review",
+    "Other browsers and operating systems"
+  ],
+  "deliveryApproved": false,
+  "limits": [
+    "Regression passes do not establish factual accuracy or artistic quality.",
+    "Private benchmark source, prompts, logs and screenshots are not shipped."
+  ]
+}

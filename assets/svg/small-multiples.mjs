@@ -1,0 +1,17 @@
+// Original editable study. Read notes for purpose, modifications, and invariants.
+// Asset placeholders are embedded by scripts/craft-core.mjs. Change content and geometry freely.
+export default {
+  study: true,
+  "id": "small-multiples",
+  "title": "Repeated-scale panels",
+  "notes": "Purpose: Compare shapes without switching axes\nModify: Rewrite labels, recompute geometry from source data, adapt framing and orientation.\nInvariant: Use common bounds and scale for comparable panels.\nStatic: Already static; preserve semantic labels and readable strokes.",
+  "sources": [
+    {
+      "type": "original-example",
+      "file": "assets/svg/small-multiples.svg"
+    }
+  ],
+  "exportPolicy": "final",
+  "className": "",
+  "content": "<h1 class=\"g-title\">Repeated-scale panels</h1><p class=\"g-purpose\">Compare shapes without switching axes</p><div class=\"g-demo\"><svg aria-labelledby=\"g-small-multiples-small-multiples-title g-small-multiples-small-multiples-desc\" role=\"img\" viewbox=\"0 0 800 440\" xmlns=\"http://www.w3.org/2000/svg\"><title id=\"g-small-multiples-small-multiples-title\">Repeated-scale panels</title><desc id=\"g-small-multiples-small-multiples-desc\">Compare shapes without switching axes. Original schematic. Values are illustrative, not measured.</desc><g data-part=\"drawing\"><rect fill=\"#f5f7f6\" height=\"230\" rx=\"0\" stroke=\"none\" stroke-width=\"2\" width=\"190\" x=\"90\" y=\"95\"></rect><line stroke=\"#718594\" stroke-width=\"2\" x1=\"110\" x2=\"260\" y1=\"300\" y2=\"300\"></line><polyline fill=\"none\" points=\"110.0,250.0 150.0,180.0 200.0,215.0 250.0,125.0\" stroke=\"#28617b\" stroke-width=\"3\"></polyline><text fill=\"#17252d\" font-family=\"Arial, sans-serif\" font-size=\"22\" text-anchor=\"middle\" x=\"185\" y=\"365\">A</text><rect fill=\"#f5f7f6\" height=\"230\" rx=\"0\" stroke=\"none\" stroke-width=\"2\" width=\"190\" x=\"310\" y=\"95\"></rect><line stroke=\"#718594\" stroke-width=\"2\" x1=\"330\" x2=\"480\" y1=\"300\" y2=\"300\"></line><polyline fill=\"none\" points=\"330.0,250.0 370.0,210.0 420.0,190.0 470.0,145.0\" stroke=\"#28617b\" stroke-width=\"3\"></polyline><text fill=\"#17252d\" font-family=\"Arial, sans-serif\" font-size=\"22\" text-anchor=\"middle\" x=\"405\" y=\"365\">B</text><rect fill=\"#f5f7f6\" height=\"230\" rx=\"0\" stroke=\"none\" stroke-width=\"2\" width=\"190\" x=\"530\" y=\"95\"></rect><line stroke=\"#718594\" stroke-width=\"2\" x1=\"550\" x2=\"700\" y1=\"300\" y2=\"300\"></line><polyline fill=\"none\" points=\"550.0,250.0 590.0,240.0 640.0,165.0 690.0,165.0\" stroke=\"#28617b\" stroke-width=\"3\"></polyline><text fill=\"#17252d\" font-family=\"Arial, sans-serif\" font-size=\"22\" text-anchor=\"middle\" x=\"625\" y=\"365\">C</text></g></svg>\n</div><div class=\"g-footer\">Original instructional study · schematic / synthetic content <code>assets/svg/small-multiples.svg</code></div>"
+};

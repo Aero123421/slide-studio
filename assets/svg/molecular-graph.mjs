@@ -1,0 +1,17 @@
+// Original editable study. Read notes for purpose, modifications, and invariants.
+// Asset placeholders are embedded by scripts/craft-core.mjs. Change content and geometry freely.
+export default {
+  study: true,
+  "id": "molecular-graph",
+  "title": "Bond graph",
+  "notes": "Purpose: Show a schematic molecular connectivity graph\nModify: Rewrite labels, recompute geometry from source data, adapt framing and orientation.\nInvariant: Illustrative graph only. Verify valence, stereochemistry and molecular identity before scientific use.\nStatic: Already static; preserve semantic labels and readable strokes.",
+  "sources": [
+    {
+      "type": "original-example",
+      "file": "assets/svg/molecular-graph.svg"
+    }
+  ],
+  "exportPolicy": "final",
+  "className": "",
+  "content": "<h1 class=\"g-title\">Bond graph</h1><p class=\"g-purpose\">Show a schematic molecular connectivity graph</p><div class=\"g-demo\"><svg aria-labelledby=\"g-molecular-graph-molecular-graph-title g-molecular-graph-molecular-graph-desc\" role=\"img\" viewbox=\"0 0 800 440\" xmlns=\"http://www.w3.org/2000/svg\"><title id=\"g-molecular-graph-molecular-graph-title\">Bond graph</title><desc id=\"g-molecular-graph-molecular-graph-desc\">Show a schematic molecular connectivity graph. Original schematic. Values are illustrative, not measured.</desc><g data-part=\"drawing\"><line stroke=\"#718594\" stroke-width=\"4\" x1=\"250\" x2=\"380\" y1=\"200\" y2=\"130\"></line><line stroke=\"#718594\" stroke-width=\"4\" x1=\"380\" x2=\"510\" y1=\"130\" y2=\"200\"></line><line stroke=\"#718594\" stroke-width=\"4\" x1=\"510\" x2=\"510\" y1=\"200\" y2=\"315\"></line><line stroke=\"#718594\" stroke-width=\"4\" x1=\"510\" x2=\"380\" y1=\"315\" y2=\"375\"></line><line stroke=\"#718594\" stroke-width=\"4\" x1=\"380\" x2=\"250\" y1=\"375\" y2=\"315\"></line><line stroke=\"#718594\" stroke-width=\"4\" x1=\"250\" x2=\"250\" y1=\"315\" y2=\"200\"></line><line stroke=\"#718594\" stroke-width=\"4\" x1=\"510\" x2=\"650\" y1=\"200\" y2=\"120\"></line><circle cx=\"250\" cy=\"200\" fill=\"#28617b\" r=\"22\"></circle><text fill=\"#fff\" font-family=\"Arial, sans-serif\" font-size=\"20\" text-anchor=\"middle\" x=\"250\" y=\"207\">C</text><circle cx=\"380\" cy=\"130\" fill=\"#28617b\" r=\"22\"></circle><text fill=\"#fff\" font-family=\"Arial, sans-serif\" font-size=\"20\" text-anchor=\"middle\" x=\"380\" y=\"137\">C</text><circle cx=\"510\" cy=\"200\" fill=\"#28617b\" r=\"22\"></circle><text fill=\"#fff\" font-family=\"Arial, sans-serif\" font-size=\"20\" text-anchor=\"middle\" x=\"510\" y=\"207\">C</text><circle cx=\"510\" cy=\"315\" fill=\"#28617b\" r=\"22\"></circle><text fill=\"#fff\" font-family=\"Arial, sans-serif\" font-size=\"20\" text-anchor=\"middle\" x=\"510\" y=\"322\">C</text><circle cx=\"380\" cy=\"375\" fill=\"#28617b\" r=\"22\"></circle><text fill=\"#fff\" font-family=\"Arial, sans-serif\" font-size=\"20\" text-anchor=\"middle\" x=\"380\" y=\"382\">C</text><circle cx=\"250\" cy=\"315\" fill=\"#28617b\" r=\"22\"></circle><text fill=\"#fff\" font-family=\"Arial, sans-serif\" font-size=\"20\" text-anchor=\"middle\" x=\"250\" y=\"322\">C</text><circle cx=\"650\" cy=\"120\" fill=\"#ae4f31\" r=\"22\"></circle><text fill=\"#fff\" font-family=\"Arial, sans-serif\" font-size=\"20\" text-anchor=\"middle\" x=\"650\" y=\"127\">X</text></g></svg>\n</div><div class=\"g-footer\">Original instructional study · schematic / synthetic content <code>assets/svg/molecular-graph.svg</code></div>"
+};

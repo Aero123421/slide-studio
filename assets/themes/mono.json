@@ -1,0 +1,12 @@
+{
+  "name": "Monochrome / 簡潔",
+  "paper": "#FFFFFF",
+  "ink": "#111111",
+  "accent": "#333333",
+  "secondary": "#777777",
+  "font": "Noto Sans CJK JP",
+  "headingFont": "Noto Sans CJK JP",
+  "radius": 0,
+  "titleSize": 50,
+  "bodySize": 24
+}

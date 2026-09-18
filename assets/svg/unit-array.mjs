@@ -1,0 +1,17 @@
+// Original editable study. Read notes for purpose, modifications, and invariants.
+// Asset placeholders are embedded by scripts/craft-core.mjs. Change content and geometry freely.
+export default {
+  study: true,
+  "id": "unit-array",
+  "title": "Countable units",
+  "notes": "Purpose: Make an absolute count inspectable\nModify: Rewrite labels, recompute geometry from source data, adapt framing and orientation.\nInvariant: Do not silently change the value represented by a unit.\nStatic: Already static; preserve semantic labels and readable strokes.",
+  "sources": [
+    {
+      "type": "original-example",
+      "file": "assets/svg/unit-array.svg"
+    }
+  ],
+  "exportPolicy": "final",
+  "className": "",
+  "content": "<h1 class=\"g-title\">Countable units</h1><p class=\"g-purpose\">Make an absolute count inspectable</p><div class=\"g-demo\"><svg aria-labelledby=\"g-unit-array-unit-array-title g-unit-array-unit-array-desc\" role=\"img\" viewbox=\"0 0 800 440\" xmlns=\"http://www.w3.org/2000/svg\"><title id=\"g-unit-array-unit-array-title\">Countable units</title><desc id=\"g-unit-array-unit-array-desc\">Make an absolute count inspectable. Original schematic. Values are illustrative, not measured.</desc><g data-part=\"drawing\"><circle cx=\"170\" cy=\"105\" fill=\"#28617b\" r=\"19\"></circle><circle cx=\"235\" cy=\"105\" fill=\"#28617b\" r=\"19\"></circle><circle cx=\"300\" cy=\"105\" fill=\"#28617b\" r=\"19\"></circle><circle cx=\"365\" cy=\"105\" fill=\"#28617b\" r=\"19\"></circle><circle cx=\"430\" cy=\"105\" fill=\"#28617b\" r=\"19\"></circle><circle cx=\"495\" cy=\"105\" fill=\"#28617b\" r=\"19\"></circle><circle cx=\"560\" cy=\"105\" fill=\"#dce6e8\" r=\"19\"></circle><circle cx=\"625\" cy=\"105\" fill=\"#dce6e8\" r=\"19\"></circle><circle cx=\"170\" cy=\"170\" fill=\"#28617b\" r=\"19\"></circle><circle cx=\"235\" cy=\"170\" fill=\"#28617b\" r=\"19\"></circle><circle cx=\"300\" cy=\"170\" fill=\"#28617b\" r=\"19\"></circle><circle cx=\"365\" cy=\"170\" fill=\"#28617b\" r=\"19\"></circle><circle cx=\"430\" cy=\"170\" fill=\"#28617b\" r=\"19\"></circle><circle cx=\"495\" cy=\"170\" fill=\"#dce6e8\" r=\"19\"></circle><circle cx=\"560\" cy=\"170\" fill=\"#dce6e8\" r=\"19\"></circle><circle cx=\"625\" cy=\"170\" fill=\"#dce6e8\" r=\"19\"></circle><circle cx=\"170\" cy=\"235\" fill=\"#28617b\" r=\"19\"></circle><circle cx=\"235\" cy=\"235\" fill=\"#28617b\" r=\"19\"></circle><circle cx=\"300\" cy=\"235\" fill=\"#28617b\" r=\"19\"></circle><circle cx=\"365\" cy=\"235\" fill=\"#28617b\" r=\"19\"></circle><circle cx=\"430\" cy=\"235\" fill=\"#dce6e8\" r=\"19\"></circle><circle cx=\"495\" cy=\"235\" fill=\"#dce6e8\" r=\"19\"></circle><circle cx=\"560\" cy=\"235\" fill=\"#dce6e8\" r=\"19\"></circle><circle cx=\"625\" cy=\"235\" fill=\"#dce6e8\" r=\"19\"></circle><circle cx=\"170\" cy=\"300\" fill=\"#28617b\" r=\"19\"></circle><circle cx=\"235\" cy=\"300\" fill=\"#28617b\" r=\"19\"></circle><circle cx=\"300\" cy=\"300\" fill=\"#28617b\" r=\"19\"></circle><circle cx=\"365\" cy=\"300\" fill=\"#dce6e8\" r=\"19\"></circle><circle cx=\"430\" cy=\"300\" fill=\"#dce6e8\" r=\"19\"></circle><circle cx=\"495\" cy=\"300\" fill=\"#dce6e8\" r=\"19\"></circle><circle cx=\"560\" cy=\"300\" fill=\"#dce6e8\" r=\"19\"></circle><circle cx=\"625\" cy=\"300\" fill=\"#dce6e8\" r=\"19\"></circle></g></svg>\n</div><div class=\"g-footer\">Original instructional study · schematic / synthetic content <code>assets/svg/unit-array.svg</code></div>"
+};

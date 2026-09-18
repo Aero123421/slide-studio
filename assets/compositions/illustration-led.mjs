@@ -1,0 +1,12 @@
+// Original editable study. Read notes for purpose, modifications, and invariants.
+// Asset placeholders are embedded by scripts/craft-core.mjs. Change content and geometry freely.
+export default {
+  study: true,
+  "id": "composition-illustration-led",
+  "title": "Illustration-led explanation",
+  "notes": "Original composition study. Replace the subject, copy and evidence; preserve the relevant design principle. Photographs are separately credited.\nGive a source illustration enough space to carry the idea.\nOne detailed illustration beats a scattering of arbitrary icons.",
+  "sources": [],
+  "exportPolicy": "final",
+  "className": "c-slide",
+  "content": "<div style=\"position:absolute;inset:0;background:#f2f0e7;color:#17252d\"><h1 class=\"c-title\" style=\"left:65px;top:96px;width:620px;font-size:81px\">A line can<br/>carry an idea.</h1><div class=\"c-graphic\" style=\"left:625px;top:65px;width:600px;height:560px;\"><svg aria-labelledby=\"composition-botanical-study-botanical-study-title composition-botanical-study-botanical-study-desc\" role=\"img\" viewbox=\"0 0 800 440\" xmlns=\"http://www.w3.org/2000/svg\"><title id=\"composition-botanical-study-botanical-study-title\">Botanical line study</title><desc id=\"composition-botanical-study-botanical-study-desc\">Introduce organic line and negative space. Original schematic. Values are illustrative, not measured.</desc><g data-part=\"drawing\"><path d=\"M400 385Q420 200 340 65\" fill=\"none\" stroke=\"#17252d\" stroke-width=\"4\"></path><path d=\"M403 325Q303 255 323 205Q408 225 403 325\" fill=\"#dce6e8\" stroke=\"#28617b\" stroke-width=\"2\"></path><path d=\"M392 255Q292 185 312 135Q397 155 392 255\" fill=\"#dce6e8\" stroke=\"#28617b\" stroke-width=\"2\"></path><path d=\"M372 175Q272 105 292 55Q377 75 372 175\" fill=\"#dce6e8\" stroke=\"#28617b\" stroke-width=\"2\"></path><path d=\"M409 350Q529 325 539 255Q429 250 409 350\" fill=\"#dce6e8\" stroke=\"#28617b\" stroke-width=\"2\"></path><path d=\"M400 275Q520 250 530 180Q420 175 400 275\" fill=\"#dce6e8\" stroke=\"#28617b\" stroke-width=\"2\"></path><path d=\"M381 190Q501 165 511 95Q401 90 381 190\" fill=\"#dce6e8\" stroke=\"#28617b\" stroke-width=\"2\"></path></g></svg>\n</div><p class=\"c-body\" style=\"left:69px;top:430px;width:550px;\">Use a purposeful illustration instead of scattering generic icons across the page.</p><div class=\"c-foot\">Original vector source. Editable paths; not a botanical identification.</div></div>"
+};

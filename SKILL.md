@@ -1,6 +1,6 @@
 ---
 name: slide-studio
-description: Author, redesign, and QA original presentations from evidence: copy, layouts, data diagrams, animation, PDF/PPTX export, brand templates. For slide creation, research talks, template systems, any language. Not template-filling.
+description: "Author, redesign, and QA original presentations from evidence: copy, layouts, data diagrams, animation, PDF/PPTX export, brand templates. For slide creation, research talks, template systems, any language. Not template-filling."
 metadata:
   version: "3.4.0"
 ---

@@ -75,7 +75,7 @@
 .tpl-pitch .tp-mkt-row .tp-num{font-size:48px;margin:8px 0 6px}
 .tpl-pitch .tp-mkt-row p{font:400 16px/1.4 var(--tp-sans);color:var(--tp-ink-2)}
 .tpl-pitch .tp-mkt-row p b{font-weight:600;color:var(--tp-ink);font-variant-numeric:tabular-nums}
-.tpl-pitch .tp-mkt-method{position:absolute;left:64px;top:382px;width:420px;padding:18px 20px;background:var(--tp-paper-2);border-left:4px solid var(--tp-butter)}
+.tpl-pitch .tp-mkt-method{position:absolute;left:64px;top:382px;width:420px;padding:18px 20px;background:var(--tp-paper-2)}
 .tpl-pitch .tp-mkt-method p{font:400 16px/1.45 var(--tp-sans);color:var(--tp-ink-2)}
 .tpl-pitch .tp-mkt-method p + p{margin-top:8px}
 

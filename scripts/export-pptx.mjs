@@ -14,7 +14,7 @@ try{
  if(mode==='editable'&&!scene)throw Error('Editable export requires Slide Studio generated HTML or .scene.json. Use fidelity mode for arbitrary HTML.');
  let pictures=[];if(mode==='fidelity'){const dir=val('--png-dir');if(!dir)throw Error('fidelity mode needs --png-dir from render.mjs');pictures=(await fs.readdir(dir)).filter(n=>/^slide-\d+\.png$/.test(n)).sort((a,b)=>Number(a.match(/\d+/)[0])-Number(b.match(/\d+/)[0])).map(n=>path.resolve(dir,n));if(!pictures.length)throw Error('No slide PNGs');if(scene&&pictures.length!==scene.slides.length)throw Error('PNG count does not match scene');}
  const slides=mode==='editable'?scene.slides:pictures.map((pic,i)=>({title:scene?.slides[i]?.title||'Slide '+(i+1),paper:'#FFFFFF',notes:scene?.slides[i]?.notes||'',sources:scene?.slides[i]?.sources||[],elements:[{type:'image',src:pic,x:0,y:0,w:1280,h:720,alt:'Full-slide rendering'}]}));
- const note=s=>s.notes+(s.sources?.length?'\n\n[Sources]\n'+s.sources.map(x=>typeof x==='string'?x:JSON.stringify(x)).join('\n'):'')+`\n\n[Export] ${mode}; HTML motion flattened. SVG/image elements remain pictures.`;
+ const note=s=>s.notes+(s.sources?.length?'\n\n[Sources]\n'+s.sources.map(x=>typeof x==='string'?x:JSON.stringify(x)).join('\n'):'');// Export facts go to stdout, never into the presenter's notes.
  await fs.mkdir(path.dirname(path.resolve(output)),{recursive:true});
  if(adapter==='artifact'){
   const {Presentation,PresentationFile}=await dependency('@oai/artifact-tool');const deck=Presentation.create({slideSize:{width:1280,height:720}});

@@ -85,7 +85,7 @@
 .tpl-qbr .q-wf{position:absolute;left:124px;top:180px;width:760px;height:468px;padding:18px 18px 10px}
 .tpl-qbr .q-wf svg{width:724px;height:436px}
 .tpl-qbr .q-notes{position:absolute;left:912px;top:180px;width:312px}
-.tpl-qbr .q-note{padding:16px 0 16px 18px;border-left:3px solid var(--q-line-2);margin-bottom:14px}
+.tpl-qbr .q-note{padding:14px 0 16px;border-top:1px solid var(--q-line-2);margin-bottom:14px}
 .tpl-qbr .q-note.pos{border-color:var(--q-mint)}
 .tpl-qbr .q-note.neg{border-color:var(--q-coral)}
 .tpl-qbr .q-note h3{font:700 18px/1.4 var(--q-jp);color:var(--q-ink)}

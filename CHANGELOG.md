@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- `scripts/slop_check.py`: deck-level review of machine-made patterns in built HTML,
+  `.scene.json` or any `.pptx` — card-edge accent stripes and title bars, decorative
+  ordinals, one eyebrow + card-row skeleton on every page, English eyebrows in a CJK
+  deck, identity colors reused for unrelated items, near-duplicate pages, small live
+  text, status words on the canvas and tool metadata in notes. SKILL.md §3 G lists
+  each pattern with its repair; unexplained findings block delivery.
+- Native PPTX export no longer appends `[Export] …` to speaker notes (it stays on stdout).
+- Studio layouts: removed the accent bar under the cover kicker and the colored stripe
+  above each metric. Copy gate rejects status labels such as 「登壇用ドラフト」.
+- Template packs: removed card-edge stripes and title ticks the new check located.
 - 12 template packs, 72 pages (`assets/templates/`, catalog kind `templates`,
   `gallery/templates.html`): pitch, quarterly business review, strategy proposal,
   Japanese research talk, architecture review/postmortem, ML model report, lecture,

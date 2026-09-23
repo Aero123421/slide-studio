@@ -13,7 +13,7 @@
 .tpl-strategy svg{display:block;overflow:visible}
 
 /* Chrome: green tick, action title, chapter tracker, hairline, footer */
-.tpl-strategy .s-tick{position:absolute;left:60px;top:40px;width:44px;height:5px;background:var(--s-green)}
+.tpl-strategy 
 .tpl-strategy .s-title{position:absolute;left:60px;top:58px;width:860px;font:700 28px/1.5 var(--s-jp);letter-spacing:.01em;color:var(--s-ink)}
 .tpl-strategy .s-title em{font-style:normal;color:var(--s-green)}
 .tpl-strategy .s-track{position:absolute;right:60px;top:40px;display:flex;gap:4px}
@@ -23,7 +23,7 @@
 .tpl-strategy .s-foot{position:absolute;left:60px;right:60px;bottom:22px;display:flex;justify-content:space-between;font:400 15px/1.3 var(--s-jp);color:var(--s-muted)}
 .tpl-strategy .s-foot b{font:400 16px/1.3 var(--s-fig);color:var(--s-ink);margin-left:10px}
 .tpl-strategy .s-fig{font-family:var(--s-fig);font-variant-numeric:lining-nums tabular-nums}
-.tpl-strategy .s-so{position:absolute;left:60px;right:60px;display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:center;padding:12px 18px;background:var(--s-green-pale);border-left:5px solid var(--s-green)}
+.tpl-strategy .s-so{position:absolute;left:60px;right:60px;display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:center;padding:12px 18px;background:var(--s-green-pale)}
 .tpl-strategy .s-so b{font:700 15px/1 var(--s-jp);letter-spacing:.14em;color:var(--s-green)}
 .tpl-strategy .s-so p{font:700 18px/1.5 var(--s-jp);color:var(--s-ink)}
 

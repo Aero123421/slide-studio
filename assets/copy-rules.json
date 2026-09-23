@@ -44,6 +44,11 @@
       "id": "ja-performed-sincerity",
       "level": "warning",
       "pattern": "正直に(?:言います|お知らせ|お伝え)|本当の価値|価値を紡ぐ"
+    },
+    {
+      "id": "ja-status-label",
+      "level": "error",
+      "pattern": "(?:登壇用|発表用|社内用|作業用|提出用)(?:ドラフト|下書き)"
     }
   ]
 }

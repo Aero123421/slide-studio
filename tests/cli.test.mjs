@@ -1,0 +1,12 @@
+import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs/promises';import os from 'node:os';import path from 'node:path';import {spawnSync} from 'node:child_process';import {fileURLToPath} from 'node:url';
+const ROOT=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
+const run=(args,env={})=>spawnSync(process.execPath,args,{cwd:ROOT,encoding:'utf8',env:{...process.env,...env}});
+test('render.mjs forwards an explicit --states value once',{skip:process.platform==='win32'},async()=>{const dir=await fs.mkdtemp(path.join(os.tmpdir(),'ss-render-'));try{const fake=path.join(dir,'python');await fs.writeFile(fake,'#!/bin/sh\nshift\necho "$@"\n',{mode:0o755});
+ const argv=a=>run(['scripts/render.mjs','deck.html','out',...a],{PYTHON:fake}).stdout.trim();
+ assert.equal(argv(['--states','all','--check']),'deck.html --out out --states all --check');
+ assert.equal(argv(['--states','sampled']),'deck.html --out out --states sampled');
+ assert.equal(argv(['--states','--check']),'deck.html --out out --states all --check');
+ assert.equal(argv(['--inline','--states']),'deck.html --out out --states all');}finally{await fs.rm(dir,{recursive:true,force:true})}});
+test('craft build refuses to overwrite without --force and explains how',async()=>{const dir=await fs.mkdtemp(path.join(os.tmpdir(),'ss-craft-'));try{const project=path.join(dir,'p');assert.equal(run(['scripts/craft.mjs','init',project]).status,0);
+ const build=extra=>run(['scripts/craft.mjs','build',path.join(project,'deck.mjs'),'--out',path.join(project,'deck.html'),'--allow-draft',...extra]);
+ assert.equal(build([]).status,0);const again=build([]);assert.equal(again.status,1);assert.match(again.stderr,/already exists; pass --force/);assert.equal(build(['--force']).status,0);}finally{await fs.rm(dir,{recursive:true,force:true})}});

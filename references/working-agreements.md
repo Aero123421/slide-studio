@@ -1,6 +1,7 @@
 # Working Agreements
 
-Autonomous work comes first, followed by installation and portability, then distribution and rights.
+Autonomy and decisions; installation, portability and capability tiers; privacy,
+trust and rights; primary references.
 
 ## Autonomous decisions without arbitrary choices
 
@@ -61,8 +62,6 @@ Never count color swaps as a new explanatory mechanism.
 
 ## Why the skill is written this way
 
-The following sections explain the design rationale behind the autonomy rules above.
-
 The entry instruction names responsibilities, freedoms, invariants and completion
 evidence. It does not prescribe a look. Task-specific detail is retrieved only when
 needed, keeping a smaller model's working context focused. Instructions combine an
@@ -116,8 +115,6 @@ specific explanation, not a blanket waiver that hides defects.
 
 ## Installation and portability
 
-The sections below cover installing the distributable and verifying it before work.
-
 The distributable folder is `slide-studio/`, containing `SKILL.md`. Install that entire
 folder, not just SKILL.md, in the agent's supported skill directory. Keep the folder
 name aligned with frontmatter `name`. This is a standard Agent Skills layout with
@@ -169,9 +166,10 @@ Everything build- and browser-related stays unrun.
 
 **Tier 1 — Node 20+ and/or Python 3.10+ standard library, no installs.**
 `catalog.mjs`, `craft.mjs` (init/build), `studio.mjs` (list/init/validate/build),
-`css-check.mjs`, `lint.mjs`, `svg-edit.py`, `editorial.py`, `evidence.py`,
-`fontcheck.py`, `audit.py`, `brand-capture.py`, `inspect-brand.py`, plus
-`clean.py`/`verify-review.py` on existing review output. Bundled gallery HTML
+`lint.mjs`, `svg-edit.py`, `editorial.py`, `evidence.py`, `audit.py`,
+`brand-capture.py`, `inspect-brand.py`, plus `clean.py`/`verify-review.py` on existing
+review output. The CSS preflight (`css-check.mjs`) runs inside build and QA.
+`fontcheck.py` additionally needs the optional `fontTools` package. Bundled gallery HTML
 opens directly. This tier builds and statically checks a deck.
 
 **Tier 2 — `pip install -r requirements.txt` plus Playwright Chromium.**
@@ -186,7 +184,7 @@ PPTX), `brand-template.py` (.potx). This tier renders, reviews, and exports.
 ```sh
 node scripts/catalog.mjs search "comparison"
 node scripts/catalog.mjs take motion-focal-reveal ./smoke-study
-node scripts/craft.mjs build ./smoke-study/deck.mjs --out ./smoke-study/deck.html
+node scripts/craft.mjs build ./smoke-study/deck.mjs --out ./smoke-study/deck.html --allow-draft
 python scripts/qa.py ./smoke-study/deck.html --out ./smoke-study/.studio-review/current --check
 ```
 
@@ -196,8 +194,6 @@ Use an actual catalog ID returned by search if a particular example ID changes.
 separate explicit command described in the README. These tests do not require API keys.
 
 ## Public distribution, data boundaries and asset rights
-
-The final sections govern privacy, trust, rights, and release hygiene.
 
 ### Privacy
 
@@ -227,8 +223,8 @@ external services. Any new integration needs its own permission and security rev
 ### Rights and redistribution
 
 Original code, docs and authored vector studies in this release are offered under
-MIT. Third-party photographs retain the rights stated in `THIRD_PARTY_NOTICES.md`
-and `assets/media/provenance.json`. Keep attribution when redistributing. User-provided
+MIT. Third-party photographs retain the rights stated in `THIRD_PARTY_NOTICES.md`.
+Keep attribution when redistributing. User-provided
 logos, product photos and confidential decks do not become MIT merely by importing them.
 
 No font files are included. Do not copy system fonts into the ZIP. Record chosen
@@ -246,3 +242,47 @@ do not commit those private terms into a public audit test.
 A distributable skill includes source, docs, tests, license/notices, dependency setup,
 working examples and a verification statement. It excludes node_modules, browser
 binaries, virtualenvs, pycache, transient renders, secret configs and user artifacts.
+
+## Primary references
+
+Consulted 2026-09-06. These are references for standards and integration boundaries,
+not copied templates or a claim that every optional integration was tested. The
+original design guidance is the author's synthesis and practical implementation.
+
+| Topic | Primary source | How used |
+|---|---|---|
+| Agent Skills structure | https://agentskills.io/specification | Frontmatter, naming, progressive references |
+| Agent description design | https://agentskills.io/skill-creation/optimizing-descriptions | Task triggers and progressive retrieval |
+| Codex/ChatGPT skill documentation | https://developers.openai.com/codex/skills/ | Host installation guidance; follow current redirect |
+| Claude Code skills | https://code.claude.com/docs/en/skills | Folder-level install and portability |
+| Motion from interactions | https://www.w3.org/WAI/WCAG21/Understanding/animation-from-interactions | Suppression of nonessential interactive motion |
+| Pause/stop/hide | https://www.w3.org/WAI/WCAG21/Understanding/pause-stop-hide.html | Automatic animation controls |
+| Reduced motion | https://www.w3.org/WAI/WCAG22/Techniques/css/C39 | CSS preference behavior |
+| Media autoplay | https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Autoplay | Explicit playback and blocked-play fallback |
+| Media play promise | https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/play | Promise-aware playback |
+| RTL markup | https://www.w3.org/International/questions/qa-html-dir | Directionality and mixed text |
+| Optional model-viewer | https://modelviewer.dev/docs/index.html | Camera controls and renderer integration boundary |
+| Model loading/decoders | https://modelviewer.dev/examples/loading/ | Posters and offline decoder dependency caveat |
+
+For publication-critical accessibility and compatibility decisions, consult the
+current full standards and test the final environment. Example checks do not certify
+conformance. Rights references for photographs are recorded separately in notices.
+
+W3C contrast minimum: https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum
+W3C non-text contrast: https://www.w3.org/WAI/WCAG21/Understanding/non-text-contrast.html
+scikit-image media rights: https://scikit-image.org/docs/stable/api/skimage.data.html
+
+### Input, animation and native-template references
+
+- Keyboard focus/event routing: https://developer.mozilla.org/en-US/docs/Web/API/Element/keydown_event
+- Held keys: https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/repeat
+- IME composition: https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/isComposing
+- Committed animation completion: https://developer.mozilla.org/en-US/docs/Web/API/Animation/finish
+- Cancellation: https://developer.mozilla.org/en-US/docs/Web/API/Animation/cancel
+- Finished promise: https://developer.mozilla.org/en-US/docs/Web/API/Animation/finished
+- Native placeholders: https://python-pptx.readthedocs.io/en/latest/user/placeholders-using.html
+- Native slide layout API: https://python-pptx.readthedocs.io/en/latest/api/slide.html
+
+These explain event and file-model behavior. The brand capture, six native layouts,
+copy gate and spatial diagnostics in this skill are local implementations, not an
+assertion that these references validate the skill’s overall design quality.

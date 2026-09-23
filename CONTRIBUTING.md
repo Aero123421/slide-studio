@@ -15,7 +15,7 @@ CI fails when either differs from a fresh build.
 Rights for borrowed media must be clear; do not silently relicense an upstream asset.
 No telemetry or external service should become required without explicit design review.
 
-For agent evaluation, record model/version, actual prompt, tool availability,
+For agent evaluation, follow [tests/EVALUATION.md](tests/EVALUATION.md). Record model/version, actual prompt, tool availability,
 source material, edits, outcomes and limitations. Do not report unrun evaluations as
 passes. Taste improvements should be demonstrated by concrete before/after evidence,
 not only a numerical score. Keep review files outside the release by default.

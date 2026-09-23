@@ -1,6 +1,6 @@
 # Verification and Delivery
 
-Delivery checklist: release gates first, then rendered-integrity QA, font auditing, export routes, and independent evaluation.
+Release gates first, then rendered-integrity QA, PDF font auditing and export routes.
 
 ## Quality gates and honest release criteria
 
@@ -32,6 +32,8 @@ python scripts/qa.py project/deck.html --out project/.studio-review/current --st
 python scripts/qa.py project/deck.html --out project/.studio-review/current --states all --review-states
 ```
 
+Other options: `--width`/`--height` (default 1280×780 viewport) and `--reduced-motion`.
+
 The tool measures overflow, text overlap, broken images, missing image alt attributes,
 duplicate IDs, runtime errors and blocked external requests. Warnings about small
 text need contextual review. Intentional crops can mask geometry, so manually inspect
@@ -40,7 +42,7 @@ truth, chart math, native-language fluency or overall aesthetic quality.
 
 It also checks structural CSS, severe measurable solid-color contrast and optional
 rendered-style/mark/focal-region assertions. Other contrast, paint, crop and stacking
-findings are advisory or unmeasured. See rendered integrity
+findings are advisory or unmeasured. See [Check what was actually painted](#check-what-was-actually-painted)
 for the precise boundaries, including why `--states all` is not widget-choice coverage.
 
 Default frames stay in memory and the report is one JSON plus one review HTML.
@@ -74,7 +76,7 @@ models. Do not claim independent-agent evaluation unless those agents were actua
 run and their outputs scored. Report clearly what was tested and what remains outside
 that test's scope.
 
-### Copy and space release gates (3.2)
+### Copy and space release gates
 
 The source check and the rendered check both inspect audience text. Production cues
 created by JavaScript are as real as static headings. Test intentional exact quotes
@@ -99,8 +101,6 @@ approve factual accuracy or design. Run QA separately on a notes-stripped audien
 build; matching visible text alone does not bind the report to that final file.
 
 ## Check what was actually painted
-
-The following section covers final HTML QA diagnostics: failed CSS, unreadable text, missing marks, and cropped subjects.
 
 Read this for final HTML QA, failed CSS, unreadable text, missing marks or cropped
 subjects. These are bounded diagnostics, not a replacement for viewing the deck.
@@ -161,7 +161,9 @@ For images without a focal annotation, manually compare the original and final c
 
 ### Meaningful controls need meaningful tests
 
-`qa.py --states all` covers declared slide builds and static final states.
+`qa.py --states all` covers declared slide builds and static final states of
+`craft.mjs` decks (the default is `sampled`: first, middle and last build); `studio.mjs`
+decks are inspected in their final build state only.
 `qa-navigation.py` exercises presentation navigation. Neither enumerates arbitrary
 custom controls nor establishes their scientific correctness. For discrete controls,
 check each choice's actual claim, formula, marks and labels; for ranges, use endpoints,
@@ -188,8 +190,6 @@ If image viewing is unavailable, say "HTML generated; visual review pending", ke
 the review HTML, and request an available visual reviewer instead of certifying beauty.
 
 ## PDF typography: inspect the font that was actually used
-
-The following section covers font auditing and PDF postflight before delivery.
 
 Four different problems can look like a bad PDF font:
 
@@ -278,8 +278,6 @@ Primary technical references: [MDN FontFaceSet.check](https://developer.mozilla.
 
 ## Export routes: choose deliberately
 
-The following section covers choosing and verifying the delivery format.
-
 PDF delivery has actual-font auditing and postflight. Use an approved project-local font contract and follow PDF typography. The postflight dependency is pypdf, included in `requirements.txt`.
 
 | Route | Preserved | Not preserved |
@@ -320,7 +318,10 @@ estimates and requires real output inspection. Font differences between environm
 can still change wrapping. SVG geometry stays a picture in the PPTX route.
 
 The historical `--mode fidelity --png-dir` entry point is retained for existing
-workflows, but the new `export.py` route avoids loose frames. The optional artifact
+workflows only; no bundled script produces the `slide-NN.png` frames it expects. Use
+`export.py` for picture PPTX. Native routes (`export-pptx.mjs --mode editable`,
+`export-pdf-office.mjs`, which also needs LibreOffice `soffice` or
+`SLIDE_STUDIO_SOFFICE`) accept `studio.mjs` HTML, not `craft.mjs` HTML. The optional artifact
 adapter is inherited and is not part of the tested default release path; do not
 claim it was verified unless you run it in a supporting environment.
 
@@ -336,44 +337,3 @@ objects as appropriate. Opening and parsing a PPTX verifies its structure, not v
 identity in every version of PowerPoint, Keynote or LibreOffice. Review the target
 application for critical deliveries. No bundled route converts CSS into PowerPoint
 animations or promises editable video/3D assets inside PPTX.
-
-## Evaluate the ability to author, not memorize layouts
-
-The final section covers independent evaluation of authoring ability, distinct from regression tests.
-
-Field outputs must be compared with the task, data and requested reading mode, not just gallery screenshots. Use the [transfer evaluation fixtures](../tests/transfer-evals.json); no new external-model performance claim follows from local regressions.
-
-The evaluation briefs in `evals/tasks.json` are reusable tests for *another* model.
-They are not claims that those models have been run. Record model/version, tool
-access, prompt, context budget, elapsed work, interventions and produced artifacts.
-Do not compare a fully tool-enabled agent with a text-only model without stating it.
-
-### Dimensions
-
-1. Correctness: evidence, scope, units, data transformations and citations.
-2. Narrative: useful ordering, specific titles, appropriate density and no filler.
-3. Composition: hierarchy, typography, image use, geometric integrity and cohesion.
-4. Behavior: functional controls, deterministic states, reset/revisit/reduced motion.
-5. Generalization: an unseen relationship or constraint handled without merely
-   selecting a supplied layout or recoloring a gallery slide.
-6. Delivery: requested format, honest editability, complete source, bounded QA output.
-
-Score each dimension 0–4 using concrete observations. A critical factual error,
-broken primary interaction, essential clipping or misleading export claim fails the
-task regardless of average score. Do not advertise a universal “design score”.
-
-### Experimental design
-
-Give the same brief and source data to agents with and without the skill. Use unseen
-subjects and compare blind when feasible. Include at least one localization stress,
-one modification of existing source, one entirely new interaction, one data-heavy
-scientific page, one image-led deck and one native-PPTX request. Include negative
-controls: an intentionally simple static deck should not become an app.
-
-Hold prompt and tool permissions constant. Inspect actual outputs. Do not use
-similarity to a gallery image as the quality metric. A different composition can
-be better. Record concrete interventions and whether the model needed repair hints.
-
-The bundled software regression suite tests helpers, parsers, retention, build and
-browser behavior. This is necessary infrastructure evidence, not a substitute for
-independent-agent creative evaluation or audience comprehension studies.

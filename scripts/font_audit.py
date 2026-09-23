@@ -169,7 +169,7 @@ def main():
             browser=launch(pw)
             try:
                 page=browser.new_page(service_workers='block');blocked=[];guard_network(page,blocked);open_deck(page,Path(a.input))
-                page.evaluate('()=>window.slideStudio.prepareExport()')
+                page.evaluate('()=>window.slideStudio.prepareExport?.() || window.slideStudio.showAllBuilds()')
                 if not a.screen:page.emulate_media(media='print')
                 settle_fonts(page);r=audit_fonts(page,contract)
                 if blocked:r['errors'].append({'message':'Blocked external requests','requests':blocked});r['passed']=False

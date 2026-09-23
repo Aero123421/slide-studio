@@ -100,7 +100,11 @@ The numbers above illustrate the schema; they are not evidence for a real claim.
 
 ### Common fields
 
-`layout`, `title` required. Optional `id` (unique), `kicker`, `notes`, `sources`. `theme` is a bundled name, an inline token object, or a JSON path relative to the deck. CLI `--theme path.json` is relative to the working directory. Local image paths are relative to the deck JSON. Assets are embedded; network fetches are not implicit.
+`layout`, `title` required. Optional `id` (unique), `kicker`, `notes`, `sources`, and
+`chrome:false` to omit the title, kicker, logo, footer, page number and DEMO marker
+for a full-bleed page. `reveal:[elementId,…]` assigns builds 1, 2, … in that order;
+`build:'content'` reveals the whole content band at step 1 and `build:'sequential'`
+reveals it column by column. `theme` is a bundled name, an inline token object, or a JSON path relative to the deck. CLI `--theme path.json` is relative to the working directory. Local image paths are relative to the deck JSON. Assets are embedded; network fetches are not implicit.
 
 `brand.footer` changes the footer. `brand.logo` is a local image path with `brand.name` for alt text. The small standard logo frame is 120×42 px; for a brand requiring another placement/clear space, adapt the layout before calling it compliant.
 
@@ -144,9 +148,9 @@ Each element uses `type,x,y,w,h`. Types: `text`, `rect`, `ellipse`, `line`, `ima
 - Shapes: `fill,stroke,strokeWidth,radius`. Set fill/stroke to `none` when absent.
 - Line: positive bounding size; optional `x1,y1,x2,y2` for direction. Keep connectors behind labels/nodes.
 - Image: local `src`, meaningful `alt`, `fit`. SVG: literal `svg` markup, `alt`; no scripts, active embeds, or external references.
-- Build: `step` integer 0+; see motion reference.
+- Build: `step` integer 0+ (0 = visible from the start), or use the slide-level `reveal`/`build` fields above.
 
-The freeform layout still has a standard header/footer. For a true full-bleed custom page, use the standalone animated HTML recipe and fidelity export, or intentionally extend the compiler. Do not place a second title over the existing one.
+The freeform layout keeps the standard header/footer unless the slide sets `chrome:false`; use that for a full-bleed native composition. Do not place a second title over an existing one.
 
 ### Iterating without losing control
 
@@ -162,7 +166,8 @@ Supported does not mean unlimited: right-to-left shaping, native chart workbooks
 
 ## Authoring API and project layout
 
-The following covers the creative `craft.mjs` API and project layout, distinct from the structured `studio.mjs` workflow above.
+The creative `craft.mjs` API (the default original-HTML route), distinct from the
+structured `studio.mjs` workflow above.
 
 ### The default authored module
 
@@ -206,10 +211,16 @@ in an `<img>` is easier to isolate but cannot be animated by selecting its inter
 
 ### Studies and adaptation
 
+Template packs (`assets/templates/<pack>/`, catalog kind `templates`) are complete page
+sets with their own art direction. Each slide module is self-contained: data arrays at
+the top drive the SVG geometry, so edit the data and let labels and marks update together.
+`pack.css` is scoped to the pack class. Replace fictional names and synthetic numbers,
+and keep each page's visible "illustrative data" line until real sources replace it.
+
 `catalog.mjs search`, `show` and `take` help retrieve a small number of relevant
 examples. `take` writes a new directory with editable `.mjs`, CSS and required local
 media; it never overwrites an existing directory. It also writes provenance notes.
-The resulting `deck.mjs` can be built directly. Built-in widgets depend on the
+The resulting `deck.mjs` is a draft: preview it with `build --allow-draft`. Built-in widgets depend on the
 installed runtime at build time, not on a network at viewing time.
 
 Every catalog source exports a slide object. It may be imported into an authored
@@ -237,10 +248,11 @@ calculate orthogonal endpoints; `scaleLinear` maps finite data; `contrast` compu
 opaque color contrast; `checkBounds` flags invalid rectangles. They are useful
 primitives, not an automatic layout optimizer or a visual quality scorer.
 
-Run `craft.mjs validate` for schema and script parsing, `editorial.py` for story
+`craft.mjs build` refuses to overwrite an existing `--out`; pass `--force` when
+rebuilding the same file intentionally. Run `craft.mjs validate` for schema and script parsing, `editorial.py` for story
 checks, and `qa.py` for browser measurements. Inspect actual output after all three.
 
-### Refinement support in 3.2
+### Layout helpers, review metadata, brand and notes
 
 `craft.mjs init` also copies `layout.mjs`. Its `allocate`, `dagLayers`, `labelRail`
 and `routeOrthogonal` helpers calculate geometry with explicit fit checks. They

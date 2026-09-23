@@ -74,6 +74,7 @@ transfer-evaluation briefs are **unrun future tests**, not measured model improv
 | Motion | 64 | Stable identities, timelines, paths, decomposition, masking, uncertainty, focus, state changes |
 | Interaction | 24 | Actual recalculation, selection, tables, media playback, OBJ/STL mesh inspection, annotations |
 | Whole-slide compositions | 36 | Image-led, typographic, geometric, editorial, quantitative and dense layouts |
+| Template packs | 72 | Richly designed, practical page sets in English and Japanese — pitch, business review, strategy, research talk, architecture review, ML report, lecture, editorial, impact report, launch, project status and keynote. Charts are computed from each page's data; all content is synthetic |
 
 Also included: multilingual and image-framing studies, a complete synthetic research
 case, two from-scratch derivations (including label-length stress cases), a six-page
@@ -113,11 +114,15 @@ node scripts/craft.mjs init ./presentation --language en
 node scripts/craft.mjs build ./presentation/deck.mjs --out ./presentation/deck.html
 ```
 
-Node 20+ builds dependency-free self-contained HTML. Import helpers from the copied
+Node 20+ builds dependency-free self-contained HTML. The build never overwrites an
+existing output silently; add `--force` when rebuilding the same file. Import helpers from the copied
 `studio-kit.mjs`, or write plain HTML/CSS/SVG. The source module is **trusted code**,
 not a sandbox for untrusted modules. See [authoring](references/authoring.md).
 
 ### Find material without committing to a template
+
+Browse the [template packs](gallery/templates.html) for complete, practical page sets, or
+search every study by communication job:
 
 ```sh
 node scripts/catalog.mjs search "uncertainty comparison"

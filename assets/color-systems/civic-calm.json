@@ -1,0 +1,42 @@
+{
+  "id": "civic-calm",
+  "name": "Civic Calm",
+  "nameJa": "青磁（自治体・公共報告）",
+  "mode": "light",
+  "mood": "ごく薄い水色がかった紙に濃い墨、落ち着いた青磁色を1色。誰にでも読めることを最優先し、色は常に文字や記号と対で使う。",
+  "useFor": ["自治体・省庁の住民向け報告", "公共事業の説明会資料", "統計・調査結果の公表", "高齢者や色覚多様性に配慮した説明"],
+  "avoidFor": ["ブランドの個性を打ち出す資料", "ダーク背景の演出", "投資家向けの攻めの提案"],
+  "tokens": {
+    "paper": "#f7f9f9",
+    "surface": "#e9f0f0",
+    "ink": "#1c262a",
+    "inkMuted": "#465559",
+    "rule": "#c9d5d6",
+    "accent": "#226b66",
+    "onAccent": "#ffffff",
+    "positive": "#2b6e3f",
+    "negative": "#a6392f"
+  },
+  "data": {
+    "categorical": ["#226b66", "#a8642a", "#4a4f8c"],
+    "sequential": ["#e2efee", "#aed4d1", "#6fb0ab", "#3a837e", "#174a47"],
+    "diverging": ["#a6392f", "#e4a89b", "#f0f2f1", "#93cbc6", "#226b66"],
+    "highlight": "#226b66",
+    "context": "#c2cfd0"
+  },
+  "type": {
+    "display": "\"Segoe UI\",\"Helvetica Neue\",\"Liberation Sans\",Arial,\"BIZ UDPGothic\",\"Hiragino Sans\",\"Noto Sans JP\",\"Meiryo\",sans-serif",
+    "body": "\"Segoe UI\",\"Helvetica Neue\",\"Liberation Sans\",Arial,sans-serif",
+    "ja": "\"BIZ UDPGothic\",\"Hiragino Sans\",\"Noto Sans JP\",\"Yu Gothic\",\"Meiryo\",\"IPAGothic\",sans-serif"
+  },
+  "ratios": {"paperAndSurface": 0.86, "ink": 0.1, "accentMax": 0.04},
+  "rules": [
+    "青磁色は「今年度・当市・対象地区」など主題の1系列と、問い合わせ先・締切など読者が行動する箇所にだけ使う。見出しの色や飾り帯には使わない。",
+    "色の違いには必ず文字か記号を添える。グラフは直接ラベル、地図・表は模様や記号（●▲■）を併用し、色だけで区別しない。",
+    "本文と補助文字は 16px 以上、補助文字も濃い灰（inkMuted）で、薄い灰の小さな注記は作らない。",
+    "増減は「増」「減」の語と矢印を数字の前に書き、緑・赤は添え色にとどめる。",
+    "比較対象（他自治体・全国平均・前年度）は context の灰青で描く。分類色は最大3色（青磁・柿渋・藍）、それを超えるときは表にする。",
+    "面（surface）は手続きの手順枠や注意書きにだけ使い、装飾のカードには使わない。"
+  ],
+  "source": "Original. Accessibility-first public-sector palette with a single celadon accent; contrast and color-vision checks by scripts/color-systems.mjs."
+}

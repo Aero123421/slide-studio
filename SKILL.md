@@ -81,6 +81,10 @@ comparison or table. Allocate space from measured content, not inherited card sl
 A small top-heavy cluster above a blank lower half often needs a larger evidence area,
 not fewer facts or more decoration. Choose type and available fonts before fitting text.
 Keep related explanation near its evidence. Dense reference pages can remain dense.
+Take color from one role-based system: the brand's, or one of `assets/color-systems/`
+(`node "$SKILL_DIR/scripts/color-systems.mjs" validate` lists their checks;
+`gallery/color-systems.html` shows them). Text stays ink and muted ink; the accent
+marks the one thing a page is about; categorical colors live on data marks only.
 
 **D. Prototype and repair.** Make the hardest explanatory page and one contrasting
 page. Render them before multiplying a flawed design. Inspect full-size text, figure

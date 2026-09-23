@@ -1,0 +1,42 @@
+{
+  "id": "food-market",
+  "name": "Food Market",
+  "nameJa": "フード・マーケット（クラフト紙・焦茶・トマトの赤）",
+  "mode": "light",
+  "mood": "市場の値札のようなクラフト色の紙に、焦茶の文字とトマトの赤を1点。食欲をそそる暖色は写真に任せ、色は値段と主役の一皿にだけ使う。",
+  "useFor": ["飲食・小売の商品提案","食品ブランドの企画書","ホテル・観光の食プラン紹介"],
+  "avoidFor": ["医療・衛生の報告","IT基盤の技術説明","厳粛な式典"],
+  "tokens": {
+    "paper": "#f2e7d2",
+    "surface": "#faf4e8",
+    "ink": "#2f2118",
+    "inkMuted": "#66503f",
+    "rule": "#dccbb0",
+    "accent": "#b83e1e",
+    "onAccent": "#ffffff",
+    "positive": "#3f7a3a",
+    "negative": "#7b2a1a"
+  },
+  "data": {
+    "categorical": ["#b83e1e","#2f6b73","#66304d"],
+    "sequential": ["#f6d8c8","#e9a98c","#d67a5a","#b83e1e","#6d2110"],
+    "diverging": ["#2f6b73","#a9c6c9","#f7f2e6","#e9a98c","#b83e1e"],
+    "highlight": "#b83e1e",
+    "context": "#c9b99f"
+  },
+  "type": {
+    "display": "\"Helvetica Neue\",\"Segoe UI\",\"Liberation Sans\",Arial,sans-serif",
+    "body": "\"Helvetica Neue\",\"Segoe UI\",\"Liberation Sans\",Arial,sans-serif",
+    "ja": "\"Hiragino Sans\",\"Noto Sans JP\",\"Yu Gothic\",\"Meiryo\",\"IPAGothic\",sans-serif"
+  },
+  "ratios": {"paperAndSurface": 0.84, "ink": 0.11, "accentMax": 0.05},
+  "rules": [
+    "トマトの赤は1ページに1か所：主役の一皿の名前、価格、または1本の系列。メニュー全部を赤くしない。",
+    "食欲を誘う色は写真が担う。写真の脇では図形も見出しも焦茶と紙色だけにし、写真の色と赤が競わないようにする。",
+    "分類色はトマト・海の青緑・葡萄の3色まで。原材料やカテゴリの比較にだけ使い、比較しない品目は context のベージュにする。4つ目の色は作らず、線種か表で分ける。",
+    "プラス/マイナスは色に加えて符号（+/−）を書く。赤は主役の意味であり、減少や欠品の意味には使わない。欠品は inkMuted の文字で示す。",
+    "表の行は surface の明るいクリームで交互に塗ってよいが、赤や青緑の行塗りはしない。",
+    "紙色のクラフトは全ページ共通。赤の全面背景は表紙だけ、そのとき文字は白（onAccent）で、飾り枠は置かない。"
+  ],
+  "source": "Original. Contrast and color-vision checks by scripts/color-systems.mjs."
+}

@@ -55,12 +55,14 @@ review caches as if they were source assets.
 ```sh
 python scripts/slop_check.py project/deck.html        # or deck.scene.json, or any .pptx
 python scripts/slop_check.py project/native.pptx --check
+python scripts/slop_check.py project/deck.html --palette assets/color-systems/<id>.json
 ```
 
 It reports located, repairable signals: accent stripes on card edges and bars under
 titles, decorative ordinals, one eyebrow + card-row skeleton repeated across the deck,
 English eyebrows in a CJK deck, an identity color reused for unrelated items,
-near-duplicate pages, a high share of small live text, status words ("登壇用ドラフト",
+near-duplicate pages, text set in many hues, colors outside a declared system
+(`--palette`), a high share of small live text, status words ("登壇用ドラフト",
 "draft") on the canvas and tool metadata in speaker notes. See SKILL.md §3 G for the
 repair of each. Warnings are review prompts: fix them or record a one-line reason the
 pattern carries meaning on that page. `--check` exits 2 only for errors (production

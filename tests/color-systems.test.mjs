@@ -1,0 +1,12 @@
+import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs/promises';import path from 'node:path';import {fileURLToPath} from 'node:url';
+import {validate,contrast,specimenSlide} from '../scripts/color-systems.mjs';
+import {validateCraft} from '../scripts/craft-core.mjs';
+const ROOT=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');const DIR=path.join(ROOT,'assets/color-systems');
+const load=async f=>JSON.parse(await fs.readFile(path.join(DIR,f),'utf8'));
+test('every bundled color system passes validation and renders a valid specimen',async()=>{const files=(await fs.readdir(DIR)).filter(f=>f.endsWith('.json'));assert(files.length>=1);const ids=new Set();
+ for(const f of files){const s=await load(f),r=validate(s,path.join(DIR,f));assert.deepEqual(r.errors,[],f);assert(!ids.has(s.id));ids.add(s.id);validateCraft({title:'x',mode:'workshop',slides:[specimenSlide(s)]})}});
+test('validator rejects unreadable text, indistinct categories and a non-monotonic ramp',async()=>{const good=await load('laboratory.json');
+ const bad=structuredClone(good);bad.tokens.inkMuted='#c9d2d6';bad.data.categorical=['#23647c','#24657d','#7a5aa6'];bad.data.sequential=['#e3f0f4','#0e3342','#a9cfdc','#5fa0b8','#23647c'];
+ const r=validate(bad);assert(r.errors.some(e=>e.startsWith('inkMuted/paper')));assert(r.errors.some(e=>e.startsWith('categorical min ΔE')));assert(r.errors.some(e=>e.includes('sequential')));
+ assert.equal(Math.round(contrast('#000000','#ffffff')),21)});
+test('validator requires concrete rules and Japanese type',async()=>{const s=await load('laboratory.json');const bad={...s,rules:['色は控えめに'],type:{display:'Arial',body:'Arial'}};const r=validate(bad);assert(r.errors.some(e=>e.startsWith('rules')));assert(r.errors.some(e=>e.startsWith('type')))});

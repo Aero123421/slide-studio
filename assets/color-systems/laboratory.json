@@ -1,0 +1,41 @@
+{
+  "id": "laboratory",
+  "name": "Laboratory",
+  "nameJa": "ラボラトリー（白地・深い青緑）",
+  "mode": "light",
+  "mood": "白い紙に深い青緑を1色。測定値と条件が主役で、色は比較の焦点にだけ使う。",
+  "useFor": ["研究発表", "技術レビュー", "データ報告"],
+  "avoidFor": ["製品発表の高揚感", "祝賀・イベント"],
+  "tokens": {
+    "paper": "#ffffff",
+    "surface": "#f3f6f7",
+    "ink": "#102b39",
+    "inkMuted": "#4d6371",
+    "rule": "#d3dde2",
+    "accent": "#23647c",
+    "onAccent": "#ffffff",
+    "positive": "#2f7d4f",
+    "negative": "#b3432f"
+  },
+  "data": {
+    "categorical": ["#23647c", "#c07a1e", "#7a5aa6", "#5d8c3a"],
+    "sequential": ["#e3f0f4", "#a9cfdc", "#5fa0b8", "#23647c", "#0e3342"],
+    "diverging": ["#b3432f", "#e2a494", "#f2f2f0", "#8fbfcf", "#23647c"],
+    "highlight": "#23647c",
+    "context": "#c3ced4"
+  },
+  "type": {
+    "display": "\"Helvetica Neue\",\"Segoe UI\",\"Liberation Sans\",Arial,sans-serif",
+    "body": "\"Helvetica Neue\",\"Segoe UI\",\"Liberation Sans\",Arial,sans-serif",
+    "ja": "\"Hiragino Sans\",\"Noto Sans JP\",\"Yu Gothic\",\"Meiryo\",\"IPAGothic\",sans-serif"
+  },
+  "ratios": {"paperAndSurface": 0.85, "ink": 0.12, "accentMax": 0.05},
+  "rules": [
+    "青緑は各ページで比較の焦点になる系列か数値の1か所だけに使い、見出しや枠には使わない。",
+    "比較されない系列は context のグレーにし、分類色は凡例ではなく線の端に直接ラベルで置く。",
+    "区間・誤差は同じ系列色の線で描き、塗りの帯にするときは不透明度ではなく sequential の淡色を使う。",
+    "プラス/マイナスは色に加えて符号（+/−）を必ず書く。",
+    "罫線は表の行区切りだけに使い、カードの枠や飾りの線には使わない。"
+  ],
+  "source": "Original. Contrast and color-vision checks by scripts/color-systems.mjs."
+}

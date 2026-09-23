@@ -1,0 +1,42 @@
+{
+  "id": "materials-lab",
+  "name": "Materials Lab",
+  "nameJa": "材料実験室（鋼青・熱の階調）",
+  "mode": "light",
+  "mood": "わずかに温かい白い紙に鋼青を一色。温度や濃度は淡黄→赤褐→焦茶の熱の階調で示し、それ以外の面は灰のままにする。",
+  "useFor": ["化学・材料科学の研究発表", "温度・濃度・応力の分布図", "実験条件と測定結果の比較", "プロセス・装置の説明"],
+  "avoidFor": ["ソフトウェア・IT の技術資料", "経営・営業の報告", "多数の系列を同時に色分けするグラフ"],
+  "tokens": {
+    "paper": "#fbfaf6",
+    "surface": "#f0eee7",
+    "ink": "#24272b",
+    "inkMuted": "#545a60",
+    "rule": "#d6d2c8",
+    "accent": "#2b5f8e",
+    "onAccent": "#ffffff",
+    "positive": "#2c7d55",
+    "negative": "#b04a2a"
+  },
+  "data": {
+    "categorical": ["#2b5f8e", "#cf7a2a", "#4c7a2c", "#9c4f7a"],
+    "sequential": ["#f6e6c4", "#edbb78", "#d8843e", "#b04f1e", "#6b2510"],
+    "diverging": ["#2b5f8e", "#93b5d2", "#f2f0ea", "#e9a978", "#b04f1e"],
+    "highlight": "#2b5f8e",
+    "context": "#c8c5bd"
+  },
+  "type": {
+    "display": "\"Segoe UI\",\"Helvetica Neue\",\"Liberation Sans\",Arial,sans-serif",
+    "body": "\"Segoe UI\",\"Helvetica Neue\",\"Liberation Sans\",Arial,sans-serif",
+    "ja": "\"Hiragino Sans\",\"Noto Sans JP\",\"Yu Gothic\",\"Meiryo\",\"IPAGothic\",sans-serif"
+  },
+  "ratios": {"paperAndSurface": 0.85, "ink": 0.12, "accentMax": 0.03},
+  "rules": [
+    "熱の階調（sequential）は温度・濃度・応力のような連続量にだけ使い、装飾や見出し、カテゴリの区別には決して使わない。ヒートマップには必ずカラーバーと単位を添える。",
+    "鋼青（accent）は注目する1条件・1試料・1系列だけに使う。試料番号や条件ラベルは ink で組み、色で識別しない。",
+    "比較の主役でない試料・条件は context の灰色にし、分類色（鋼青・銅・オリーブ・赤紫）は最大4条件までとして線の端に直接ラベルを書く。",
+    "冷←→熱、収縮←→膨張のような発散は diverging の鋼青←→赤褐で示し、中央の基準（室温、初期値）は紙に近い生成りにする。",
+    "改善/劣化の数値は深緑と赤褐色に加えて符号（+/−）と単位を書く。赤褐色は熱の階調の高温側と紛れるので、同じページでヒートマップと増減表示を並べない。",
+    "装置図や反応式は ink の線だけで描き、材料の種類は塗りではなくハッチングやラベルで区別する。"
+  ],
+  "source": "Original. Contrast and color-vision checks by scripts/color-systems.mjs."
+}

@@ -1,0 +1,42 @@
+{
+  "id": "sakura-spring",
+  "name": "Sakura Spring",
+  "nameJa": "桜・春（淡い桜の紙・葡萄鼠の文字・深い桜1点）",
+  "mode": "light",
+  "mood": "ほんのり桜色を帯びた紙に、葡萄鼠の文字。桜は淡い面と深い1点で使い分け、若草と空色は比較のときだけ添える。",
+  "useFor": ["春の催し・入学・入社の案内","季節キャンペーンの企画","地域イベントの報告"],
+  "avoidFor": ["財務・監査の報告","障害・事故の報告","技術仕様の説明"],
+  "tokens": {
+    "paper": "#fcf6f5",
+    "surface": "#f6e8ea",
+    "ink": "#3a2a30",
+    "inkMuted": "#705a62",
+    "rule": "#e6d2d6",
+    "accent": "#b83c62",
+    "onAccent": "#ffffff",
+    "positive": "#4c8a4e",
+    "negative": "#a9432f"
+  },
+  "data": {
+    "categorical": ["#b83c62","#6a9a3a","#4d86b8","#7f6f75"],
+    "sequential": ["#fbe4e8","#f2b8c4","#e2849c","#c04a70","#7c2543"],
+    "diverging": ["#4d86b8","#b6cde3","#f8f1f0","#edb3c1","#b83c62"],
+    "highlight": "#b83c62",
+    "context": "#d5c8cb"
+  },
+  "type": {
+    "display": "\"Hiragino Sans\",\"Noto Sans JP\",\"Yu Gothic\",\"Meiryo\",\"IPAGothic\",\"Helvetica Neue\",sans-serif",
+    "body": "\"Helvetica Neue\",\"Segoe UI\",\"Liberation Sans\",Arial,sans-serif",
+    "ja": "\"Hiragino Sans\",\"Noto Sans JP\",\"Yu Gothic\",\"Meiryo\",\"IPAGothic\",sans-serif"
+  },
+  "ratios": {"paperAndSurface": 0.85, "ink": 0.11, "accentMax": 0.04},
+  "rules": [
+    "桜色には二つの役割しかない：淡い桜（surface / sequential の最淡色）は面、深い桜（accent）は1ページ1か所の焦点。中間の桜は本文の背景にも文字にも使わない。",
+    "文字は葡萄鼠の ink と inkMuted だけ。ピンクの文字は見出しの1語まで。プロジェクターでは淡い桜の上の薄い文字が最初に消える。",
+    "花びら、ぼかし、桜色から白へのグラデーションは描かない。春らしさは紙の色と余白で出す。",
+    "比較しない系列は context の灰桜で描き、若草と空色は3系列以上を並べるときにだけ使う。",
+    "プラス/マイナスは色に加えて符号（+/−）を書く。深い桜を増加の意味に、negative の赤茶を桜と混同する位置に置かない。",
+    "写真は本来の色のまま置き、桜色のオーバーレイをかけない。"
+  ],
+  "source": "Original. Contrast and color-vision checks by scripts/color-systems.mjs."
+}

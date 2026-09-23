@@ -37,6 +37,16 @@ def hue_bucket(c):
     if s<.3 or l<.12 or l>.92:return None
     return int(((h*360)+15)//30)%12
 def saturated(c):return hue_bucket(c) is not None
+def lab(c):
+    rgb=hexrgb(c);lin=[v/12.92 if v<=.04045 else ((v+.055)/1.055)**2.4 for v in rgb]
+    X=(.4124*lin[0]+.3576*lin[1]+.1805*lin[2])/.95047;Y=.2126*lin[0]+.7152*lin[1]+.0722*lin[2];Z=(.0193*lin[0]+.1192*lin[1]+.9505*lin[2])/1.08883
+    f=lambda t:t**(1/3) if t>.008856 else 7.787*t+16/116
+    return (116*f(Y)-16,500*(f(X)-f(Y)),200*(f(Y)-f(Z)))
+def delta_e(a,b):return sum((x-y)**2 for x,y in zip(lab(a),lab(b)))**.5
+def palette_colors(path):
+    d=json.loads(Path(path).read_text(encoding='utf-8'));cols=list(d.get('tokens',{}).values())
+    data=d.get('data',{});cols+=[c for k in('categorical','sequential','diverging') for c in data.get(k,[])]+[data.get('highlight'),data.get('context')]
+    return [c for c in cols if hexrgb(c)]
 
 # ---------- loaders: every slide becomes {id,title,notes,elements:[{kind,x,y,w,h,fill,color,text,size}]}
 def load_scene(path):
@@ -177,7 +187,7 @@ def tokens(text):
     t=text.lower();words=set(re.findall(r'[a-z][a-z0-9\-]{2,}',t))
     cjk=''.join(CJK.findall(t));return words|{cjk[i:i+2] for i in range(len(cjk)-1)}
 
-def review(slides,source):
+def review(slides,source,palette=None):
     findings=[];add=lambda sev,sig,slide,msg,fix:findings.append({'severity':sev,'signal':sig,'slide':slide,'message':msg,'repair':fix})
     heads=[h['text'] for h in (max((t for t in texts(s) if t['y']<0.3*H and not ORDINAL.match(t['text'])),key=lambda t:t['size'],default=None) for s in slides) if h]
     cjk_deck=bool(heads) and sum(bool(CJK.search(h)) for h in heads)>=0.5*len(heads)  # judged by page titles, not by product names
@@ -227,6 +237,23 @@ def review(slides,source):
         if ident and len(others)>=2:
             add('warning','color-identity-reused','deck',f"A hue used as the identity of '{ident[0]}' also colors unrelated items: {', '.join(others[:4])}.",
                 'Keep identity colors for their entity only; use neutral ink or one accent for everything else.')
+    # many hues on text: identity or decoration colors spread across the deck
+    text_hues=defaultdict(set)
+    for s in slides:
+        for t in texts(s):
+            hb=hue_bucket(t.get('color'))
+            if hb is not None:text_hues[hb].add(s['id'])
+    spread=[h for h,ss in text_hues.items() if len(ss)>=2]
+    if len(spread)>=4:add('warning','rainbow-text','deck',f"Text is set in {len(spread)} different saturated hues across the deck.",
+        'Keep text in ink and muted ink; give one accent to the single thing each page is about, and keep categorical colors on data marks.')
+    if palette:
+        allowed=palette_colors(palette);off=defaultdict(set)
+        for s in slides:
+            for e in s['elements']:
+                c=e.get('color') if e['kind']=='text' else e.get('fill')
+                if hexrgb(c) and min(delta_e(c,a) for a in allowed)>10:off[c.lower()].add(s['id'])
+        for c,ss in sorted(off.items(),key=lambda kv:-len(kv[1]))[:8]:
+            add('warning','off-palette',', '.join(sorted(ss)[:4]),f"{c} is not in the declared color system ({Path(palette).stem}).",'Map it to the nearest role (ink, inkMuted, rule, accent, a data color) or justify it.')
     # near-duplicate pages
     toks=[tokens(' '.join(t['text'] for t in texts(s))) for s in slides]
     for i in range(len(slides)):
@@ -246,9 +273,10 @@ def review(slides,source):
 
 def main():
     a=argparse.ArgumentParser(description=__doc__,formatter_class=argparse.RawDescriptionHelpFormatter);a.add_argument('input');a.add_argument('--check',action='store_true',help='exit 2 when errors are found')
+    a.add_argument('--palette',help='assets/color-systems/<id>.json the deck declares; colors outside it are reported')
     args=a.parse_args()
     try:
-        slides,kind=load(args.input);r=review(slides,kind)
+        slides,kind=load(args.input);r=review(slides,kind,args.palette)
         print(json.dumps(r,ensure_ascii=False,indent=2));return 2 if args.check and r['errors'] else 0
     except Exception as e:print('Slop check:',e,file=sys.stderr);return 1
 if __name__=='__main__':sys.exit(main())

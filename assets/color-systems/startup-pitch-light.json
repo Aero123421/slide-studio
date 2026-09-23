@@ -1,0 +1,42 @@
+{
+  "id": "startup-pitch-light",
+  "name": "Startup Pitch Light",
+  "nameJa": "白紙と藍紫（投資家ピッチ）",
+  "mode": "light",
+  "mood": "白い紙に黒に近い墨、暗く鮮やかな藍紫を1色。自信は色数ではなく大きな数字と余白で見せる、虹色にならないピッチの配色。",
+  "useFor": ["投資家向けピッチ・資金調達資料", "新規事業の社内提案", "製品ローンチの概要説明", "アクセラレーターのデモデイ"],
+  "avoidFor": ["監査・リスク報告", "官公庁向けの説明", "数表が多い財務詳細"],
+  "tokens": {
+    "paper": "#ffffff",
+    "surface": "#f4f4f1",
+    "ink": "#141414",
+    "inkMuted": "#55555a",
+    "rule": "#dcdcd8",
+    "accent": "#3f3ab0",
+    "onAccent": "#ffffff",
+    "positive": "#1f8a4c",
+    "negative": "#c4382c"
+  },
+  "data": {
+    "categorical": ["#3f3ab0", "#d97a26", "#2e8b7a"],
+    "sequential": ["#e9e8f7", "#c2bfe9", "#8f8ad4", "#5b55bf", "#2b2780"],
+    "diverging": ["#c4382c", "#eaa79c", "#f2f2ef", "#a9a6e0", "#4a45b8"],
+    "highlight": "#3f3ab0",
+    "context": "#cfcfd4"
+  },
+  "type": {
+    "display": "\"Helvetica Neue\",\"Segoe UI\",\"Liberation Sans\",Arial,\"Hiragino Sans\",\"Noto Sans JP\",\"Yu Gothic\",\"Meiryo\",sans-serif",
+    "body": "\"Helvetica Neue\",\"Segoe UI\",\"Liberation Sans\",Arial,sans-serif",
+    "ja": "\"Hiragino Sans\",\"Noto Sans JP\",\"Yu Gothic\",\"Meiryo\",\"IPAGothic\",sans-serif"
+  },
+  "ratios": {"paperAndSurface": 0.86, "ink": 0.09, "accentMax": 0.05},
+  "rules": [
+    "藍紫は1ページ1か所：牽引力を示す1つの数字、市場図の自社の位置、または依頼額の1枠。ロゴを除き、見出し・帯・アイコン群には塗らない。",
+    "競合・市場全体・過去は context の灰で描き、自社だけを藍紫にする。分類色の橙・青緑は事業セグメントを並べる1ページだけに使い、3色を超えない。",
+    "成長率は数字（×倍、%）で語り、緑・赤は前年差の1か所だけ。上向き矢印の緑や赤い「課題」バッジは作らない。",
+    "面（surface）は「なぜ今か」「依頼」など結論枠にだけ使う。3〜4枚のカードを等しく並べるレイアウトには使わない。",
+    "薄い藍紫（sequential の1〜2段目）は投影で白に飛ぶので、面を塗るときは3段目以上を使う。",
+    "写真・スクリーンショットの上に藍紫の文字を載せない。製品画面は実物の色のまま入れ、紙面と合わせるための着色をしない。"
+  ],
+  "source": "Original. White paper, near-black ink and a single deep indigo accent; contrast and color-vision checks by scripts/color-systems.mjs."
+}

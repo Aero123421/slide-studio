@@ -1,0 +1,42 @@
+{
+  "id": "editorial-vermilion",
+  "name": "Editorial Vermilion",
+  "nameJa": "エディトリアル・朱赤（象牙の紙・墨・朱赤1色）",
+  "mode": "light",
+  "mood": "雑誌の見開きのような象牙色の紙に、墨の文字と朱赤を1点。文章が主役で、色は段落の中の傍点のように使う。",
+  "useFor": ["論考・エッセイ型の発表","調査記事の共有","編集方針・コンセプトの提示"],
+  "avoidFor": ["ダッシュボードの定例報告","多系列の詳細チャート","製品UIのデモ"],
+  "tokens": {
+    "paper": "#f8f5ee",
+    "surface": "#efeadf",
+    "ink": "#1d1b18",
+    "inkMuted": "#5f5a51",
+    "rule": "#d8d2c4",
+    "accent": "#d63a1b",
+    "onAccent": "#ffffff",
+    "positive": "#3d7250",
+    "negative": "#8e2a17"
+  },
+  "data": {
+    "categorical": ["#d63a1b","#3e3b36","#4c6b8b","#8a7d2c"],
+    "sequential": ["#f8ddd4","#eeab96","#e07454","#d63a1b","#7c1e0c"],
+    "diverging": ["#4c6b8b","#b4c2d1","#f1ede3","#f0b19c","#d63a1b"],
+    "highlight": "#d63a1b",
+    "context": "#cdc6b8"
+  },
+  "type": {
+    "display": "Georgia,\"Times New Roman\",\"Liberation Serif\",serif",
+    "body": "Georgia,\"Times New Roman\",\"Liberation Serif\",serif",
+    "ja": "\"Hiragino Mincho ProN\",\"Noto Serif JP\",\"Yu Mincho\",\"IPAMincho\",serif"
+  },
+  "ratios": {"paperAndSurface": 0.86, "ink": 0.12, "accentMax": 0.02},
+  "rules": [
+    "朱赤は見開き（1ページ）に1か所：引用の頭の1語、主張を担う1つの数字、または本文中の1語。見出し全体を朱赤にしない。",
+    "図表では朱赤は焦点の1本だけ。他の系列は context の砂色で描き、線の端に直接ラベルを置く。",
+    "プラス/マイナスは色に加えて +/− を書く。朱赤は「注意」「減少」の意味では使わず、焦点の意味だけに保つ。",
+    "罫線は本文の段組みの区切りと表の行にだけ使う。カードの枠、飾りの下線、色帯は作らない。",
+    "細い明朝の補助文字は inkMuted より薄くしない。プロジェクターでは象牙色の紙に薄い灰は消える。",
+    "写真・図版はモノクロか本来の色のまま置く。朱赤のフィルターやオーバーレイをかけない。"
+  ],
+  "source": "Original. Contrast and color-vision checks by scripts/color-systems.mjs."
+}

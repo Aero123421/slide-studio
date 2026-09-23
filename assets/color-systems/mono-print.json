@@ -1,0 +1,42 @@
+{
+  "id": "mono-print",
+  "name": "Mono Print",
+  "nameJa": "モノクロ印刷（墨・臙脂ひとつ）",
+  "mode": "light",
+  "mood": "白黒コピーされても壊れない、墨の濃淡だけの紙面。色は臙脂を一つだけ持ち、なくても意味が通るように設計する。",
+  "useFor": ["白黒印刷される配布資料・ハンドアウト", "論文のプレプリントや補足資料", "コピーして回覧される講義ノート", "FAX・複合機での配布"],
+  "avoidFor": ["カラー投影が前提の講演", "多系列の色分けが必要な図", "ブランド訴求や商品紹介"],
+  "tokens": {
+    "paper": "#ffffff",
+    "surface": "#efefed",
+    "ink": "#161616",
+    "inkMuted": "#505050",
+    "rule": "#b8b8b8",
+    "accent": "#9b2d1f",
+    "onAccent": "#ffffff",
+    "positive": "#3a3a3a",
+    "negative": "#9b2d1f"
+  },
+  "data": {
+    "categorical": ["#161616", "#5a5a5a", "#8f8f8f"],
+    "sequential": ["#e2e2e2", "#b3b3b3", "#808080", "#4d4d4d", "#161616"],
+    "diverging": ["#9b2d1f", "#cfa39c", "#f0f0f0", "#a6a6a6", "#3a3a3a"],
+    "highlight": "#9b2d1f",
+    "context": "#c8c8c8"
+  },
+  "type": {
+    "display": "\"Times New Roman\",Times,Georgia,\"Liberation Serif\",serif",
+    "body": "\"Times New Roman\",Times,Georgia,\"Liberation Serif\",serif",
+    "ja": "\"Hiragino Mincho ProN\",\"Noto Serif JP\",\"Yu Mincho\",\"IPAMincho\",serif"
+  },
+  "ratios": {"paperAndSurface": 0.88, "ink": 0.11, "accentMax": 0.01},
+  "rules": [
+    "臙脂（accent / highlight）は1ページに1か所、白黒で印刷されたとき濃い灰色として区別できる要素（主役の1本の線、1つの数値）にだけ使う。臙脂がなくても読めるよう、その要素には必ずラベルか矢印を添える。",
+    "系列の区別は墨の3階調に加えて実線・破線・点線、丸・四角・三角のマーカーで重ね、色（灰の濃さ）だけで3本以上を区別しない。",
+    "プラス/マイナスは色では示さない。符号（+/−）と▲▼、または表の列分けで示し、negative の臙脂は「注意すべき値」の1か所にだけ使う。",
+    "量は sequential の墨の階調で塗り、階調の隣接段は白黒コピーで潰れないよう L* 差 15 以上の段だけを選んで使う（5段中3段が目安）。",
+    "面（surface）はコピーで消えることを前提に、枠線（rule）と字下げで区切りを二重に示す。面の色差だけに頼らない。",
+    "文字は ink の墨で組み、inkMuted の灰文字は脚注と出典に限る。薄い灰色の文字を本文に使わない。"
+  ],
+  "source": "Original. Contrast and color-vision checks by scripts/color-systems.mjs."
+}

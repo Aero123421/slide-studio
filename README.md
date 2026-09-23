@@ -74,6 +74,7 @@ transfer-evaluation briefs are **unrun future tests**, not measured model improv
 | Motion | 64 | Stable identities, timelines, paths, decomposition, masking, uncertainty, focus, state changes |
 | Interaction | 24 | Actual recalculation, selection, tables, media playback, OBJ/STL mesh inspection, annotations |
 | Whole-slide compositions | 36 | Image-led, typographic, geometric, editorial, quantitative and dense layouts |
+| Color systems | 37 | Role-based palettes with usage rules, checked for contrast and color-vision distance ([gallery](gallery/color-systems.html)) |
 | Template packs | 72 | Richly designed, practical page sets in English and Japanese — pitch, business review, strategy, research talk, architecture review, ML report, lecture, editorial, impact report, launch, project status and keynote. Charts are computed from each page's data; all content is synthetic |
 
 Also included: multilingual and image-framing studies, a complete synthetic research

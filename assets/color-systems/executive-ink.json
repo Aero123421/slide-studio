@@ -1,0 +1,42 @@
+{
+  "id": "executive-ink",
+  "name": "Executive Ink",
+  "nameJa": "墨と臙脂（取締役会報告）",
+  "mode": "light",
+  "mood": "ほぼ墨一色の紙面に、深い臙脂を各ページ1点だけ。色は判断を求める箇所の印であり、飾りには一切使わない。",
+  "useFor": ["取締役会・経営会議の報告", "監査委員会への説明資料", "年次報告書の要約", "白黒印刷される稟議・答申"],
+  "avoidFor": ["製品発表やイベントの告知", "採用・ブランド紹介", "5系列以上を色で見分けるグラフ"],
+  "tokens": {
+    "paper": "#fbfaf7",
+    "surface": "#f1f0ec",
+    "ink": "#1b1b1f",
+    "inkMuted": "#55555c",
+    "rule": "#d3d2cd",
+    "accent": "#6e1f2e",
+    "onAccent": "#ffffff",
+    "positive": "#2f6446",
+    "negative": "#9b2c2c"
+  },
+  "data": {
+    "categorical": ["#1b1b1f", "#6e1f2e", "#5a5a61", "#8f8f95"],
+    "sequential": ["#e9e8e4", "#c4c3bf", "#97979c", "#5f5f66", "#1b1b1f"],
+    "diverging": ["#9b2c2c", "#d9a49b", "#efeeea", "#a3a3a9", "#3a3a40"],
+    "highlight": "#6e1f2e",
+    "context": "#c6c5c0"
+  },
+  "type": {
+    "display": "Georgia,\"Times New Roman\",\"Hiragino Mincho ProN\",\"Noto Serif JP\",\"Yu Mincho\",\"IPAMincho\",serif",
+    "body": "\"Helvetica Neue\",\"Segoe UI\",\"Liberation Sans\",Arial,sans-serif",
+    "ja": "\"Hiragino Sans\",\"Noto Sans JP\",\"Yu Gothic\",\"Meiryo\",\"IPAGothic\",sans-serif"
+  },
+  "ratios": {"paperAndSurface": 0.88, "ink": 0.1, "accentMax": 0.02},
+  "rules": [
+    "臙脂は1ページに1か所、決議事項・依頼事項・最重要の数値のいずれかにだけ置く。見出し、罫線、アイコン、表の見出し行には使わない。",
+    "系列は墨の濃淡（分類色は明度順）で見分け、白黒印刷でも順序が保てるようにする。第4系列以降は線種（破線・点線）で分ける。",
+    "強調しない系列は context の薄い灰にし、凡例を置かず線端や棒の上に直接ラベルを書く。",
+    "プラス/マイナスは色に頼らず、必ず符号（+/△）と桁揃えで示す。緑と赤は表の増減列と前年差の1列だけに限る。",
+    "面（surface）は結論ボックスと総計行にだけ使い、カードを並べる目的では使わない。",
+    "写真・図版はモノクロ処理を基本にし、カラー写真は証拠として必要なときだけ入れる。"
+  ],
+  "source": "Original. Near-monochrome ledger idiom with a single deep accent; contrast and color-vision checks by scripts/color-systems.mjs."
+}

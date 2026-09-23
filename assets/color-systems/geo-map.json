@@ -1,0 +1,42 @@
+{
+  "id": "geo-map",
+  "name": "Geo Map",
+  "nameJa": "地図帳（灰生成り・深い青緑）",
+  "mode": "light",
+  "mood": "地図帳の紙のような灰がかった生成りに、海の深い青緑を一色。地域の量は階級区分の階調で、基準との差は赤土←→青緑で塗り分ける。",
+  "useFor": ["都道府県・市区町村別の統計地図", "地理・地域データの比較", "人口・経済・環境の空間分布", "自治体・政策向けの地域報告"],
+  "avoidFor": ["時系列中心の財務報告", "製品・ブランドの訴求", "ダークな会場向けの演出"],
+  "tokens": {
+    "paper": "#f4f2ec",
+    "surface": "#eae7df",
+    "ink": "#26292c",
+    "inkMuted": "#565c62",
+    "rule": "#cbc6ba",
+    "accent": "#1c6b74",
+    "onAccent": "#ffffff",
+    "positive": "#3a7d44",
+    "negative": "#a94a2b"
+  },
+  "data": {
+    "categorical": ["#1c6b74", "#c5732b", "#6e5b9c", "#7a5040"],
+    "sequential": ["#e7eee0", "#b5d3bb", "#7fb3a3", "#47898a", "#1e5a66"],
+    "diverging": ["#a94a2b", "#dba58c", "#f2f0ea", "#93c1bc", "#1c6b74"],
+    "highlight": "#1c6b74",
+    "context": "#c9c4b8"
+  },
+  "type": {
+    "display": "\"Gill Sans\",\"Segoe UI\",\"Helvetica Neue\",\"Liberation Sans\",Arial,sans-serif",
+    "body": "\"Segoe UI\",\"Helvetica Neue\",\"Liberation Sans\",Arial,sans-serif",
+    "ja": "\"Hiragino Sans\",\"Noto Sans JP\",\"Yu Gothic\",\"Meiryo\",\"IPAGothic\",sans-serif"
+  },
+  "ratios": {"paperAndSurface": 0.84, "ink": 0.11, "accentMax": 0.05},
+  "rules": [
+    "階級区分図（コロプレス）は sequential の5段をそのまま階級に使い、階級の境界値を凡例に必ず書く。量を分類色で塗り分けない。",
+    "地図の中で注目する1地域だけを accent の青緑で塗るか輪郭を太くし、ほかの地域は sequential の階調か context の灰生成りに留める。",
+    "基準（全国平均、前回調査）との差は diverging の赤土←→青緑で塗り、中央の階級は紙に近い生成りにする。赤と緑の対比は使わない。",
+    "地域の境界線は rule の灰色、海岸線と注目地域の輪郭だけ ink の線にする。地名ラベルは ink で地図の上に直接置き、inkMuted は出典と縮尺に限る。",
+    "地図と並べる棒グラフや表は地図と同じ階調・同じ階級で塗り、地域名の順序も地図の凡例と揃える。",
+    "増減の数値は緑と赤土に加えて符号（+/−）と▲▼を書き、地図の塗りには positive/negative の色を使わない。"
+  ],
+  "source": "Original. Contrast and color-vision checks by scripts/color-systems.mjs."
+}

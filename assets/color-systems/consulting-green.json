@@ -1,0 +1,42 @@
+{
+  "id": "consulting-green",
+  "name": "Consulting Green",
+  "nameJa": "常磐と黄土（提案書）",
+  "mode": "light",
+  "mood": "白い紙に深い常磐緑で論旨を通し、推奨案にだけ黄土を灯す。論理の骨組みが色より先に見える提案書の配色。",
+  "useFor": ["コンサルティング提案書", "戦略オプションの比較", "経営課題の構造化資料", "プロジェクト最終報告"],
+  "avoidFor": ["財務諸表の増減表示（緑が損益と混同される）", "環境・サステナビリティ報告での緑の濫用", "祝賀・イベント告知"],
+  "tokens": {
+    "paper": "#ffffff",
+    "surface": "#f3f6f2",
+    "ink": "#16211b",
+    "inkMuted": "#4e5c53",
+    "rule": "#d2dad3",
+    "accent": "#1f5a3c",
+    "onAccent": "#ffffff",
+    "positive": "#2c7a4b",
+    "negative": "#b0402e"
+  },
+  "data": {
+    "categorical": ["#1f5a3c", "#b7791f", "#4f6a8c", "#6f3d64"],
+    "sequential": ["#e4efe6", "#b3d1bb", "#75a888", "#3b7d59", "#173f2b"],
+    "diverging": ["#b0402e", "#e3a999", "#f1f1ed", "#9cc3a8", "#1f5a3c"],
+    "highlight": "#b7791f",
+    "context": "#c6cdc7"
+  },
+  "type": {
+    "display": "\"Helvetica Neue\",\"Segoe UI\",\"Liberation Sans\",Arial,\"Hiragino Sans\",\"Noto Sans JP\",\"Yu Gothic\",\"Meiryo\",sans-serif",
+    "body": "\"Helvetica Neue\",\"Segoe UI\",\"Liberation Sans\",Arial,sans-serif",
+    "ja": "\"Hiragino Sans\",\"Noto Sans JP\",\"Yu Gothic\",\"Meiryo\",\"IPAGothic\",sans-serif"
+  },
+  "ratios": {"paperAndSurface": 0.86, "ink": 0.1, "accentMax": 0.04},
+  "rules": [
+    "常磐緑は論旨（章の主張文、論理ツリーの幹、結論ボックス）にだけ使い、装飾の帯や番号丸には使わない。",
+    "黄土（highlight）は「推奨案」に限る。比較表なら推奨列の見出しと合計、グラフなら推奨案の1系列だけ。ページに推奨がなければ黄土は出ない。",
+    "比較される他の選択肢は context の灰緑で描き、系列名は凡例でなく線端・棒の脇に直接書く。",
+    "増減は色ではなく矢印と数値で示す。positive/negative の色は表の差分列と KPI の変化1か所だけに限る。",
+    "面（surface）は「So what」の結論枠と表の合計行にだけ使う。",
+    "3系列を超えるときは分類色を増やさず、系列を統合するか小さな複数グラフに分ける。"
+  ],
+  "source": "Original. Deep green argument color with an ochre recommendation mark; contrast and color-vision checks by scripts/color-systems.mjs."
+}

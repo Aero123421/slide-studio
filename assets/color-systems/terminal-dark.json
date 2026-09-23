@@ -1,0 +1,42 @@
+{
+  "id": "terminal-dark",
+  "name": "Terminal Dark",
+  "nameJa": "ターミナル（青黒・琥珀）",
+  "mode": "dark",
+  "mood": "青みのある黒に、灰白の文字と琥珀色の警告灯が一つ。稼働状況やログを夜の運用室で読む落ち着き。",
+  "useFor": ["SRE・運用の振り返り・障害報告", "システム設計レビュー", "エンジニア向けの技術発表", "モニタリング指標の共有"],
+  "avoidFor": ["印刷配布資料", "明るい会場での投影", "経営層向けのサマリー"],
+  "tokens": {
+    "paper": "#171b21",
+    "surface": "#20262e",
+    "ink": "#dfe4e8",
+    "inkMuted": "#9ba6b1",
+    "rule": "#303840",
+    "accent": "#e2a33c",
+    "onAccent": "#1a1408",
+    "positive": "#5fbf8a",
+    "negative": "#e8705f"
+  },
+  "data": {
+    "categorical": ["#6fb1e3", "#e2a33c", "#f0b4bb", "#3fa082"],
+    "sequential": ["#233448", "#2f5476", "#4477a3", "#6ca0cc", "#a6ccea"],
+    "diverging": ["#e8705f", "#8f5a52", "#343b44", "#4f7796", "#6fb1e3"],
+    "highlight": "#e2a33c",
+    "context": "#4c5763"
+  },
+  "type": {
+    "display": "\"Segoe UI\",\"Helvetica Neue\",\"Liberation Sans\",Arial,sans-serif",
+    "body": "\"Segoe UI\",\"Helvetica Neue\",\"Liberation Sans\",Arial,sans-serif",
+    "ja": "\"Hiragino Sans\",\"Noto Sans JP\",\"Yu Gothic\",\"Meiryo\",\"IPAGothic\",sans-serif"
+  },
+  "ratios": {"paperAndSurface": 0.86, "ink": 0.11, "accentMax": 0.03},
+  "rules": [
+    "琥珀色（accent）は各ページで「今見るべき1点」――障害の発生時刻、閾値を超えた1系列、判断を求める1行――だけに置き、見出しや箇条書きの記号には使わない。",
+    "時系列の主役でない系列は context の暗い灰青にし、青・琥珀・薄紅・青緑の分類色は同時に4本までとして線の右端に直接ラベルを付ける。",
+    "正常/異常は緑と赤の色に加えて必ず記号（OK / NG、▲▼、+/−）または文字で書き、ステータスの点だけで状態を伝えない。",
+    "コードやログ、識別子、数値は等幅フォントで ink の色のまま組み、シンタックスハイライトの多色を持ち込まない。",
+    "面（surface）はコードブロックと表の帯だけに使い、カードを並べて枠で囲まない。区切りは rule の暗い線1本。",
+    "紙は #171b21 の青黒で固定し、純黒の背景や白（#fff）の文字は使わない。ライトのグラフ画像を貼るときは紙色に合わせて再描画する。"
+  ],
+  "source": "Original. Contrast and color-vision checks by scripts/color-systems.mjs."
+}

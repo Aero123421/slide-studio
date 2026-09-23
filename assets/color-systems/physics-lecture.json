@@ -1,0 +1,42 @@
+{
+  "id": "physics-lecture",
+  "name": "Physics Lecture",
+  "nameJa": "講義室（黒鉛・投影に強い）",
+  "mode": "light",
+  "mood": "白に近い灰色の紙に黒鉛の濃い文字。式と図は暗いインクだけで描き、色は説明中の1本の線にだけ。古い投影機で洗い流されても読める。",
+  "useFor": ["物理・数学・工学の講義", "式や導出を追う説明", "古いプロジェクターや明るい教室での投影", "板書の代わりになる資料"],
+  "avoidFor": ["写真・ビジュアル中心のプレゼン", "ブランドやマーケティングの資料", "多系列を同時に見せるダッシュボード"],
+  "tokens": {
+    "paper": "#f2f4f0",
+    "surface": "#e4e8e2",
+    "ink": "#14181a",
+    "inkMuted": "#3f474b",
+    "rule": "#aeb6b4",
+    "accent": "#1e5f8c",
+    "onAccent": "#ffffff",
+    "positive": "#1f5a2a",
+    "negative": "#cc4a30"
+  },
+  "data": {
+    "categorical": ["#1e5f8c", "#b16d0f", "#a83c63", "#3d3d3d"],
+    "sequential": ["#cfdde8", "#a8c4d8", "#6f9bbb", "#3f7299", "#1a4a6e"],
+    "diverging": ["#cc4a30", "#e29a8a", "#f0f0ee", "#93b8d0", "#1e5f8c"],
+    "highlight": "#1e5f8c",
+    "context": "#a3abaf"
+  },
+  "type": {
+    "display": "\"Palatino Linotype\",Palatino,\"Book Antiqua\",Georgia,\"Liberation Serif\",serif",
+    "body": "\"Segoe UI\",\"Helvetica Neue\",\"Liberation Sans\",Arial,sans-serif",
+    "ja": "\"Hiragino Sans\",\"Noto Sans JP\",\"Yu Gothic\",\"Meiryo\",\"IPAGothic\",sans-serif"
+  },
+  "ratios": {"paperAndSurface": 0.84, "ink": 0.14, "accentMax": 0.02},
+  "rules": [
+    "投影で洗い流されることを前提に、文字は ink か inkMuted（対比 9:1 以上）だけで組み、紙との差が L* 15 未満の淡い色（surface、sequential[0] より薄い色）に文字や細線を載せない。",
+    "式の中で今説明している項・変数だけを青（accent）にし、式全体や見出しに色を付けない。ページに青の箇所は1つ。",
+    "図の曲線は主役1本を青、ほかは context の灰色にし、灰色の線は 2.5px 以上の太さで描く。分類色を使うときも線幅と実線/破線で区別を重ねる。",
+    "座標軸・矢印・補助線は rule の灰色ではなく ink の線で描く。rule は表の行区切りだけに使う。",
+    "符号や増減は色に頼らず式・符号（+/−）・矢印の向きで示し、赤褐色と深緑は「誤り／正しい」の1組の対比に限定する。",
+    "本文は 22px 以上、補助文字も 16px 以上にし、太さ 400 未満の細いウエイトは使わない。"
+  ],
+  "source": "Original. Contrast and color-vision checks by scripts/color-systems.mjs."
+}

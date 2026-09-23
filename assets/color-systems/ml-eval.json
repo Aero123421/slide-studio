@@ -1,0 +1,42 @@
+{
+  "id": "ml-eval",
+  "name": "ML Evaluation",
+  "nameJa": "モデル評価（白地・マゼンタ）",
+  "mode": "light",
+  "mood": "白い紙に、クラスを表す4色と、閾値・動作点を指すマゼンタが一つ。混同行列や ROC を色ではなく数値で読ませる。",
+  "useFor": ["機械学習モデルの評価報告", "実験結果の比較（ベースライン対提案手法）", "混同行列・ROC・PR曲線の説明", "データセットの分析"],
+  "avoidFor": ["製品のマーケティング資料", "組織・経営の報告", "学術以外の一般向け講演"],
+  "tokens": {
+    "paper": "#ffffff",
+    "surface": "#f3f4f7",
+    "ink": "#1a1f2b",
+    "inkMuted": "#525b6b",
+    "rule": "#d7dbe2",
+    "accent": "#c2286e",
+    "onAccent": "#ffffff",
+    "positive": "#2a8659",
+    "negative": "#b8432b"
+  },
+  "data": {
+    "categorical": ["#2f6db5", "#d07a1a", "#2e9a84", "#7a5c2e"],
+    "sequential": ["#e4eaf5", "#b8c9e6", "#86a3d1", "#4f78b8", "#244f8a"],
+    "diverging": ["#b8432b", "#e4a08c", "#f2f2f2", "#9db7de", "#2f6db5"],
+    "highlight": "#c2286e",
+    "context": "#c5cad3"
+  },
+  "type": {
+    "display": "\"Segoe UI\",\"Helvetica Neue\",\"Liberation Sans\",Arial,sans-serif",
+    "body": "\"Segoe UI\",\"Helvetica Neue\",\"Liberation Sans\",Arial,sans-serif",
+    "ja": "\"Hiragino Sans\",\"Noto Sans JP\",\"Yu Gothic\",\"Meiryo\",\"IPAGothic\",sans-serif"
+  },
+  "ratios": {"paperAndSurface": 0.86, "ink": 0.11, "accentMax": 0.03},
+  "rules": [
+    "マゼンタ（accent / highlight）は閾値・動作点・採用した1モデルを指す線や点、その値を書いた1語だけに使い、クラス色として使わない。",
+    "クラス色（青・橙・青緑・紫）はデータセットの各クラスに1対1で固定し、モデルやバージョンの区別には使わない。モデル比較は主役1本以外を context の灰色にする。",
+    "混同行列やヒートマップは sequential の青の階調で塗り、セルには必ず数値を書く。色だけで大小を伝えない。",
+    "指標の改善/悪化は緑と赤褐色に加えて符号と差分（+0.03 など）を書き、ベースラインの値は inkMuted で必ず併記する。",
+    "ROC・PR 曲線の対角線（ランダム）と基準線は rule の灰色ではなく ink の破線で描く。信頼区間は同色の淡い帯（sequential[1]）で塗る。",
+    "コードやハイパーパラメータは等幅フォントで ink のまま組み、強調にマゼンタ以外の色を持ち込まない。"
+  ],
+  "source": "Original. Contrast and color-vision checks by scripts/color-systems.mjs."
+}

@@ -54,6 +54,15 @@ class SlopCheck(unittest.TestCase):
         p=self.dir/'deck.pptx';prs.save(p)
         r=review(load_pptx(p),'pptx')
         self.assertIn('accent-stripe',signals(r));self.assertIn('tool-metadata-in-notes',signals(r))
+    def test_palette_discipline(self):
+        r=self.run_scene([sloppy_slide(i) for i in range(1,5)])
+        self.assertIn('rainbow-text',signals(r))
+        s=clean_slide(0);s['elements'].append(rect(900,200,200,200,'#ff00aa'))
+        r=review(load_scene(self._write([s,clean_slide(1),clean_slide(2)])),'scene',str(ROOT/'assets/color-systems/laboratory.json'))
+        self.assertTrue(any(f['signal']=='off-palette' and '#ff00aa' in f['message'] for f in r['findings']))
+        self.assertFalse(any(f['signal']=='off-palette' and '#f3f4f6' in f['message'] for f in r['findings']))
+    def _write(self,slides):
+        p=self.dir/'p.scene.json';p.write_text(json.dumps(scene(slides),ensure_ascii=False));return p
     def test_bundled_studio_examples_have_no_errors(self):
         import subprocess
         for name in ['technical','executive','talk']:

@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- 37 role-based color systems (`assets/color-systems/`, `gallery/color-systems.html`)
+  for business, public sector, research, engineering, education and expressive/cultural
+  decks (including 和色 and dark keynote systems). Each defines paper/surface/ink/
+  inkMuted/rule/accent/onAccent/positive/negative, categorical/sequential/diverging data
+  palettes with highlight and context colors, Japanese font stacks and palette-specific
+  usage rules. `scripts/color-systems.mjs` validates WCAG contrast, categorical distance
+  under simulated deuteranopia/protanopia/tritanopia and ramp lightness, and renders
+  specimens. Replaces the former three-token design-systems file.
+- `slop_check.py`: `rainbow-text` and `--palette` (colors outside the declared system).
 - `scripts/slop_check.py`: deck-level review of machine-made patterns in built HTML,
   `.scene.json` or any `.pptx` — card-edge accent stripes and title bars, decorative
   ordinals, one eyebrow + card-row skeleton on every page, English eyebrows in a CJK

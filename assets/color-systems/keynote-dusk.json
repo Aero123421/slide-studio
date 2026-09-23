@@ -1,0 +1,42 @@
+{
+  "id": "keynote-dusk",
+  "name": "Keynote Dusk",
+  "nameJa": "キーノート・夕暮れ（炭色の舞台・夕焼けの橙）",
+  "mode": "dark",
+  "mood": "暮れかけの舞台のような暖かい炭色に、夕焼けの橙を1点。色は「今ここを見てほしい」合図であり、画面を飾る光ではない。",
+  "useFor": ["基調講演・全社集会","製品ビジョンの発表","大会場での上映"],
+  "avoidFor": ["印刷配布資料","数表が多い定例報告","明るい会議室での小画面共有"],
+  "tokens": {
+    "paper": "#1b1a20",
+    "surface": "#27252d",
+    "ink": "#ece6dc",
+    "inkMuted": "#aaa39a",
+    "rule": "#3b3842",
+    "accent": "#e6864f",
+    "onAccent": "#1b1a20",
+    "positive": "#8cc19a",
+    "negative": "#e07a6e"
+  },
+  "data": {
+    "categorical": ["#e6864f","#86a9d4","#d9bd74","#8f6a9e"],
+    "sequential": ["#2c2331","#5a3b3e","#93524a","#c76e4f","#f2a374"],
+    "diverging": ["#86a9d4","#4e5c73","#26252b","#7d4f3d","#e6864f"],
+    "highlight": "#e6864f",
+    "context": "#5d5a63"
+  },
+  "type": {
+    "display": "\"Helvetica Neue\",\"Segoe UI\",\"Liberation Sans\",Arial,sans-serif",
+    "body": "\"Helvetica Neue\",\"Segoe UI\",\"Liberation Sans\",Arial,sans-serif",
+    "ja": "\"Hiragino Sans\",\"Noto Sans JP\",\"Yu Gothic\",\"Meiryo\",\"IPAGothic\",sans-serif"
+  },
+  "ratios": {"paperAndSurface": 0.86, "ink": 0.1, "accentMax": 0.04},
+  "rules": [
+    "橙は1ページに1か所：見出しの1語、1本の系列、1つの数字のいずれか。ページ内に橙が2か所あれば、片方は本文色に戻す。",
+    "背景は炭色を平塗りにする。橙から紫への光のグラデーション、光彩、ぼかしは使わない。舞台照明は言葉で作る。",
+    "比較されない系列・過去年度・他社は context の灰紫にし、線の端に直接ラベルを置く。凡例の色玉は作らない。",
+    "プラス/マイナスは色に加えて矢印（▲/▼）か符号を必ず添える。暗い背景では緑と赤の彩度を上げず、明るさの差で読ませる。",
+    "本文は ink の生成り色で、純白（#ffffff）は使わない。大きな数字だけ ink、単位と注記は inkMuted。",
+    "セクション区切り・ページ番号・ロゴ・罫線に橙を使わない。橙が主題以外に出た瞬間、聴衆は焦点を失う。"
+  ],
+  "source": "Original. Contrast and color-vision checks by scripts/color-systems.mjs."
+}

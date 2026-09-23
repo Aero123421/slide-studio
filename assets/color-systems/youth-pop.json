@@ -1,0 +1,42 @@
+{
+  "id": "youth-pop",
+  "name": "Youth Pop",
+  "nameJa": "ユース・ポップ（白と黒・コバルト・赤・黄の面）",
+  "mode": "light",
+  "mood": "白い紙に黒い文字。コバルトを骨格、赤を焦点、黄は文字を載せる面としてだけ使う三原色。強さは色数ではなく、1ページ1色の潔さで出す。",
+  "useFor": ["学生・若者向けイベントの告知","コミュニティ活動の報告","部活・サークル・学園祭の企画"],
+  "avoidFor": ["役員会・投資家向け報告","医療・介護の説明","喪や謝罪の場面"],
+  "tokens": {
+    "paper": "#fdfcf7",
+    "surface": "#ffe45c",
+    "ink": "#141414",
+    "inkMuted": "#54544e",
+    "rule": "#d9d7cc",
+    "accent": "#1f3fbf",
+    "onAccent": "#ffffff",
+    "positive": "#1f8a4c",
+    "negative": "#c8262e"
+  },
+  "data": {
+    "categorical": ["#1f3fbf","#d8262e","#141414","#a37c00"],
+    "sequential": ["#e4e8fa","#aeb9ef","#6f83de","#1f3fbf","#101f66"],
+    "diverging": ["#c8262e","#f2b0b0","#f4f2ea","#b3bff0","#2a4ccc"],
+    "highlight": "#d8262e",
+    "context": "#c9c7bd"
+  },
+  "type": {
+    "display": "\"Arial Black\",\"Helvetica Neue\",\"Segoe UI\",\"Liberation Sans\",Arial,sans-serif",
+    "body": "\"Helvetica Neue\",\"Segoe UI\",\"Liberation Sans\",Arial,sans-serif",
+    "ja": "\"Hiragino Sans\",\"Noto Sans JP\",\"Yu Gothic\",\"Meiryo\",\"IPAGothic\",sans-serif"
+  },
+  "ratios": {"paperAndSurface": 0.8, "ink": 0.12, "accentMax": 0.08},
+  "rules": [
+    "1ページに使う原色は1色。コバルト（骨格・ボタン）と赤（焦点の1か所）が同じページに並ぶのは、赤が図の中の1本の系列であるときだけ。",
+    "黄（surface）は文字を載せる面としてのみ使う。黄の文字、黄の線、黄の棒グラフは作らない。黄の面の上の文字は必ず黒（ink）。",
+    "文字は黒だけ。コバルトの文字は見出しの1語まで、赤の文字は数字1つまで。赤い見出し、青い本文は禁止。",
+    "図表では焦点が赤、それ以外は context の灰。黒は「全体」「合計」の系列にだけ使う。",
+    "プラス/マイナスは色に加えて符号（+/−）を書く。焦点の赤と negative の赤を同じページに置かない。",
+    "コバルトの全面背景は表紙だけ。そのとき文字は白（onAccent）、黄と赤は置かない。三色を同時に見せるページを作らない。"
+  ],
+  "source": "Original. Contrast and color-vision checks by scripts/color-systems.mjs."
+}

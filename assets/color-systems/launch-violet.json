@@ -1,0 +1,42 @@
+{
+  "id": "launch-violet",
+  "name": "Launch Violet",
+  "nameJa": "ローンチ・バイオレット（生成り白・菫と珊瑚）",
+  "mode": "light",
+  "mood": "温かみのある白地に、深い菫を骨格、珊瑚色を1点の焦点として置く。高揚感はグラデーションではなく、余白と一つの色の対比で出す。",
+  "useFor": ["製品・機能の発表","ブランドの新方針の共有","ユーザー向けの導入説明"],
+  "avoidFor": ["財務・監査の報告","学術発表","喪や謝罪の場面"],
+  "tokens": {
+    "paper": "#faf8f5",
+    "surface": "#f0ede8",
+    "ink": "#221f2c",
+    "inkMuted": "#5d5869",
+    "rule": "#dcd8d1",
+    "accent": "#5a3ec2",
+    "onAccent": "#ffffff",
+    "positive": "#2e8a5e",
+    "negative": "#b5342a"
+  },
+  "data": {
+    "categorical": ["#5a3ec2","#df5a36","#2a8b8a","#7d5c10"],
+    "sequential": ["#ece7f8","#c5b6ec","#987fdc","#6a4fcb","#3a2a86"],
+    "diverging": ["#cf4a2a","#f0b7a5","#f1efec","#bdb0e8","#5a3ec2"],
+    "highlight": "#df5a36",
+    "context": "#cfcbc6"
+  },
+  "type": {
+    "display": "\"Avenir Next\",\"Helvetica Neue\",\"Segoe UI\",\"Liberation Sans\",Arial,sans-serif",
+    "body": "\"Helvetica Neue\",\"Segoe UI\",\"Liberation Sans\",Arial,sans-serif",
+    "ja": "\"Hiragino Sans\",\"Noto Sans JP\",\"Yu Gothic\",\"Meiryo\",\"IPAGothic\",sans-serif"
+  },
+  "ratios": {"paperAndSurface": 0.84, "ink": 0.11, "accentMax": 0.05},
+  "rules": [
+    "菫と珊瑚の役割を分ける：菫は構造（ボタン、見出しの1語、主系列）、珊瑚は焦点（今日発表する1つの数字・1本の線）。同じ要素に両方は使わない。",
+    "菫から珊瑚へのグラデーション、ぼかし、斜めの色面は禁止。色面が要るときは surface の生成りか、sequential の最淡色を平塗りする。",
+    "珊瑚は1ページ1か所。前ページで珊瑚だった系列は、次ページで主題を外れたら context の灰色に戻す。",
+    "プラス/マイナスは positive/negative の色に加えて +/− を書く。珊瑚を「増加」の意味で使わない。",
+    "アイコン、カードの角飾り、区切り線、ページ番号には菫も珊瑚も使わない。白地・墨・罫線だけで組む。",
+    "写真の上に文字を置くときは、菫の半透明ではなく ink の平塗り帯を敷く。"
+  ],
+  "source": "Original. Contrast and color-vision checks by scripts/color-systems.mjs."
+}

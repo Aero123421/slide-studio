@@ -1,0 +1,42 @@
+{
+  "id": "sustainability-moss",
+  "name": "Sustainability Moss",
+  "nameJa": "サステナビリティ・苔（石灰の紙・苔の緑・土の赤茶）",
+  "mode": "light",
+  "mood": "石灰色の紙に、苔のような深い黄緑と土の赤茶。明るい黄緑の「エコ」記号を避け、色は目標と実績の差にだけ使う。",
+  "useFor": ["ESG・統合報告","環境目標と実績の説明","地域・一次産業の事業計画"],
+  "avoidFor": ["製品ローンチの高揚感","エンタメ・イベント告知","金融市況の速報"],
+  "tokens": {
+    "paper": "#f4f3ec",
+    "surface": "#e9e9de",
+    "ink": "#1f2a22",
+    "inkMuted": "#52604f",
+    "rule": "#d2d4c4",
+    "accent": "#4a6b2e",
+    "onAccent": "#ffffff",
+    "positive": "#2b7a5c",
+    "negative": "#b0532a"
+  },
+  "data": {
+    "categorical": ["#4a6b2e","#b9764a","#6d8a9c","#5a3e2a"],
+    "sequential": ["#e5e9d6","#bcc99f","#8aa467","#4a6b2e","#22391a"],
+    "diverging": ["#b0532a","#dcb49c","#f0f0e8","#b4c699","#4a6b2e"],
+    "highlight": "#4a6b2e",
+    "context": "#c6c8b9"
+  },
+  "type": {
+    "display": "Georgia,\"Times New Roman\",\"Liberation Serif\",serif",
+    "body": "\"Helvetica Neue\",\"Segoe UI\",\"Liberation Sans\",Arial,sans-serif",
+    "ja": "\"Hiragino Sans\",\"Noto Sans JP\",\"Yu Gothic\",\"Meiryo\",\"IPAGothic\",sans-serif"
+  },
+  "ratios": {"paperAndSurface": 0.86, "ink": 0.11, "accentMax": 0.03},
+  "rules": [
+    "苔の緑は「目標に対する実績」の1系列か1つの数字にだけ使う。見出し、アイコン、葉のイラスト、地球のマークを緑にしない。",
+    "削減量・排出量の推移は sequential の石灰色から苔への濃淡で表し、明るい黄緑は一切使わない。",
+    "土の赤茶は negative であると同時に「未達」の色。達成/未達は色に加えて達成率の数字と符号（+/−）で書く。",
+    "比較しない年度・拠点・他社は context の石灰灰で描き、線の端に直接ラベルを置く。",
+    "緑の全面背景は作らない。章扉も石灰色の紙のまま、見出しの1語だけ苔の緑にする。",
+    "写真は本来の色のまま置き、緑のフィルターや半透明の重ねをしない。"
+  ],
+  "source": "Original. Contrast and color-vision checks by scripts/color-systems.mjs."
+}

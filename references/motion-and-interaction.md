@@ -1,6 +1,6 @@
 # Motion and Interaction
 
-The three parts below cover choreography and animation, interactive explanation, and media/3D boundaries.
+Choreography and animation, interactive explanation, then media/3D boundaries.
 
 ## Choreography, not a list of entrance effects
 
@@ -62,7 +62,7 @@ The player does this for declared states; custom loops must do it themselves.
 
 Automatic movement needs an appropriate pause/stop mechanism. Nonessential motion
 triggered by interaction should be suppressible. Avoid flashing content. Consult the
-W3C sources in `evidence-and-diagrams.md`; the runtime is not a WCAG certification.
+[W3C references](working-agreements.md#primary-references); the runtime is not a WCAG certification.
 
 For export choose: final informative state, selected frozen state, or separate pages
 for meaningful intermediate states. A final frame containing only “Done” is not a
@@ -101,8 +101,6 @@ or `studio:state` for intra-slide changes. Animation is a removable layer over a
 already committed target; cancelled callbacks must not restore stale styles.
 
 ## Interactive explanation without building unnecessary applications
-
-The following sections cover when and how to use interaction in a deck.
 
 Use interaction when changing a variable, inspecting a component or exploring a
 condition teaches something that a static sequence cannot communicate as well.
@@ -220,8 +218,6 @@ caption and narrative scope synchronized with the new dataset.
 
 ## Media and 3D: practical boundaries
 
-The following sections cover the practical boundaries for video, audio, and 3D.
-
 ### Video and audio
 
 Use real local media, a descriptive title, selected poster, controls, captions or
@@ -290,4 +286,4 @@ do not silently export a blank canvas or controls alone.
 External iframes and web demos require explicit permission and a network disclosure.
 Treat them as untrusted content, use a sandbox with minimum permissions and a static
 fallback. A public OSS skill should not embed accounts, tokens, analytics or private
-URLs. See `working-agreements.md`.
+URLs. See [working agreements](working-agreements.md#trust-boundaries).

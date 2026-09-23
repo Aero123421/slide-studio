@@ -162,7 +162,8 @@ Supported does not mean unlimited: right-to-left shaping, native chart workbooks
 
 ## Authoring API and project layout
 
-The following covers the creative `craft.mjs` API and project layout, distinct from the structured `studio.mjs` workflow above.
+The creative `craft.mjs` API (the default original-HTML route), distinct from the
+structured `studio.mjs` workflow above.
 
 ### The default authored module
 
@@ -240,7 +241,7 @@ primitives, not an automatic layout optimizer or a visual quality scorer.
 Run `craft.mjs validate` for schema and script parsing, `editorial.py` for story
 checks, and `qa.py` for browser measurements. Inspect actual output after all three.
 
-### Refinement support in 3.2
+### Layout helpers, review metadata, brand and notes
 
 `craft.mjs init` also copies `layout.mjs`. Its `allocate`, `dagLayers`, `labelRail`
 and `routeOrthogonal` helpers calculate geometry with explicit fit checks. They

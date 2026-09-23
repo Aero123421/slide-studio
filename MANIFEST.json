@@ -22,8 +22,8 @@
     },
     {
       "path": "CONTRIBUTING.md",
-      "bytes": 1356,
-      "sha256": "53ef7af98104bae91cebc2953a411356eb58019d65f3a448849da30a5d70c013"
+      "bytes": 1407,
+      "sha256": "381998450df1c910012df7849720263121af715b42ea99905557fdcb83b421af"
     },
     {
       "path": "LICENSE",
@@ -32,8 +32,8 @@
     },
     {
       "path": "README.ja.md",
-      "bytes": 11413,
-      "sha256": "1f2ca80da384ed4f82c9e44183a3cbef0236920eb8eb26199c0df1c093492f37"
+      "bytes": 11159,
+      "sha256": "52a2876a6531ea6fe0eab5bb72154f708c026aa547031d5f608742d6942353d8"
     },
     {
       "path": "README.md",
@@ -42,8 +42,8 @@
     },
     {
       "path": "SKILL.md",
-      "bytes": 11463,
-      "sha256": "edfd638f831a3329349441734931d993fd5e133a3c9aaffba6c3ae7f80e76145"
+      "bytes": 12034,
+      "sha256": "8ecbc4a5d15603a4b260b199a5300058aa9f81b0fc51d250049140dda36b6e78"
     },
     {
       "path": "THIRD_PARTY_NOTICES.md",
@@ -2132,8 +2132,8 @@
     },
     {
       "path": "references/authoring.md",
-      "bytes": 14983,
-      "sha256": "488afd5907c5c637e7ff0ef7df0f77cf3f62f803d94db95addbb2a7f8e9ba666"
+      "bytes": 15000,
+      "sha256": "b96c73e318c5400315bff0e31965098597dac8b07da0edca78c4734627124b67"
     },
     {
       "path": "references/brand.md",
@@ -2142,13 +2142,13 @@
     },
     {
       "path": "references/evidence-and-diagrams.md",
-      "bytes": 18460,
-      "sha256": "7c315464221927b71e2231c1cb564ea979582b95b40ef6f67fed63121ac46ff0"
+      "bytes": 15054,
+      "sha256": "4691859b9f0202a021059d9f7a3e944bb0bd0b725699503b8d4260555d69aa85"
     },
     {
       "path": "references/motion-and-interaction.md",
-      "bytes": 15723,
-      "sha256": "4b54a7cede6c2d2fb05815e8102e6e6aee4fdfd31bc7e36f089308585ed33437"
+      "bytes": 15596,
+      "sha256": "467c9f82d134342502eb21b00d688d88e155eafd9844d7210a9023505d315181"
     },
     {
       "path": "references/repair.md",
@@ -2157,18 +2157,18 @@
     },
     {
       "path": "references/verification-and-delivery.md",
-      "bytes": 22053,
-      "sha256": "e2345fefb206b03aec0e6c3b3d39802111cdbe260c51dcf82f6e78c00577e6e1"
+      "bytes": 19294,
+      "sha256": "0dd81b9d62f24359ff7bd7ebfb5917496e3c7add39b0b6d000ca00afa448d440"
     },
     {
       "path": "references/visual-design.md",
-      "bytes": 29858,
-      "sha256": "521f5a015c21e93aa3cfc2c1020982ff271553b7f7391375bc07292cadd86ba6"
+      "bytes": 28962,
+      "sha256": "5a97bb5bd15f554f9c1410a11ee67e27a7124687995b7290dcafeae8f0d5e422"
     },
     {
       "path": "references/working-agreements.md",
-      "bytes": 13084,
-      "sha256": "d83b154c5a19ab654f68475e7cb7bf2bdd12817f38647d5e309977853f6ba07d"
+      "bytes": 16142,
+      "sha256": "980df835ef1c376bedcc203dbfdaad9f24136660218321b5a7d7814e217e2acf"
     },
     {
       "path": "references/writing-and-editing.md",
@@ -2182,8 +2182,8 @@
     },
     {
       "path": "scripts/audit.py",
-      "bytes": 5037,
-      "sha256": "71b0aba8e346a338ab2139b1b749dd54c9606cff9a8e4e4820d8abe36f37e833"
+      "bytes": 7095,
+      "sha256": "182164f0ca648dd365f68c5746083e588c73c4fb877b270f2e9a9fd8f2b1ddd2"
     },
     {
       "path": "scripts/brand-capture.py",
@@ -2356,9 +2356,14 @@
       "sha256": "f788f2dd46bc102b6f498aeac26ad29c6bdb004c5d3ee54b88624df4f22bc0c1"
     },
     {
+      "path": "tests/EVALUATION.md",
+      "bytes": 2536,
+      "sha256": "9172f0cc74b289a8a7fbd5b3bc6c13a3a8584b738755f93f40f844e49a15ea03"
+    },
+    {
       "path": "tests/agent-evals.json",
-      "bytes": 6121,
-      "sha256": "b4b7b8896d403f04b8613badebfaa389a3eff3bdf4623a41cfaebf1365e0eb4e"
+      "bytes": 5881,
+      "sha256": "1abba9cab1908e99468510389aa8474ca302440dc6fee42a19e1880e04ed5e12"
     },
     {
       "path": "tests/browser.py",
@@ -2429,6 +2434,11 @@
       "path": "tests/rendered_review.py",
       "bytes": 2487,
       "sha256": "7cc510f0505023e2a240c48dc2f113ffd0759c95f8595fe6690d3a4266e4d7d5"
+    },
+    {
+      "path": "tests/test_audit.py",
+      "bytes": 2428,
+      "sha256": "0f2f94feaeb913b01a84873e34fd5ef0bd5ac9040f10948386398493952e84d0"
     },
     {
       "path": "tests/test_brand.py",

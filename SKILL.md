@@ -1,6 +1,6 @@
 ---
 name: slide-studio
-description: "Author, redesign, and QA original presentations from evidence: copy, layouts, data diagrams, animation, PDF/PPTX export, brand templates. For slide creation, research talks, template systems, any language. Not template-filling."
+description: "Author, revise and QA presentations from source material: claims and copy, whole-slide layout, truthful data diagrams, motion and interaction, self-contained HTML, PDF and PowerPoint export (picture or native editable), and company brand kits/POTX templates. Use when asked to create, rewrite, redesign, fix or review slides, a deck, talk, pitch, lecture or research presentation, in any language. Designs from the content instead of filling a fixed layout."
 metadata:
   version: "3.4.0"
 ---
@@ -45,7 +45,8 @@ restate the advice in audience copy. Then choose relevant guides:
 | Authoring APIs, studio scenes, story contract | [Authoring](references/authoring.md) |
 | Native editable PowerPoint | [Authoring](references/authoring.md), [Verification and delivery](references/verification-and-delivery.md) |
 | Existing company slides / reusable private templates | [Brand systems](references/brand.md) |
-| Rights, source trust, installation, autonomy | [Working agreements](references/working-agreements.md) |
+| Revising an existing PPTX/PDF deck | Read its text/figures with host tools, keep its facts, rebuild; [Brand systems](references/brand.md) for its identity. In-place PPTX editing is not a route here |
+| Rights, source trust, installation, autonomy, capability tiers | [Working agreements](references/working-agreements.md) |
 
 Search by the explanation needed, not a color or generic decorative style:
 `node "$SKILL_DIR/scripts/catalog.mjs" search "conditional branch" --limit 4`.
@@ -100,11 +101,12 @@ Resolve `SKILL_DIR` from this file's location. Work in the user's project, never
 editing the installed skill. Match the loop to the host's capability tier
 (see [Working agreements](references/working-agreements.md)): when browser QA
 or installs are unavailable, skip those steps and report them as unrun.
-The default original-HTML route requires no layout ID:
+Use `python3` where `python` is absent. The default original-HTML route requires no layout ID:
 
 ```sh
 node "$SKILL_DIR/scripts/craft.mjs" init ./presentation --language en
 # Author deck.mjs. Set readingMode; replace the draft and actual source/data.
+# While deck.mjs still has draft:true, preview by adding --allow-draft to build.
 node "$SKILL_DIR/scripts/craft.mjs" build ./presentation/deck.mjs --out ./presentation/deck.html
 # For important numeric claims, independently check declared input/expected values:
 python "$SKILL_DIR/scripts/evidence.py" ./presentation/evidence.json

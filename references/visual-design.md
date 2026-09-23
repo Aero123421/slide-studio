@@ -14,8 +14,6 @@ Write the claim and its scope in one plain sentence. Name the actual relationshi
 paired comparison, flow, causal hypothesis, mechanism, containment, sequence,
 topology, part-whole, threshold, uncertainty, spatial correspondence or spatial
 detail, evidence versus interpretation, or emphasis.
-*(The relationship lists from “Design a page without a template” and “Inventing
-compositions from relationships” are merged here as one union; no item was dropped.)*
 A diagram is not automatically appropriate: the original image, a table or a short
 statement may be the best evidence.
 
@@ -23,7 +21,6 @@ Choose a reading operation: compare on an aligned axis (compare registered
 positions), follow a path, find a part (inspect a focal object or a selected
 range), scan rows, read a hierarchy, progress through states, or connect an
 observation to its limit.
-*(The reading-operation and reading-strategy lists are likewise merged here.)*
 Now choose the primary medium and a subordinate treatment for supporting material.
 Write a three-line plan of *content and geometry*, not a long art-direction essay.
 
@@ -62,9 +59,6 @@ row of feature cards, and a measured distribution is not an ornamental wave. Kee
 strokes, corner behavior, icon scale and arrowheads internally consistent.
 
 Use proximity to group evidence with its interpretation.
-*(“Align optical edges” here was removed as duplicated: the fuller rules are “Align
-visible glyph edges optically, not only text-box edges” and “Align visible edges
-and baselines, not only nominal wrapper rectangles” below.)*
 Place sources where they are readable without competing with the argument. Use
 photographs at a scale that lets them communicate; avoid arbitrary microthumbnails.
 A new diagram can share a brand's type and colors without sharing a preset layout.
@@ -99,11 +93,8 @@ the concrete repair. “Make more professional” is not an actionable review fi
 
 ### A constructive grammar
 
-Relationship and reading-strategy choices are merged into “Establish the explanation
-before its shape” above; the transformations below operate on whichever relationship
-was chosen.
-
-Derive a composition through transformations: translate a cluster; change scale
+Start from the relationship and reading operation chosen in “Establish the
+explanation before its shape” above. Derive a composition through transformations: translate a cluster; change scale
 hierarchies; rotate the conceptual axis; expand a selected region; split a figure
 across registered views; put annotations in an external rail; turn repeated values
 into small multiples; replace a diagram with the actual object plus labels; combine
@@ -358,11 +349,9 @@ hierarchy. They do not automatically make a slide modern. Avoid placing small te
 across widely varying luminance. Patterns need scale discipline: fine lines can
 alias on projectors and exports. Inspect at actual target dimensions.
 
-`assets/design-systems.json` includes editable starting palettes. Any palette may be
-changed. Run real contrast checks after changes and review data semantics separately.
-*(Conflict note: “any palette may be changed” refers to these editable seed
-palettes; a supplied brand identity is still preserved — the stricter rule above —
-so a supplied white brand is never shifted to cream without permission.)*
+`assets/design-systems.json` includes editable starting palettes. Any of these seed
+palettes may be changed; a supplied brand identity may not (see above). Run real
+contrast checks after changes and review data semantics separately.
 
 ## Typography across languages
 
@@ -405,7 +394,7 @@ letterspacing. Use logical properties (`margin-inline-start`, `inset-inline-end`
 `text-align:start`). Mirror reading flow where appropriate, not numerical charts,
 scientific axes or the inherent direction of a physical object. Use `<bdi>` or
 `dir="ltr"` for identifiers, code, units or URLs inside RTL prose. Never reverse
-strings programmatically to “support RTL”. See the W3C source in `evidence-and-diagrams.md`.
+strings programmatically to “support RTL”. See the W3C references in [working agreements](working-agreements.md#primary-references).
 
 For Devanagari and other combining scripts, do not split grapheme clusters. Avoid
 letter-by-letter text animation that separates combining marks. Reveal phrases,
@@ -506,7 +495,4 @@ Use PNG for transparency or sharp screenshots where appropriate, JPEG/WebP for
 photographic imagery after checking artifacts. Keep originals outside disposable QA.
 The built-in placeholder syntax embeds local media up to 16 MiB per asset; large
 video should be an explicit local asset bundle, not megabytes pasted into model context.
-Do not ship unrelated photographs with the deck.
-*(“Do not ship font files” was removed here as duplicated: the fuller rule — no font
-binaries bundled, users obtain fonts through approved channels — is kept under
-“Typography across languages”.)*
+Do not ship unrelated photographs or font files with the deck.

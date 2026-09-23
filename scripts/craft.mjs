@@ -14,6 +14,6 @@ try{
  }else if(cmd==='build'||cmd==='validate'){
   const file=path.resolve(args[0]||'');if(!args[0])throw Error('Specify trusted local deck.mjs.');const deck=(await import(pathToFileURL(file).href)).default;
   const options={allowDraft:args.includes('--allow-draft'),assetBase:path.dirname(file),stripNotes:args.includes('--strip-notes')};const result=validateCraft(deck,options);
-  if(cmd==='build'){const out=get('--out');if(!out||!out.endsWith('.html'))throw Error('build requires --out FILE.html');const text=await renderCraft(deck,options);await fs.mkdir(path.dirname(path.resolve(out)),{recursive:true});await fs.writeFile(out,text,{flag:args.includes('--force')?'w':'wx'});result.output=path.resolve(out)}console.log(JSON.stringify(result,null,2));
+  if(cmd==='build'){const out=get('--out');if(!out||!out.endsWith('.html'))throw Error('build requires --out FILE.html');const text=await renderCraft(deck,options);await fs.mkdir(path.dirname(path.resolve(out)),{recursive:true});await fs.writeFile(out,text,{flag:args.includes('--force')?'w':'wx'}).catch(e=>{throw e.code==='EEXIST'?Error(`${out} already exists; pass --force to rebuild it.`):e});result.output=path.resolve(out)}console.log(JSON.stringify(result,null,2));
  }else console.log('craft.mjs init PROJECT [--language en]\ncraft.mjs validate TRUSTED_DECK.mjs\ncraft.mjs build TRUSTED_DECK.mjs --out deck.html [--allow-draft] [--strip-notes] [--force]');
 }catch(e){console.error('Craft:',e.message);process.exitCode=1}

@@ -113,7 +113,8 @@ node scripts/craft.mjs init ./presentation --language en
 node scripts/craft.mjs build ./presentation/deck.mjs --out ./presentation/deck.html
 ```
 
-Node 20+ builds dependency-free self-contained HTML. Import helpers from the copied
+Node 20+ builds dependency-free self-contained HTML. The build never overwrites an
+existing output silently; add `--force` when rebuilding the same file. Import helpers from the copied
 `studio-kit.mjs`, or write plain HTML/CSS/SVG. The source module is **trusted code**,
 not a sandbox for untrusted modules. See [authoring](references/authoring.md).
 

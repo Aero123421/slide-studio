@@ -17,8 +17,8 @@
     },
     {
       "path": "CHANGELOG.md",
-      "bytes": 4501,
-      "sha256": "6fe12b76e28339496af48c9ada2bc6bf1caf6419f69785a7772295a39665790e"
+      "bytes": 5371,
+      "sha256": "8bca9125dea39f9b53410e6e42b99d1d2c611289411f9f28a27140dc13a115dc"
     },
     {
       "path": "CONTRIBUTING.md",
@@ -37,13 +37,13 @@
     },
     {
       "path": "README.md",
-      "bytes": 15010,
-      "sha256": "9d05070be586a990058169333bfdbb2e4c7e35b1f21be4423ee9e50e70dcb14d"
+      "bytes": 15111,
+      "sha256": "85a740b9a0e1c4d099e9e8a04b7749c6812e50d73c71b784f426b520c0ad7710"
     },
     {
       "path": "SKILL.md",
-      "bytes": 12034,
-      "sha256": "8ecbc4a5d15603a4b260b199a5300058aa9f81b0fc51d250049140dda36b6e78"
+      "bytes": 12088,
+      "sha256": "01abd30e4df6aac1c359b38c12b6cd34db8d0abab00d8ba7a9c2ece5a26b7203"
     },
     {
       "path": "THIRD_PARTY_NOTICES.md",
@@ -2132,13 +2132,13 @@
     },
     {
       "path": "references/authoring.md",
-      "bytes": 15000,
-      "sha256": "b96c73e318c5400315bff0e31965098597dac8b07da0edca78c4734627124b67"
+      "bytes": 15444,
+      "sha256": "401e35199824f3f02df24f1bdaf663f69154a26337ed1e3ec12c234523aa2944"
     },
     {
       "path": "references/brand.md",
-      "bytes": 6838,
-      "sha256": "e59b5f022d8588f736d3677cab7588993962f9ddbca7a7219e32ba48527d50c2"
+      "bytes": 6974,
+      "sha256": "dbb32a665875a34c6a6c79e01e091648338ee05e25ddfc0c4c731fb37cd81945"
     },
     {
       "path": "references/evidence-and-diagrams.md",
@@ -2147,8 +2147,8 @@
     },
     {
       "path": "references/motion-and-interaction.md",
-      "bytes": 15596,
-      "sha256": "467c9f82d134342502eb21b00d688d88e155eafd9844d7210a9023505d315181"
+      "bytes": 15805,
+      "sha256": "63e4eff582b0756ac20e5b48cf5b5cbda4531230b54058234bd7268423af1dbb"
     },
     {
       "path": "references/repair.md",
@@ -2157,8 +2157,8 @@
     },
     {
       "path": "references/verification-and-delivery.md",
-      "bytes": 19294,
-      "sha256": "0dd81b9d62f24359ff7bd7ebfb5917496e3c7add39b0b6d000ca00afa448d440"
+      "bytes": 19770,
+      "sha256": "5297eaf681214b7a9352a139ad1cf2a2533b3d4d0b3c6275cff07671d3e79720"
     },
     {
       "path": "references/visual-design.md",
@@ -2167,8 +2167,8 @@
     },
     {
       "path": "references/working-agreements.md",
-      "bytes": 16142,
-      "sha256": "980df835ef1c376bedcc203dbfdaad9f24136660218321b5a7d7814e217e2acf"
+      "bytes": 16253,
+      "sha256": "bf5d38ea5cee61e38e253bcf3996bdce5943000ab1c734d143273704e97d932d"
     },
     {
       "path": "references/writing-and-editing.md",
@@ -2257,8 +2257,8 @@
     },
     {
       "path": "scripts/craft.mjs",
-      "bytes": 3039,
-      "sha256": "e210f9ccfcb268e4b6275d5ef2d993e46b097974f1f166c993f39c7cca9495c1"
+      "bytes": 3137,
+      "sha256": "0a60bc3e829c87dd7fcbe8c6aae07677493feac70e0a8a9719b1cd271eed5d67"
     },
     {
       "path": "scripts/css-check.mjs",
@@ -2267,8 +2267,8 @@
     },
     {
       "path": "scripts/deps.mjs",
-      "bytes": 1024,
-      "sha256": "5481e7487e5eddcd7d6884e0681c4a84c25c48914d477e2fcf304ea89b9ef78c"
+      "bytes": 1036,
+      "sha256": "46e039d166eb742a4500a3a30acb6216db8ae7c81a831b35e91588b3869f4152"
     },
     {
       "path": "scripts/editorial.py",
@@ -2297,8 +2297,8 @@
     },
     {
       "path": "scripts/font_audit.py",
-      "bytes": 12812,
-      "sha256": "d2f1dff68a80ad39c8bfbb5f2b36545936fc954fbcbd9c032ad30e9d743c712a"
+      "bytes": 12852,
+      "sha256": "36639a292640012a166bd652fad360f95dd79d5f36581f78e72d788ba1d02d02"
     },
     {
       "path": "scripts/fontcheck.py",
@@ -2332,8 +2332,8 @@
     },
     {
       "path": "scripts/render.mjs",
-      "bytes": 933,
-      "sha256": "42ea2548ff39a09615be9700d20896388d6faff5ff9bbdd16673508dddc6847d"
+      "bytes": 973,
+      "sha256": "11f23201ce180ec8923f72111b1c1501e0ec4e9cbd53496bfee3589d9ca0345a"
     },
     {
       "path": "scripts/review_workspace.py",
@@ -2369,6 +2369,11 @@
       "path": "tests/browser.py",
       "bytes": 16268,
       "sha256": "c131845c4308f781e06d256c2012a925facfdef3c9724786ed5c8e17aea6cf6f"
+    },
+    {
+      "path": "tests/cli.test.mjs",
+      "bytes": 1850,
+      "sha256": "c52cdad6ed6bb7be36158b1f23f0836b8f91bcb8662f02f4ce337cd95f1f7fb1"
     },
     {
       "path": "tests/core.test.mjs",

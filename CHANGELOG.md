@@ -13,6 +13,18 @@
 - Added CI (Node 20/22 tests, Python unit tests, gallery and MANIFEST freshness).
 - Declared the missing `lxml` dependency in `requirements.txt`.
 - `gallery/*.html` documented as generated output; CI enforces a fresh build.
+- Doc review: removed merge-editing notes and filler from guides; fixed dead paths
+  and anchors; moved primary references to working agreements and maintainer
+  evaluation methodology to `tests/EVALUATION.md`; trigger-oriented SKILL description.
+- Docs now match code: `craft.mjs build --force` for rebuilds, `--allow-draft` in the
+  smoke test and after `catalog take`, `data-motion`/`data-easing` presets, studio
+  `chrome:false`/`reveal`/`build`, qa.py `--states` default and studio-deck scope,
+  fontTools for `fontcheck.py`, native routes accept studio HTML only, logo `required`
+  is not enforced.
+- Fixed `render.mjs --states VALUE` passing the value twice, `font_audit.py` failing on
+  `studio.mjs` HTML, and a clearer error when a craft build output already exists.
+- `audit.py` checks markdown anchors, backticked repository paths and SKILL.md
+  frontmatter.
 
 ## 3.4.0 — 2026-09-07
 

@@ -166,9 +166,10 @@ Everything build- and browser-related stays unrun.
 
 **Tier 1 — Node 20+ and/or Python 3.10+ standard library, no installs.**
 `catalog.mjs`, `craft.mjs` (init/build), `studio.mjs` (list/init/validate/build),
-`css-check.mjs`, `lint.mjs`, `svg-edit.py`, `editorial.py`, `evidence.py`,
-`fontcheck.py`, `audit.py`, `brand-capture.py`, `inspect-brand.py`, plus
-`clean.py`/`verify-review.py` on existing review output. Bundled gallery HTML
+`lint.mjs`, `svg-edit.py`, `editorial.py`, `evidence.py`, `audit.py`,
+`brand-capture.py`, `inspect-brand.py`, plus `clean.py`/`verify-review.py` on existing
+review output. The CSS preflight (`css-check.mjs`) runs inside build and QA.
+`fontcheck.py` additionally needs the optional `fontTools` package. Bundled gallery HTML
 opens directly. This tier builds and statically checks a deck.
 
 **Tier 2 — `pip install -r requirements.txt` plus Playwright Chromium.**
@@ -183,7 +184,7 @@ PPTX), `brand-template.py` (.potx). This tier renders, reviews, and exports.
 ```sh
 node scripts/catalog.mjs search "comparison"
 node scripts/catalog.mjs take motion-focal-reveal ./smoke-study
-node scripts/craft.mjs build ./smoke-study/deck.mjs --out ./smoke-study/deck.html
+node scripts/craft.mjs build ./smoke-study/deck.mjs --out ./smoke-study/deck.html --allow-draft
 python scripts/qa.py ./smoke-study/deck.html --out ./smoke-study/.studio-review/current --check
 ```
 

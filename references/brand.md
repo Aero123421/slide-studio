@@ -62,7 +62,9 @@ lists, margin/gutter values, and an optional approved project-relative `logo` im
 ```
 
 The path is illustrative; provide an actual authorized asset. The runtime uses
-`object-fit:contain` and does not redraw it. Required logo omission is rejected.
+`object-fit:contain` and does not redraw it. Logo path, alt text and geometry are
+validated when present; `required` records intent but is not enforced, so check
+that every rendered page that needs the mark shows it.
 Style changes in custom CSS can still violate identity; inspect the rendered output.
 Token validation is not complete brand enforcement. Do not claim pixel-identical
 reproduction of an arbitrary source master.

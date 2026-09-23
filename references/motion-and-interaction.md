@@ -93,9 +93,11 @@ target state. It does not inspect every possible custom effect. Inspect a real
 intermediate frame, interruption, reverse and replay as well. Use `tests/navigation.py`
 when editing the player itself. Do not add a second global keyboard listener.
 
-The small entry presets on `data-step` are `reveal`, `lift`, `slide`, `wipe`, `trace`,
-`focus` and `settle`. They are optional; use authored `data-states` for substantive
-transformations. The same element should not have competing owners of `transform`.
+Small entry presets are chosen with `data-motion` next to `data-step`
+(`<p data-step="1" data-motion="lift">`): `reveal`, `lift`, `slide`, `wipe`, `trace`,
+`focus` and `settle`. An unknown name raises a player warning, which fails QA.
+`data-easing` overrides the default curve. They are optional, ignored on elements with
+`data-states`; use authored `data-states` for substantive transformations. The same element should not have competing owners of `transform`.
 `onEnter` runs when entering a slide, not at every build. Use the widget update hook
 or `studio:state` for intra-slide changes. Animation is a removable layer over an
 already committed target; cancelled callbacks must not restore stale styles.

@@ -107,6 +107,7 @@ Use `python3` where `python` is absent. The default original-HTML route requires
 node "$SKILL_DIR/scripts/craft.mjs" init ./presentation --language en
 # Author deck.mjs. Set readingMode; replace the draft and actual source/data.
 # While deck.mjs still has draft:true, preview by adding --allow-draft to build.
+# Rebuilding to an existing --out file needs --force.
 node "$SKILL_DIR/scripts/craft.mjs" build ./presentation/deck.mjs --out ./presentation/deck.html
 # For important numeric claims, independently check declared input/expected values:
 python "$SKILL_DIR/scripts/evidence.py" ./presentation/evidence.json

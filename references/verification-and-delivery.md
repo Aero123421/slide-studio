@@ -32,6 +32,8 @@ python scripts/qa.py project/deck.html --out project/.studio-review/current --st
 python scripts/qa.py project/deck.html --out project/.studio-review/current --states all --review-states
 ```
 
+Other options: `--width`/`--height` (default 1280×780 viewport) and `--reduced-motion`.
+
 The tool measures overflow, text overlap, broken images, missing image alt attributes,
 duplicate IDs, runtime errors and blocked external requests. Warnings about small
 text need contextual review. Intentional crops can mask geometry, so manually inspect
@@ -159,7 +161,9 @@ For images without a focal annotation, manually compare the original and final c
 
 ### Meaningful controls need meaningful tests
 
-`qa.py --states all` covers declared slide builds and static final states.
+`qa.py --states all` covers declared slide builds and static final states of
+`craft.mjs` decks (the default is `sampled`: first, middle and last build); `studio.mjs`
+decks are inspected in their final build state only.
 `qa-navigation.py` exercises presentation navigation. Neither enumerates arbitrary
 custom controls nor establishes their scientific correctness. For discrete controls,
 check each choice's actual claim, formula, marks and labels; for ranges, use endpoints,
@@ -314,7 +318,10 @@ estimates and requires real output inspection. Font differences between environm
 can still change wrapping. SVG geometry stays a picture in the PPTX route.
 
 The historical `--mode fidelity --png-dir` entry point is retained for existing
-workflows, but the new `export.py` route avoids loose frames. The optional artifact
+workflows only; no bundled script produces the `slide-NN.png` frames it expects. Use
+`export.py` for picture PPTX. Native routes (`export-pptx.mjs --mode editable`,
+`export-pdf-office.mjs`, which also needs LibreOffice `soffice` or
+`SLIDE_STUDIO_SOFFICE`) accept `studio.mjs` HTML, not `craft.mjs` HTML. The optional artifact
 adapter is inherited and is not part of the tested default release path; do not
 claim it was verified unless you run it in a supporting environment.
 

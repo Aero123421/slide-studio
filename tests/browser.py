@@ -124,7 +124,7 @@ def main():
     page.set_content(content,wait_until='load');expect(state('threshold')['counts']=={'tp':1,'fp':1,'fn':1,'tn':1})
    check('project-owned data overrides toy fixture and recomputes actual counts',custom_data)
    def index_search():
-    page.set_content((ROOT/'gallery/index.html').read_text(),wait_until='load');expect(page.locator('#results tr').count()==228);page.get_by_label('Search by explanatory purpose').fill('error-bars');expect(page.locator('#results tr').count()==1)
+    page.set_content((ROOT/'gallery/index.html').read_text(),wait_until='load');expect(page.locator('#results tr').count()==300);page.get_by_label('Search by explanatory purpose').fill('error-bars');expect(page.locator('#results tr').count()==1)
    check('offline workshop index filters actual source catalog',index_search)
    # Probe actual animated transitions for each source, then direct jumps and reverse states.
    open_deck(page,ROOT/'gallery/motion.html')

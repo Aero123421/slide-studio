@@ -2,7 +2,7 @@
 /** Purpose-based retrieval and portable extraction. Does not publish or install anything. */
 import fs from 'node:fs/promises';import path from 'node:path';import {ROOT} from './craft-core.mjs';
 const args=process.argv.slice(2),cmd=args.shift(),opt=k=>{const i=args.indexOf(k);return i<0?undefined:args[i+1]};
-const dictionary={'比較':'comparison compare paired bars','図':'diagram','動き':'motion','アニメーション':'motion','写真':'image photo crop','画像':'image photo','研究':'research study uncertainty','幾何学':'geometric geometry','操作':'interactions','動画':'video','音声':'audio','フォント':'type typography','比較图':'comparison','交互':'interactions','研究発表':'research methods results','動畫':'motion','gráfico':'chart plot','animation':'motion'};
+const dictionary={'テンプレート':'templates','ひな形':'templates','比較':'comparison compare paired bars','図':'diagram','動き':'motion','アニメーション':'motion','写真':'image photo crop','画像':'image photo','研究':'research study uncertainty','幾何学':'geometric geometry','操作':'interactions','動画':'video','音声':'audio','フォント':'type typography','比較图':'comparison','交互':'interactions','研究発表':'research methods results','動畫':'motion','gráfico':'chart plot','animation':'motion'};
 try{const {resources}=JSON.parse(await fs.readFile(path.join(ROOT,'assets/catalog.json'),'utf8'));let rows=resources;
  if(cmd==='show'){const r=rows.find(x=>x.id===args[0]);if(!r)throw Error('Unknown ID. Use search or list.');console.log(JSON.stringify(r,null,2));}
  else if(cmd==='take'){

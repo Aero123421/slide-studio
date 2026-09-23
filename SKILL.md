@@ -51,6 +51,11 @@ restate the advice in audience copy. Then choose relevant guides:
 Search by the explanation needed, not a color or generic decorative style:
 `node "$SKILL_DIR/scripts/catalog.mjs" search "conditional branch" --limit 4`.
 Inspect an example's source and invariants. Do not read or copy the entire library.
+For a practical page type with finished art direction (pitch, business review, strategy,
+research talk, architecture review, ML report, lecture, editorial, impact report, launch,
+project status, keynote; English and Japanese), `catalog.mjs list --kind templates`.
+A template pack is a coherent reference to adapt: replace its synthetic data, copy and
+fictional names, recompute its charts, and keep only what fits. Do not submit it as-is.
 
 ## 3. Author in a bounded loop
 

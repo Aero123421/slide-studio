@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- 12 template packs, 72 pages (`assets/templates/`, catalog kind `templates`,
+  `gallery/templates.html`): pitch, quarterly business review, strategy proposal,
+  Japanese research talk, architecture review/postmortem, ML model report, lecture,
+  editorial essay, impact report, product launch, project status and keynote, in English
+  and Japanese. Each pack has its own art direction and scoped CSS; charts and diagrams
+  are computed from one data array per page; all names and numbers are fictional and
+  labelled as illustrative. The gallery index features them; `catalog.mjs` maps
+  「テンプレート」 searches to them.
+- Runtime: scaled slides render SVG text with `text-rendering:geometricPrecision`, which
+  keeps Chromium from drawing labels at stale positions.
 - Merged 36 reference guides into 9 (writing, authoring, evidence, design,
   motion, verification, repair, brand, working agreements). All rules, steps,
   commands, and code blocks preserved; SKILL.md routing table rewritten.

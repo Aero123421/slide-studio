@@ -1,0 +1,128 @@
+/* Template pack: プロジェクト定例・進捗報告 (tpl-project-status). Every selector is scoped to .tpl-project-status. */
+.tpl-project-status{
+  --ps-ink:#1b2433;--ps-ink-2:#465264;--ps-ink-3:#5f6b7c;--ps-paper:#ffffff;--ps-surface:#f3f5f8;--ps-line:#d8dee6;--ps-line-2:#e8ecf1;
+  --ps-navy:#1d3a5f;--ps-teal:#0c7478;--ps-teal-soft:#e0f1f1;
+  --ps-g:#2b7a4b;--ps-g-bg:#e2f2e8;--ps-a:#946000;--ps-a-dot:#e0a100;--ps-a-bg:#fff2d2;--ps-r:#b8372a;--ps-r-bg:#fbe3df;
+  --ps-jp:"Hiragino Sans","Noto Sans JP","Yu Gothic","Meiryo","IPAGothic","IPAPGothic",sans-serif;
+  --ps-num:"Inter","Helvetica Neue","Segoe UI","Liberation Sans",Arial,"IPAGothic",sans-serif;
+  background:var(--ps-paper);color:var(--ps-ink);font-family:var(--ps-jp);word-break:auto-phrase;line-break:strict;
+}
+.tpl-project-status .ps-page{position:absolute;inset:0;overflow:hidden}
+.tpl-project-status .ps-abs{position:absolute}
+.tpl-project-status .ps-deco{position:absolute;pointer-events:none}
+.tpl-project-status svg{display:block;overflow:visible}
+.tpl-project-status svg text{text-rendering:geometricPrecision}
+.tpl-project-status .ps-num{font-family:var(--ps-num);font-variant-numeric:tabular-nums}
+
+/* running header shared by every page */
+.tpl-project-status .ps-bar{position:absolute;left:0;right:0;top:0;height:46px;display:flex;align-items:center;gap:14px;padding:0 56px;border-bottom:1px solid var(--ps-line);background:#fff}
+.tpl-project-status .ps-bar::before{content:"";position:absolute;left:0;top:0;bottom:-1px;width:8px;background:linear-gradient(180deg,var(--ps-teal),var(--ps-navy))}
+.tpl-project-status .ps-bar svg{width:24px;height:24px}
+.tpl-project-status .ps-bar p{font:700 15px/1 var(--ps-jp);color:var(--ps-navy);letter-spacing:.04em}
+.tpl-project-status .ps-bar p span{font-weight:400;color:var(--ps-ink-3);margin-left:10px}
+.tpl-project-status .ps-bar .ps-meta{margin-left:auto;font:400 15px/1 var(--ps-jp);color:var(--ps-ink-3);letter-spacing:.02em}
+.tpl-project-status .ps-bar .ps-meta b{font-weight:700;color:var(--ps-ink-2);margin-right:12px}
+.tpl-project-status .ps-sec{font:700 15px/1 var(--ps-jp);color:var(--ps-teal);letter-spacing:.12em}
+.tpl-project-status .ps-title{margin-top:10px;font:700 31px/1.38 var(--ps-jp);letter-spacing:.01em;color:var(--ps-ink)}
+.tpl-project-status .ps-source{position:absolute;left:56px;bottom:18px;font:400 15px/1.3 var(--ps-jp);color:var(--ps-ink-3)}
+
+/* RAG chip: color + shape + word, never color alone */
+.tpl-project-status .ps-rag{display:inline-flex;align-items:center;gap:7px;padding:5px 11px 5px 9px;border-radius:6px;font:700 15px/1 var(--ps-jp);white-space:nowrap}
+.tpl-project-status .ps-rag svg{width:13px;height:13px}
+.tpl-project-status .ps-rag.is-g{background:var(--ps-g-bg);color:var(--ps-g)}
+.tpl-project-status .ps-rag.is-a{background:var(--ps-a-bg);color:var(--ps-a)}
+.tpl-project-status .ps-rag.is-r{background:var(--ps-r-bg);color:var(--ps-r)}
+
+/* 01 summary */
+.tpl-project-status .ps-hero{position:absolute;left:56px;top:176px;width:392px;bottom:130px;border-radius:14px;background:linear-gradient(160deg,#fff8e6 0%,#fff2d2 100%);border:1px solid #f0d99a;padding:28px 30px}
+.tpl-project-status .ps-hero-top{display:flex;align-items:center;gap:18px}
+.tpl-project-status .ps-hero-top svg{width:56px;height:136px;flex:none}
+.tpl-project-status .ps-hero-top p{font:700 15px/1 var(--ps-jp);color:var(--ps-a);letter-spacing:.1em}
+.tpl-project-status .ps-hero-top strong{display:block;margin-top:10px;font:700 46px/1 var(--ps-jp);color:#7a4f00}
+.tpl-project-status .ps-hero-top em{display:block;margin-top:10px;font:400 15px/1.4 var(--ps-jp);font-style:normal;color:#7a5a17}
+.tpl-project-status .ps-hero blockquote{margin:24px 0 0;padding:18px 0 0;border-top:1px solid #ecd28c;font:700 21px/1.6 var(--ps-jp);color:var(--ps-ink)}
+.tpl-project-status .ps-areas{position:absolute;left:478px;right:56px;top:176px;border-collapse:collapse;table-layout:fixed}
+.tpl-project-status .ps-areas th{font:700 15px/1.2 var(--ps-jp);color:var(--ps-ink-3);text-align:left;padding:0 10px 10px 0;border-bottom:1.5px solid var(--ps-ink)}
+.tpl-project-status .ps-areas td{padding:13px 10px 13px 0;border-bottom:1px solid var(--ps-line);vertical-align:middle;font:400 16px/1.5 var(--ps-jp);color:var(--ps-ink-2)}
+.tpl-project-status .ps-areas td:first-child{font:700 17px/1.3 var(--ps-jp);color:var(--ps-ink)}
+.tpl-project-status .ps-trend{display:inline-flex;align-items:center;gap:6px;font:400 15px/1 var(--ps-jp);color:var(--ps-ink-3)}
+.tpl-project-status .ps-trend svg{width:18px;height:18px}
+.tpl-project-status .ps-kpis{position:absolute;left:56px;right:56px;bottom:54px;height:52px;display:grid;grid-template-columns:repeat(4,1fr);gap:28px}
+.tpl-project-status .ps-kpi{display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;column-gap:14px;align-items:end}
+.tpl-project-status .ps-kpi p{grid-column:1/3;font:400 15px/1.2 var(--ps-jp);color:var(--ps-ink-3)}
+.tpl-project-status .ps-kpi strong{font:700 26px/1 var(--ps-num);color:var(--ps-ink);white-space:nowrap}
+.tpl-project-status .ps-kpi strong small{font:400 15px/1 var(--ps-jp);color:var(--ps-ink-3);margin-left:3px}
+.tpl-project-status .ps-kpi svg{width:100%;height:22px}
+
+/* 02 milestones / 03 burndown / 05 risks: full-width figure areas */
+.tpl-project-status .ps-fig{position:absolute}
+.tpl-project-status .ps-rail{position:absolute;display:flex;flex-direction:column;gap:0}
+.tpl-project-status .ps-rail > div{padding:14px 0 14px;border-top:1px solid var(--ps-line)}
+.tpl-project-status .ps-rail > div:first-child{border-top:1.5px solid var(--ps-ink)}
+.tpl-project-status .ps-rail p{font:400 15px/1.3 var(--ps-jp);color:var(--ps-ink-3)}
+.tpl-project-status .ps-rail strong{display:block;margin-top:6px;font:700 28px/1.05 var(--ps-num);color:var(--ps-ink)}
+.tpl-project-status .ps-rail strong small{font:400 16px/1 var(--ps-jp);color:var(--ps-ink-2);margin-left:4px}
+.tpl-project-status .ps-rail .is-bad strong{color:var(--ps-r)}
+.tpl-project-status .ps-rail .ps-rail-note{margin-top:6px;font:400 15px/1.45 var(--ps-jp);color:var(--ps-ink-2)}
+
+/* 04 RACI */
+.tpl-project-status .ps-raci{position:absolute;left:56px;top:162px;width:900px;border-collapse:separate;border-spacing:0;table-layout:fixed}
+.tpl-project-status .ps-raci th{font:700 15px/1.3 var(--ps-jp);color:var(--ps-ink-2);padding:0 4px 10px;text-align:center;vertical-align:bottom;border-bottom:1.5px solid var(--ps-ink)}
+.tpl-project-status .ps-raci th:first-child{text-align:left;padding-left:0}
+.tpl-project-status .ps-raci td{height:38px;padding:0 4px;text-align:center;border-bottom:1px solid var(--ps-line-2);font:400 16px/1.3 var(--ps-jp)}
+.tpl-project-status .ps-raci td:first-child{text-align:left;padding-left:0;font:400 16px/1.3 var(--ps-jp);color:var(--ps-ink)}
+.tpl-project-status .ps-raci td:first-child b{display:inline-block;width:26px;font:700 15px/1 var(--ps-num);color:var(--ps-ink-3)}
+.tpl-project-status .ps-raci tr.is-key td{background:#f1f8f8}
+.tpl-project-status .ps-raci tfoot td{height:40px;border-bottom:0;border-top:1.5px solid var(--ps-ink);font:700 15px/1 var(--ps-num);color:var(--ps-ink-2)}
+.tpl-project-status .ps-raci tfoot td:first-child{font:700 15px/1 var(--ps-jp);color:var(--ps-ink-2)}
+.tpl-project-status .ps-raci tfoot td.is-hot{color:var(--ps-r)}
+.tpl-project-status .ps-cell{display:inline-grid;place-items:center;min-width:32px;height:28px;padding:0 6px;border-radius:6px;font:700 15px/1 var(--ps-num);letter-spacing:.02em}
+.tpl-project-status .ps-cell.is-A{background:var(--ps-navy);color:#fff}
+.tpl-project-status .ps-cell.is-R{background:var(--ps-teal);color:#fff}
+.tpl-project-status .ps-cell.is-AR{background:linear-gradient(135deg,var(--ps-navy) 50%,var(--ps-teal) 50%);color:#fff}
+.tpl-project-status .ps-cell.is-C{background:#fff;color:var(--ps-teal);box-shadow:inset 0 0 0 1.5px var(--ps-teal)}
+.tpl-project-status .ps-cell.is-I{color:var(--ps-ink-3);font-weight:400}
+.tpl-project-status .ps-none{display:inline-block;width:10px;height:2px;border-radius:1px;background:#c9d1db;vertical-align:middle}
+.tpl-project-status .ps-check{display:inline-flex;align-items:center;gap:4px;font:700 15px/1 var(--ps-num);color:var(--ps-g)}
+.tpl-project-status .ps-legend{position:absolute;left:992px;right:56px;top:162px}
+.tpl-project-status .ps-legend dl{margin:0}
+.tpl-project-status .ps-legend div{display:grid;grid-template-columns:42px 1fr;gap:10px;align-items:start;padding:12px 0;border-top:1px solid var(--ps-line)}
+.tpl-project-status .ps-legend div:first-child{border-top:1.5px solid var(--ps-ink)}
+.tpl-project-status .ps-legend dt{padding-top:1px}
+.tpl-project-status .ps-legend dd{margin:0;font:400 15px/1.45 var(--ps-jp);color:var(--ps-ink-2)}
+.tpl-project-status .ps-legend dd b{display:block;font:700 16px/1.3 var(--ps-jp);color:var(--ps-ink)}
+.tpl-project-status .ps-callout{margin-top:18px;padding:14px 16px;border-radius:10px;background:var(--ps-r-bg);font:400 15px/1.55 var(--ps-jp);color:#6d231b}
+.tpl-project-status .ps-callout b{display:block;margin-bottom:4px;font:700 16px/1.3 var(--ps-jp);color:var(--ps-r)}
+
+/* 05 risks */
+.tpl-project-status .ps-risks{position:absolute;left:520px;right:56px;top:170px;border-collapse:collapse;table-layout:fixed}
+.tpl-project-status .ps-risks th{font:700 15px/1.2 var(--ps-jp);color:var(--ps-ink-3);text-align:left;padding:0 10px 9px 0;border-bottom:1.5px solid var(--ps-ink)}
+.tpl-project-status .ps-risks td{padding:10px 10px 10px 0;border-bottom:1px solid var(--ps-line);vertical-align:top;font:400 15px/1.5 var(--ps-jp);color:var(--ps-ink-2)}
+.tpl-project-status .ps-risks td b{font-weight:700;color:var(--ps-ink)}
+.tpl-project-status .ps-risks .ps-id{display:inline-grid;place-items:center;width:40px;height:26px;border-radius:13px;font:700 15px/1 var(--ps-num);color:#fff}
+.tpl-project-status .ps-risks .ps-score{font:700 20px/1 var(--ps-num)}
+.tpl-project-status .ps-risks .ps-score small{display:block;margin-top:5px;font:400 15px/1 var(--ps-num);color:var(--ps-ink-3)}
+.tpl-project-status .ps-risks .ps-kind{display:inline-block;margin-right:6px;padding:2px 6px;border-radius:4px;font:700 15px/1.2 var(--ps-jp);background:var(--ps-surface);color:var(--ps-ink-2)}
+.tpl-project-status .ps-risks .ps-kind.is-issue{background:var(--ps-r-bg);color:var(--ps-r)}
+
+/* 06 decisions and actions */
+.tpl-project-status .ps-dec{position:absolute;left:56px;top:170px;width:470px}
+.tpl-project-status .ps-dec article{position:relative;padding:16px 0 16px 64px;border-top:1px solid var(--ps-line)}
+.tpl-project-status .ps-dec article:first-of-type{border-top:1.5px solid var(--ps-ink)}
+.tpl-project-status .ps-dec .ps-dno{position:absolute;left:0;top:17px;font:700 15px/1.2 var(--ps-num);color:var(--ps-teal)}
+.tpl-project-status .ps-dec p{margin-top:5px;font:400 15px/1.45 var(--ps-jp);color:var(--ps-ink-3)}
+.tpl-project-status .ps-dec p.ps-dtext{margin-top:0;font:700 18px/1.55 var(--ps-jp);color:var(--ps-ink)}
+.tpl-project-status .ps-act{position:absolute;left:566px;right:56px;top:170px;border-collapse:collapse;table-layout:fixed}
+.tpl-project-status .ps-act th{font:700 15px/1.2 var(--ps-jp);color:var(--ps-ink-3);text-align:left;padding:0 8px 9px 0;border-bottom:1.5px solid var(--ps-ink)}
+.tpl-project-status .ps-act td{padding:11px 8px 11px 0;border-bottom:1px solid var(--ps-line);vertical-align:top;font:400 16px/1.45 var(--ps-jp);color:var(--ps-ink)}
+.tpl-project-status .ps-act td.ps-due{font:700 16px/1.3 var(--ps-num);white-space:nowrap}
+.tpl-project-status .ps-act td.ps-due small{display:block;margin-top:3px;font:400 15px/1.2 var(--ps-jp);color:var(--ps-ink-3)}
+.tpl-project-status .ps-act tr.is-late td.ps-due small{color:var(--ps-r);font-weight:700}
+.tpl-project-status .ps-state{display:inline-block;padding:4px 8px;border-radius:5px;font:700 15px/1 var(--ps-jp);white-space:nowrap}
+.tpl-project-status .ps-state.is-new{background:var(--ps-teal-soft);color:var(--ps-teal)}
+.tpl-project-status .ps-state.is-cont{background:var(--ps-surface);color:var(--ps-ink-2)}
+.tpl-project-status .ps-state.is-late{background:var(--ps-r-bg);color:var(--ps-r)}
+.tpl-project-status .ps-next{position:absolute;left:56px;right:56px;bottom:22px;height:62px;display:flex;align-items:center;gap:22px;padding:0 24px;border-radius:12px;background:var(--ps-navy);color:#fff}
+.tpl-project-status .ps-next p{font:700 15px/1 var(--ps-jp);letter-spacing:.1em;color:#9fd3d3}
+.tpl-project-status .ps-next strong{font:700 19px/1.3 var(--ps-jp)}
+.tpl-project-status .ps-next span{margin-left:auto;font:400 15px/1.4 var(--ps-jp);color:#d5deea}

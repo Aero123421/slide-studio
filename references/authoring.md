@@ -211,6 +211,12 @@ in an `<img>` is easier to isolate but cannot be animated by selecting its inter
 
 ### Studies and adaptation
 
+Template packs (`assets/templates/<pack>/`, catalog kind `templates`) are complete page
+sets with their own art direction. Each slide module is self-contained: data arrays at
+the top drive the SVG geometry, so edit the data and let labels and marks update together.
+`pack.css` is scoped to the pack class. Replace fictional names and synthetic numbers,
+and keep each page's visible "illustrative data" line until real sources replace it.
+
 `catalog.mjs search`, `show` and `take` help retrieve a small number of relevant
 examples. `take` writes a new directory with editable `.mjs`, CSS and required local
 media; it never overwrites an existing directory. It also writes provenance notes.

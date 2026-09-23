@@ -1,0 +1,42 @@
+{
+  "id": "field-survey",
+  "name": "Field Survey",
+  "nameJa": "野外調査（生成り・苔と土）",
+  "mode": "light",
+  "mood": "日焼けした野帳のような生成りの紙に、苔の緑を一色。量は土の色の濃淡で、湿潤と乾燥は青緑と茶の対比で示す。",
+  "useFor": ["生態学・環境科学の調査報告", "地質・土壌・水文のデータ発表", "フィールドワークの成果共有", "自然保護・農業関連の説明"],
+  "avoidFor": ["IT・ソフトウェアの技術発表", "金融・投資の報告", "高彩度が求められるイベント資料"],
+  "tokens": {
+    "paper": "#f5f1e6",
+    "surface": "#ebe5d5",
+    "ink": "#2a3324",
+    "inkMuted": "#5a6350",
+    "rule": "#d2cab5",
+    "accent": "#4e7a34",
+    "onAccent": "#f7f4ea",
+    "positive": "#2f6f8a",
+    "negative": "#b0552b"
+  },
+  "data": {
+    "categorical": ["#4e7a34", "#a8781f", "#4f6f9a", "#7d4b4b"],
+    "sequential": ["#efe4cc", "#d3b98c", "#ae8b56", "#7f5e2f", "#4a3516"],
+    "diverging": ["#8b5a2b", "#cfae83", "#f0ece2", "#86bdb0", "#2a7f7a"],
+    "highlight": "#4e7a34",
+    "context": "#c9c1ad"
+  },
+  "type": {
+    "display": "Georgia,\"Times New Roman\",\"Liberation Serif\",serif",
+    "body": "\"Segoe UI\",\"Helvetica Neue\",\"Liberation Sans\",Arial,sans-serif",
+    "ja": "\"Hiragino Sans\",\"Noto Sans JP\",\"Yu Gothic\",\"Meiryo\",\"IPAGothic\",sans-serif"
+  },
+  "ratios": {"paperAndSurface": 0.86, "ink": 0.11, "accentMax": 0.03},
+  "rules": [
+    "苔の緑（accent）は注目させる調査区・種・1系列にだけ使い、自然を連想させるからといって見出しや装飾に緑を広げない。",
+    "量（個体数・濃度・被度）は sequential の土色の階調で示し、分類色で量を表さない。階調の最も淡い段は紙と区別できる #efe4cc から始める。",
+    "増減は「湿潤の青緑＝プラス」「乾いた赤土＝マイナス」で固定し、必ず符号か▲▼を添える。赤と緑の対比は使わない。",
+    "発散スケール（湿潤←→乾燥、増加←→減少）は茶と青緑の組で、中央の基準値は紙に近い生成りにする。",
+    "地図や写真の上に置く文字は ink の深いオリーブ黒に限り、inkMuted の薄い文字を写真の上に載せない。",
+    "比較の主役でない調査区や年は context の生成りグレーにし、分類色は線の端や地図の領域に直接ラベルする。"
+  ],
+  "source": "Original. Contrast and color-vision checks by scripts/color-systems.mjs."
+}

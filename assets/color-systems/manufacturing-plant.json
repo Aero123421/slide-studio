@@ -1,0 +1,42 @@
+{
+  "id": "manufacturing-plant",
+  "name": "Manufacturing Plant",
+  "nameJa": "鋼と安全色（工場・稼働報告）",
+  "mode": "light",
+  "mood": "薄い灰白の紙に鋼色の墨。安全色（赤＝停止・異常、黄＝注意、緑＝正常）は現場の意味のままにしか使わず、それ以外の色は鋼の濃淡で組む。",
+  "useFor": ["工場の稼働・生産状況の報告", "設備保全・停止時間の分析", "安全・品質の月次レビュー", "現場改善（カイゼン）の発表"],
+  "avoidFor": ["ブランド・マーケティング資料", "投資家向けの提案", "赤・緑・黄を装飾に使いたい資料"],
+  "tokens": {
+    "paper": "#f6f7f5",
+    "surface": "#e9ece8",
+    "ink": "#1d2320",
+    "inkMuted": "#4b5450",
+    "rule": "#cbd1cc",
+    "accent": "#2e4a5a",
+    "onAccent": "#ffffff",
+    "positive": "#1f6b33",
+    "negative": "#c62828"
+  },
+  "data": {
+    "categorical": ["#2e4a5a", "#705238", "#6b7f93"],
+    "sequential": ["#e4e9ec", "#b5c3cb", "#83a0ae", "#516f82", "#2e4a5a"],
+    "diverging": ["#b71c1c", "#e6a09a", "#eff1ee", "#9dc9a3", "#1f6b33"],
+    "highlight": "#2e4a5a",
+    "context": "#c1c8c8"
+  },
+  "type": {
+    "display": "Arial,\"Helvetica Neue\",\"Segoe UI\",\"Liberation Sans\",\"BIZ UDPGothic\",\"Meiryo\",\"Hiragino Sans\",\"Noto Sans JP\",sans-serif",
+    "body": "Arial,\"Helvetica Neue\",\"Segoe UI\",\"Liberation Sans\",sans-serif",
+    "ja": "\"BIZ UDPGothic\",\"Meiryo\",\"Hiragino Sans\",\"Noto Sans JP\",\"Yu Gothic\",\"IPAGothic\",sans-serif"
+  },
+  "ratios": {"paperAndSurface": 0.86, "ink": 0.1, "accentMax": 0.04},
+  "rules": [
+    "赤（negative）は停止・異常・災害にだけ、緑（positive）は正常稼働・目標達成にだけ使う。見出し、矢印、装飾、順位の塗り分けには絶対に使わない。",
+    "注意の黄 #e0a800 はトークンに含めず、必要なときだけ注意状態のセルや記号（△）に限って使う。黄の文字は書かず、必ず墨の文字を添える。",
+    "状態は色に加えて記号と語（●稼働、△注意、■停止）を必ず並記し、モニターや白黒印刷でも読めるようにする。",
+    "ラインや設備の系列は鋼・土・鈍色の3色で描き、赤・緑・黄と混ざらない色相を守る。4系列以上は表にするか、線種（破線・点線）で分ける。",
+    "鋼色（accent）は今月・当ラインの系列と、依頼事項の1枠にだけ。他期間・他ラインは context の灰で描く。",
+    "稼働率や負荷の濃淡は sequential の鋼の階調で示し、赤や緑の階調は作らない。"
+  ],
+  "source": "Original. Steel-grey field with safety colors reserved for their operational meaning; contrast and color-vision checks by scripts/color-systems.mjs."
+}

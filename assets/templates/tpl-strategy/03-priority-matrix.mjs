@@ -50,7 +50,7 @@ export default {
   exportPolicy: 'final',
   className: 'tpl-strategy s-matrix',
   content: `<div class="s-wrap">
-  <div class="s-tick"></div>
+  
   <h1 class="s-title" data-region="title">${moves.length}つの打ち手のうち、効果が大きく実行しやすい<em>${top.length}つを最優先</em>とする</h1>
   <div class="s-track" aria-label="章の位置">${track}</div>
   <div class="s-rule"></div>

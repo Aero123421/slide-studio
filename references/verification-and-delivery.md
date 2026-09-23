@@ -50,6 +50,26 @@ The tool reuses an owned output directory. Unknown, modified and symlinked files
 protected. Cleanup is dry-run unless `clean.py ... --apply` is used. Never hand out
 review caches as if they were source assets.
 
+### Machine-made patterns
+
+```sh
+python scripts/slop_check.py project/deck.html        # or deck.scene.json, or any .pptx
+python scripts/slop_check.py project/native.pptx --check
+python scripts/slop_check.py project/deck.html --palette assets/color-systems/<id>.json
+```
+
+It reports located, repairable signals: accent stripes on card edges and bars under
+titles, decorative ordinals, one eyebrow + card-row skeleton repeated across the deck,
+English eyebrows in a CJK deck, an identity color reused for unrelated items,
+near-duplicate pages, text set in many hues, colors outside a declared system
+(`--palette`), a high share of small live text, status words ("登壇用ドラフト",
+"draft") on the canvas and tool metadata in speaker notes. See SKILL.md §3 G for the
+repair of each. Warnings are review prompts: fix them or record a one-line reason the
+pattern carries meaning on that page. `--check` exits 2 only for errors (production
+copy, tool metadata in notes). It is a geometry/text heuristic, not a taste score, and
+it does not see pixels inside images. HTML input needs Playwright; `.pptx` needs
+python-pptx; `.scene.json` needs only the standard library.
+
 ### Visual inspection routine
 
 First inspect the contact view for deck rhythm and repeated mistakes. Then inspect

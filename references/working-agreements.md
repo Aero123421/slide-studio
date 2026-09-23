@@ -167,6 +167,7 @@ Everything build- and browser-related stays unrun.
 **Tier 1 — Node 20+ and/or Python 3.10+ standard library, no installs.**
 `catalog.mjs`, `craft.mjs` (init/build), `studio.mjs` (list/init/validate/build),
 `lint.mjs`, `svg-edit.py`, `editorial.py`, `evidence.py`, `audit.py`,
+`slop_check.py` (on `.scene.json`),
 `brand-capture.py`, `inspect-brand.py`, plus `clean.py`/`verify-review.py` on existing
 review output. The CSS preflight (`css-check.mjs`) runs inside build and QA.
 `fontcheck.py` additionally needs the optional `fontTools` package. Bundled gallery HTML
@@ -174,7 +175,7 @@ opens directly. This tier builds and statically checks a deck.
 
 **Tier 2 — `pip install -r requirements.txt` plus Playwright Chromium.**
 `qa.py`, `qa-navigation.py`, `font_audit.py`, `export.py` (PDF and screenshot
-PPTX), `brand-template.py` (.potx). This tier renders, reviews, and exports.
+PPTX), `brand-template.py` (.potx), `slop_check.py` on HTML or `.pptx`. This tier renders, reviews, and exports.
 
 **Tier 3 — `npm install` (pptxgenjs).** `export-pptx.mjs` native editable route.
 `export-pdf-office.mjs` additionally needs LibreOffice `soffice`.

@@ -45,7 +45,7 @@ restate the advice in audience copy. Then choose relevant guides:
 | Authoring APIs, studio scenes, story contract | [Authoring](references/authoring.md) |
 | Native editable PowerPoint | [Authoring](references/authoring.md), [Verification and delivery](references/verification-and-delivery.md) |
 | Existing company slides / reusable private templates | [Brand systems](references/brand.md) |
-| Revising an existing PPTX/PDF deck | Read its text/figures with host tools, keep its facts, rebuild; [Brand systems](references/brand.md) for its identity. In-place PPTX editing is not a route here |
+| Revising an existing PPTX/PDF deck | `slop_check.py deck.pptx` lists what to fix; read its text/figures with host tools, keep its facts, rebuild; [Brand systems](references/brand.md) for its identity. In-place PPTX editing is not a route here |
 | Rights, source trust, installation, autonomy, capability tiers | [Working agreements](references/working-agreements.md) |
 
 Search by the explanation needed, not a color or generic decorative style:
@@ -81,6 +81,10 @@ comparison or table. Allocate space from measured content, not inherited card sl
 A small top-heavy cluster above a blank lower half often needs a larger evidence area,
 not fewer facts or more decoration. Choose type and available fonts before fitting text.
 Keep related explanation near its evidence. Dense reference pages can remain dense.
+Take color from one role-based system: the brand's, or one of `assets/color-systems/`
+(`node "$SKILL_DIR/scripts/color-systems.mjs" validate` lists their checks;
+`gallery/color-systems.html` shows them). Text stays ink and muted ink; the accent
+marks the one thing a page is about; categorical colors live on data marks only.
 
 **D. Prototype and repair.** Make the hardest explanatory page and one contrasting
 page. Render them before multiplying a flawed design. Inspect full-size text, figure
@@ -99,6 +103,25 @@ Test focused navigation controls, reverse/rapid input, revisit, reduced motion a
 export. An accurate useful still is better than an unrelated animation.
 Check the meaning of every discrete choice, and boundary/changeover values for ranges.
 "The output changed" does not establish that the new equation, label or diagram is true.
+
+**G. Strip the machine-made look before calling it done.** These patterns make a deck
+read as generated. The default is to remove each one; keep it only when you can say
+in one line what it tells the reader on that page.
+
+| Pattern | Do instead |
+|---|---|
+| The same skeleton on every page: small caps eyebrow, title, a row of 3–4 equal cards, footer | Give each page the form its evidence needs: chart, table, diagram, photo or one sentence |
+| Colored stripe on a card edge, a bar under the title, a tick before the eyebrow | Nothing. Group with space or a tint; state emphasis in the words or the data mark |
+| Big `01 02 03` in front of items that are not a sequence | Let the headings carry the order |
+| English eyebrows (`HOW TO CHOOSE`) in a Japanese or other non-English deck | Remove, or write a label in the deck's language that adds information |
+| An entity's identity color (a model, a product) reused on unrelated items | Identity colors belong to that entity only; everything else neutral or one accent |
+| The same entity list restated on the cover, a profile page and a summary page | Say it once where it is evidenced; later pages add a new question or decision |
+| Attribute cards (price cards, spec cards) standing in for a table or chart | A table for attributes, a chart on one shared scale for quantities |
+| Half the canvas empty below small text | Enlarge the evidence; cut duplicated words instead of shrinking type |
+| "Draft", "for the talk", tool or export notes on the canvas or in speaker notes | File name, runbook or nothing |
+
+`scripts/slop_check.py` locates these in a built HTML, a `.scene.json` or any `.pptx`
+(including decks made elsewhere). Each warning needs a fix or that one-line reason.
 
 ## 4. Build and inspect
 
@@ -119,6 +142,8 @@ python "$SKILL_DIR/scripts/evidence.py" ./presentation/evidence.json
 # Use this for a substantial sourced story, not as a truth certificate:
 python "$SKILL_DIR/scripts/editorial.py" ./presentation/story.json
 python "$SKILL_DIR/scripts/qa.py" ./presentation/deck.html --out ./presentation/.studio-review/current --states all --check
+# Deck-level review for machine-made patterns (also accepts .scene.json or .pptx):
+python "$SKILL_DIR/scripts/slop_check.py" ./presentation/deck.html
 # On motion decks, exercise real click/key paths:
 python "$SKILL_DIR/scripts/qa-navigation.py" ./presentation/deck.html --out ./presentation/navigation.json
 # After the LAST build, including a separate stripped audience build:
@@ -179,7 +204,7 @@ Never recursively delete a user's source/output folders or include caches in a Z
 
 Deliver the requested files, editable source, provenance and a compact observed-test
 summary. Block success for wrong facts, unreadable essentials, false graph relations,
-dead controls or unverified required exports. Report unrun tests as unrun. Do not
+dead controls, unverified required exports, or unexplained `slop_check.py` findings. Report unrun tests as unrun. Do not
 claim aesthetic certification, complete language/security compliance, or that all AI
 models now create equally good slides. Finish the package, not just a status update.
 Bind the QA report to the exact delivered HTML and loaded local assets. A later build

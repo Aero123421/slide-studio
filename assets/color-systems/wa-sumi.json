@@ -1,0 +1,42 @@
+{
+  "id": "wa-sumi",
+  "name": "Wa Sumi",
+  "nameJa": "和・墨と朱（生成りの紙・墨の濃淡・朱1点）",
+  "mode": "light",
+  "mood": "生成りの紙に墨の濃淡で組み、朱は落款のように1か所だけ。色数を増やさず、墨の五段階で階層を作る。",
+  "useFor": ["伝統・文化事業の企画書","老舗・地域産品のブランド説明","式典・記念行事の資料"],
+  "avoidFor": ["スタートアップの製品発表","多系列のダッシュボード","海外向けのテック系講演"],
+  "tokens": {
+    "paper": "#f3ecdc",
+    "surface": "#ebe3cf",
+    "ink": "#24221d",
+    "inkMuted": "#5f5a4f",
+    "rule": "#d3cab4",
+    "accent": "#c4402c",
+    "onAccent": "#ffffff",
+    "positive": "#4f7a3c",
+    "negative": "#7a2e20"
+  },
+  "data": {
+    "categorical": ["#c4402c","#5b6f7c","#3b3833"],
+    "sequential": ["#e6dfcc","#c5bca6","#96907d","#5f5a4f","#24221d"],
+    "diverging": ["#2f5a7a","#a9bbc9","#efe8d8","#e6a996","#c4402c"],
+    "highlight": "#c4402c",
+    "context": "#c2b9a5"
+  },
+  "type": {
+    "display": "\"Hiragino Mincho ProN\",\"Noto Serif JP\",\"Yu Mincho\",\"IPAMincho\",Georgia,serif",
+    "body": "\"Hiragino Mincho ProN\",\"Noto Serif JP\",\"Yu Mincho\",\"IPAMincho\",Georgia,serif",
+    "ja": "\"Hiragino Mincho ProN\",\"Noto Serif JP\",\"Yu Mincho\",\"IPAMincho\",serif"
+  },
+  "ratios": {"paperAndSurface": 0.87, "ink": 0.11, "accentMax": 0.02},
+  "rules": [
+    "朱は落款：1ページに1か所、小さく置く。見出し全体や大きな色面に朱を使うことはない。朱の丸印（●）は許すが、朱の帯は許さない。",
+    "階層は色ではなく墨の濃淡で作る。見出しは ink、本文は ink、注記は inkMuted、消えてよい情報は sequential の淡墨。",
+    "連続値は淡墨から濃墨への墨の濃淡（sequential）で表す。朱の濃淡グラデーションは作らない。",
+    "分類色は朱・藍鼠・墨の3色まで。朱は焦点の系列にだけ使い、比較されない系列は context の淡墨にする。4系列目が必要なら線種（点線・破線）で分ける。",
+    "プラス/マイナスは色に加えて「増」「減」か符号を書く。朱を減少の意味で使わない。",
+    "罫線は表の横罫だけ。縦罫、枠、角丸のカード、影は作らない。区切りは余白と墨の濃淡で示す。"
+  ],
+  "source": "Original. Traditional Japanese color names used as reference for hue only. Contrast and color-vision checks by scripts/color-systems.mjs."
+}

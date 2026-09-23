@@ -251,7 +251,7 @@ Record the dominant idea in one sentence. For example: “A photographic subject
 anchors a restrained editorial composition; annotations reveal details without
 obscuring the original.” Choose background, text, accent and data roles; heading,
 body, label and code styles; a spacing rhythm; image treatment; and motion character.
-See `assets/design-systems.json` for editable seed systems, not mandatory themes.
+Start color from a role-based system in `assets/color-systems/` (below), not a list of swatches.
 
 A slide needs a clear first read, a second read, and a deliberate stopping point.
 Rank elements by meaning before assigning size. The most saturated area, highest
@@ -322,6 +322,34 @@ expressive palette when the brief warrants it. A dark scientific slide and a war
 editorial slide can both be excellent. Never “improve” a supplied white brand to
 cream without permission. Preserve identity and source evidence.
 
+### Role-based color systems
+
+`assets/color-systems/<id>.json` defines each palette by role — paper, surface, ink,
+inkMuted, rule, accent, onAccent, positive, negative — plus data palettes
+(categorical 3–6 ordered by use, a 5-step sequential ramp, a 5-step diverging ramp
+with a neutral middle, one highlight and a quiet context color), font stacks with
+Japanese fallbacks, rough area ratios and palette-specific usage rules. Pick by
+content and audience (`useFor` / `avoidFor`), not by taste in isolation; a supplied
+brand overrides all of them. `gallery/color-systems.html` shows every system applied
+to text, a highlight-versus-context chart, categorical lines and both ramps.
+
+```sh
+node scripts/color-systems.mjs validate                       # all systems, or pass files
+node scripts/color-systems.mjs specimen out.html my-brand.json   # preview your own system
+python scripts/slop_check.py deck.html --palette assets/color-systems/laboratory.json
+```
+
+The validator computes WCAG contrast for every text/background role pair, CIELAB
+distance between categorical colors with and without simulated deuteranopia,
+protanopia and tritanopia, monotonic lightness for sequential ramps and a neutral
+middle for diverging ramps. `slop_check.py --palette` lists colors used outside the
+declared system. Arithmetic does not replace looking at the rendered page.
+
+Discipline that makes a palette read as designed rather than generated: one hue
+family dominates; the accent is scarce and means "this"; everything not under
+discussion takes the context color; identity colors (a product, a model, a team)
+are used for that entity only; positive/negative always carry a sign or word as well.
+
 Use the `contrast()` helper for opaque pairs. It returns a numerical ratio, not a
 full accessibility certification. For ordinary web text, the relevant WCAG AA
 contrast thresholds are 4.5:1, or 3:1 for qualifying large text; verify the current
@@ -349,8 +377,8 @@ hierarchy. They do not automatically make a slide modern. Avoid placing small te
 across widely varying luminance. Patterns need scale discipline: fine lines can
 alias on projectors and exports. Inspect at actual target dimensions.
 
-`assets/design-systems.json` includes editable starting palettes. Any of these seed
-palettes may be changed; a supplied brand identity may not (see above). Run real
+The color systems are editable starting points; a supplied brand identity is not
+(see above). Run real
 contrast checks after changes and review data semantics separately.
 
 ## Typography across languages

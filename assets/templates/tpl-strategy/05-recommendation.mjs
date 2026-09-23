@@ -50,7 +50,7 @@ export default {
   exportPolicy: 'final',
   className: 'tpl-strategy s-rec',
   content: `<div class="s-wrap">
-  <div class="s-tick"></div>
+  
   <h1 class="s-title" data-region="title">推奨は<em>案C 段階導入</em>。料金改定で早く利益を確保し、<br>その利益で拠点統合と自動化を進める</h1>
   <div class="s-track" aria-label="章の位置">${track}</div>
   <div class="s-rule"></div>

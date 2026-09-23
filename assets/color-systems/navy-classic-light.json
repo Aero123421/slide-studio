@@ -1,0 +1,42 @@
+{
+  "id": "navy-classic-light",
+  "name": "Navy Classic Light",
+  "nameJa": "生成りと紺、煉瓦ひとつ",
+  "mode": "light",
+  "mood": "温かい生成りの紙に紺の墨。青は背景にも帯にも塗らず、煉瓦色を1点だけ据える。保守的だが既製品に見えない企業配色。",
+  "useFor": ["中期経営計画の説明", "株主・投資家向け会社説明", "社外向け事業紹介", "官公庁・金融機関への提出資料"],
+  "avoidFor": ["スタートアップの勢いを見せる資料", "ダーク背景で投影する講演", "多数の製品を色で見分けるカタログ"],
+  "tokens": {
+    "paper": "#f9f6ef",
+    "surface": "#f0ece2",
+    "ink": "#1b2a44",
+    "inkMuted": "#55617a",
+    "rule": "#d8d1c1",
+    "accent": "#b5482f",
+    "onAccent": "#ffffff",
+    "positive": "#2f6b45",
+    "negative": "#8c2f22"
+  },
+  "data": {
+    "categorical": ["#1b2a44", "#b5482f", "#6d7b57", "#7a86a0"],
+    "sequential": ["#e3e6ec", "#b3bccb", "#7d8ba5", "#4a5b7d", "#1b2a44"],
+    "diverging": ["#8c2f22", "#d8a293", "#f0ece2", "#9aa8c0", "#34497a"],
+    "highlight": "#b5482f",
+    "context": "#c9c3b5"
+  },
+  "type": {
+    "display": "Georgia,\"Times New Roman\",\"Hiragino Mincho ProN\",\"Noto Serif JP\",\"Yu Mincho\",\"IPAMincho\",serif",
+    "body": "\"Helvetica Neue\",\"Segoe UI\",\"Liberation Sans\",Arial,sans-serif",
+    "ja": "\"Hiragino Sans\",\"Noto Sans JP\",\"Yu Gothic\",\"Meiryo\",\"IPAGothic\",sans-serif"
+  },
+  "ratios": {"paperAndSurface": 0.86, "ink": 0.11, "accentMax": 0.03},
+  "rules": [
+    "紺は文字と線の色であって塗りの色ではない。紺のベタ背景、紺の帯、紺のカード見出しは作らない。",
+    "煉瓦色は1ページ1か所（主張の1語、強調する1系列、または依頼事項の枠線）だけ。増減の赤とは別物なので、数字の色には使わない。",
+    "比較の相手は context の砂色で描き、系列名は線端・棒脇に直接書く。凡例は4系列以上のときだけ。",
+    "減少は negative の暗い煉瓦に加えて △ を付ける。増加は緑を使わず墨のままでよい（増加が主張のときだけ緑）。",
+    "面（surface）は表の合計行と引用枠に限り、白い紙の上の白いカードは作らない。",
+    "写真は生成りの紙になじむよう彩度を抑え、写真の上に文字を載せない。"
+  ],
+  "source": "Original. Warm paper with navy ink and one brick accent; contrast and color-vision checks by scripts/color-systems.mjs."
+}

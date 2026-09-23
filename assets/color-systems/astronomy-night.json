@@ -1,0 +1,42 @@
+{
+  "id": "astronomy-night",
+  "name": "Astronomy Night",
+  "nameJa": "観測夜（藍黒・鈍い金）",
+  "mode": "dark",
+  "mood": "観測所の夜のような藍黒に、生成り色の文字。金は星表の中の一つの天体を指すためにだけ、鈍く光る。",
+  "useFor": ["天文学・宇宙科学の講演", "暗い会場での夜間セッション", "望遠鏡・観測データの紹介", "プラネタリウムや科学館の解説"],
+  "avoidFor": ["印刷配布資料", "明るい昼間の会議室", "業務報告・経営資料"],
+  "tokens": {
+    "paper": "#0e1320",
+    "surface": "#161c2c",
+    "ink": "#e7e3d8",
+    "inkMuted": "#a9adb6",
+    "rule": "#2a3247",
+    "accent": "#d2ab52",
+    "onAccent": "#1a1508",
+    "positive": "#7ec49b",
+    "negative": "#e37f6c"
+  },
+  "data": {
+    "categorical": ["#d2ab52", "#7fb2e3", "#e08a8a", "#7f889e"],
+    "sequential": ["#1c2740", "#2e4470", "#4a679e", "#7b93c2", "#b9c6e0"],
+    "diverging": ["#e3a85a", "#8a6a44", "#2a3247", "#4d6b94", "#85b2e6"],
+    "highlight": "#d2ab52",
+    "context": "#4b5568"
+  },
+  "type": {
+    "display": "Georgia,\"Times New Roman\",\"Liberation Serif\",serif",
+    "body": "\"Segoe UI\",\"Helvetica Neue\",\"Liberation Sans\",Arial,sans-serif",
+    "ja": "\"Hiragino Sans\",\"Noto Sans JP\",\"Yu Gothic\",\"Meiryo\",\"IPAGothic\",sans-serif"
+  },
+  "ratios": {"paperAndSurface": 0.88, "ink": 0.10, "accentMax": 0.02},
+  "rules": [
+    "金（accent）は各ページで注目する1天体・1観測点・1つの数値だけに使い、見出し・罫線・アイコンには決して塗らない。金の塗り面は作らない。",
+    "星図や散布図の主役でない点は context の暗い灰青にし、金の点は1つ、または1系列だけ。分類色（金・氷青・淡紅・鈍い灰青）は同時に4本までとし、線の端に直接ラベルを書く。",
+    "文字は生成り（ink）で組み、純白 #fff は使わない。inkMuted の灰色は座標・単位・出典に限り、暗い紙の上では 16px 未満にしない。",
+    "明るさ・強度は sequential の藍→薄青（暗い紙の上で薄いほど強い）で示し、発散は暖色（金）←→寒色（氷青）で中央を紙に近い暗い灰青にする。",
+    "増減は緑と朱に加えて符号（+/−）と▲▼を書き、輝度の変化は色ではなく明るさの差で描く。",
+    "写真や観測画像を置くページは紙をそのまま背景にし、面（surface）や枠で囲まない。キャプションは ink で画像の外側に添える。"
+  ],
+  "source": "Original. Contrast and color-vision checks by scripts/color-systems.mjs."
+}

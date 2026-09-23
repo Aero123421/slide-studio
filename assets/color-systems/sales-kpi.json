@@ -1,0 +1,42 @@
+{
+  "id": "sales-kpi",
+  "name": "Sales KPI",
+  "nameJa": "紺青の実績と灰の計画（営業レビュー）",
+  "mode": "light",
+  "mood": "白い紙に濃い紺青を実績だけに塗り、計画は灰の枠線で示す。達成・未達は色より先に差分の数字で語る営業レビューの配色。",
+  "useFor": ["営業成績・KPIレビュー", "予算対実績の進捗報告", "パイプラインと受注予測", "週次・月次の業績会議"],
+  "avoidFor": ["ブランドやビジョンの提示", "監査や統制の報告", "写真中心のストーリー資料"],
+  "tokens": {
+    "paper": "#ffffff",
+    "surface": "#f2f4f7",
+    "ink": "#182030",
+    "inkMuted": "#4f5866",
+    "rule": "#d3d8de",
+    "accent": "#1f4e9c",
+    "onAccent": "#ffffff",
+    "positive": "#1f7a4d",
+    "negative": "#c0392b"
+  },
+  "data": {
+    "categorical": ["#1f4e9c", "#c27d1a", "#3f8a6a", "#8a5a9a"],
+    "sequential": ["#e4ebf5", "#b3c6e3", "#7d9ccb", "#446fae", "#14325f"],
+    "diverging": ["#c0392b", "#e8a89b", "#f1f2f0", "#9fc9b4", "#1f7a4d"],
+    "highlight": "#1f4e9c",
+    "context": "#c3c9d1"
+  },
+  "type": {
+    "display": "\"Segoe UI\",\"Helvetica Neue\",\"Liberation Sans\",Arial,\"Noto Sans JP\",\"Hiragino Sans\",\"Yu Gothic\",\"Meiryo\",sans-serif",
+    "body": "\"Segoe UI\",\"Helvetica Neue\",\"Liberation Sans\",Arial,sans-serif",
+    "ja": "\"Noto Sans JP\",\"Hiragino Sans\",\"Yu Gothic\",\"Meiryo\",\"IPAGothic\",sans-serif"
+  },
+  "ratios": {"paperAndSurface": 0.85, "ink": 0.1, "accentMax": 0.05},
+  "rules": [
+    "紺青は「実績」だけに塗る。計画・目標・前年は context の灰で、棒なら枠線のみ、線なら細い破線にし、色で年度や担当を区別しない。",
+    "達成率は数字（%）と差分（+/△）を必ず書き、緑・赤は達成/未達の1セルまたは1系列にだけ添える。ランキング全体を赤緑で塗り分けない。",
+    "分類色は「担当・地域・製品」の内訳を並べる1ページに限り、最大4色。同じ担当には全ページ同じ色を保つ。",
+    "KPI の大きな数字は墨で書き、色を付けるのは達成/未達を示す差分の1行だけ。数字そのものを紺青にしない。",
+    "面（surface）は目標の再掲枠と今週の決定事項の枠にだけ使い、KPI カードを並べる背景にはしない。",
+    "薄い紺青（sequential の1〜2段目）は投影で白に沈むので、ヒートマップでは3段目以上から始める。"
+  ],
+  "source": "Original. Cobalt actuals on white with grey plan outlines; contrast and color-vision checks by scripts/color-systems.mjs."
+}

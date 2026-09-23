@@ -1,0 +1,42 @@
+{
+  "id": "tech-conference-light",
+  "name": "Tech Conference Light",
+  "nameJa": "テック・カンファレンス（白い紙・黒鉄・青緑1点）",
+  "mode": "light",
+  "mood": "清潔な白い紙に黒鉄の文字、深い青緑を1点。既定の青を避け、コードと図が主役になるように色は状態と焦点にだけ使う。",
+  "useFor": ["開発者向けカンファレンスの講演","技術アーキテクチャの説明","OSS・APIの紹介"],
+  "avoidFor": ["ブランド・感性訴求の発表","伝統・文化事業","式典・祝賀"],
+  "tokens": {
+    "paper": "#fcfcfb",
+    "surface": "#f0f2f1",
+    "ink": "#161c1a",
+    "inkMuted": "#54605c",
+    "rule": "#d5dad8",
+    "accent": "#0e7c6b",
+    "onAccent": "#ffffff",
+    "positive": "#3a9150",
+    "negative": "#9e2c2c"
+  },
+  "data": {
+    "categorical": ["#0e7c6b","#3b3f44","#b46a05","#7a4a9a"],
+    "sequential": ["#dff1ec","#a4d8cd","#5eaf9e","#0e7c6b","#064a40"],
+    "diverging": ["#b46a05","#e8c68e","#f1f2f0","#9fd0c5","#0e7c6b"],
+    "highlight": "#0e7c6b",
+    "context": "#c7ccca"
+  },
+  "type": {
+    "display": "\"Segoe UI\",\"Helvetica Neue\",\"Liberation Sans\",Arial,sans-serif",
+    "body": "\"Segoe UI\",\"Helvetica Neue\",\"Liberation Sans\",Arial,sans-serif",
+    "ja": "\"Hiragino Sans\",\"Noto Sans JP\",\"Yu Gothic\",\"Meiryo\",\"IPAGothic\",sans-serif"
+  },
+  "ratios": {"paperAndSurface": 0.86, "ink": 0.11, "accentMax": 0.03},
+  "rules": [
+    "青緑は焦点の1か所：図の中の変更されたコンポーネント、1本の系列、または1つのベンチマーク値。見出しやロゴを青緑にしない。",
+    "コードブロックは surface の薄い灰に ink の文字。構文ハイライトは ink の太字と inkMuted の2階調で行い、青緑は変更行にだけ使う。",
+    "アーキテクチャ図の箱は白地に rule の線。新規・変更の箱だけ青緑の線にし、既存の箱は context の灰の線で描く。塗りつぶしの色分けはしない。",
+    "分類色（黒鉄・琥珀・菫）は3系列以上を比較するベンチマークにだけ使い、比較しない系列は context にする。",
+    "プラス/マイナス（速い/遅い、成功/失敗）は色に加えて符号か単語で書く。青緑を「成功」の意味に転用しない。",
+    "矢印、アイコン、ページ番号、区切り線は ink か rule の灰。青緑の矢印は禁止。"
+  ],
+  "source": "Original. Contrast and color-vision checks by scripts/color-systems.mjs."
+}

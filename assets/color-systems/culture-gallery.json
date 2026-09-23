@@ -1,0 +1,42 @@
+{
+  "id": "culture-gallery",
+  "name": "Culture Gallery",
+  "nameJa": "カルチャー・ギャラリー（白壁・展示室の灰・臙脂1点）",
+  "mode": "light",
+  "mood": "美術館の白壁と展示室の灰に、深い臙脂を1点。作品と余白が主役で、色はキャプションの一語のように控えて置く。",
+  "useFor": ["展覧会の企画・広報","文化施設の事業報告","作品・コレクションの紹介"],
+  "avoidFor": ["セールス提案","スタートアップの製品発表","速報性の高い報告"],
+  "tokens": {
+    "paper": "#f8f8f6",
+    "surface": "#ebebe7",
+    "ink": "#1b1b1a",
+    "inkMuted": "#5c5c58",
+    "rule": "#d4d4cf",
+    "accent": "#6b1e2e",
+    "onAccent": "#ffffff",
+    "positive": "#3a6e4f",
+    "negative": "#9a3b2b"
+  },
+  "data": {
+    "categorical": ["#6b1e2e","#4a4a48","#1c6470","#8a6a1f"],
+    "sequential": ["#f0e2e4","#d9b3b8","#b57a84","#8b4553","#5a1424"],
+    "diverging": ["#1c6470","#a9c3c5","#f2f2ef","#d4a9af","#6b1e2e"],
+    "highlight": "#6b1e2e",
+    "context": "#c9c9c4"
+  },
+  "type": {
+    "display": "\"Times New Roman\",Georgia,\"Liberation Serif\",serif",
+    "body": "\"Helvetica Neue\",\"Segoe UI\",\"Liberation Sans\",Arial,sans-serif",
+    "ja": "\"Hiragino Mincho ProN\",\"Noto Serif JP\",\"Yu Mincho\",\"IPAMincho\",serif"
+  },
+  "ratios": {"paperAndSurface": 0.88, "ink": 0.1, "accentMax": 0.02},
+  "rules": [
+    "臙脂は1ページに1か所：会期・作品名・来場者数のいずれか1つ。見出し全体、下線、枠、アイコンには使わない。",
+    "作品図版の周囲は白壁（paper）だけ。図版に接する位置に臙脂や展示室の灰の色面を置かない。",
+    "展示室の灰（surface）は図版のマット、または表の見出し行にだけ使う。カードを量産する地色にはしない。",
+    "比較しない年度・館・展示は context の灰で描き、線の端に直接ラベルを置く。凡例は作らない。",
+    "プラス/マイナスは色に加えて符号（+/−）を書く。臙脂を減少の意味に使わない。",
+    "図版を全面に敷く表紙・章扉では、文字は白（#ffffff）ではなく paper の白壁色で置き、暗い帯を敷かない。"
+  ],
+  "source": "Original. Contrast and color-vision checks by scripts/color-systems.mjs."
+}

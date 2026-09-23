@@ -1,0 +1,42 @@
+{
+  "id": "hr-people",
+  "name": "HR People",
+  "nameJa": "桜鼠と海老茶（人事・組織文化）",
+  "mode": "light",
+  "mood": "ほのかに桜色を帯びた紙に、やわらかい海老茶を1色。柔らかいが薄くはなく、人の話をする資料で文字が確実に読める配色。",
+  "useFor": ["人事制度・人材戦略の説明", "従業員サーベイ・エンゲージメント報告", "組織文化・研修プログラムの紹介", "採用・オンボーディング資料"],
+  "avoidFor": ["決算・財務報告", "リスク・監査の指摘", "製品スペックの比較"],
+  "tokens": {
+    "paper": "#fbf8f7",
+    "surface": "#f3ecea",
+    "ink": "#2b2326",
+    "inkMuted": "#5f5358",
+    "rule": "#e0d5d3",
+    "accent": "#8f4a66",
+    "onAccent": "#ffffff",
+    "positive": "#3f7a5c",
+    "negative": "#b0483a"
+  },
+  "data": {
+    "categorical": ["#8f4a66", "#4a7a8a", "#a07a2e", "#5f6294"],
+    "sequential": ["#f2e4ea", "#dcb8c8", "#bd879f", "#96566f", "#5e2f44"],
+    "diverging": ["#b0483a", "#e4a99c", "#f3f0ee", "#a5c9b8", "#3f7a5c"],
+    "highlight": "#8f4a66",
+    "context": "#cfc3c4"
+  },
+  "type": {
+    "display": "\"Avenir Next\",\"Helvetica Neue\",\"Segoe UI\",\"Liberation Sans\",Arial,\"Hiragino Sans\",\"Noto Sans JP\",\"Yu Gothic\",\"Meiryo\",sans-serif",
+    "body": "\"Helvetica Neue\",\"Segoe UI\",\"Liberation Sans\",Arial,sans-serif",
+    "ja": "\"Hiragino Sans\",\"Noto Sans JP\",\"Yu Gothic\",\"Meiryo\",\"IPAGothic\",sans-serif"
+  },
+  "ratios": {"paperAndSurface": 0.86, "ink": 0.1, "accentMax": 0.04},
+  "rules": [
+    "海老茶は「当社・今年度・注目する1群」の系列と、依頼事項の1枠にだけ使う。見出し文字やアイコンの塗りには使わない。",
+    "サーベイの回答分布は sequential の桜鼠の濃淡で描き、肯定/否定を緑・赤で塗らない（赤緑は増減の1列だけ）。",
+    "他部門・全社平均・前回調査は context の灰桜で描き、系列名は線端に直接書く。",
+    "補助文字（inkMuted）も濃い鼠色を守り、薄い桜色の紙に薄い灰の小さな注記を置かない。",
+    "面（surface）は従業員の声の引用枠と制度の要点枠にだけ使い、写真やアイコンの背景には使わない。",
+    "人物写真は色補正で暖色に寄せず、そのままの色で入れる。写真の上に文字を載せない。"
+  ],
+  "source": "Original. Blush-tinted paper with a muted plum accent; contrast and color-vision checks by scripts/color-systems.mjs."
+}

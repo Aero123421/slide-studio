@@ -46,7 +46,7 @@ export default {
   exportPolicy: 'final',
   className: 'tpl-strategy s-options',
   content: `<div class="s-wrap">
-  <div class="s-tick"></div>
+  
   <h1 class="s-title" data-region="title"><em>段階導入（案C）</em>は利益改善で全自動化に及ばないが、<br>投資とリスクの釣り合いが最も良い</h1>
   <div class="s-track" aria-label="章の位置">${track}</div>
   <div class="s-rule"></div>

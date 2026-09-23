@@ -1,0 +1,42 @@
+{
+  "id": "finance-ledger",
+  "name": "Finance Ledger",
+  "nameJa": "帳簿（決算・財務報告）",
+  "mode": "light",
+  "mood": "冷たい白紙と黒鉛色の墨。色を持つのは増益の緑と減益の赤だけで、それ以外の数字はすべて同じ墨で並ぶ帳簿の配色。",
+  "useFor": ["決算説明・業績報告", "予算実績対比表", "財務モデルのサマリー", "白黒印刷される数表中心の資料"],
+  "avoidFor": ["ブランドや製品の紹介", "複数事業を色で見分けるダッシュボード", "感情に訴えるストーリー資料"],
+  "tokens": {
+    "paper": "#fdfdfb",
+    "surface": "#f0f2ef",
+    "ink": "#14171c",
+    "inkMuted": "#4b5158",
+    "rule": "#cdd1cc",
+    "accent": "#2b3440",
+    "onAccent": "#ffffff",
+    "positive": "#1e7a4a",
+    "negative": "#a52a2a"
+  },
+  "data": {
+    "categorical": ["#2b3440", "#6e5228", "#6f8ea8"],
+    "sequential": ["#e7eaee", "#bcc6cf", "#8699ab", "#516980", "#22323f"],
+    "diverging": ["#a52a2a", "#e0a69c", "#f0f1ee", "#9ccab0", "#1e7a4a"],
+    "highlight": "#2b3440",
+    "context": "#c3c8cd"
+  },
+  "type": {
+    "display": "\"Segoe UI\",\"Helvetica Neue\",\"Liberation Sans\",Arial,\"Noto Sans JP\",\"Hiragino Sans\",\"Yu Gothic\",\"Meiryo\",sans-serif",
+    "body": "\"Segoe UI\",\"Helvetica Neue\",\"Liberation Sans\",Arial,sans-serif",
+    "ja": "\"Noto Sans JP\",\"Hiragino Sans\",\"Yu Gothic\",\"Meiryo\",\"IPAGothic\",sans-serif"
+  },
+  "ratios": {"paperAndSurface": 0.88, "ink": 0.11, "accentMax": 0.01},
+  "rules": [
+    "緑と赤は「前期比・予算比の増減」にだけ使う。売上や費用の項目名、見出し、系列色には絶対に使わない。減少は赤に加えて △ または括弧で必ず示す。",
+    "黒鉛色（accent）は表の見出し行と合計行の帯、当期系列の棒だけ。ボタン風の塗りや見出しの飾りには使わない。",
+    "当期は黒鉛の実線・塗り、前期・予算は context の灰の細線または枠線で描き、色で年度を区別しない。",
+    "分類色は明度順（黒鉛→黄銅→鋼青）の3色までとし、白黒印刷で順序が保てるようにする。4系列以上は表にする。",
+    "数字は等幅数字（tabular-nums）で右揃え。単位と桁区切りは列見出しに1回だけ書く。",
+    "面（surface）は交互行の縞ではなく、小計・合計の行だけに使う。"
+  ],
+  "source": "Original. Ledger idiom: graphite ink, semantic green/red only; contrast and color-vision checks by scripts/color-systems.mjs."
+}

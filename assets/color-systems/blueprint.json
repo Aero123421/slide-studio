@@ -1,0 +1,42 @@
+{
+  "id": "blueprint",
+  "name": "Blueprint",
+  "nameJa": "青図（薄青灰・濃紺の線）",
+  "mode": "light",
+  "mood": "薄い青灰色の製図用紙に濃紺の線で描く設計図。構成要素は線と面で区切り、色は経路の1本にだけ乗せる。",
+  "useFor": ["システム構成・アーキテクチャ設計", "建築・設備の計画説明", "ネットワーク・データフロー図", "技術仕様のレビュー"],
+  "avoidFor": ["写真中心のブランド資料", "感情的な訴求・キャンペーン", "細かな数値表を大量に載せる報告"],
+  "tokens": {
+    "paper": "#e4eaf1",
+    "surface": "#f2f5f9",
+    "ink": "#14243a",
+    "inkMuted": "#45566b",
+    "rule": "#b5c3d3",
+    "accent": "#1c4f9e",
+    "onAccent": "#ffffff",
+    "positive": "#2b7a5a",
+    "negative": "#b7472a"
+  },
+  "data": {
+    "categorical": ["#1c4f9e", "#9c6a1e", "#4d8a7a", "#8a4f8f"],
+    "sequential": ["#cfdbea", "#9fb8d6", "#6f93c0", "#3f6aab", "#1c4f9e"],
+    "diverging": ["#b7472a", "#dea28c", "#f4f6f8", "#9db6da", "#1c4f9e"],
+    "highlight": "#1c4f9e",
+    "context": "#aab8c8"
+  },
+  "type": {
+    "display": "\"Avenir Next\",\"Segoe UI\",\"Helvetica Neue\",\"Liberation Sans\",Arial,sans-serif",
+    "body": "\"Avenir Next\",\"Segoe UI\",\"Helvetica Neue\",\"Liberation Sans\",Arial,sans-serif",
+    "ja": "\"Hiragino Sans\",\"Noto Sans JP\",\"Yu Gothic\",\"Meiryo\",\"IPAGothic\",sans-serif"
+  },
+  "ratios": {"paperAndSurface": 0.84, "ink": 0.13, "accentMax": 0.03},
+  "rules": [
+    "構成図の箱は surface の白い面と rule の線で描き、箱ごとに色を変えない。濃紺（accent）は今説明している経路・コンポーネント1つだけに使う。",
+    "矢印と接続線は ink の細線で統一し、種類の違い（同期/非同期、既存/新規）は色ではなく実線・破線・線幅で表す。",
+    "分類色は「所有チーム」「レイヤー」のような1つの軸にだけ割り当て、同じページで2つの軸を色で同時に示さない。使わない要素は context の青灰にする。",
+    "改善/劣化の数値には深緑と赤褐色に加えて▲▼と符号を書き、図中の要素の状態には positive/negative を塗らない。",
+    "紙の薄青は全ページ共通の背景とし、セクションごとに背景色を変えない。大きな塗り面は sequential の淡色までに留める。",
+    "ラベルは箱の内側に ink で書き、注記は inkMuted で箱の外に添える。凡例より直接ラベルを優先する。"
+  ],
+  "source": "Original. Contrast and color-vision checks by scripts/color-systems.mjs."
+}

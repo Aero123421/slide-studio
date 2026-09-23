@@ -1,0 +1,42 @@
+{
+  "id": "wa-ai",
+  "name": "Wa Ai",
+  "nameJa": "和・藍（白練の紙・藍の濃淡・浅葱）",
+  "mode": "light",
+  "mood": "冷たく澄んだ白練の紙に、藍の濃淡だけで組む。藍が骨格と焦点を兼ね、浅葱と柿は比較のときだけ現れる。",
+  "useFor": ["自治体・公共の説明資料","藍染め・工芸・海運などの事業紹介","冷静さが求められる方針説明"],
+  "avoidFor": ["食品・飲食の提案","祝賀・イベント告知","子ども向けの教材"],
+  "tokens": {
+    "paper": "#f5f7f8",
+    "surface": "#e8eef1",
+    "ink": "#182a3e",
+    "inkMuted": "#4d6072",
+    "rule": "#c9d3da",
+    "accent": "#264c78",
+    "onAccent": "#ffffff",
+    "positive": "#2f7a5a",
+    "negative": "#b1453a"
+  },
+  "data": {
+    "categorical": ["#264c78","#2a8a99","#b25a2a","#6f6b64"],
+    "sequential": ["#e2ebf2","#adc6db","#6a95b8","#2f6392","#172f4d"],
+    "diverging": ["#a0501f","#e3b899","#eff2f3","#a3bfd6","#2f6392"],
+    "highlight": "#264c78",
+    "context": "#c1ccd3"
+  },
+  "type": {
+    "display": "\"Hiragino Sans\",\"Noto Sans JP\",\"Yu Gothic\",\"Meiryo\",\"IPAGothic\",\"Helvetica Neue\",sans-serif",
+    "body": "\"Helvetica Neue\",\"Segoe UI\",\"Liberation Sans\",Arial,sans-serif",
+    "ja": "\"Hiragino Sans\",\"Noto Sans JP\",\"Yu Gothic\",\"Meiryo\",\"IPAGothic\",sans-serif"
+  },
+  "ratios": {"paperAndSurface": 0.86, "ink": 0.11, "accentMax": 0.04},
+  "rules": [
+    "藍は見出しの1語、1本の焦点系列、ボタンの3か所にしか出ない。本文と見出しの地色は ink の紺墨で、藍を文字色に広く使わない。",
+    "連続値は白練から藍への濃淡（sequential）だけで表す。浅葱や柿を「多い・少ない」の意味には使わない。",
+    "浅葱と柿は3系列以上を比較するときだけ登場し、比較を終えたら次ページで context の白鼠に戻す。",
+    "プラス/マイナスは色に加えて符号（+/−）を書く。柿色は分類色であり、減少や警告の意味に転用しない。",
+    "背景の藍の色面は表紙と章扉に限り、そのとき文字は ink ではなく paper の白練で、下線や枠は置かない。",
+    "罫線は表と時間軸だけ。藍の細線でカードを囲まない。"
+  ],
+  "source": "Original. Traditional Japanese color names used as reference for hue only. Contrast and color-vision checks by scripts/color-systems.mjs."
+}

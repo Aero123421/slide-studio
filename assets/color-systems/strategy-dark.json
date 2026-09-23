@@ -1,0 +1,42 @@
+{
+  "id": "strategy-dark",
+  "name": "Strategy Dark",
+  "nameJa": "炭と真鍮（暗い会議室）",
+  "mode": "dark",
+  "mood": "純黒ではない炭色の紙に温かい生成りの文字、真鍮色を1点だけ。ネオンも光彩もなく、暗い会議室で投影しても眩しくない戦略発表の配色。",
+  "useFor": ["経営戦略・中期計画の発表", "役員合宿・オフサイトの議論資料", "大会議室での投影を前提とした講演", "買収・提携の検討資料"],
+  "avoidFor": ["印刷・配布が前提の資料", "数表が多い財務報告", "明るい会場での住民説明"],
+  "tokens": {
+    "paper": "#1c1f24",
+    "surface": "#272b32",
+    "ink": "#e8e5de",
+    "inkMuted": "#aaaba6",
+    "rule": "#3b4049",
+    "accent": "#c9a45c",
+    "onAccent": "#1c1f24",
+    "positive": "#7fb58a",
+    "negative": "#d9806a"
+  },
+  "data": {
+    "categorical": ["#c9a45c", "#7fa7c4", "#97bb9f"],
+    "sequential": ["#3a3833", "#66593a", "#8f7a45", "#b8994f", "#e0c27a"],
+    "diverging": ["#d9806a", "#8f5f52", "#2f3238", "#5f7d66", "#7fb58a"],
+    "highlight": "#c9a45c",
+    "context": "#5c616b"
+  },
+  "type": {
+    "display": "Georgia,\"Times New Roman\",\"Hiragino Mincho ProN\",\"Noto Serif JP\",\"Yu Mincho\",\"IPAMincho\",serif",
+    "body": "\"Helvetica Neue\",\"Segoe UI\",\"Liberation Sans\",Arial,sans-serif",
+    "ja": "\"Hiragino Sans\",\"Noto Sans JP\",\"Yu Gothic\",\"Meiryo\",\"IPAGothic\",sans-serif"
+  },
+  "ratios": {"paperAndSurface": 0.86, "ink": 0.1, "accentMax": 0.03},
+  "rules": [
+    "真鍮色は1ページ1か所：戦略の1語、選ぶべき1案、または強調する1系列。見出し全体や罫線、番号には使わない。",
+    "文字は生成り（ink）で、純白 #ffffff は使わない。細い書体と薄い灰の組み合わせは投影で消えるため、補助文字も inkMuted より薄くしない。",
+    "比較対象の系列は context の暗い灰で描き、暗い紙に暗い線を置くときは線を太く（3px 以上）する。",
+    "増減は色に加えて符号を必ず付け、positive/negative は表の差分列と KPI の変化1か所だけ。淡い緑・珊瑚を面で塗らない。",
+    "面（surface）は結論と論点の枠にだけ使い、カードを並べる格子は作らない。光彩・グラデーション・半透明の重ねは使わない。",
+    "写真は暗い紙に沈まないよう明るめのものを選び、写真の上に真鍮色の文字を載せない。"
+  ],
+  "source": "Original. Charcoal paper, warm off-white ink and a brass accent, no neon; contrast and color-vision checks by scripts/color-systems.mjs."
+}

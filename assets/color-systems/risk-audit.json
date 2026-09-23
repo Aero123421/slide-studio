@@ -1,0 +1,42 @@
+{
+  "id": "risk-audit",
+  "name": "Risk Audit",
+  "nameJa": "灰と朱の段階（監査・リスク評価）",
+  "mode": "light",
+  "mood": "冷たい灰白の紙に濃い墨。色は重大度の段階（薄い砂→琥珀→朱→暗い赤）だけを表し、朱は「重大」にしか現れない。",
+  "useFor": ["内部監査・外部監査の報告", "リスク評価マトリクス（ヒートマップ）", "コンプライアンス・統制の評価", "インシデントの振り返り"],
+  "avoidFor": ["ブランド・製品紹介", "複数事業の売上比較", "祝賀・イベント告知"],
+  "tokens": {
+    "paper": "#fafafa",
+    "surface": "#eff0f2",
+    "ink": "#1c1f26",
+    "inkMuted": "#4e535d",
+    "rule": "#cfd2d8",
+    "accent": "#8f2a22",
+    "onAccent": "#ffffff",
+    "positive": "#2f6b45",
+    "negative": "#b8442c"
+  },
+  "data": {
+    "categorical": ["#2f3e55", "#8a7345", "#4f7f6f"],
+    "sequential": ["#ece7d6", "#e3c27a", "#d98a3a", "#b8442c", "#6e1a1a"],
+    "diverging": ["#8f2a22", "#dca293", "#eff0f2", "#a9b9c9", "#3f5a78"],
+    "highlight": "#b8442c",
+    "context": "#c8cbd1"
+  },
+  "type": {
+    "display": "\"Segoe UI\",\"Helvetica Neue\",\"Liberation Sans\",Arial,\"Hiragino Sans\",\"Noto Sans JP\",\"Yu Gothic\",\"Meiryo\",sans-serif",
+    "body": "\"Segoe UI\",\"Helvetica Neue\",\"Liberation Sans\",Arial,sans-serif",
+    "ja": "\"Hiragino Sans\",\"Noto Sans JP\",\"Yu Gothic\",\"Meiryo\",\"IPAGothic\",sans-serif"
+  },
+  "ratios": {"paperAndSurface": 0.86, "ink": 0.1, "accentMax": 0.04},
+  "rules": [
+    "sequential は重大度そのものである（低→高）。件数や金額など重大度以外の量には使わず、別の量は墨の濃淡か表で示す。",
+    "accent の暗い赤は「重大」判定の印にだけ使う。見出し、ボタン風の枠、章扉には使わない。重大がないページに赤は存在しない。",
+    "重大度は色に加えて必ず語（低・中・高・重大）か記号（○△▲●）を並記し、ヒートマップの各セルに文字を入れる。",
+    "分類色は監査対象（部門・拠点・プロセス）にだけ使い、朱・橙・黄の重大度色と重ならない色相（藍・黄銅・青緑）の3色に限る。4系列以上は表にする。",
+    "統制が有効なら positive の緑、不備なら negative の朱。ただし結論文の色付けは1ページ1か所までで、本文中の語は墨のまま。",
+    "面（surface）は指摘事項の枠と改善計画の表にだけ使い、装飾のカードには使わない。"
+  ],
+  "source": "Original. Neutral grey field with a severity ramp as the only chroma; contrast and color-vision checks by scripts/color-systems.mjs."
+}

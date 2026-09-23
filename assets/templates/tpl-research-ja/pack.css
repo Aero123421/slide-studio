@@ -72,7 +72,7 @@
 .tpl-research-ja .rj-read .rj-ci{font:400 18px/1.5 var(--rj-num);color:var(--rj-ink2)}
 .tpl-research-ja .rj-read dl{margin:22px 0 0;padding:14px 0 0;border-top:.75px solid var(--rj-rule);display:grid;grid-template-columns:1fr auto;row-gap:10px;column-gap:14px;font:400 16px/1.45 var(--rj-sans);color:var(--rj-ink2)}
 .tpl-research-ja .rj-read dd{margin:0;font:700 19px/1.3 var(--rj-num);color:var(--rj-ink);text-align:right}
-.tpl-research-ja .rj-def{position:absolute;left:900px;top:470px;width:316px;padding:14px 16px;background:var(--rj-card);border-left:3px solid var(--rj-accent);font:400 15px/1.65 var(--rj-sans);color:var(--rj-ink2)}
+.tpl-research-ja .rj-def{position:absolute;left:900px;top:470px;width:316px;padding:14px 16px;background:var(--rj-card);font:400 15px/1.65 var(--rj-sans);color:var(--rj-ink2)}
 .tpl-research-ja .rj-def b{color:var(--rj-ink)}
 
 /* 05 ablation table */

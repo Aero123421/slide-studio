@@ -66,7 +66,7 @@ export default {
   exportPolicy: 'final',
   className: 'tpl-strategy s-roadmap',
   content: `<div class="s-wrap">
-  <div class="s-tick"></div>
+  
   <h1 class="s-title" data-region="title">最初の18か月で料金改定と拠点統合を終え、<br><em>自動化は2度の判断を経て</em>2029年度に本稼働させる</h1>
   <div class="s-track" aria-label="章の位置">${track}</div>
   <div class="s-rule"></div>

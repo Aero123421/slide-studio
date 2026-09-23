@@ -1,0 +1,42 @@
+{
+  "id": "luxury-noir",
+  "name": "Luxury Noir",
+  "nameJa": "ラグジュアリー・ノワール（黒檀・象牙・シャンパン1点）",
+  "mode": "dark",
+  "mood": "黒檀のような暖かい黒に、象牙色の文字とシャンパンの金を細く1点。輝きは光沢や金のグラデーションではなく、余白と細い線の抑制で作る。",
+  "useFor": ["高級ブランドの発表会","招待制イベント・受賞式","富裕層向けサービスの提案"],
+  "avoidFor": ["数表の多い業績報告","印刷して配る資料","明るい会議室での小画面共有"],
+  "tokens": {
+    "paper": "#151412",
+    "surface": "#211f1b",
+    "ink": "#ebe4d5",
+    "inkMuted": "#aaa08d",
+    "rule": "#3a362f",
+    "accent": "#c9b27c",
+    "onAccent": "#151412",
+    "positive": "#6f9d68",
+    "negative": "#e69c92"
+  },
+  "data": {
+    "categorical": ["#c9b27c","#a3aebb","#c0898f","#74906b"],
+    "sequential": ["#2a2720","#55503f","#867c5c","#b39f6b","#e6d6a6"],
+    "diverging": ["#8fa6c4","#4c5568","#26241f","#6b6046","#c9b27c"],
+    "highlight": "#c9b27c",
+    "context": "#59554d"
+  },
+  "type": {
+    "display": "\"Palatino Linotype\",Palatino,Georgia,\"Times New Roman\",\"Liberation Serif\",serif",
+    "body": "\"Helvetica Neue\",\"Segoe UI\",\"Liberation Sans\",Arial,sans-serif",
+    "ja": "\"Hiragino Mincho ProN\",\"Noto Serif JP\",\"Yu Mincho\",\"IPAMincho\",serif"
+  },
+  "ratios": {"paperAndSurface": 0.9, "ink": 0.08, "accentMax": 0.02},
+  "rules": [
+    "シャンパンは1ページに1か所、細く：見出しの1語、1本の細い罫、または1つの数字。金の面、金のグラデーション、金の縁取りは作らない。",
+    "背景は黒檀の平塗り。光沢、ビネット、放射状の光、金粉のテクスチャは使わない。写真は暗部を持ち上げず、そのまま置く。",
+    "文字は象牙色の ink で、純白は使わない。大きな見出しは ink、補足は inkMuted、ロゴやクレジットも inkMuted で小さく。",
+    "図表では焦点の1本がシャンパン、他は context の灰茶。分類色（銀鼠・薔薇鼠・鶯鼠）は3系列以上の比較にだけ使う。",
+    "プラス/マイナスは色に加えて符号（+/−）を書く。暗い地では緑と赤の彩度を上げず、明るさで読ませる。",
+    "罫線はシャンパンではなく rule の暗い茶。シャンパンの罫は1ページに1本まで、見出しの下ではなく数字の脇に置く。"
+  ],
+  "source": "Original. Contrast and color-vision checks by scripts/color-systems.mjs."
+}

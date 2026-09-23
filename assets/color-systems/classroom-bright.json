@@ -1,0 +1,42 @@
+{
+  "id": "classroom-bright",
+  "name": "Classroom Bright",
+  "nameJa": "教室（白地・空色）",
+  "mode": "light",
+  "mood": "白い紙に空色を一色と、クリーム色の面。学ぶ人を迎える明るさはあるが、色の役割は一つずつで乱れない。",
+  "useFor": ["学校の授業・教材", "社員研修・オンボーディング", "初学者向けのワークショップ", "学習者に配布する演習資料"],
+  "avoidFor": ["経営会議・投資家向け資料", "厳密な学術データの報告", "夜間のダークな会場での投影"],
+  "tokens": {
+    "paper": "#ffffff",
+    "surface": "#fff5e4",
+    "ink": "#24303d",
+    "inkMuted": "#4f5b68",
+    "rule": "#d9dee4",
+    "accent": "#1f6fd1",
+    "onAccent": "#ffffff",
+    "positive": "#2d8a4e",
+    "negative": "#d0452c"
+  },
+  "data": {
+    "categorical": ["#1f6fd1", "#e07a1f", "#2f9a5a", "#c2417a"],
+    "sequential": ["#dce9f8", "#aecbef", "#7aa9e0", "#4785d0", "#1f5aa6"],
+    "diverging": ["#d0452c", "#efa48f", "#f4f4f2", "#9ec4ee", "#1f6fd1"],
+    "highlight": "#1f6fd1",
+    "context": "#c9d0d8"
+  },
+  "type": {
+    "display": "Verdana,\"Segoe UI\",\"Helvetica Neue\",\"Liberation Sans\",Arial,sans-serif",
+    "body": "Verdana,\"Segoe UI\",\"Helvetica Neue\",\"Liberation Sans\",Arial,sans-serif",
+    "ja": "\"Hiragino Maru Gothic ProN\",\"Hiragino Sans\",\"Noto Sans JP\",\"Yu Gothic\",\"Meiryo\",\"IPAGothic\",sans-serif"
+  },
+  "ratios": {"paperAndSurface": 0.84, "ink": 0.12, "accentMax": 0.04},
+  "rules": [
+    "空色（accent）は「今日の問い」「覚える1語」「答え」のように学習者が最初に見るべき1か所と、演習の指示ボタンに限り、見出し全体には使わない。",
+    "クリーム色の面（surface）は演習問題・例題・まとめの枠だけに使い、ページの半分以上を面で覆わない。装飾のストライプや角のアイコンは付けない。",
+    "正解/不正解、増減は緑と赤に加えて必ず ○×・▲▼・符号を添える。子どもや色覚の違う学習者が色なしで読めるようにする。",
+    "分類色（青・橙・緑・紅）はステップの区別や登場人物の区別のような1つの軸にだけ使い、同じページでほかの意味に流用しない。比較しない項目は context の灰色。",
+    "文字は ink の濃紺で組み、inkMuted は出典と注釈だけ。学習者向けの本文は 20px 以上、太さ 500 以上にして教室の投影でも読めるようにする。",
+    "図のグラデーションや影は使わず、量は sequential の空色の階調、変化は diverging の橙←→空色で示す。"
+  ],
+  "source": "Original. Contrast and color-vision checks by scripts/color-systems.mjs."
+}

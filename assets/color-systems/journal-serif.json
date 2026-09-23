@@ -1,0 +1,42 @@
+{
+  "id": "journal-serif",
+  "name": "Journal Serif",
+  "nameJa": "学術誌（生成り紙・藍墨・朱）",
+  "mode": "light",
+  "mood": "生成りの紙に藍色の墨で組んだ論文誌のような静けさ。朱は論旨の要点を各ページ一か所だけ指す。",
+  "useFor": ["学会発表・招待講演", "論文内容の紹介", "人文・社会科学の講義", "書評・文献レビュー"],
+  "avoidFor": ["ダッシュボード風の数値羅列", "製品発表・ローンチ", "明るい会場での短時間の訴求"],
+  "tokens": {
+    "paper": "#f7f2e8",
+    "surface": "#efe8d9",
+    "ink": "#1c2740",
+    "inkMuted": "#4e5568",
+    "rule": "#d6cdb9",
+    "accent": "#c2401d",
+    "onAccent": "#fbf6ec",
+    "positive": "#2f6b4a",
+    "negative": "#8a2b2b"
+  },
+  "data": {
+    "categorical": ["#1f3a6e", "#a8741f", "#5b7f52", "#7c4d6e"],
+    "sequential": ["#e4e0d4", "#b5bdd3", "#8391b0", "#4d6190", "#1f3a6e"],
+    "diverging": ["#b83b1a", "#e3a48b", "#f3efe6", "#9aa8c8", "#2a4a82"],
+    "highlight": "#c2401d",
+    "context": "#c7bfae"
+  },
+  "type": {
+    "display": "Georgia,\"Times New Roman\",\"Liberation Serif\",serif",
+    "body": "Georgia,\"Times New Roman\",\"Liberation Serif\",serif",
+    "ja": "\"Hiragino Mincho ProN\",\"Noto Serif JP\",\"Yu Mincho\",\"IPAMincho\",serif"
+  },
+  "ratios": {"paperAndSurface": 0.86, "ink": 0.12, "accentMax": 0.02},
+  "rules": [
+    "朱（accent）は各ページで論旨の要点1か所（強調する語、注目させる1系列、図中の1本の矢印）だけに使い、見出し・ページ番号・罫線には決して使わない。",
+    "比較の主役でない系列は context の生成りグレーにし、藍色の分類色は同時に4本までとして線の端に直接ラベルを書く。",
+    "プラス/マイナスの数値は深緑と葡萄色に加えて必ず符号（+/−）または▲▼を付け、朱と混同しないよう変化率には朱を使わない。",
+    "本文は必ず ink の藍墨で組み、明朝体の補助文字（inkMuted）は出典・図注・脚注に限定して 14px 未満にしない。",
+    "引用文や定義は surface の生成りの面に載せ、枠線ではなく面の色差と字下げで区切る。",
+    "図版の塗りは sequential の淡い藍を使い、朱の塗りつぶし面は作らない。"
+  ],
+  "source": "Original. Contrast and color-vision checks by scripts/color-systems.mjs."
+}

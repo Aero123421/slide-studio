@@ -1,0 +1,42 @@
+{
+  "id": "clinical-trial",
+  "name": "Clinical Trial",
+  "nameJa": "臨床試験（治療の青・対照の灰）",
+  "mode": "light",
+  "mood": "白い紙に、治療群は青、対照群は灰色という固定の意味を持つ色だけを置く。色覚の違いに関わらず群の区別が読める。",
+  "useFor": ["臨床試験・治験結果の報告", "医療・疫学データの発表", "効果と安全性の比較", "倫理審査・規制当局向け資料"],
+  "avoidFor": ["製品プロモーション", "感情に訴えるストーリーテリング", "多群を同じ重みで並べる比較"],
+  "tokens": {
+    "paper": "#ffffff",
+    "surface": "#f2f5f8",
+    "ink": "#1b2733",
+    "inkMuted": "#4f5d6b",
+    "rule": "#d5dce3",
+    "accent": "#1d5fa6",
+    "onAccent": "#ffffff",
+    "positive": "#1f7a6b",
+    "negative": "#b8451c"
+  },
+  "data": {
+    "categorical": ["#1d5fa6", "#7a838d", "#d07a1f", "#1f7868"],
+    "sequential": ["#e3edf7", "#b4cde9", "#7ea9d6", "#4a7fbd", "#1d4f8a"],
+    "diverging": ["#b8451c", "#e6a385", "#f1f1f1", "#93b7e0", "#1d5fa6"],
+    "highlight": "#1d5fa6",
+    "context": "#c3ccd5"
+  },
+  "type": {
+    "display": "\"Segoe UI\",\"Helvetica Neue\",\"Liberation Sans\",Arial,sans-serif",
+    "body": "\"Segoe UI\",\"Helvetica Neue\",\"Liberation Sans\",Arial,sans-serif",
+    "ja": "\"Hiragino Sans\",\"Noto Sans JP\",\"Yu Gothic\",\"Meiryo\",\"IPAGothic\",sans-serif"
+  },
+  "ratios": {"paperAndSurface": 0.86, "ink": 0.11, "accentMax": 0.03},
+  "rules": [
+    "治療群（介入群）は常に青、対照群・プラセボは常に灰色（2番目の分類色）で、デッキ全体で入れ替えない。第3群以降だけに橙と青緑を使う。",
+    "有意差・p値・信頼区間は色で示さず、区間は同じ群の色の細線、有意な結果は数値の脇に * や n を明記する。",
+    "有害事象や悪化はマイナスの赤褐色に▲▼と符号を添え、改善は青緑で同様に記す。赤と緑の対比だけで安全性を語らない。",
+    "accent の青は「主要評価項目」の1か所（見出し中の語、あるいは主要エンドポイントの1系列）だけで、副次評価項目は context の灰色のままにする。",
+    "生存曲線やフォレストプロットの基準線（HR=1、差=0）は rule の薄い灰色ではなく ink の細線で描き、判断の基準を目立たせる。",
+    "surface の面は表の帯や補足の枠に限定し、群別に面を塗り分けない。"
+  ],
+  "source": "Original. Contrast and color-vision checks by scripts/color-systems.mjs."
+}

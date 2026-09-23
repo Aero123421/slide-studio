@@ -1,0 +1,42 @@
+{
+  "id": "nonprofit-warm",
+  "name": "Nonprofit Warm",
+  "nameJa": "生成りとテラコッタ（活動報告）",
+  "mode": "light",
+  "mood": "クリーム色の紙に焦茶の墨、テラコッタを1点。人の営みを写真と数字で伝える温かい年次報告の配色で、色は成果の1か所を指す。",
+  "useFor": ["NPO・財団の年次報告・インパクトレポート", "寄付者向け活動報告", "地域活動・教育プログラムの紹介", "CSR・社会貢献活動の報告"],
+  "avoidFor": ["財務諸表中心の資料", "緊急性・危機を伝える資料", "冷静な技術レビュー"],
+  "tokens": {
+    "paper": "#fbf6ec",
+    "surface": "#f3ebd9",
+    "ink": "#3a2a20",
+    "inkMuted": "#6b5a4c",
+    "rule": "#e0d4bf",
+    "accent": "#b5502a",
+    "onAccent": "#ffffff",
+    "positive": "#3f7a45",
+    "negative": "#8a3325"
+  },
+  "data": {
+    "categorical": ["#b5502a", "#3f6b6b", "#c8781e", "#5a4632"],
+    "sequential": ["#f5e6cf", "#e6c48f", "#d09a4a", "#a86d1c", "#6b4310"],
+    "diverging": ["#8a3325", "#dfa08f", "#f3ebd9", "#9ec48f", "#3f7a45"],
+    "highlight": "#b5502a",
+    "context": "#cfc4b0"
+  },
+  "type": {
+    "display": "Georgia,\"Times New Roman\",\"Hiragino Mincho ProN\",\"Noto Serif JP\",\"Yu Mincho\",\"IPAMincho\",serif",
+    "body": "\"Helvetica Neue\",\"Segoe UI\",\"Liberation Sans\",Arial,sans-serif",
+    "ja": "\"Hiragino Sans\",\"Noto Sans JP\",\"Yu Gothic\",\"Meiryo\",\"IPAGothic\",sans-serif"
+  },
+  "ratios": {"paperAndSurface": 0.84, "ink": 0.1, "accentMax": 0.04},
+  "rules": [
+    "テラコッタは各ページで「今年の成果」1か所（大きな数字1つ、または強調する1系列）にだけ。見出し・帯・アイコンの塗りには使わない。",
+    "写真が主役のページでは色を足さない。写真の隣の文字は墨と補助の焦茶だけで組む。",
+    "参考値（前年・目標・全国平均）は context の砂色で描き、系列名は線端に直接書く。分類色の2色目以降は複数の活動を並べる1ページだけに使う。",
+    "減少は色ではなく ▼ と「減」の語で示す。negative の色は表の増減列だけに限り、写真やタイトルの近くには置かない。",
+    "面（surface）は寄付者の声・受益者の言葉など引用枠にだけ使い、統計カードの背景にはしない。",
+    "薄い黄土の連続色（sequential の1〜2段目）は投影で消えるため、地図や帯グラフでは3段目以上を使う。"
+  ],
+  "source": "Original. Cream paper, warm brown ink and a single terracotta mark; contrast and color-vision checks by scripts/color-systems.mjs."
+}

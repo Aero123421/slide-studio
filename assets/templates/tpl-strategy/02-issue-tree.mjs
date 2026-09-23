@@ -35,7 +35,7 @@ const lines = lay.map(b => {
 }).join('');
 const subBoxes = lay.map(b => {
   const mid = (b.top + b.bot) / 2, h = b.bot - b.top;
-  return `<rect x="${subX}" y="${b.top}" width="${subW}" height="${h}" fill="#f1f7f5"/><rect x="${subX}" y="${b.top}" width="4" height="${h}" fill="#0d5c4f"/>
+  return `<rect x="${subX}" y="${b.top}" width="${subW}" height="${h}" fill="#f1f7f5"/>
     <text x="${subX + 20}" y="${mid - 8}" style="font:400 26px var(--s-fig);fill:#0d5c4f">${b.no}</text>
     <text x="${subX + 50}" y="${mid - 10}" class="s-sv-t">${b.title[0]}</text><text x="${subX + 50}" y="${mid + 14}" class="s-sv-t">${b.title[1]}</text>`;
 }).join('');
@@ -67,7 +67,7 @@ export default {
   exportPolicy: 'final',
   className: 'tpl-strategy s-tree-page',
   content: `<div class="s-wrap">
-  <div class="s-tick"></div>
+  
   <h1 class="s-title" data-region="title">${leaves.length}つの問いのうち${counts.done}つは検証を終えた。<br>残る主な論点は<em>自動化の効果と投資回収</em>に絞られた</h1>
   <div class="s-track" aria-label="章の位置">${track}</div>
   <div class="s-rule"></div>

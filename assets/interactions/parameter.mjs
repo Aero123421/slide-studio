@@ -30,7 +30,7 @@ Static: The export shows the starting state (${start.dose} mg, half-life ${start
   exportPolicy: 'final',
   className: 'st cs-laboratory',
   content: `<h1 class="st-head">At ${start.dose} mg every ${drug.interval} hours, peaks stay under the ${limits.max} mg/L limit only while the half-life is shorter than ${one(limitHalfLife)} hours</h1>
-<p class="st-dek">A fictional antibiotic, one-compartment model: IV dose every ${drug.interval} h, ${drug.volume} L volume of distribution, first ${drug.horizon} hours.</p>
+<p class="st-dek">A fictional antibiotic given by IV every ${drug.interval} h; one-compartment model, ${drug.volume} L volume.</p>
 <div class="widget" data-interactive="" id="${ID}-widget" data-region="primary"><div class="w-plot"></div><div class="w-controls"></div><output aria-live="polite" class="w-status"></output></div>
 <p class="st-source" data-region="source"><span>Illustrative model · not dosing guidance</span><span>Interaction · Parameter explorer</span></p>`,
   widgets: [{
@@ -41,15 +41,14 @@ Static: The export shows the starting state (${start.dose} mg, half-life ${start
       refs: [{ y: limits.max, label: `Toxic above ${limits.max} mg/L`, tone: 'negative' }, { y: limits.min, label: `Effective above ${limits.min} mg/L`, tone: 'muted', side: 'below' }],
       bands: [{ from: limits.min, to: limits.max }] },
     controls: {
-      dose: { label: `Dose every ${drug.interval} hours (mg)`, min: 250, max: 1000, step: 50, format: '{v} mg' },
-      halfLife: { label: 'Elimination half-life (hours)', min: 3, max: 12, step: 0.5, digits: 1, format: '{v} h' },
+      dose: { label: `Dose every ${drug.interval} h (mg)`, min: 250, max: 750, step: 50, format: '{v}\u00a0mg' },
+      halfLife: { label: 'Elimination half-life (h)', min: 3, max: 12, step: 0.5, digits: 1, format: '{v}\u00a0h' },
     },
     axes: { x: { title: 'Hours after the first dose', ticks: Array.from({ length: drug.horizon / drug.interval + 1 }, (_, i) => i * drug.interval) },
-      y: { title: 'Concentration in plasma (mg/L)', min: 0, max: 45, ticks: [0, 10, 20, 30, 40], digits: 1 } },
+      y: { title: 'Concentration in plasma (mg/L)', min: 0, max: 60, ticks: [0, 10, 20, 30, 40, 50, 60], digits: 1 } },
     text: {
-      status: `Half-life {halfLife} h, {dose} mg: above ${limits.max} mg/L for {hoursAbove} of ${drug.horizon} hours, below ${limits.min} mg/L for {hoursBelow}.`,
-      readout: [{ value: '{peak} mg/L', label: 'peak after the last dose' }, { value: '{trough} mg/L', label: `trough at ${drug.horizon} hours` }],
-      peakLabel: 'peak {v}', troughLabel: 'trough {v}',
+      status: `In the first ${drug.horizon} hours: {hoursAbove}\u00a0h above ${limits.max}\u00a0mg/L and {hoursBelow}\u00a0h below ${limits.min}\u00a0mg/L.`,
+      readout: [{ value: '{peak}', unit: 'mg/L', label: 'peak after the last dose' }, { value: '{trough}', unit: 'mg/L', label: `trough at ${drug.horizon} hours` }],
       figure: 'Plasma concentration over 72 hours with the effective and toxic limits',
     },
   }],

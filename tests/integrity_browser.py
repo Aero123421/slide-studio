@@ -93,6 +93,17 @@ def run():
         test('a tight-leaded hero numeral is measured by its line box, not its font box',lambda:expect(not hero['results'][0]['overlaps'],str(hero['results'][0]['overlaps'])))
         source.write_text(build('<p style="font-size:60px;margin:0">Overlapping line</p><p style="font-size:60px;margin:-50px 0 0">Second line on top</p>'));args.out=str(folder/'overlap');overlap=render(args)
         test('text that really overlaps is still reported',lambda:expect(overlap['results'][0]['overlaps'],str(overlap['results'][0])))
+        # PDF text layer: Inter's alternates (figure punctuation, tabular digits) export as private-use
+        # code points; export.py must still deliver a searchable PDF (via its text-layer fallback).
+        source.write_text(build('<h1>Opening hours</h1><p style="font-family:Inter,Arial;font-variant-numeric:tabular-nums">Open 18:00 – 19:30, 1,234 visits, +12.5%</p>'))
+        pdf_out=folder/'hours.pdf'
+        exported=subprocess.run([sys.executable,str(ROOT/'scripts/export.py'),str(source),str(pdf_out),'--force'],capture_output=True,text=True)
+        def searchable_pdf():
+            expect(exported.returncode==0,exported.stdout[-600:]+exported.stderr[-600:])
+            from pypdf import PdfReader
+            text=PdfReader(str(pdf_out)).pages[0].extract_text()
+            expect('18:00' in text and '1,234' in text and not any(0xE000<=ord(c)<=0xF8FF for c in text),repr(text))
+        test('PDF export keeps figures and punctuation searchable when a font maps alternates to private use',searchable_pdf)
         source.write_text(build('<p style="background:#fff;color:#fff">Essential information.</p>'));args.out=str(folder/'broken-contrast');bad=render(args)
         test('severe rendered contrast failure reaches the QA exit gate',lambda:expect(not bad['passed'] and any(x['integrityBlocking'] for x in bad['results'])))
         if os.environ.get('SLIDE_STUDIO_INLINE')!='1':

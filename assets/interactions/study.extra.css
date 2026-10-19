@@ -26,10 +26,10 @@
 .st .w-field input[type=file] { font: 400 16px/1.3 var(--ss-font-sans, Inter, sans-serif); color: var(--ss-ink, #17202b); }
 .st .w-check { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 10px; align-items: center; font: 500 17px/1.35 var(--ss-font-sans, Inter, sans-serif); color: var(--ss-ink, #17202b); cursor: pointer; }
 .st .w-check input { width: 19px; height: 19px; margin: 0; accent-color: var(--ss-accent, #2457c5); }
-.st .w-controls button { font: 600 16px/1.25 var(--ss-font-sans, Inter, sans-serif); min-height: 42px; padding: 9px 16px; background: var(--ss-paper, #fff); color: var(--ss-ink, #17202b); border: 1px solid var(--ss-rule, #c3cad4); border-radius: 6px; cursor: pointer; }
-.st .w-controls button:hover { border-color: var(--ss-muted, #5a6676); }
-.st .w-controls button.w-primary { background: var(--ss-accent, #2457c5); color: var(--ss-on-accent, #fff); border-color: var(--ss-accent, #2457c5); }
-.st .w-controls .w-reset { position: absolute; right: 0; bottom: 0; width: 288px; color: var(--ss-muted, #5a6676); font-weight: 500; }
+.st .widget button { font: 600 16px/1.25 var(--ss-font-sans, Inter, sans-serif); min-height: 42px; padding: 9px 16px; background: var(--ss-paper, #fff); color: var(--ss-ink, #17202b); border: 1px solid var(--ss-rule, #c3cad4); border-radius: 6px; cursor: pointer; }
+.st .widget button:hover { border-color: var(--ss-muted, #5a6676); }
+.st .widget button.w-primary { background: var(--ss-accent, #2457c5); color: var(--ss-on-accent, #fff); border-color: var(--ss-accent, #2457c5); }
+.st .widget > .w-reset { grid-column: 2; grid-row: 4; align-self: end; color: var(--ss-muted, #5a6676); font-weight: 500; }
 .st .w-radios { border: 0; margin: 0; padding: 0; display: grid; gap: 0; min-width: 0; }
 .st .w-radios legend.w-label { margin-bottom: 8px; padding: 0; }
 .st .w-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
@@ -50,6 +50,7 @@
 /* Readout: one or two numbers the current state produces. */
 .st .w-kpi { display: grid; gap: 4px; }
 .st .w-kpi b { font: 650 44px/1 var(--ss-font-display, var(--ss-font-sans, Inter, sans-serif)); letter-spacing: -.02em; font-variant-numeric: tabular-nums lining-nums; color: var(--ss-ink, #17202b); }
+.st .w-kpi b small { font-size: .5em; font-weight: 500; letter-spacing: 0; margin-left: .2em; color: var(--ss-muted, #5a6676); }
 .st .w-kpi span { font: 400 17px/1.35 var(--ss-font-sans, Inter, sans-serif); color: var(--ss-muted, #5a6676); }
 .st .w-kpi--accent b { color: var(--ss-accent, #2457c5); }
 .st .w-kpi--negative b { color: var(--ss-negative, #b5432f); }

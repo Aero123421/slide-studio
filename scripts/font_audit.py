@@ -101,8 +101,11 @@ def audit_fonts(page,contract=None):
             'limits':['Checks actual DOM text fonts in the selected browser state, not text drawn inside Canvas, images or opaque frames.','A matching family does not certify glyph shaping, language, weight or beauty; inspect the exported pages.','No automatic approval of fallback families.']}
 
 def normalized(text):
-    text=unicodedata.normalize('NFKC',text).casefold()
+    # U+02BC and U+2019 are one glyph in many fonts; PDF text extraction may return either.
+    text=unicodedata.normalize('NFKC',text).replace('\u02bc','\u2019').replace('\u02ee','\u201d').casefold()
     return ''.join(c for c in text if not c.isspace() and unicodedata.category(c)!='Cf' and c not in ('\ufe0e','\ufe0f','\u00ad'))
+def private_use(text):
+    return sum(1 for c in text if 0xE000<=ord(c)<=0xF8FF)
 
 def print_text(page):
     return page.locator('.slide').evaluate_all(r'''slides=>slides.map(slide=>{
@@ -110,7 +113,9 @@ def print_text(page):
       while(n=walk.nextNode()){
         const e=n.parentElement;if(!e||e.closest('script,style,template,option')||!n.textContent.trim())continue;
         let shown=!!e.getClientRects().length;
-        for(let p=e;p&&p!==slide.parentElement;p=p.parentElement){const s=getComputedStyle(p);if(s.display==='none'||s.visibility==='hidden'||+s.opacity===0)shown=false}
+        // Screen-reader-only text is never painted, so it cannot be expected in the PDF.
+        const srOnly=s=>(s.position==='absolute'||s.position==='fixed')&&(/^rect\(0(px)?,?\s*0(px)?,?\s*0(px)?,?\s*0(px)?\)$/.test(s.clip)||/^inset\((50|100)%\)$/.test(s.clipPath)||(parseFloat(s.width)<=1&&parseFloat(s.height)<=1));
+        for(let p=e;p&&p!==slide.parentElement;p=p.parentElement){const s=getComputedStyle(p);if(s.display==='none'||s.visibility==='hidden'||+s.opacity===0||srOnly(s))shown=false}
         if(shown)result.push(n.textContent);
       }
       return result.join(' ');
@@ -151,10 +156,12 @@ def pdf_postflight(file,expected_text):
             missing=collections.Counter(normalized(expected))-collections.Counter(normalized(text));lost=sum(missing.values())
             if lost:errors.append(f'Page {i+1}: {lost} expected text characters not recoverable from PDF; inspect glyphs, clipping and font encoding')
             if '\ufffd' in text or '\x00' in text:errors.append(f'Page {i+1}: replacement/null characters in extracted text')
+            pua=private_use(text)
+            if pua and lost:errors.append(f'Page {i+1}: {pua} characters came out as private-use code points: the font maps alternate glyphs (contextual punctuation, tabular figures, character variants) there, so search and copy fail')
             pages.append({'page':i+1,'size':[float(p.mediabox.width),float(p.mediabox.height)],'expectedCharacters':len(normalized(expected)),
-                          'extractedCharacters':len(normalized(text)),'missingCharacters':dict(missing),'passed':not lost and '\ufffd' not in text and '\x00' not in text})
+                          'extractedCharacters':len(normalized(text)),'missingCharacters':dict(missing),'privateUse':pua,'passed':not lost and '\ufffd' not in text and '\x00' not in text})
             resource_fonts(p.get('/Resources'))
-    return {'passed':not errors,'errors':errors,'warnings':warnings,'pages':pages,'fontTypes':dict(font_types),'fonts':list(fonts.values()),
+    return {'passed':not errors,'errors':errors,'warnings':warnings,'pages':pages,'privateUse':sum(p['privateUse'] for p in pages),'fontTypes':dict(font_types),'fonts':list(fonts.values()),
             'limits':['Text character coverage is order-independent: it does not certify reading order or correct claims.',
                       'Type3 is not automatically a fault. Visual inspection is still required.',
                       'PDF text extraction can fail for legitimate complex-script encoding: inspect and use an explicit, documented acceptance process rather than ignoring it.']}

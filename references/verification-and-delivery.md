@@ -299,6 +299,16 @@ Unicode forms and text order. It detects loss, not logical reading order or trut
 A legitimate PDF encoding may still make extraction fail: investigate and document,
 not silently disable the check. Always render the PDF and inspect the difficult pages.
 
+Some fonts — Inter among them — give their alternate glyphs private-use code points
+(punctuation set for figures by contextual alternates, tabular figures, character
+variants such as `cv08`). Chromium writes those code points into the PDF text layer, so
+"18:00" or "1,234" cannot be searched or copied. When the postflight finds that, the
+export renders the PDF once more with those substitutions turned off (layout features
+such as Japanese `palt`, kerning and ligatures stay) and reports
+`textLayerFallback` in its result. Look at the PDF: figures may be proportional instead
+of tabular. A font with standard mappings (Helvetica Neue, Hiragino, Noto) avoids the
+fallback. Screen-reader-only text is not expected in the PDF, because it is never painted.
+
 Actual DOM text inspection does not see text painted into Canvas, images or opaque
 embedded frames. Those regions need visual inspection and an accessible alternative.
 Custom beforeprint scripts must not introduce untested late text/font states.

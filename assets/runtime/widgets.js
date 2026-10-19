@@ -47,6 +47,8 @@ function fmt(v, digits = 0, locale = 'en', signed = false) {
   const zero = Number(Math.abs(v).toFixed(digits)) === 0;
   return (v < 0 && !zero ? '−' : signed && v > 0 && !zero ? '+' : '') + s;
 }
+/** "a, b and c" in the page's language. */
+const listOf = (items, locale = 'en') => { try { return new Intl.ListFormat(locale, { type: 'conjunction' }).format(items); } catch { return items.join(', '); } };
 /** Fill "{key}" and "{key|one|many}" from values (numbers are formatted, strings kept). */
 function fill(template, values, locale = 'en') {
   return String(template ?? '').replace(/\{(\w+)(?:\|([^|}]*)\|([^}]*))?\}/g, (m, key, one, many) => {
@@ -167,6 +169,8 @@ function ticks(lo, hi, count = 5) {
   for (let v = Math.ceil(lo / s - 1e-9) * s; v <= hi + s * 1e-9; v += s) out.push(Math.round(v / s) * s);
   return out.map(v => Number(v.toPrecision(12)));
 }
+/** Decimals needed to print a list of tick values (0 for whole numbers). */
+const tickDigits = values => Math.max(0, ...values.map(v => (String(Number(Number(v).toPrecision(10))).split('.')[1] || '').length));
 function niceDomain(lo, hi, count = 5) {
   if (lo === hi) { lo -= 1; hi += 1; }
   const s = niceStep(hi - lo, count);
@@ -349,7 +353,7 @@ function mount(config, defaultAssets) {
     summary.innerHTML = rows.length ? `<p class="w-summary-head">${esc(ui.settings)}</p><dl>${rows.join('')}</dl>` : '';
   }
   function setReadout(items) {
-    readout.innerHTML = (items || []).map(it => `<div class="w-kpi${it.tone ? ' w-kpi--' + esc(it.tone) : ''}"><b>${esc(it.value)}</b><span>${esc(it.label)}</span></div>`).join('');
+    readout.innerHTML = (items || []).map(it => `<div class="w-kpi${it.tone ? ' w-kpi--' + esc(it.tone) : ''}"><b>${esc(it.value)}${it.unit ? `<small>${esc(it.unit)}</small>` : ''}</b><span>${esc(it.label)}</span></div>`).join('');
   }
   function plotSize() {
     const W = plot.clientWidth, H = plot.clientHeight;
@@ -373,7 +377,8 @@ function mount(config, defaultAssets) {
     wrap: (s, width, size = 16, weight = 400) => wrapText(s, width, size, weight, w.font()),
   };
   const view = make(w) || {};
-  const resetButton = button(ui.reset, () => reset(), { cls: 'w-reset' });
+  // Reset sits in its own row of the widget (after the status), so a long status never runs under it.
+  const resetButton = button(ui.reset, () => reset(), { cls: 'w-reset', container: root, hideStatic: true });
   resetButton.dataset.wReset = '';
 
   function render() {
@@ -382,7 +387,7 @@ function mount(config, defaultAssets) {
     const out = view.render ? view.render(state) : '';
     const message = typeof out === 'string' ? out : out?.status ?? '';
     if (status.textContent !== message) status.textContent = message;
-    const items = out?.readout ?? (Array.isArray(w.text.readout) ? w.text.readout.map(r => ({ ...r, value: w.fill(r.value, out?.values || {}), label: w.fill(r.label, out?.values || {}) })) : null);
+    const items = out?.readout ?? (Array.isArray(w.text.readout) ? w.text.readout.map(r => ({ ...r, value: w.fill(r.value, out?.values || {}), label: w.fill(r.label, out?.values || {}), unit: r.unit ? w.fill(r.unit, out?.values || {}) : '' })) : null);
     setReadout(items);
     root.dataset.state = JSON.stringify(state);
     writeSummary();
@@ -411,12 +416,12 @@ const box = (W, H, m) => ({ l: m.l, r: W - m.r, t: m.t, b: H - m.b, w: W - m.l -
 const yTitle = (b, s) => (s ? text(b.l, b.t - 18, s, { size: 16, fill: C.muted, valign: 'bottom' }) : '');
 const xTitle = (b, s, y = b.b + 36) => (s ? text(b.r, y, s, { size: 16, fill: C.muted, anchor: 'end', valign: 'top' }) : '');
 /** Horizontal reference lines with labels at the right end (data.refs: [{y, label, tone}]). */
-function refLines(refs, y, b, w) {
+function refLines(refs, y, b) {
   let out = '';
   for (const ref of refs || []) {
-    const py = y(ref.y), col = tone(ref.tone, C.muted), above = ref.side !== 'below';
+    const py = y(ref.y), col = tone(ref.tone, C.muted), above = ref.side !== 'below', left = ref.align === 'left';
     out += line(b.l, py, b.r, py, { stroke: col, width: 1.4, dash: ref.dash === false ? null : '5 4' });
-    if (ref.label) out += text(b.r - 4, above ? py - 6 : py + 6, ref.label, { size: 16, fill: col, anchor: 'end', valign: above ? 'bottom' : 'top', weight: 600, halo: C.paper });
+    if (ref.label) out += text(left ? b.l + 6 : b.r - 4, above ? py - 6 : py + 6, ref.label, { size: 16, fill: col, anchor: left ? 'start' : 'end', valign: above ? 'bottom' : 'top', weight: 600, halo: C.paper });
   }
   return out;
 }
@@ -494,9 +499,10 @@ KINDS.parameter = w => {
       const yd = [ax.y?.min ?? model.y[0], ax.y?.max ?? model.y[1]];
       const b = box(W, H, { l: 64, r: 16, t: 44, b: 64 });
       const x = linear(xd, [b.l, b.r]), y = linear(yd, [b.b, b.t]);
-      const fx = v => w.fmt(v, ax.x?.digits ?? (xd[1] - xd[0] <= 2 ? 1 : 0)), fy = v => w.fmt(v, ax.y?.digits ?? (yd[1] - yd[0] <= 2 ? 1 : 0));
-      let out = axisY(y, { x: b.l, values: ax.y?.ticks || ticks(yd[0], yd[1], 5), format: fy, grid: [b.l, b.r] });
-      out += axisX(x, { y: b.b, values: ax.x?.ticks || ticks(xd[0], xd[1], 8), format: fx });
+      const yt = ax.y?.ticks || ticks(yd[0], yd[1], 5), xt = ax.x?.ticks || ticks(xd[0], xd[1], 8);
+      const fx = v => w.fmt(v, ax.x?.tickDigits ?? tickDigits(xt)), fy = v => w.fmt(v, ax.y?.tickDigits ?? tickDigits(yt));
+      let out = axisY(y, { x: b.l, values: yt, format: fy, grid: [b.l, b.r] });
+      out += axisX(x, { y: b.b, values: xt, format: fx });
       out += line(b.l, b.b, b.r, b.b, { stroke: C.ink, width: 1.4 });
       out += yTitle(b, ax.y?.title) + xTitle(b, ax.x?.title);
       for (const band of d.bands || []) out += rect(b.l, y(band.to), b.w, y(band.from) - y(band.to), { fill: C.surface }) +
@@ -511,12 +517,20 @@ KINDS.parameter = w => {
           pts.push([t1, model.at(p, t1 - 1e-6)]);
         }
       } else for (let i = 0; i <= 400; i++) { const t = xd[0] + (i / 400) * (xd[1] - xd[0]); pts.push([t, model.at(p, t)]); }
-      const clipId = `${w.config.id}-clip`;
-      out += tag('defs', {}, tag('clipPath', { id: clipId }, rect(b.l, b.t - 2, b.w, b.h + 4, {})));
-      const P = pts.map(([t, v]) => [x(t), y(v)]);
+      // The curve is clipped to the plot; where it passes the upper limit, a negative-coloured copy shows.
+      const clipId = `${w.config.id}-clip`, overId = `${w.config.id}-over`, P = pts.map(([t, v]) => [x(t), y(v)]);
+      out += tag('defs', {}, tag('clipPath', { id: clipId }, rect(b.l, b.t - 2, b.w, b.h + 4, {})) +
+        (d.window ? tag('clipPath', { id: overId }, rect(b.l, b.t - 2, b.w, y(d.window[1]) - b.t + 2, {})) : ''));
       out += tag('g', { 'clip-path': `url(#${clipId})` }, polyline(P, { stroke: C.accent, width: 3 }) +
-        (d.window ? polyline(P.map((q, i) => (pts[i][1] > d.window[1] ? q : [q[0], y(d.window[1])])), { stroke: C.negative, width: 3.4 }) : ''));
-      out += refLines(d.refs, y, b, w);
+        (d.window ? tag('g', { 'clip-path': `url(#${overId})` }, polyline(P, { stroke: C.negative, width: 3.4 })) : ''));
+      out += refLines(d.refs, y, b);
+      // A curve that leaves the fixed scale says so where it leaves, instead of silently rescaling.
+      const exit = pts.find(([, v]) => v > yd[1]);
+      if (exit) {
+        const top = Math.max(...pts.map(([, v]) => v)), note = fill(w.text.offScale || '↑ off scale, up to {v}', { v: w.fmt(top, ax.y?.digits ?? 1) }, w.locale);
+        const ex = clamp(x(exit[0]) + 8, b.l, b.r - w.tw(note, 16, 650));
+        out += text(ex, b.t + 6, note, { size: 16, weight: 650, fill: C.negative, valign: 'top', halo: C.paper });
+      }
       const values = Object.fromEntries(keys.map(key => [key, w.fmt(p[key], (w.config.controls?.[key]?.digits ?? model.params[key].digits) || 0)]));
       if (d.model === 'dosing') {
         const st = dosingStats(model, p, d.window);
@@ -528,10 +542,9 @@ KINDS.parameter = w => {
         const lastDose = Math.ceil(p.horizon / p.interval - 1e-9) - 1, tp = lastDose * p.interval, tt = (lastDose + 1) * p.interval - 1e-6;
         if (tp >= xd[0] && tt <= xd[1] + 1e-6) {
           const cp = model.at(p, tp), ct = model.at(p, tt);
-          out += circle(x(tp), y(cp), 5, { fill: C.paper, stroke: cp > (d.window?.[1] ?? Infinity) ? C.negative : C.accent, width: 2.4 });
-          out += circle(x(tt), y(ct), 5, { fill: C.paper, stroke: C.accent, width: 2.4 });
-          out += text(x(tp) - 10, Math.max(b.t + 10, y(cp) - 10), fill(w.text.peakLabel || 'peak {v}', { v: w.fmt(cp, dg) }, w.locale), { size: 16, anchor: 'end', weight: 650, fill: cp > (d.window?.[1] ?? Infinity) ? C.negative : C.ink, halo: C.paper });
-          out += text(x(tt) - 8, Math.min(b.b - 10, y(ct) + 14), fill(w.text.troughLabel || 'trough {v}', { v: w.fmt(ct, dg) }, w.locale), { size: 16, anchor: 'end', valign: 'top', weight: 650, halo: C.paper });
+          out += circle(x(tp), y(cp), 5.5, { fill: C.paper, stroke: cp > (d.window?.[1] ?? Infinity) ? C.negative : C.accent, width: 2.6 });
+          out += circle(x(tt), y(ct), 5.5, { fill: C.paper, stroke: C.accent, width: 2.6 });
+          if (w.text.peakLabel) out += text(x(tp), Math.max(b.t + 4, y(cp) - 12), fill(w.text.peakLabel, { v: w.fmt(cp, dg) }, w.locale), { size: 16, anchor: 'middle', valign: 'bottom', weight: 650, fill: cp > (d.window?.[1] ?? Infinity) ? C.negative : C.ink, halo: C.paper });
         }
       } else if (d.model === 'decay') values.end = w.fmt(model.at(p, xd[1]), 1);
       else if (d.model === 'logistic') values.half = w.fmt(Math.log(p.capacity / p.start - 1) / p.rate, 1);
@@ -558,28 +571,37 @@ KINDS.threshold = w => {
       s.counts = { tp, fp, fn, tn };
       const { width: W, height: H } = w.size(), ax = w.axes;
       const rowNames = [t.positive || 'Positive', t.negative || 'Negative'];
-      const labelW = Math.max(...rowNames.map(n => w.tw(n, 18, 650))) + 28;
+      const nPos = labels.filter(Boolean).length, counts2 = [nPos, labels.length - nPos];
+      const countLine = n => fill(t.rowCount || '{n|case|cases}', { n }, w.locale);
+      const labelW = Math.max(...rowNames.map((n, k) => Math.max(w.tw(n, 18, 650), w.tw(countLine(counts2[k]), 18, 400)))) + 34;
       const b = box(W, H, { l: Math.max(110, labelW), r: 20, t: 70, b: 62 });
       const x = linear(domain, [b.l + 12, b.r - 12]);
-      const gap = 30, rowH = (b.h - gap) / 2;
-      // Dot radius: largest that lets the tallest stack fit its row (below a 26 px label lane).
-      let r = 9, levels;
-      for (; r > 3; r -= 0.5) { levels = stackLevels(values.map(x), r); const top = Math.max(0, ...levels.map((k, i) => k)); if ((top + 1) * 2 * r * 1.08 <= rowH - 30) break; }
+      const gap = 30, lane = 30;
+      // Each row is as tall as its tallest stack needs (at least three dots); the dot radius is the largest that fits.
+      const idxOf = cls => values.map((_, i) => i).filter(i => labels[i] === cls);
+      let r = 11, lv = [], heights;
+      for (; r > 3; r -= 0.25) {
+        lv = [1, 0].map(cls => stackLevels(idxOf(cls).map(i => x(values[i])), r));
+        heights = lv.map(l => Math.max(3, Math.max(0, ...l) + 1) * 2 * r * 1.08 + lane);
+        if (heights[0] + heights[1] + gap <= b.h) break;
+      }
+      const spare = b.h - gap - heights[0] - heights[1];
+      heights = heights.map(h => h + spare / 2);
       const boundary = d.step ? th - d.step / 2 : th, bx = x(boundary);
       let out = rect(bx, b.t - 6, b.r - bx, b.h + 6, { fill: C.surface });
-      const rows = [{ y0: b.t, cls: 1 }, { y0: b.t + rowH + gap, cls: 0 }];
+      const rows = [{ y0: b.t, cls: 1, h: heights[0], lv: lv[0] }, { y0: b.t + heights[0] + gap, cls: 0, h: heights[1], lv: lv[1] }];
       // Separate stacks per row so each row's dots start at its own baseline.
       for (const row of rows) {
-        const idx = values.map((_, i) => i).filter(i => labels[i] === row.cls);
-        const lv = stackLevels(idx.map(i => x(values[i])), r), base = row.y0 + rowH;
+        const idx = idxOf(row.cls), lvs = row.lv, rowH = row.h, base = row.y0 + rowH;
         out += line(b.l, base, b.r, base, { stroke: C.rule });
         idx.forEach((i, k) => {
           const flagged = values[i] >= th, missed = row.cls === 1 && !flagged;
           const fillC = missed ? C.negative : flagged ? C.ink : C.context;
-          out += circle(x(values[i]), base - r * 1.08 - lv[k] * 2 * r * 1.08, r, { fill: fillC });
+          out += circle(x(values[i]), base - r * 1.08 - lvs[k] * 2 * r * 1.08, r, { fill: fillC });
         });
-        const n = idx.length, name = rowNames[row.cls ? 0 : 1];
-        out += text(b.l - 18, base - rowH / 2 + 4, [name, fill(t.rowCount || '{n} {total|patient|patients}', { n, total: n }, w.locale)], { size: 18, anchor: 'end', valign: 'middle', weight: 650, lh: 1.3 });
+        const n = idx.length, name = rowNames[row.cls ? 0 : 1], ly = base - (rowH - lane) / 2;
+        out += text(b.l - 20, ly - 12, name, { size: 18, anchor: 'end', valign: 'middle', weight: 650 });
+        out += text(b.l - 20, ly + 12, countLine(n), { size: 18, anchor: 'end', valign: 'middle', fill: C.muted });
         const left = row.cls ? fill(t.fn || '{fn} missed', { fn }, w.locale) : fill(t.tn || '{tn} cleared', { tn }, w.locale);
         const right = row.cls ? fill(t.tp || '{tp} caught', { tp }, w.locale) : fill(t.fp || '{fp} false alarms', { fp }, w.locale);
         out += text(b.l + 4, row.y0 + 4, left, { size: 18, weight: 650, valign: 'top', fill: row.cls && fn ? C.negative : C.muted });
@@ -628,7 +650,7 @@ function lineChart(w, S, { W, H, cursor, refs, margin } = {}) {
   out += axisX(v => x(v.value), { y: b.b, values: xt });
   out += line(b.l, b.b, b.r, b.b, { stroke: C.ink, width: 1.4 });
   out += yTitle(b, ax.y?.title) + xTitle(b, ax.x?.title, b.b + 36);
-  out += refLines(refs, y, b, w);
+  out += refLines(refs, y, b);
   const ends = [];
   S.lines.forEach((l, k) => {
     const col = tone(l.tone, k ? C.muted : C.accent);
@@ -669,7 +691,7 @@ KINDS.scrubber = w => {
       const vals = { label: labelOf(i), n: i + 1, i, count: n, y: w.fmt(v0, w.data.series && !w.axes.y?.digits ? 3 : dg), y2: isNum(v1) ? w.fmt(v1, dg) : '–',
         delta: isNum(v1) ? w.fmt(v0 - v1, dg, true) : '–', change: isNum(prev) ? w.fmt(v0 - prev, dg, true) : '–',
         trend: !isNum(prev) || v0 === prev ? (w.text.steady || 'steady') : v0 > prev ? (w.text.rising || 'rising') : (w.text.falling || 'falling'),
-        vsRef: isNum(ref) ? w.fmt(v0 - ref, dg, true) : '–', ref: isNum(ref) ? w.fmt(ref, dg) : '–' };
+        vsRef: isNum(ref) ? w.fmt(v0 - ref, dg, true) : '–', overRef: isNum(ref) ? w.fmt(Math.abs(v0 - ref), dg) : '–', ref: isNum(ref) ? w.fmt(ref, dg) : '–' };
       let status = w.fill(w.text.status || 'Sample {n} / {count}; y = {y}', vals);
       if (isNum(ref) && w.text.statusAbove && v0 >= ref) status = w.fill(w.text.statusAbove, vals);
       return { status, values: vals };
@@ -969,7 +991,7 @@ KINDS.histogram = w => {
       const gapPx = Math.min(4, (b.w / nb) * 0.12);
       counts.forEach((c, i) => {
         const x0 = x(domain[0] + i * width) + gapPx / 2, x1 = x(domain[0] + (i + 1) * width) - gapPx / 2, isPeak = d.domain && peaks.includes(i);
-        out += rect(x0, y(c), x1 - x0, y(0) - y(c), { fill: isPeak ? C.accent : C.ink, opacity: isPeak ? null : 0.78 });
+        out += rect(x0, y(c), x1 - x0, y(0) - y(c), { fill: isPeak ? C.accent : d.domain ? C.context : C.ink, opacity: isPeak || d.domain ? null : 0.78 });
         if (x1 - x0 >= w.tw(String(c), 16) + 4 && c) out += text((x0 + x1) / 2, y(c) - 6, String(c), { size: 16, anchor: 'middle', valign: 'bottom', fill: C.muted });
       });
       // Rug: every observation, unchanged by binning.
@@ -979,9 +1001,9 @@ KINDS.histogram = w => {
       out += axisX(x, { y: b.b, values: ax.x?.ticks || (nb <= 12 ? edges : ticks(domain[0], domain[1], 8)), format: v => w.fmt(v, ax.x?.digits ?? (domain[1] - domain[0] <= 2 ? 2 : 0)) });
       out += yTitle(b, ax.y?.title) + xTitle(b, ax.x?.title, b.b + 36);
       w.draw(svgRoot(W, H, out, t.figure || 'Histogram with a rug of every observation'));
-      const span = i => `${w.fmt(domain[0] + i * width, ax.x?.digits ?? 0)}–${w.fmt(domain[0] + (i + 1) * width, ax.x?.digits ?? 0)}`;
+      const span = i => `${w.fmt(domain[0] + i * width, ax.x?.digits ?? 0)}\u2060–\u2060${w.fmt(domain[0] + (i + 1) * width, ax.x?.digits ?? 0)}`;
       const vals = { bins: nb, width: w.fmt(width, ax.x?.widthDigits ?? (Number.isInteger(width) ? 0 : 1)), total: sum(counts), peaks: peaks.length,
-        peakList: peaks.map(span).join(w.locale.startsWith('ja') ? '、' : ' and '), first: peaks.length ? span(peaks[0]) : '–' };
+        peakList: listOf(peaks.map(span), w.locale), first: peaks.length ? span(peaks[0]) : '–' };
       return { status: w.fill(peaks.length > 1 ? t.statusTwoPeaks || t.status || '{bins} equal-width bins; total count {total} is conserved.' : t.status || '{bins} equal-width bins; total count {total} is conserved.', vals), values: vals };
     },
   };

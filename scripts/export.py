@@ -7,6 +7,17 @@ from pathlib import Path
 from qa import launch,open_deck,guard_network
 from font_audit import load_contract,settle_fonts,audit_fonts,print_text,pdf_postflight
 
+# Some fonts (Inter among them) give their alternate glyphs private-use code points: contextual
+# punctuation between figures, tabular figures, character variants. Chromium then writes those
+# code points into the PDF text layer, so "18:00" cannot be searched or copied. When the strict
+# postflight finds that, the PDF is rendered once more with those substitutions turned off;
+# layout features (Japanese palt, kerning, ligatures) are kept.
+PDF_SAFE_TEXT=r'''()=>{let n=0;const keep=/^["'](palt|halt|vpal|vhal|kern|vkrn|liga|clig|locl|ccmp)["']/;
+ for(const el of document.querySelectorAll('*')){const s=getComputedStyle(el),f=s.fontFeatureSettings;
+  if(f&&f!=='normal'){const k=f.split(',').map(x=>x.trim()).filter(x=>keep.test(x));el.style.setProperty('font-feature-settings',k.length?k.join(', '):'normal','important')}
+  el.style.setProperty('font-variant-ligatures','no-contextual','important');el.style.setProperty('font-variant-numeric','normal','important');n++}
+ return n}'''
+
 def run(a):
     from playwright.sync_api import sync_playwright
     inp=Path(a.input).resolve();dest=a.output or a.out
@@ -37,6 +48,11 @@ def run(a):
                     expected=print_text(page)
                     page.pdf(path=tmp,print_background=True,prefer_css_page_size=True)
                     postflight=pdf_postflight(tmp,expected)
+                    if not postflight['passed'] and postflight.get('privateUse'):
+                        first=postflight['errors'];page.evaluate(PDF_SAFE_TEXT);settle_fonts(page)
+                        page.pdf(path=tmp,print_background=True,prefer_css_page_size=True)
+                        postflight=pdf_postflight(tmp,expected)
+                        postflight['textLayerFallback']={'reason':first[:3],'applied':'Contextual alternates, tabular figures and character variants were turned off for this PDF so its text can be searched and copied. Look at the PDF: digits and punctuation may be set slightly differently from the HTML.'}
                     if not postflight['passed']:raise ValueError('PDF postflight failed: '+repr(postflight['errors']))
                 else:
                     from pptx import Presentation

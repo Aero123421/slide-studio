@@ -1149,7 +1149,7 @@ const DEFAULT_QUIZ = {
   answer: 'range',
 };
 KINDS.quiz = w => {
-  const q = { ...DEFAULT_QUIZ, ...w.data }, t = w.text, own = !!w.data.question;
+  const own = !!w.data.question, q = own ? { ...w.data } : { ...DEFAULT_QUIZ }, t = w.text;
   const correctText = t.correct || 'Correct: show the estimate with its uncertainty and conditions.';
   w.plot.innerHTML = `<div class="w-quiz"><p class="w-question">${esc(q.question)}</p>${q.prompt ? `<p class="w-prompt">${esc(q.prompt)}</p>` : ''}<div class="w-options"></div>` +
     `<div class="w-explain">${q.explanation ? `<p>${esc(q.explanation)}</p>` : ''}${q.figure || ''}</div></div>`;
@@ -1196,7 +1196,7 @@ const DEFAULT_DECISION = {
 KINDS.decision = w => {
   const d = w.data.tree ? w.data : DEFAULT_DECISION, t = w.text;
   for (const q of d.questions) w.select(q.id, w.spec(q.id, { label: q.label, options: q.options }));
-  // Tidy layout: leaves evenly down the page, each question centred on its leaves.
+  // Layout: questions in columns by depth, every outcome in one column on the right, leaves evenly spaced.
   const nodes = [], edges = [];
   let leaf = 0;
   (function walk(n, depth, parent, via) {
@@ -1204,11 +1204,14 @@ KINDS.decision = w => {
     if (parent) edges.push({ from: parent, to: me, via });
     if (n.result !== undefined) { me.slot = leaf++; return me; }
     const q = d.questions.find(x => x.id === n.ask);
-    const kids = Object.entries(n.branches).map(([v, child]) => walk(child, depth + 1, me, { value: v, label: q.options.find(o => String(o[0]) === v)?.[1] ?? v }));
+    const kids = Object.entries(n.branches).map(([v, child]) => {
+      const opt = q.options.find(o => String(o[0]) === v);
+      return walk(child, depth + 1, me, { value: v, label: q.short?.[v] ?? opt?.[2] ?? opt?.[1] ?? v });
+    });
     me.slot = (kids[0].slot + kids[kids.length - 1].slot) / 2;
     return me;
   })(d.tree, 0, null, null);
-  const depth = Math.max(...nodes.map(n => n.depth));
+  const qDepth = Math.max(0, ...nodes.filter(n => n.n.result === undefined).map(n => n.depth));
   return {
     render(s) {
       // Follow the current answers from the root to a result.
@@ -1220,22 +1223,25 @@ KINDS.decision = w => {
         n = e ? e.to : null;
       }
       s.result = result;
-      const { width: W, height: H } = w.size(), colW = (W - 20) / (depth + 1), boxW = Math.min(colW - 56, d.boxWidth || 230);
-      const yOf = slot => 30 + ((slot + 0.5) / leaf) * (H - 60), xOf = dep => 10 + dep * colW;
+      const { width: W, height: H } = w.size();
+      const qName = nd => { const q = d.questions.find(x => x.id === nd.n.ask); return q.short?.name ?? q.name ?? q.label; };
+      const qW = Math.max(...nodes.filter(nd => nd.n.result === undefined).map(nd => w.tw(qName(nd), 17, 650))) + 28;
+      const rW = Math.min(d.resultWidth || 250, W * 0.36);
+      const colStep = qDepth ? (W - rW - qW - 120) / qDepth : 0;
+      const yOf = slot => 24 + ((slot + 0.5) / leaf) * (H - 48), xOf = nd => (nd.n.result !== undefined ? W - rW : nd.depth * colStep);
       let out = '';
       for (const e of edges) {
-        const on = active.has(e.from) && active.has(e.to), x1 = xOf(e.from.depth) + boxW, y1 = yOf(e.from.slot), x2 = xOf(e.to.depth), y2 = yOf(e.to.slot), xm = x1 + 22;
-        out += path(`M${r2(x1)} ${r2(y1)}H${r2(xm)}V${r2(y2)}H${r2(x2 - 8)}`, { stroke: on ? C.accent : C.context, width: on ? 3 : 1.8, join: 'miter' }) +
-          arrowHead(x2, y2, 0, 9, on ? C.accent : C.context);
-        out += text(xm + 8, y2 - 8, e.via.label, { size: 16, weight: on ? 700 : 400, fill: on ? C.accent : C.muted, valign: 'bottom' });
+        const on = active.has(e.from) && active.has(e.to), x1 = xOf(e.from) + qW, y1 = yOf(e.from.slot), x2 = xOf(e.to), y2 = yOf(e.to.slot), xm = x1 + 18;
+        const col = on ? C.accent : C.context;
+        out += path(`M${r2(x1)} ${r2(y1)}H${r2(xm)}V${r2(y2)}H${r2(x2 - 9)}`, { stroke: col, width: on ? 3 : 1.8, join: 'miter' }) + arrowHead(x2, y2, 0, 9, col);
+        out += text(xm + 10, y2 - 7, e.via.label, { size: 16, weight: on ? 700 : 400, fill: on ? C.accent : C.muted, valign: 'bottom', halo: C.paper });
       }
       for (const nd of nodes) {
-        const x0 = xOf(nd.depth), cy = yOf(nd.slot), on = active.has(nd), isResult = nd.n.result !== undefined;
-        const label = isResult ? nd.n.result : d.questions.find(q => q.id === nd.n.ask).label;
-        const lines = w.wrap(label, boxW - 24, 17, isResult ? 650 : 400), bh = lines.length * 22 + 22;
-        const fillC = isResult && on ? C.accent : C.paper, stroke = on ? C.accent : C.rule;
-        out += rect(x0, cy - bh / 2, boxW, bh, { fill: fillC, stroke, width: on ? 2.4 : 1.4, rx: 6 });
-        out += text(x0 + 12, cy, lines, { size: 17, weight: isResult ? 650 : 400, valign: 'middle', lh: 1.3, fill: isResult && on ? C.onAccent : on ? C.ink : C.muted });
+        const x0 = xOf(nd), cy = yOf(nd.slot), on = active.has(nd), isResult = nd.n.result !== undefined;
+        const boxW = isResult ? rW : qW;
+        const lines = isResult ? w.wrap(nd.n.result, boxW - 26, 17, 650) : [qName(nd)], bh = lines.length * 22 + 20;
+        out += rect(x0, cy - bh / 2, boxW, bh, { fill: isResult && on ? C.accent : C.paper, stroke: on ? C.accent : C.rule, width: on ? 2.4 : 1.4, rx: 6 });
+        out += text(x0 + 13, cy, lines, { size: 17, weight: 650, valign: 'middle', lh: 1.3, fill: isResult && on ? C.onAccent : on ? C.ink : C.muted });
       }
       w.draw(svgRoot(W, H, out, t.figure || `Decision tree; current outcome: ${result}`));
       return { status: w.fill(t.status || 'Choose interaction only when it helps inspect a meaningful alternative.', { result: result ?? '' }), values: { result } };
@@ -1296,10 +1302,15 @@ KINDS.graph = w => {
         const x = px(n), y = py(n), reach = isNum(dist[i]), isOrigin = i === origin;
         out += circle(x, y, isOrigin ? 10 : 7, { fill: isOrigin ? C.accent : reach ? C.ink : C.paper, stroke: isOrigin ? C.paper : reach ? C.paper : C.muted, width: 2 });
         const side = n.label || (d.nodes.length <= 6 ? 'below' : 'right');
-        const mins = d.edges.some(e => e.minutes) && !isOrigin ? (reach ? ` · ${fill(t.minutes || '{m} min', { m: fmt(dist[i], 0, w.locale) }, w.locale)}` : ` · ${t.unreachable || 'cut off'}`) : '';
-        const lab = n.name + mins, dx = side === 'right' ? 14 : side === 'left' ? -14 : 0, dy = side === 'below' ? 16 : side === 'above' ? -16 : 0;
-        out += text(x + dx, y + dy, lab, { size: d.nodes.length <= 6 ? 22 : 16, weight: isOrigin ? 700 : reach ? 600 : 400, fill: isOrigin ? C.accent : reach ? C.ink : C.muted,
-          anchor: side === 'right' ? 'start' : side === 'left' ? 'end' : 'middle', valign: side === 'below' ? 'top' : side === 'above' ? 'bottom' : 'middle', halo: C.paper });
+        const timed = d.edges.some(e => e.minutes) && !isOrigin;
+        const sub = timed ? (reach ? fill(t.minutes || '{m} min', { m: fmt(dist[i], 0, w.locale) }, w.locale) : t.unreachable || 'cut off') : null;
+        const dx = side === 'right' ? 14 : side === 'left' ? -14 : 0, dy = side === 'below' ? 14 : side === 'above' ? -14 : 0;
+        const anchor = side === 'right' ? 'start' : side === 'left' ? 'end' : 'middle', big = d.nodes.length <= 6 ? 22 : 17;
+        const nameY = sub ? (side === 'below' ? y + dy : side === 'above' ? y + dy - 20 : y - 10) : y + dy;
+        out += text(x + dx, nameY, n.name, { size: big, weight: isOrigin ? 700 : reach ? 650 : 400, fill: isOrigin ? C.accent : reach ? C.ink : C.muted,
+          anchor, valign: side === 'below' ? 'top' : side === 'above' ? 'bottom' : 'middle', halo: C.paper });
+        if (sub) out += text(x + dx, side === 'below' ? nameY + 21 : side === 'above' ? nameY + 1 : y + 11, sub, { size: 16, fill: reach ? C.muted : C.negative,
+          anchor, valign: side === 'below' ? 'top' : side === 'above' ? 'top' : 'middle', halo: C.paper, num: true });
       });
       w.draw(svgRoot(W, H, out, t.figure || 'Network with reachable nodes highlighted'));
       const reach = s.reachable.length, cut = d.nodes.length - reach, far = Math.max(...dist.filter(isNum));
@@ -1319,13 +1330,14 @@ KINDS.matrix = w => {
   w.select('column', w.spec('column', { label: 'Column', numeric: true, options: cols.map((c, i) => [i + 1, c]) }));
   w.on(w.plot, 'click', e => { const td = e.target.closest('[data-cell]'); if (td) { const [r, c] = td.dataset.cell.split(',').map(Number); w.state.row = r; w.state.column = c; w.render(); } });
   const cell = v => (d.prefix || '') + fmt(v, d.digits ?? 0, w.locale) + (d.suffix || '');
+  const inCell = v => (d.cellPrefix ?? d.prefix ?? '') + fmt(v, d.digits ?? 0, w.locale) + (d.cellSuffix ?? d.suffix ?? '');
   return {
     render(s) {
       const R = clamp(Math.round(s.row), 1, rows.length), K = clamp(Math.round(s.column), 1, cols.length);
       const head = `<tr><th scope="col" class="w-corner">${esc(d.corner || '')}</th>${cols.map((c, i) => `<th scope="col"${i + 1 === K ? ' class="is-on"' : ''}>${esc(c)}</th>`).join('')}</tr>`;
       const body = rows.map((r, ri) => `<tr${ri + 1 === R ? ' class="is-on"' : ''}><th scope="row"${ri + 1 === R ? ' class="is-on"' : ''}>${esc(r)}</th>${values[ri].map((v, ci) => {
         const cls = ri + 1 === R && ci + 1 === K ? 'is-pick' : ri + 1 === R || ci + 1 === K ? 'is-cross' : '';
-        return `<td data-cell="${ri + 1},${ci + 1}"${cls ? ` class="${cls}"` : ''}>${cell(v)}</td>`;
+        return `<td data-cell="${ri + 1},${ci + 1}"${cls ? ` class="${cls}"` : ''}>${inCell(v)}</td>`;
       }).join('')}</tr>`).join('');
       w.draw(`<table class="w-matrix">${d.caption ? `<caption>${esc(d.caption)}</caption>` : ''}<thead>${head}</thead><tbody>${body}</tbody></table>`);
       const v = values[R - 1][K - 1], min = Math.min(...values.flat());

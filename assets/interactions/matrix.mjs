@@ -33,7 +33,7 @@ Static: 書き出しは見出しと同じ選択（${sizes[start.row - 1]}サイ�
     id: `${ID}-widget`,
     kind: 'matrix',
     initial: { ...start },
-    data: { rows: sizes.map(s => `${s}サイズ`), columns: zones, values, suffix: '円', corner: 'サイズ＼届け先' },
+    data: { rows: sizes.map(s => `${s}サイズ`), columns: zones, values, suffix: '円', cellSuffix: '', caption: '運賃（円）。行がサイズ、列が届け先' },
     controls: { row: { label: '荷物のサイズ' }, column: { label: '届け先（関東から）' } },
     text: {
       reset: '元に戻す',

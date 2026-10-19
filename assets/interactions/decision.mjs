@@ -2,9 +2,9 @@
 // The widget (kind 'decision') walks `tree` with the selected answers and lights the path it takes;
 // the headline walks the same tree here with tomorrow's forecast.
 const questions = [
-  { id: 'warning', label: '気象警報（前日17時）', options: [['none', 'なし'], ['issued', '大雨・暴風警報が出ている']] },
-  { id: 'wind', label: '最大風速の予報', options: [['calm', '10 m/s未満'], ['strong', '10 m/s以上']] },
-  { id: 'rain', label: '降水確率（当日午前）', options: [['low', '30%以下'], ['mid', '40〜50%'], ['high', '60%以上']] },
+  { id: 'warning', label: '気象警報（前日17時）', name: '気象警報', options: [['none', 'なし', '出ていない'], ['issued', '大雨・暴風警報が出ている', '出ている']] },
+  { id: 'wind', label: '最大風速の予報', name: '最大風速', options: [['calm', '10 m/s未満'], ['strong', '10 m/s以上']] },
+  { id: 'rain', label: '降水確率（当日午前）', name: '降水確率', options: [['low', '30%以下'], ['mid', '40〜50%'], ['high', '60%以上']] },
 ];
 const tree = {
   ask: 'warning', branches: {
@@ -45,7 +45,7 @@ Static: 書き出しは見出しと同じ予報（降水確率${label('rain', fo
     id: `${ID}-widget`,
     kind: 'decision',
     initial: { ...forecast },
-    data: { questions, tree, boxWidth: 210 },
+    data: { questions, tree, resultWidth: 260 },
     text: { reset: '元に戻す', status: 'この条件では：{result}。', figure: '開催判断の分岐図' },
   }],
 };

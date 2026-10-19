@@ -587,13 +587,13 @@
     },
     {
       "path": "assets/interactions/decision.mjs",
-      "bytes": 3667,
-      "sha256": "7b937d9a0907e22e01a00880df736c1d96c06603c14e08c37aa57b98ff53544d"
+      "bytes": 3771,
+      "sha256": "6200757a25271fbc721d81a6cbb6737191b818f3d930801358b9248f0171f209"
     },
     {
       "path": "assets/interactions/graph.mjs",
-      "bytes": 5805,
-      "sha256": "f02605534221ca8311de720586d18ed7c6cd74b05e3e960ad52144ee13210f13"
+      "bytes": 5811,
+      "sha256": "b20dca82bf2ffa93884bcb60ab9b0482dba50713029b1174bb8455ebc3484d83"
     },
     {
       "path": "assets/interactions/histogram.mjs",
@@ -622,8 +622,8 @@
     },
     {
       "path": "assets/interactions/matrix.mjs",
-      "bytes": 3855,
-      "sha256": "358413c78de3bb03eb7fcd1c286f56d97d698a4f7d3709be7c262bba2af384ae"
+      "bytes": 3902,
+      "sha256": "548398db498668dc84b9f0b86ccfc64c874e6a08622a573c041fd5395ee815e5"
     },
     {
       "path": "assets/interactions/parameter.mjs",
@@ -1152,8 +1152,8 @@
     },
     {
       "path": "assets/runtime/widgets.js",
-      "bytes": 121328,
-      "sha256": "c22b19c8d1b36bd1af9ccb05a8b2a82b01b8ac6f6b5424ffa3dd70601cac5902"
+      "bytes": 122245,
+      "sha256": "f80d068c085ffba9ef8c18c15f0983041cd1a47bfbab4765c571058b9206a74a"
     },
     {
       "path": "assets/story.schema.json",
@@ -2762,8 +2762,8 @@
     },
     {
       "path": "gallery/interactions.html",
-      "bytes": 708206,
-      "sha256": "0de592bc9d93cddfc15dffa573579de11d5893d795ecdd85cff2b7fd06621571"
+      "bytes": 709278,
+      "sha256": "8a88f649bffe94b7e927f399a583f8433dffb0a36af97a4bb684ab82cc92ee28"
     },
     {
       "path": "gallery/languages.html",
@@ -2787,8 +2787,8 @@
     },
     {
       "path": "gallery/research.html",
-      "bytes": 277389,
-      "sha256": "111077dd95cccfe48c067a2a5e9024351d70520a2cea3cd3c5613c260b675440"
+      "bytes": 278306,
+      "sha256": "a1ba4d0361d1accc901718709c45aca40f3155581239a6bbba17366d41da930b"
     },
     {
       "path": "gallery/templates.html",

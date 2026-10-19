@@ -118,7 +118,7 @@ HTML_JS=r'''()=>{const out=[];const slides=[...document.querySelectorAll('.slide
   for(const el of s.querySelectorAll('*')){const cs=getComputedStyle(el);if(cs.visibility==='hidden'||cs.display==='none'||+cs.opacity===0)continue;const r=el.getBoundingClientRect();if(!r.width&&!r.height)continue;
    const box={x:(r.left-r0.left)*k,y:(r.top-r0.top)*k,w:r.width*k,h:r.height*k};
    const own=[...el.childNodes].filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim();
-   if(own&&!(el instanceof SVGElement&&el.tagName!=='text'&&el.tagName!=='tspan'))els.push({...box,kind:'text',text:el.innerText?.trim()||own,size:parseFloat(cs.fontSize)*k,color:rgb(cs.color)});
+   if(own&&!(el instanceof SVGElement&&el.tagName!=='text'&&el.tagName!=='tspan'))els.push({...box,kind:'text',text:el.innerText?.trim()||own,size:parseFloat(cs.fontSize)*k,color:rgb(cs.color),inFigure:!!el.closest('svg[role="img"]')});
    const bg=rgb(cs.backgroundColor);if(bg&&!(el===s))els.push({...box,kind:'shape',fill:bg});
    for(const side of ['Top','Right','Bottom','Left']){const bw=parseFloat(cs['border'+side+'Width']);const bc=rgb(cs['border'+side+'Color']);if(bw>=2&&bc&&cs['border'+side+'Style']!=='none'){const others=['Top','Right','Bottom','Left'].filter(x=>x!==side).every(x=>parseFloat(cs['border'+x+'Width'])<1);if(others&&!/^(TABLE|THEAD|TBODY|TFOOT|TR|TH|TD|COL|COLGROUP|CAPTION|HR)$/.test(el.tagName)){const t=bw*k;const b=side==='Top'?{x:box.x,y:box.y,w:box.w,h:t}:side==='Bottom'?{x:box.x,y:box.y+box.h-t,w:box.w,h:t}:side==='Left'?{x:box.x,y:box.y,w:t,h:box.h}:{x:box.x+box.w-t,y:box.y,w:t,h:box.h};
      // A one-sided rule is a card stripe only on something that looks like a card (tinted, rounded or shadowed); on a table or a plain block it is typography.
@@ -180,6 +180,7 @@ def load_html(path):
                 if meta and isinstance(meta.get('slides'),list):
                     for s,m in zip(slides,meta['slides']):
                         s['notes']=m.get('notes','') or s['notes'];s['title']=m.get('title') or s['title']
+                        s['workshop']=meta.get('mode')=='workshop'
                         s['copyWaivers']=[w for w in (m.get('copyWaivers') or []) if isinstance(w,dict)]
             except Exception:pass
             return slides
@@ -217,8 +218,9 @@ def accent_stripes(s):
     return found
 
 def ordinals(s):
+    # Numbers drawn inside a figure (cell counts, node degrees) are data, not decoration.
     ts=texts(s);body=statistics.median([t['size'] for t in ts]) if ts else 16
-    return [t for t in ts if ORDINAL.match(t['text']) and t['size']>=max(24,1.4*body)]
+    return [t for t in ts if ORDINAL.match(t['text']) and t['size']>=max(24,1.4*body) and not t.get('inFigure')]
 
 def card_row(s):
     """Largest set of >=3 equal-width boxes (filled cards or text columns) side by side on one baseline."""
@@ -253,7 +255,9 @@ def review(slides,source,palette=None):
             add('warning','accent-stripe',sid,f"Thin colored bar {round(e['w'])}×{round(e['h'])}px at ({round(e['x'])},{round(e['y'])}) {'on a card edge' if kind=='card-edge' else 'beside a label or under a title'}.",
                 'Delete it. Separate cards with space or a tint; mark a real category with a direct label or the data mark itself.')
         o=ordinals(s)
-        if len(o)>=2:add('warning','decorative-ordinals',sid,f"{len(o)} large ordinal numbers ({', '.join(t['text'] for t in o[:4])}).",
+        # Decorative ordinals count items: a leading zero (01 02) or a run that starts 1, 2. Counts such as 3 and 13 are data.
+        vals={int(re.sub(r'\D','',t['text'])) for t in o}
+        if len(o)>=2 and (any(re.match(r'^\s*0\d',t['text']) for t in o) or {1,2}<=vals):add('warning','decorative-ordinals',sid,f"{len(o)} large ordinal numbers ({', '.join(t['text'] for t in o[:4])}).",
             'Keep numbers only for a real sequence the audience must follow; otherwise let the headings carry the order.')
         for t in texts(s):
             if cjk_deck and t['y']<0.14*H and t['size']<=18 and EYEBROW.match(t['text']) and sum(c.isalpha() for c in t['text'])>=4:
@@ -358,9 +362,14 @@ def review(slides,source,palette=None):
         small=[x for x in sizes if x<14]
         if len(small)>=0.3*len(sizes):add('warning','small-live-text','deck',f"{len(small)} of {len(sizes)} text runs are under 14px on a 1280px canvas (about 10.5pt on a 13.33in slide).",
             'Cut duplicated words and enlarge what remains; move optional detail to notes or an appendix page.')
+    # A workshop gallery is a collection of independent studies, each with its own system:
+    # deck-level consistency signals do not apply to it (page-level signals still do).
+    limits=['Geometry and text heuristics; they locate candidates, they do not judge taste or truth.','A warning is resolved by a fix or by a one-line reason the pattern carries meaning on that page.']
+    if slides and all(s.get('workshop') for s in slides):
+        findings[:]=[f for f in findings if f['signal'] not in {'repeated-skeleton','card-rows-everywhere','color-identity-reused','rainbow-text','near-duplicate-pages'}]
+        limits.append('Workshop gallery: deck-level consistency checks (skeleton, card rows, identity colors, text hues, near-duplicates) were skipped.')
     errors=[f for f in findings if f['severity']=='error']
-    return {'source':source,'slides':len(slides),'errors':len(errors),'warnings':len(findings)-len(errors),'findings':findings,
-            'limits':['Geometry and text heuristics; they locate candidates, they do not judge taste or truth.','A warning is resolved by a fix or by a one-line reason the pattern carries meaning on that page.']}
+    return {'source':source,'slides':len(slides),'errors':len(errors),'warnings':len(findings)-len(errors),'findings':findings,'limits':limits}
 
 def main():
     a=argparse.ArgumentParser(description=__doc__,formatter_class=argparse.RawDescriptionHelpFormatter);a.add_argument('input');a.add_argument('--check',action='store_true',help='exit 2 when errors are found')

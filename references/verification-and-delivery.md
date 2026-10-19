@@ -74,6 +74,11 @@ pattern carries meaning on that page. `--check` exits 2 only for errors (product
 copy, tool metadata in notes). It is a geometry/text heuristic, not a taste score, and
 it does not see pixels inside images. HTML input needs Playwright; `.pptx` needs
 python-pptx; `.scene.json` needs only the standard library.
+Numbers drawn inside a figure (cell counts, node degrees) are data, not ordinals; a
+slide's `copyWaivers` excuse the exact quote they name. A workshop gallery (`mode:
+'workshop'`) is a set of independent studies, so the deck-level consistency signals
+(skeleton, card rows, identity colors, text hues, near-duplicates) are skipped for it;
+a deck you deliver gets all of them.
 
 ### Visual inspection routine
 

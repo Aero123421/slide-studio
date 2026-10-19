@@ -4,10 +4,14 @@
 import { svgRoot, el, g, textLines, rng, theme as makeTheme } from '../runtime/figure.mjs';
 
 // The lecture this page opens (fictional society, speaker and event).
+// Dates are ISO strings; weekday names are derived, never typed.
+const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const day = (iso, { weekday = true, year = true } = {}) => { const d = new Date(`${iso}T12:00:00Z`); return `${weekday ? `${DAYS[d.getUTCDay()]} ` : ''}${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]}${year ? ` ${d.getUTCFullYear()}` : ''}`; };
 const lecture = {
   series: 'Skarra Geological Society, winter lectures 2026',
   speaker: 'Ingrid Halvorsen',
-  when: 'Thursday 26 November, 19:30, Harbour Hall',
+  date: '2026-11-26', time: '19:30', venue: 'Harbour Hall',
 };
 // Station SKR1, vertical component: one drum line per two minutes, 30 lines (02:40–03:40).
 const record = { station: 'SKR1', start: 2 * 3600 + 40 * 60, secondsPerLine: 120, lines: 30 };
@@ -84,7 +88,7 @@ export default {
   content: `<p class="eo-series" data-region="support">${lecture.series}</p>
 <h1 class="eo-title" data-region="title">${inWords[seconds] ?? seconds}<br>seconds<br>at <em>${clock(quake.origin)}</em></h1>
 <p class="eo-dek" data-region="support">The island’s strongest earthquake since 1962, read second by second from the seismometer on Skarra Head.</p>
-<p class="eo-byline" data-region="support"><b>${lecture.speaker}</b><br>${lecture.when}</p>
+<p class="eo-byline" data-region="support"><b>${lecture.speaker}</b><br>${day(lecture.date, { year: false })}, ${lecture.time}, ${lecture.venue}</p>
 <figure class="eo-record" data-region="primary">${helicorder()}</figure>
 <p class="eo-caption" data-region="source">Record: station ${record.station}, vertical, two minutes per line. Synthetic illustration.</p>`,
 };

@@ -339,8 +339,8 @@ ${source(credit(img, 'double espresso', p.scale), 'Deliberate inset', 'native si
     sources: [{ type: 'image', file: 'assets/media/study-01.jpg', license: 'CC0' }],
     notes: 'Purpose: a shaped frame is decoration; use it when the shape repeats the subject (a round cup seen from above) and the picture is identity, not evidence.\nModify: clip-path: circle() on a square cover crop; the circle is centred on the saucer, so the cup and spoon stay whole.\nInvariant: never mask a photograph that is evidence (a sample, a site, a figure): the mask hides what the reader needs to judge.\nStatic: already static.',
     content: `${p.html}
-<h1 class="im-head" data-region="title" style="${at(tx, 76, span(5) + 24)}">${cap(WORDS[fromDouble])} of the ${WORDS[menu.length]} drinks on the ${shot.cafe} bar menu start from the same double</h1>
-<table class="im-menu" data-region="support" style="${at(tx, 268, span(5) + 24)}">${menu.map(m => `<tr><th>${m.name}<span>${m.what}</span></th><td>€${fmt(m.eur, { digits: 2 })}</td></tr>`).join('')}</table>
+<h1 class="im-head" data-region="title" style="${at(tx, 64, span(5) + 24)}">${cap(WORDS[fromDouble])} of the ${WORDS[menu.length]} drinks on the ${shot.cafe} bar menu start from the same double</h1>
+<table class="im-menu" data-region="support" style="${at(tx, 248, 1216 - tx)}">${menu.map(m => `<tr><th>${m.name}<span>${m.what}</span></th><td>€${fmt(m.eur, { digits: 2 })}</td></tr>`).join('')}</table>
 ${source(credit(img, 'double espresso', p.scale), 'Shaped frame', 'a circle that repeats the cup; never for evidence')}`,
   });
 }

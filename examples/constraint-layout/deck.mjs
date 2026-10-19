@@ -74,7 +74,7 @@ function measureStep(step, lang, fields, width) {
   });
   const height = 2 * PAD.y + sum(blocks.map(b => b.lines.length * b.size * b.lh)) + GAP.block * (blocks.length - 1);
   const tooWide = blocks.find(b => b.widest > inner + 0.5), tooLong = blocks.find(b => b.lines.length > MAX_LINES[b.f]);
-  return { blocks, height, problem: tooWide ? `a ${tooWide.f} word is wider than the column`
+  return { blocks, height, problem: tooWide ? `${step.id} ${tooWide.f} has a word wider than the column`
     : tooLong ? `${step.id} ${tooLong.f} needs ${tooLong.lines.length} lines (max ${MAX_LINES[tooLong.f]})` : null };
 }
 
@@ -130,7 +130,7 @@ function drawStep(step, b, measured) {
     y += x.lines.length * x.size * x.lh + GAP.block;
     return lines;
   });
-  return g({ 'data-step-id': step.id },
+  return g({ 'data-node': step.id },
     el('rect', { x: b.x, y: b.y, width: b.w, height: b.h, rx: 6, fill: step.exception ? t.c('paper') : t.c('surface'),
       stroke: step.gate ? t.c('accent') : step.exception ? t.c('muted') : t.c('rule'), 'stroke-width': step.gate ? 2.2 : 1.2,
       'stroke-dasharray': step.exception ? '5 4' : null }),

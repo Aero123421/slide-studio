@@ -54,7 +54,7 @@ function endGrain(theme = 'css') {
     el('circle', { cx: heart.cx, cy: heart.cy, r: heart.r, fill: t.seq(2) }),
     el('path', { d: rays, stroke: t.seq(0), 'stroke-width': 1.6, opacity: 0.55, fill: 'none' }),
     circles.slice(0, -1).map(c => el('circle', { cx: c.cx.toFixed(1), cy: c.cy.toFixed(1), r: c.r.toFixed(1), fill: 'none', stroke: t.seq(c.sap ? 3 : 4), 'stroke-width': Math.max(0.7, c.w * scale * 0.38).toFixed(2), opacity: 0.9 })),
-    el('circle', { cx: outer.cx, cy: outer.cy, r: outer.r, fill: 'none', stroke: t.c('accent'), 'stroke-width': 4 }),
+    el('circle', { cx: outer.cx, cy: outer.cy, r: outer.r, fill: 'none', stroke: t.c('accent'), 'stroke-width': 5.5 }),
     el('path', { d: check, fill: t.seq(4) }),
     el('circle', { cx: px, cy: py, r: 4, fill: t.seq(4) }));
 }

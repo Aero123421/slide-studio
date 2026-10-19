@@ -3,7 +3,12 @@
 // and the departure minutes placed at their true clock positions so the new frequency is visible.
 
 const route = { number: 4, name: 'Harbour – University', stop: 'Harbour Square' };
-const change = { from: 'Monday 7 March 2027', until: '6 March' };
+// Dates are ISO strings; weekday names are derived, never typed.
+const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const day = (iso, { weekday = true, year = true } = {}) => { const d = new Date(`${iso}T12:00:00Z`); return `${weekday ? `${DAYS[d.getUTCDay()]} ` : ''}${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]}${year ? ` ${d.getUTCFullYear()}` : ''}`; };
+const change = { from: '2027-03-08' }; // first day of the new timetable
+const lastOld = new Date(Date.parse(`${change.from}T12:00:00Z`) - 864e5).toISOString().slice(0, 10);
 const peak = { span: ['6:30', '20:00'], days: 'Monday to Friday', headway: { old: 10, new: 6 }, firstMinute: { old: 5, new: 3 } };
 const trip = { minutes: 24, layover: 4 }; // one way, and turnaround at each end
 const offPeakHeadway = 10;
@@ -35,12 +40,12 @@ export default {
   sources: [{ type: 'original-example', file: 'assets/compositions/swiss-type.mjs' }],
   exportPolicy: 'final',
   content: `<p class="sw-route" data-region="support"><span class="sw-bullet" aria-label="Tram ${route.number}">${route.number}</span>Tram ${route.number}, ${route.name}</p>
-<p class="sw-date" data-region="support">From ${change.from}</p>
+<p class="sw-date" data-region="support">From ${day(change.from)}</p>
 <h1 class="sw-display" data-region="title" data-qa-overlap="Display leading 1.02: the line boxes overlap by design; the glyphs do not touch.">${lines.map(l => `<span style="margin-left:-${l.inset}em">${l.text}</span>`).join('')}</h1>
 <div class="sw-times" data-region="primary">
   <p class="sw-head">Departures from ${route.stop}, 8:00 to 8:59</p>
-  <p class="sw-row sw-old"><span class="sw-label">Until ${change.until}</span>${minutes(before, 'sw-min')}</p>
-  <p class="sw-row sw-new"><span class="sw-label">From ${change.from.replace(/^\w+ /, '').replace(/ \d{4}$/, '')}</span>${minutes(after, 'sw-min')}</p>
+  <p class="sw-row sw-old"><span class="sw-label">Until ${day(lastOld, { weekday: false, year: false })}</span>${minutes(before, 'sw-min')}</p>
+  <p class="sw-row sw-new"><span class="sw-label">From ${day(change.from, { weekday: false, year: false })}</span>${minutes(after, 'sw-min')}</p>
 </div>
 <p class="sw-note" data-region="support">Evenings and weekends stay every ${offPeakHeadway} minutes. The trip still takes ${trip.minutes} minutes; ${trams(peak.headway.new)} trams instead of ${trams(peak.headway.old)} hold the ${peak.headway.new}-minute gap.</p>
 <p class="st-source" data-region="source"><span>Illustrative timetable · Vessby Transit</span><span>Swiss grid: 12 columns, one display size</span></p>`,

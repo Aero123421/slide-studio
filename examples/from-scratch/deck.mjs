@@ -9,7 +9,7 @@
 //   4. Composition  regions on a 12-column grid made with kit.mjs → `cols`, `span`
 import fs from 'node:fs/promises';
 import { h, grid, position } from '../../assets/runtime/kit.mjs';
-import { theme, el, g, svgRoot, textLines, linear, spreadLabels, lineChart, barChart, fmt, sum } from '../../assets/runtime/figure.mjs';
+import { theme, el, g, svgRoot, textLines, linear, niceDomain, spreadLabels, lineChart, barChart, fmt, sum } from '../../assets/runtime/figure.mjs';
 
 // ------------------------------------------------------------------ 1 · brief
 const brief = {
@@ -104,10 +104,10 @@ function busFigure(box) {
   return lineChart({
     id: 'bus-fig', width: box.w, height: box.h, x, xEvery: 2, fontSize: 18, unit: 'Median minutes, Quay Road to Station Avenue',
     series: [{ name: '2025', values: bus.before, color: t.c('muted') }, { name: 'Trial 2026', values: bus.trial }],
-    highlight: 'Trial 2026', yDomain: [6, 14], format: { digits: 1 }, endValues: false,
+    highlight: 'Trial 2026', yDomain: niceDomain([Math.min(...bus.trial, ...bus.before), Math.max(...bus.before, ...bus.trial)], 4), format: { digits: 1 }, endValues: false,
     bands: [{ from: hhmm(trial.lane[0]), to: hhmm(trial.lane[1]), label: `Lane in force, ${hhmm(trial.lane[0])}–${hhmm(trial.lane[1])}` }],
-    // The claim is the gap at the peak hour, so mark the gap itself: a bracket between the two lines.
-    // A difference line through the two points at the peak hour; its label sits in the empty band between the lines.
+    // The claim is the gap at the peak hour, so mark the gap itself: a difference line through the two points,
+    // labelled in the empty band between the lines.
     extra: ({ x, y }) => { const i = hours.indexOf(peak.hr), between = bus.trial[i] + (bus.before[i] - bus.trial[i]) * 0.25;
       return g({ 'data-step': 1, 'data-motion': 'reveal', 'data-delay': 500 },
         el('line', { x1: x(i), x2: x(i), y1: y(bus.before[i]) + 6, y2: y(bus.trial[i]) - 6, stroke: t.c('accent'), 'stroke-width': 2.4, 'stroke-dasharray': '1 5', 'stroke-linecap': 'round' }),
@@ -122,7 +122,7 @@ function busFigure(box) {
 function carFigure(box) {
   return barChart({
     id: 'car-fig', width: box.w, height: box.h, data: delays, sort: 'desc', highlight: worst.label, fontSize: 18,
-    domain: [0, 2.5], barRatio: 0.46, format: { digits: 1, prefix: '+' }, unit: 'Added minutes at the evening peak, trial minus 2025', labelWidth: 230,
+    domain: [0, BOARD_LIMIT * 1.25], barRatio: 0.46, format: { digits: 1, prefix: '+' }, unit: 'Added minutes at the evening peak, trial minus 2025', labelWidth: 230,
     reference: { value: BOARD_LIMIT, label: `Board limit +${fmt(BOARD_LIMIT, { digits: 1 })}` },
     title: 'Added car travel time at the evening peak on each affected street',
     desc: `All four streets stay below the +${fmt(BOARD_LIMIT, { digits: 1 })}-minute limit; the largest increase is ${worst.label}, +${min(worst.value)} minutes.`,
@@ -133,8 +133,9 @@ function carFigure(box) {
 function scheduleFigure(box) {
   const d0 = day(decision.start) - 6, d1 = day(opening.start) + 10;
   const y = linear([d0, d1], [24, box.h - 24]);                       // time runs down the page
-  const lineX = 132, months = [];
-  for (let m = new Date(Date.UTC(2026, 11, 1)); day(m.toISOString().slice(0, 10)) < d1; m = new Date(Date.UTC(m.getUTCFullYear(), m.getUTCMonth() + 1, 1))) months.push(m);
+  const lineX = 132, months = [];                                     // month labels sit left of the time line
+  const first = new Date(decision.start + 'T00:00:00Z');
+  for (let m = new Date(Date.UTC(first.getUTCFullYear(), first.getUTCMonth() + 1, 1)); day(m.toISOString().slice(0, 10)) < d1; m = new Date(Date.UTC(m.getUTCFullYear(), m.getUTCMonth() + 1, 1))) months.push(m);
   return svgRoot({ id: 'schedule-fig', width: box.w, height: box.h, title: 'Schedule from board decision to opening',
     desc: `Decision ${longDate(decision.start)}; night works ${longDate(schedule[2].start)} to ${longDate(schedule[2].end)}; opening ${longDate(opening.start)}.` },
   el('line', { x1: lineX, x2: lineX, y1: y(d0), y2: y(d1), stroke: t.c('rule'), 'stroke-width': 2 }),
@@ -220,7 +221,7 @@ export default {
 <p class="abs ask-lead" data-region="support" ${at(span(0, 8, 316, 110))}>In the ${trial.weeks}-week trial, Route ${trial.route} crossed ${trial.street} up to ${min(-peak.d)} minutes faster, and car delay on every affected street stayed inside the board’s ${fmt(BOARD_LIMIT, { digits: 0 })}-minute limit.</p>
 <p class="abs ask-decision" data-region="primary" ${at(span(0, 8, 480, 90))}><b>Decision today:</b> ${usd(cost)} for permanent works from the ${FUND.name}, so the lane opens on ${longDate(opening.start)}.</p>
 <p class="abs ask-by" data-region="source" ${at(span(0, 12, 640, 30))}><span>Transit Board, ${longDate(decision.start)}</span><span>Dana Okafor, Director of Service Planning</span></p>`,
-      notes: `Answer first: the board is asked to approve one thing. The next three pages answer the three questions members asked when they approved the trial: did it help the buses, what did it cost drivers, and what will it cost us.`,
+      notes: `Brief: ${brief.decision}, for ${brief.audience.toLowerCase()}. Answer first: the board is asked to approve one thing. The next three pages answer the three questions members asked when they approved the trial: did it help the buses, what did it cost drivers, and what will it cost us.`,
       sources,
     },
     {

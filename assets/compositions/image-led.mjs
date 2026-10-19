@@ -11,7 +11,11 @@ const photo = {
 // Sun–Earth L1 sits about a·∛(m / 3M) from Earth (Hill-sphere approximation).
 const AU = 149.6e6, earthToSunMass = 3.003e-6; // km; Earth mass / Sun mass
 const l1 = AU * Math.cbrt(earthToSunMass / 3);
-const lecture = { kind: 'Public lecture', speaker: 'Dr Lena Moraes', venue: 'Harbourside Planetarium', when: 'Thursday 19 November 2026, 19:30' };
+// Dates are ISO strings; weekday names are derived, never typed.
+const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const day = (iso, { weekday = true, year = true } = {}) => { const d = new Date(`${iso}T12:00:00Z`); return `${weekday ? `${DAYS[d.getUTCDay()]} ` : ''}${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]}${year ? ` ${d.getUTCFullYear()}` : ''}`; };
+const lecture = { kind: 'Public lecture', speaker: 'Dr Lena Moraes', venue: 'Harbourside Planetarium', date: '2026-11-19', time: '19:30' };
 
 const pw = Math.round(photo.w * photo.scale), ph = Math.round(photo.h * photo.scale);
 
@@ -26,6 +30,6 @@ export default {
   content: `<img class="il-photo" data-region="primary" src="${photo.src}" alt="${photo.alt}" style="width:${pw}px;height:${ph}px">
 <h1 class="il-title" data-region="title">From L1, the Earth is always lit</h1>
 <p class="il-dek" data-region="support">The satellite on top of this rocket now sits ${fmt(l1 / 1e6, { digits: 1 })} million kilometres towards the Sun. From there the whole sunlit face of the planet fits in one frame.</p>
-<p class="il-meta" data-region="support">${lecture.kind}<br><b>${lecture.speaker}</b><br>${lecture.venue}<br>${lecture.when}</p>
+<p class="il-meta" data-region="support">${lecture.kind}<br><b>${lecture.speaker}</b><br>${lecture.venue}<br>${day(lecture.date)}, ${lecture.time}</p>
 <p class="il-credit" data-region="source">${photo.credit}</p>`,
 };

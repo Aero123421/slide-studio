@@ -5,11 +5,15 @@ import { svgRoot, el, g, textLines, theme as makeTheme, n } from '../runtime/fig
 
 const harmonics = 8;          // how many harmonics to draw
 const featured = 3;           // the one in the accent: touch the string at 1/3 to sound it
+// Dates are ISO strings; weekday names are derived, never typed.
+const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const day = (iso, { weekday = true, year = true } = {}) => { const d = new Date(`${iso}T12:00:00Z`); return `${weekday ? `${DAYS[d.getUTCDay()]} ` : ''}${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]}${year ? ` ${d.getUTCFullYear()}` : ''}`; };
 const concert = {
   title: 'Overtones',
   line: 'A lecture-concert on the natural harmonics of a single string',
   people: ['Mira Okafor, cello', 'Anton Vahl, lecture'],
-  when: 'Friday 4 December 2026, 19:30',
+  date: '2026-12-04', time: '19:30',
   where: 'Small Hall, Linden Conservatory',
 };
 // The string spans columns 4–12 on the slide; the drawing is authored at that size.
@@ -60,6 +64,6 @@ export default {
   content: `<figure class="gp-art" data-region="primary">${drawing()}</figure>
 <h1 class="gp-title" data-region="title">${concert.title}</h1>
 <p class="gp-line" data-region="support">${concert.line}</p>
-<p class="gp-meta" data-region="support">${concert.people.join('<br>')}<br><br>${concert.when}<br>${concert.where}</p>
+<p class="gp-meta" data-region="support">${concert.people.join('<br>')}<br><br>${day(concert.date)}, ${concert.time}<br>${concert.where}</p>
 <p class="gp-caption" data-region="source">Drawn to scale: the arcs are the vibrating parts of one string in its first ${harmonics} harmonics. Touched lightly at ${frac(1, featured)} of its length, the string sounds the ${ordinal(featured)} (gold).</p>`,
 };

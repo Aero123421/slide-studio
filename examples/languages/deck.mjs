@@ -60,7 +60,7 @@ const plain = s => s.replace(/<[^>]+>/g, '').replace(/&shy;/g, '').replace(/\|/g
 const phrases = s => s.replace(/\|/g, '<wbr>');
 const cap = s => s.charAt(0).toLocaleUpperCase() + s.slice(1);
 // French sets a no-break space before ; ! ? (narrow) and before a colon (full width).
-const frenchSpacing = s => s.replace(/\s*([;!?])/g, ' $1').replace(/\s+:(?=\s)/g, ' :');
+const frenchSpacing = s => s.replace(/\s*([;!?])/g, '\u202F$1').replace(/\s+:(?=\s)/g, '\u00A0:');
 // Japanese and Korean write exact counts in myriads: 119,100 → 11万9100 / 11만 9100.
 const myriad = (v, unit, gap = '') => `${Math.floor(v / 1e4)}${unit}${v % 1e4 ? gap + (v % 1e4) : ''}`;
 
@@ -260,14 +260,14 @@ const LANGS = [
 const t = theme();
 const NOTES = {
   en: 'Latin reference page. Display face with slight negative tracking and a balanced two-line headline; tabular figures in the chart; dates, lists and plurals come from Intl, not from typing.',
-  ja: 'Japanese: headline broken between phrases (auto-phrase in Chromium, keep-all + <wbr> elsewhere), strict kinsoku, no negative tracking, looser leading. Exact counts in myriads (12万件, 11万9100件); the axis counts in 万件.',
-  'zh-Hans': 'Simplified Chinese: Simplified forms and a Simplified font (Han unification needs lang + the right font), full-width punctuation, phrase breaks marked with <wbr>, 万 for large counts, decimals in 万 (11.91万次).',
+  ja: 'Japanese: headline broken between phrases (auto-phrase in Chromium, keep-all + <wbr> elsewhere), strict kinsoku, no negative tracking, looser leading. Exact counts in myriads (e.g. 11万9100件); the axis counts in 万件.',
+  'zh-Hans': 'Simplified Chinese: Simplified forms and a Simplified font (Han unification needs lang + the right font), full-width punctuation, phrase breaks marked with <wbr>, 万 for large counts, decimals in 万 (e.g. 11.91万次).',
   'zh-Hant': 'Traditional Chinese written as Taiwan writes it (紙本書, 借閱, 成長, 萬), not converted from Simplified; the font stack names Traditional faces first so punctuation sits centred.',
-  ko: 'Korean: words are separated by spaces, so word-break: keep-all stops breaks inside words; myriad counts (11만 9100건); tilde for ranges in the source line.',
+  ko: 'Korean: words are separated by spaces, so word-break: keep-all stops breaks inside words; myriad counts (e.g. 11만 9100건); tilde for ranges in the source line.',
   ar: 'Arabic: right-to-left page (headline right, rail left, source mirrored) but the time axis still runs left to right — a number line, not a reading order. Arabic-Indic digits from ar-EG, plural nouns from Intl.PluralRules (٣ فروع, ١٤ فرعًا), codes isolated with <bdi>, larger size and leading, no letter-spacing.',
-  hi: 'Hindi: Devanagari needs taller leading for marks above and below the headline bar and never takes letter-spacing; Indian digit grouping (1,20,000) and lakh for the big number (14.9 लाख); danda (।) ends the sentence.',
+  hi: 'Hindi: Devanagari needs taller leading for marks above and below the headline bar and never takes letter-spacing; Indian digit grouping (e.g. 1,20,000) and lakh for the big number (e.g. 14.9 लाख); danda (।) ends the sentence.',
   de: 'German: long compounds carry soft hyphens (U+00AD) at their joints (Zweig-stellen, Ausleih-zahlen, Wieder-eröffnung), so they break where an editor would; decimal comma, "19 %" with a no-break space, "Mio." for millions, E-Books never split after the E.',
-  fr: 'French: a helper inserts the no-break spaces before : ; ? (fine space before ; ! ?), typographic apostrophes, narrow no-break space as thousands separator (120 000), "1,49 million" singular by plural rule.',
+  fr: 'French: a helper inserts the no-break spaces before : ; ? (fine space before ; ! ?), typographic apostrophes, narrow no-break space as thousands separator (e.g. 120 000), million/millions by plural rule.',
   es: 'Spanish: opening ¿ for the question, decimal comma, "19 %" with a space as the RAE recommends, "y" before the last list item from Intl.ListFormat, "millones" by plural rule.',
 };
 
@@ -334,6 +334,7 @@ ${colors}
 .lp .nb { white-space: nowrap; }
 
 .lp:is(:lang(ja), :lang(zh), :lang(ko)) .st-head { font-size: 38px; line-height: 1.42; letter-spacing: 0; font-weight: 700; max-width: 720px; word-break: keep-all; }
+/* Japanese: phrase breaking where supported (Chromium); other browsers keep keep-all and the <wbr> marks. */
 .lp:lang(ja) .st-head { word-break: auto-phrase; font-feature-settings: "palt" 1; letter-spacing: .02em; }
 .lp:is(:lang(ja), :lang(zh), :lang(ko)) :is(.st-text, .st-kpi span) { font-size: 18px; line-height: 1.75; line-break: strict; }
 .lp:lang(zh) :is(.st-text, .st-kpi span) { word-break: keep-all; }

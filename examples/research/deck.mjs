@@ -215,6 +215,7 @@ function alertsFigure() {
     return g({}, el('rect', { x: x0, y: y(b.dry), width: bw, height: y(0) - y(b.dry), fill: t.c('accent') }),
       el('rect', { x: x0, y: y(b.dug), width: bw, height: y(b.dry) - y(b.dug) - 1.5, fill: t.c('context') }));
   });
+  const keyY = y(Math.max(...ops.bands.map(b => b.dug ?? 0))) - 48;         // the key sits just above the tallest excavated band
   const xt = x(T0), key = (fill, label, value, yy) => g({},                   // a two-line key with totals, in the empty space above the dug bands
     el('rect', { x: x(0.62), y: yy - 9, width: 18, height: 18, fill }),
     textLines([label], { x: x(0.62) + 28, y: yy, size: 17, valign: 'middle', fill: t.c('ink') }),
@@ -230,8 +231,8 @@ function alertsFigure() {
   el('line', { x1: xt, x2: xt, y1: box.y - 56, y2: y(0), stroke: t.c('ink'), 'stroke-width': 1.5 }),
   textLines(['Not dug: outcome never recorded'], { x: xt - 12, y: box.y - 40, size: 17, anchor: 'end', fill: t.c('muted'), weight: 600 }),
   textLines(['Dug: outcome recorded'], { x: xt + 12, y: box.y - 40, size: 17, fill: t.c('ink'), weight: 600 }),
-  key(t.c('context'), 'Leak found', count(dug - dry), y(560)),
-  key(t.c('accent'), 'No leak found', count(dry), y(500)));
+  key(t.c('context'), 'Leak found', count(dug - dry), keyY - 30),
+  key(t.c('accent'), 'No leak found', count(dry), keyY));
 }
 
 /** Page 3: how every flagged site got its reference label. Arrows mean "then". */
@@ -325,7 +326,7 @@ function valueFigure() {
   return lineChart({
     id: 'value-fig', width: 800, height: 482, xType: 'linear', x: inView.map(c => c.t), markers: 'all', endValues: false, fontSize: 17,
     series: R.map(r => ({ name: `Miss = ${r} dry dig${r > 1 ? 's' : ''}`, values: inView.map(c => costOf(c, r)), color: t.c('muted') })), strokeWidth: 2.4,
-    xFormat: v => fmt(v, { digits: 1 }), xTicks: 6, yDomain: [0, 70], unit: `Dry digs + R × missed leaks, per ${sites.length} sites`, xLabel: 'Threshold',
+    xFormat: v => fmt(v, { digits: 1 }), xTicks: 6, yDomain: niceDomain([0, Math.max(...inView.flatMap(c => R.map(r => costOf(c, r))))], 4), unit: `Dry digs + R × missed leaks, per ${sites.length} sites`, xLabel: 'Threshold',
     title: 'Cost of each threshold in dry-dig equivalents, for three prices of a missed leak',
     desc: best.map((b, i) => `If a miss costs ${R[i]} dry digs, the cheapest threshold is ${t2(b.t)}.`).join(' '),
     extra: ({ x, y, box }) => g({},
@@ -339,17 +340,17 @@ function valueFigure() {
 
 /** Page 10, middle column: the sensitivity interval narrows with the square root of confirmed leaks. */
 function precisionFigure() {
-  const W = 368, H = 176, box = { x: 44, y: 12, w: 316, h: 110 };
-  const x = linear([0, 150], [box.x, box.x + box.w]), y = linear([0, 30], [box.y + box.h, box.y]);
+  const W = 368, H = 176, box = { x: 44, y: 12, w: 316, h: 110 }, n0 = 8;   // curve from 8 leaks, out to twice the target
+  const x = linear([0, Math.ceil(leaksNeeded * 2 / 50) * 50], [box.x, box.x + box.w]), y = linear(niceDomain([0, halfWidth(n0) * 100], 3), [box.y + box.h, box.y]);
   const at = n => [x(n), y(halfWidth(n) * 100)];
   const mark = (n, text, fill, dx) => g({}, el('circle', { cx: at(n)[0], cy: at(n)[1], r: 6, fill, stroke: t.c('paper'), 'stroke-width': 2 }),
     textLines([text], { x: at(n)[0] + dx, y: at(n)[1] - 12, size: 16, fill, weight: 600, halo: t.c('paper') }));
   return svgRoot({ id: 'precision-fig', width: W, height: H, title: 'Half-width of the 95% interval on sensitivity by number of confirmed leaks',
     desc: `±${fmt(halfWidth(nLeak) * 100, { digits: 0 })} points with ${nLeak} leaks; ±${fmt(TARGET * 100, { digits: 0 })} needs ${leaksNeeded}.` },
-  axis(y, { orient: 'left', at: box.x, grid: [box.x, box.x + box.w], theme: t, size: 16, tickValues: [0, 10, 20, 30], format: v => (v ? `±${v}` : '0') }),
+  axis(y, { orient: 'left', at: box.x, grid: [box.x, box.x + box.w], theme: t, size: 16, count: 3, format: v => (v ? `±${v}` : '0') }),
   el('line', { x1: box.x, x2: box.x + box.w, y1: y(0), y2: y(0), stroke: t.c('ink'), 'stroke-width': 1.2 }),
-  axis(x, { orient: 'bottom', at: y(0), theme: t, size: 16, tickValues: [0, 50, 100, 150], tickSize: 4 }),
-  el('path', { d: pathFromPoints(Array.from({ length: 143 }, (_, i) => at(i + 8))), fill: 'none', stroke: t.c('muted'), 'stroke-width': 2.2 }),
+  axis(x, { orient: 'bottom', at: y(0), theme: t, size: 16, count: 3, tickSize: 4 }),
+  el('path', { d: pathFromPoints(Array.from({ length: x.domain[1] - n0 + 1 }, (_, i) => at(i + n0))), fill: 'none', stroke: t.c('muted'), 'stroke-width': 2.2 }),
   mark(nLeak, `now, ${nLeak} leaks`, t.c('ink'), 10),
   mark(leaksNeeded, `${leaksNeeded} leaks`, t.c('accent'), 8),
   textLines(['confirmed leaks'], { x: box.x + box.w, y: H - 2, size: 16, anchor: 'end', fill: t.c('muted') }));

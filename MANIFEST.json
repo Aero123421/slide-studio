@@ -7,8 +7,8 @@
   "files": [
     {
       "path": ".github/workflows/ci.yml",
-      "bytes": 991,
-      "sha256": "2186f30ef87092bec5e07beb0a76f669fc08adc299a19d7e9dd7d47b80da687e"
+      "bytes": 1064,
+      "sha256": "b94e08de96481fc09cf194bd730f05c024372133da1013c65e244deae59ed179"
     },
     {
       "path": ".gitignore",
@@ -4647,8 +4647,8 @@
     },
     {
       "path": "tests/core.test.mjs",
-      "bytes": 17462,
-      "sha256": "277066a6a0db56fd19fde4c2309e4d1c6cbf4ddffbde0f091cc6c8641cf61fc1"
+      "bytes": 17834,
+      "sha256": "8aed3e8ca8dc053d0f6ee29f1f06852072ab75ca34262bbb63a12af26dea418c"
     },
     {
       "path": "tests/craft.test.mjs",

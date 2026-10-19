@@ -1,4 +1,4 @@
-import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs/promises';import os from 'node:os';import path from 'node:path';import vm from 'node:vm';import {spawnSync} from 'node:child_process';import {ROOT,compile,loadTheme,embedAssets,LAYOUTS,contrast,wrap} from '../scripts/core.mjs';import {renderHTML} from '../scripts/html.mjs';
+import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs/promises';import os from 'node:os';import path from 'node:path';import vm from 'node:vm';import {spawnSync} from 'node:child_process';import {ROOT,compile,loadTheme,embedAssets,LAYOUTS,contrast,wrap} from '../scripts/core.mjs';import {renderHTML} from '../scripts/html.mjs';import {dependency} from '../scripts/deps.mjs';
 const theme=await loadTheme('neutral');const deck=s=>({version:1,title:'Test',sample:true,slides:[s]});
 // Embedded images are base64 and may spell "NaN"; geometry and text are checked, and every scene number must be finite.
 test('all worked examples compile with portable local assets',async()=>{let found=new Set();for(const file of (await fs.readdir(path.join(ROOT,'assets/examples'))).filter(x=>x.endsWith('.json'))){const d=JSON.parse(await fs.readFile(path.join(ROOT,'assets/examples',file)));const scene=await embedAssets(compile(d,await loadTheme(d.theme)),path.join(ROOT,'assets/examples'));const html=renderHTML(scene);for(const match of html.matchAll(/<script>([\s\S]*?)<\/script>/g))new vm.Script(match[1]);assert.equal(scene.slides.length,d.slides.length);d.slides.forEach(s=>found.add(s.layout));assert(!html.replace(/data:[\w/+.-]+;base64,[A-Za-z0-9+/=]+/g,'').includes('NaN'));const finite=v=>typeof v==='number'?Number.isFinite(v):Array.isArray(v)?v.every(finite):v&&typeof v==='object'?Object.values(v).every(finite):true;assert(scene.slides.every(s=>finite(s.elements)),file);assert(scene.slides.every(s=>s.elements.every(n=>Number.isInteger(n.step))));}assert.deepEqual([...found].sort(),[...LAYOUTS].sort())});
@@ -129,7 +129,11 @@ test('Japanese wraps between phrases, without stranding a short first line', () 
   assert(!wrap('2029年度に270億円まで増やす', 200, 24).some(l => /^(年度|億円)/.test(l)), 'numbers stay with their units');
 });
 
-test('editable PPTX export writes native shapes, freeform paths, tables and slide titles', async () => {
+test('editable PPTX export writes native shapes, freeform paths, tables and slide titles', async t => {
+  // Native PPTX is capability tier 3 (npm install). Without it the check is reported as unrun, never as a
+  // pass; CI installs the dependencies, so there a missing package fails the test.
+  const missing = await dependency('pptxgenjs').then(() => null, e => e.message);
+  if (missing && !process.env.CI) return t.skip(`unrun, tier 3 not installed: ${missing}`);
   const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'ss-pptx-'));
   try {
     const spec = { version: 1, title: 'Native', sample: true, language: 'ja', slides: [
@@ -142,7 +146,7 @@ test('editable PPTX export writes native shapes, freeform paths, tables and slid
     await fs.writeFile(sceneFile, JSON.stringify(compile(spec, theme)));
     const r = spawnSync(process.execPath, [path.join(ROOT, 'scripts/export-pptx.mjs'), sceneFile, out, '--mode', 'editable'], { encoding: 'utf8' });
     assert.equal(r.status, 0, r.stderr);
-    const { default: JSZip } = await import(path.join(ROOT, 'node_modules/jszip/lib/index.js'));
+    const { default: JSZip } = await dependency('jszip');
     const zip = await JSZip.loadAsync(await fs.readFile(out));
     const xml = await Promise.all([1, 2, 3, 4].map(i => zip.file(`ppt/slides/slide${i}.xml`).async('string')));
     assert(xml[0].includes('<a:custGeom>') && xml[0].includes('<a:arcTo'), 'donut ring sectors are freeform shapes');

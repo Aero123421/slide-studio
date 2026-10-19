@@ -592,8 +592,8 @@
     },
     {
       "path": "assets/interactions/graph.mjs",
-      "bytes": 1694,
-      "sha256": "2f626ea59b7f5efa241b1a5aabc0b2a7a68542740317d3676c9119258e9bd74e"
+      "bytes": 5805,
+      "sha256": "f02605534221ca8311de720586d18ed7c6cd74b05e3e960ad52144ee13210f13"
     },
     {
       "path": "assets/interactions/histogram.mjs",
@@ -622,8 +622,8 @@
     },
     {
       "path": "assets/interactions/matrix.mjs",
-      "bytes": 1664,
-      "sha256": "d80e2cd43f5fe830947cf1ac69e1222daa726f2f010666fe387f5a5e0f8d3815"
+      "bytes": 3855,
+      "sha256": "358413c78de3bb03eb7fcd1c286f56d97d698a4f7d3709be7c262bba2af384ae"
     },
     {
       "path": "assets/interactions/parameter.mjs",
@@ -2758,12 +2758,12 @@
     {
       "path": "gallery/index.html",
       "bytes": 170515,
-      "sha256": "2804a17438273390a4508a6899a6d71f7e5acbf2a2116bb605b5d80f45a105dd"
+      "sha256": "da80308f986e46c2a6cd6c564fb2a113cacb5ead80b050850c5e3f5ca454cd07"
     },
     {
       "path": "gallery/interactions.html",
-      "bytes": 696954,
-      "sha256": "c8bea02d53fe0d6daf76c50e0af4288f5932900fd5aab9cc93e1eb54391a87e5"
+      "bytes": 701196,
+      "sha256": "a3fb7b990fa4892994c44587f86bdc6a11f7bb659e6eeb96f49d36ca113e75a8"
     },
     {
       "path": "gallery/languages.html",

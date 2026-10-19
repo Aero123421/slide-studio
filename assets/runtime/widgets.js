@@ -1234,7 +1234,11 @@ KINDS.decision = w => {
         const on = active.has(e.from) && active.has(e.to), x1 = xOf(e.from) + qW, y1 = yOf(e.from.slot), x2 = xOf(e.to), y2 = yOf(e.to.slot), xm = x1 + 18;
         const col = on ? C.accent : C.context;
         out += path(`M${r2(x1)} ${r2(y1)}H${r2(xm)}V${r2(y2)}H${r2(x2 - 9)}`, { stroke: col, width: on ? 3 : 1.8, join: 'miter' }) + arrowHead(x2, y2, 0, 9, col);
-        out += text(xm + 10, y2 - 7, e.via.label, { size: 16, weight: on ? 700 : 400, fill: on ? C.accent : C.muted, valign: 'bottom', halo: C.paper });
+        // The option label sits on the run into the child when it fits there, else beside the vertical run.
+        const style = { size: 16, weight: on ? 700 : 400, fill: on ? C.accent : C.muted, halo: C.paper };
+        const lw = w.tw(e.via.label, 16, on ? 700 : 400);
+        if (x2 - xm - 18 >= lw + 10 || Math.abs(y2 - y1) < 30) out += text(xm + 10, y2 - 7, e.via.label, { ...style, valign: 'bottom' });
+        else out += text(xm + 8, (y1 + y2) / 2, e.via.label, { ...style, valign: 'middle' });
       }
       for (const nd of nodes) {
         const x0 = xOf(nd), cy = yOf(nd.slot), on = active.has(nd), isResult = nd.n.result !== undefined;
@@ -1306,11 +1310,11 @@ KINDS.graph = w => {
         const sub = timed ? (reach ? fill(t.minutes || '{m} min', { m: fmt(dist[i], 0, w.locale) }, w.locale) : t.unreachable || 'cut off') : null;
         const dx = side === 'right' ? 14 : side === 'left' ? -14 : 0, dy = side === 'below' ? 14 : side === 'above' ? -14 : 0;
         const anchor = side === 'right' ? 'start' : side === 'left' ? 'end' : 'middle', big = d.nodes.length <= 6 ? 22 : 17;
-        const nameY = sub ? (side === 'below' ? y + dy : side === 'above' ? y + dy - 20 : y - 10) : y + dy;
-        out += text(x + dx, nameY, n.name, { size: big, weight: isOrigin ? 700 : reach ? 650 : 400, fill: isOrigin ? C.accent : reach ? C.ink : C.muted,
-          anchor, valign: side === 'below' ? 'top' : side === 'above' ? 'bottom' : 'middle', halo: C.paper });
-        if (sub) out += text(x + dx, side === 'below' ? nameY + 21 : side === 'above' ? nameY + 1 : y + 11, sub, { size: 16, fill: reach ? C.muted : C.negative,
-          anchor, valign: side === 'below' ? 'top' : side === 'above' ? 'top' : 'middle', halo: C.paper, num: true });
+        // Name, then minutes underneath; for labels above a stop the pair is lifted as a block.
+        const nameY = side === 'below' ? y + dy : side === 'above' ? y + dy - (sub ? 21 : 0) : sub ? y - 10 : y;
+        const valign = side === 'below' ? 'top' : side === 'above' ? 'bottom' : 'middle';
+        out += text(x + dx, nameY, n.name, { size: big, weight: isOrigin ? 700 : reach ? 650 : 400, fill: isOrigin ? C.accent : reach ? C.ink : C.muted, anchor, valign, halo: C.paper });
+        if (sub) out += text(x + dx, side === 'below' ? nameY + 21 : side === 'above' ? y + dy : y + 11, sub, { size: 16, fill: reach ? C.muted : C.negative, anchor, valign, halo: C.paper, num: true });
       });
       w.draw(svgRoot(W, H, out, t.figure || 'Network with reachable nodes highlighted'));
       const reach = s.reachable.length, cut = d.nodes.length - reach, far = Math.max(...dist.filter(isNum));

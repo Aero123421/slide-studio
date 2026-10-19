@@ -390,7 +390,7 @@ ${source(`Figure: ${shot.cafe} coffee lab, note 3 (illustrative data), with ${im
     content: `${p.html}
 <h1 class="im-head im-head--feature" data-region="title" style="${at(M, 82, span(4) - 14)}">Why the towers stand taller than the rocket</h1>
 <p class="im-lead" data-region="support" style="${at(M, 278, span(4) - 14)}">Four lattice towers ring the pad. The wires strung from their masts, not the vehicle, are meant to take a lightning strike.</p>
-<p class="im-byline" style="${at(M, 432, span(4) - 14)}">Words by Jonas Weber</p>
+<p class="im-byline" style="${at(M, p.at([0, img.h])[1] - 22, span(4) - 14)}">Words by Jonas Weber</p>
 ${source(credit(img, 'launch pad at dusk', p.scale), 'Bleed to one edge', 'the right edge only; three edges on the margins')}`,
   });
 }

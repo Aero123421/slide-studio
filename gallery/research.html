@@ -1237,7 +1237,7 @@ function mount(config, defaultAssets) {
     const set = document.createElement('fieldset');
     set.className = 'w-radios' + (s.cls ? ' ' + s.cls : '');
     set.innerHTML = `<legend class="${s.showLegend ? 'w-label' : 'w-sr'}">${esc(s.label)}</legend>` + s.options.map(([v, t]) =>
-      `<label class="w-radio"><input type="radio" name="${esc(config.id + '-' + key)}" value="${esc(v)}"><span>${esc(t)}</span></label>`).join('');
+      `<label class="w-radio"><input type="radio" name="${esc(config.id + '-' + key)}" value="${esc(v)}" aria-label="${esc(t)}"><span>${esc(t)}</span></label>`).join('');
     container.append(set);
     for (const el of set.querySelectorAll('input')) on(el, 'change', () => { if (el.checked) { state[key] = el.value; render(); } });
     bindings.push({ key, type: 'radios', el: set, spec: s });
@@ -2066,6 +2066,8 @@ KINDS.ablation = w => {
 };
 
 /* ---------- quiz: local practice with feedback per answer ---------- */
+/** Prefix and sentence: no space after Japanese full stops. */
+const join = (a, b) => (b ? `${a}${/[。．！？]$/.test(a) ? '' : ' '}${b}` : a);
 const DEFAULT_QUIZ = {
   question: 'What should accompany an estimate?', prompt: 'Choose the option that helps the audience judge the strength of the evidence.',
   options: [{ id: 'mean', label: 'The mean alone' }, { id: 'range', label: 'Estimate with interval' }, { id: 'decoration', label: 'More decoration' }],
@@ -2088,10 +2090,11 @@ KINDS.quiz = w => {
   return {
     render(s) {
       const chosen = q.options.find(o => o.id === s.choice), right = s.choice === q.answer;
-      quiz.dataset.checked = String(!!s.checked && !!chosen);
-      const done = !!s.checked && !!chosen;
+      quiz.dataset.checked = String((!!s.checked && !!chosen) || document.body.dataset.export === 'true');
+      // A static export is an answer sheet: the answer, the explanation and the shares are shown.
+      const exporting = document.body.dataset.export === 'true', done = (!!s.checked && !!chosen) || exporting;
       for (const label of quiz.querySelectorAll('.w-radio')) {
-        const id = label.querySelector('input').value, isAnswer = done && id === q.answer, isWrong = done && id === s.choice && !right;
+        const id = label.querySelector('input').value, isAnswer = done && id === q.answer, isWrong = done && !!s.checked && id === s.choice && !right;
         label.classList.toggle('is-answer', isAnswer);
         label.classList.toggle('is-wrong', isWrong);
         const mark = isAnswer ? t.answerMark || 'Correct answer' : isWrong ? t.yourMark || 'Your answer' : '';
@@ -2104,8 +2107,8 @@ KINDS.quiz = w => {
       let status;
       if (!s.checked) status = t.prompt || (own ? '' : 'Local practice only. No scores leave this page.');
       else if (!chosen) status = t.none || 'Choose an answer first.';
-      else if (right) status = own ? `${t.correctPrefix || 'Correct:'} ${chosen.feedback || ''}`.trim() : correctText;
-      else status = own ? `${t.wrongPrefix || 'Not quite:'} ${chosen.feedback || ''}`.trim() : (t.wrong || 'Try again: visual polish cannot substitute for uncertainty.');
+      else if (right) status = own ? join(t.correctPrefix || 'Correct:', chosen.feedback) : correctText;
+      else status = own ? join(t.wrongPrefix || 'Not quite:', chosen.feedback) : (t.wrong || 'Try again: visual polish cannot substitute for uncertainty.');
       return { status, values: { choice: chosen?.label || '' } };
     },
   };

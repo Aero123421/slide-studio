@@ -56,8 +56,18 @@ finished example with computed headlines.
   tight-leaded hero numeral is measured by its line box. `slop_check.py` reads SVG lines
   and fills, judges hue by Lab chroma (navy ink is ink), treats table rules as typography
   and honours a slide's `copyWaivers`.
-- Structured route: localized kickers in the bundled Japanese examples, 15 px chrome,
-  a sample label in the deck language, no faded section numeral.
+- **Structured route (native, editable PowerPoint)** rebuilt to the same standard:
+  `scripts/core.mjs` is readable code with a 12-column page system, headline 36–44 px,
+  body ≥ 20 px, labels ≥ 16 px, contrast-derived muted text and the accent kept for the
+  highlighted item. All 25 layouts were recomposed — round axis ticks, direct labels, real
+  tables, native donut sectors, labelled scatter points, opt-in numbering instead of
+  decorative ordinals. `export-pptx.mjs` writes title placeholders, native tables and
+  freeform charts, `ja-JP` text and the deck's theme fonts, and repairs pptxgenjs XML. The
+  seven example decks were rewritten; new schema fields are optional, old decks compile.
+- **PDF text layer**: exports stay searchable when a font gives alternate glyphs private-use
+  code points (Inter's figure punctuation and tabular digits: the page is printed again
+  with those substitutions off) or when a CJK font shares a glyph between a radical and its
+  ideograph (the text layer is rewritten from ⽉/⻑ to 月/長).
 - Tests: figure-engine suite (every chart renders a finite, accessible SVG with unique
   ids), HTML style-signal tests for `slop_check.py`, Player 4 browser suite
   (`tests/player_browser.py`), and integrity regressions for clipped, hidden and

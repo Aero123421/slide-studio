@@ -2664,9 +2664,63 @@ function meshBounds(mesh) {
   }
   return { min, max, groups };
 }
+/** Z-buffer rasterizer: exact hidden surfaces at every angle (sorting faces by depth fails for large
+ *  faces). polys: [{p: [[x, y, depth], …] in CSS px, rgb, id}]; k = buffer pixels per CSS px.
+ *  Returns the image and, per pixel, the id of the visible face's piece (−1 for background). */
+function rasterize(polys, PW, PH, k) {
+  const depth = new Float32Array(PW * PH).fill(-Infinity), ids = new Int32Array(PW * PH).fill(-1);
+  const img = new ImageData(PW, PH), px = img.data;
+  for (const f of polys) {
+    const P = f.p.map(v => [v[0] * k, v[1] * k, v[2]]);
+    for (let t = 1; t + 1 < P.length; t++) {
+      const a = P[0], b = P[t], c = P[t + 1];
+      const area = (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]);
+      if (Math.abs(area) < 1e-9) continue;
+      const sg = area > 0 ? 1 : -1;
+      const x0 = Math.max(0, Math.floor(Math.min(a[0], b[0], c[0]))), x1 = Math.min(PW - 1, Math.ceil(Math.max(a[0], b[0], c[0])));
+      const y0 = Math.max(0, Math.floor(Math.min(a[1], b[1], c[1]))), y1 = Math.min(PH - 1, Math.ceil(Math.max(a[1], b[1], c[1])));
+      for (let y = y0; y <= y1; y++) {
+        const py = y + 0.5;
+        for (let x = x0; x <= x1; x++) {
+          const qx = x + 0.5;
+          const w0 = sg * ((c[0] - b[0]) * (py - b[1]) - (c[1] - b[1]) * (qx - b[0]));
+          if (w0 < 0) continue;
+          const w1 = sg * ((a[0] - c[0]) * (py - c[1]) - (a[1] - c[1]) * (qx - c[0]));
+          if (w1 < 0) continue;
+          const w2 = sg * ((b[0] - a[0]) * (py - a[1]) - (b[1] - a[1]) * (qx - a[0]));
+          if (w2 < 0) continue;
+          const d = (w0 * a[2] + w1 * b[2] + w2 * c[2]) / (w0 + w1 + w2 || 1), i = y * PW + x;
+          if (d <= depth[i]) continue;
+          depth[i] = d; ids[i] = f.id;
+          const o = i * 4; px[o] = f.rgb[0]; px[o + 1] = f.rgb[1]; px[o + 2] = f.rgb[2]; px[o + 3] = 255;
+        }
+      }
+    }
+  }
+  return { img, ids };
+}
+/** The point deepest inside a piece's visible pixels (so a leader lands clearly on it), in buffer px. */
+function deepestPoint(ids, PW, PH, id, box, step) {
+  let best = null, bestR = -1, bestD = Infinity;
+  const cx = (box[0] + box[2]) / 2, cy = (box[1] + box[3]) / 2, radii = [1, 2, 4, 6, 9, 13, 18, 25, 34].map(r => r * step);
+  const at = (x, y) => x >= 0 && y >= 0 && x < PW && y < PH && ids[y * PW + x] === id;
+  for (let y = box[1]; y <= box[3]; y += step) for (let x = box[0]; x <= box[2]; x += step) {
+    if (!at(x, y)) continue;
+    let r = 0;
+    for (const q of radii) {
+      const e = Math.round(q * 0.71);
+      if (at(x + q, y) && at(x - q, y) && at(x, y + q) && at(x, y - q) && at(x + e, y + e) && at(x - e, y - e) && at(x + e, y - e) && at(x - e, y + e)) r = q; else break;
+    }
+    const dist = Math.hypot(x - cx, y - cy);
+    if (r > bestR || (r === bestR && dist < bestD)) { best = [x, y]; bestR = r; bestD = dist; }
+  }
+  return best;
+}
 function meshWidget(w) {
   const t = w.text, kind = w.config.kind, d = w.data;
-  let mesh = StudioMesh.parseOBJ(w.assets.obj), info = meshBounds(mesh), pieces = meshPieces(mesh);
+  let mesh = StudioMesh.parseOBJ(w.assets.obj), info = meshBounds(mesh), pieces = meshPieces(mesh), offscreen = null;
+  const idsOf = list => new Map([...new Set(list)].map((key, i) => [key, i]));
+  let pieceIds = idsOf(pieces);
   w.plot.innerHTML = `<canvas tabindex="0" role="img" aria-label="${esc(t.canvasLabel || 'Interactive triangle mesh. Drag to rotate, or use yaw and pitch sliders.')}"></canvas><svg class="w-mesh-labels" aria-hidden="true"></svg>`;
   const canvas = w.plot.querySelector('canvas'), labels = w.plot.querySelector('.w-mesh-labels');
   w.slider('yaw', w.spec('yaw', { label: 'Yaw (degrees)', min: -180, max: 180, step: 1, format: '{v}°' }));
@@ -2684,7 +2738,7 @@ function meshWidget(w) {
         if (!f) return;
         if (f.size > 8 * 1024 * 1024) throw Error(t.tooLarge || 'File exceeds 8 MiB');
         const m = /\.obj$/i.test(f.name) ? StudioMesh.parseOBJ(await f.text()) : StudioMesh.parseSTL(await f.arrayBuffer());
-        mesh = m; info = meshBounds(mesh); pieces = meshPieces(mesh); w.state.filename = f.name; w.render();
+        mesh = m; info = meshBounds(mesh); pieces = meshPieces(mesh); pieceIds = idsOf(pieces); w.state.filename = f.name; w.render();
       } catch (err) { w.status.textContent = err.message; }
     });
   }
@@ -2733,49 +2787,42 @@ function meshWidget(w) {
         const a = [p[1][0] - p[0][0], p[1][1] - p[0][1], p[1][2] - p[0][2]], b = [p[2][0] - p[0][0], p[2][1] - p[0][1], p[2][2] - p[0][2]];
         const nrm = [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]], len = Math.hypot(...nrm) || 1;
         const shade = 0.62 + 0.38 * Math.abs((nrm[0] * 0.3 - nrm[1] * 0.55 + nrm[2] * 0.78) / len);
-        polys.push({ p, g: f.group, piece: pieces[fi], depth: p.reduce((acc, v) => acc + v[2], 0) / p.length, rgb: colorOf(f.group).map(c => Math.round(c * shade)) });
+        polys.push({ p, g: f.group, piece: pieces[fi], id: pieceIds.get(pieces[fi]), depth: p.reduce((acc, v) => acc + v[2], 0) / p.length, rgb: colorOf(f.group).map(c => Math.round(c * shade)) });
       });
-      polys.sort((a, b) => a.depth - b.depth);
-      for (const f of polys) {
-        ctx.beginPath();
-        f.p.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)));
-        ctx.closePath();
-        ctx.fillStyle = ctx.strokeStyle = `rgb(${f.rgb.join(',')})`;
-        ctx.lineWidth = 0.6; ctx.fill(); ctx.stroke();
-      }
+      // Rasterize with a depth buffer at twice the pixel density (or the screen's, if higher), then
+      // scale down for smooth edges.
+      const k = dpr >= 2 ? dpr : 2 * dpr, PW = Math.max(1, Math.round(W * k)), PH = Math.max(1, Math.round(H * k));
+      const { img, ids } = rasterize(polys, PW, PH, k);
+      offscreen ||= document.createElement('canvas');
+      offscreen.width = PW; offscreen.height = PH;
+      offscreen.getContext('2d').putImageData(img, 0, 0);
+      ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(offscreen, 0, 0, W, H);
       s.triangles = mesh.faces.length; s.drawn = polys.length;
-      // Direct labels: part name and its measured size, with a leader to a point where the part itself
-      // is visible. A part hidden behind others (or above the cut) gets a dashed leader and a muted label.
+      // Direct labels: part name and its measured size, with a leader to the point deepest inside the
+      // visible pixels of the part's most visible piece. A part hidden behind others (or above the cut)
+      // gets a dashed leader and a muted label.
       let svg = '';
       if (named.length) {
-        for (const f of polys) {
-          const xs = f.p.map(v => v[0]), ys = f.p.map(v => v[1]);
-          f.box = [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)];
-          f.area = Math.abs(f.p.reduce((acc, v, i) => { const u = f.p[(i + 1) % f.p.length]; return acc + v[0] * u[1] - u[0] * v[1]; }, 0)) / 2;
+        const seen = new Map();   // piece id → {n, box}
+        for (let i = 0; i < ids.length; i++) {
+          const id = ids[i];
+          if (id < 0) continue;
+          let st = seen.get(id);
+          if (!st) seen.set(id, st = { n: 0, box: [PW, PH, -1, -1] });
+          const x = i % PW, y = (i - x) / PW;
+          st.n++; if (x < st.box[0]) st.box[0] = x; if (y < st.box[1]) st.box[1] = y; if (x > st.box[2]) st.box[2] = x; if (y > st.box[3]) st.box[3] = y;
         }
-        const inside = (pt, p) => { let c = false; for (let i = 0, j = p.length - 1; i < p.length; j = i++) if ((p[i][1] > pt[1]) !== (p[j][1] > pt[1]) && pt[0] < ((p[j][0] - p[i][0]) * (pt[1] - p[i][1])) / (p[j][1] - p[i][1]) + p[i][0]) c = !c; return c; };
-        const topAt = pt => { for (let k = polys.length - 1; k >= 0; k--) { const f = polys[k], b = f.box; if (pt[0] >= b[0] && pt[0] <= b[2] && pt[1] >= b[1] && pt[1] <= b[3] && inside(pt, f.p)) return f; } return null; };
-        // Sample points inside a face: its centre, and points towards each corner and each edge.
-        const samples = f => { const c = [mean(f.p.map(v => v[0])), mean(f.p.map(v => v[1]))], out = [c];
-          f.p.forEach((v, i) => { const u = f.p[(i + 1) % f.p.length]; out.push([c[0] + (v[0] - c[0]) * 0.7, c[1] + (v[1] - c[1]) * 0.7], [c[0] + ((v[0] + u[0]) / 2 - c[0]) * 0.7, c[1] + ((v[1] + u[1]) / 2 - c[1]) * 0.7]); });
-          return out; };
-        const testable = polys.length <= 20000;
         const items = named.map(g => {
-          const gb = info.groups[g], mid = gb.min.map((v, k) => (v + gb.max[k]) / 2), dims = gb.max.map((v, k) => v - gb.min[k]);
-          const own = polys.filter(f => f.g === g);
-          // Visible sample points per connected piece (largest faces first, at most 200 faces tested).
-          const seen = new Map();
-          if (testable) for (const f of [...own].sort((a, b) => b.area - a.area).slice(0, 200)) {
-            if (f.area < 2) continue;
-            for (const pt of samples(f)) if (topAt(pt)?.g === g) { if (!seen.has(f.piece)) seen.set(f.piece, []); seen.get(f.piece).push({ pt, wgt: f.area }); }
+          const gb = info.groups[g], mid = gb.min.map((v, k2) => (v + gb.max[k2]) / 2), dims = gb.max.map((v, k2) => v - gb.min[k2]);
+          const own = polys.filter(f => f.g === g), mine = [...new Set(own.map(f => f.id))];
+          const shown = mine.map(id => ({ id, ...(seen.get(id) || { n: 0 }) })).filter(p => p.n >= 12 * k * k).sort((a, b) => b.n - a.n)[0];
+          let anchor = null, hidden = cut < 1 && gb.min[2] > limit;
+          if (shown && !hidden) {
+            const pt = deepestPoint(ids, PW, PH, shown.id, shown.box, Math.max(1, Math.round(1.5 * k)));
+            if (pt) anchor = [(pt[0] + 0.5) / k, (pt[1] + 0.5) / k];
           }
-          let anchor, hidden = cut < 1 && gb.min[2] > limit;
-          const best = [...seen.values()].sort((a, b) => sum(b.map(s => s.wgt)) - sum(a.map(s => s.wgt)))[0];
-          if (best && !hidden) {
-            // The visible point nearest the weighted centre of what shows of the most visible piece.
-            const W0 = sum(best.map(s => s.wgt)), cx = sum(best.map(s => s.pt[0] * s.wgt)) / W0, cy = sum(best.map(s => s.pt[1] * s.wgt)) / W0;
-            anchor = best.reduce((a, s) => (Math.hypot(s.pt[0] - cx, s.pt[1] - cy) < Math.hypot(a[0] - cx, a[1] - cy) ? s.pt : a), best[0].pt);
-          } else {
+          if (!anchor) {
             // Not visible: point at where the part is (the front half of its front-most piece).
             const byPiece = new Map();
             for (const f of own) { if (!byPiece.has(f.piece)) byPiece.set(f.piece, []); byPiece.get(f.piece).push(f); }
@@ -2783,7 +2830,7 @@ function meshWidget(w) {
             const front = [...nearest].sort((a, b) => b.depth - a.depth).slice(0, Math.max(1, Math.ceil(nearest.length / 2)));
             anchor = front.length ? [mean(front.map(f => mean(f.p.map(v => v[0])))), mean(front.map(f => mean(f.p.map(v => v[1]))))]
               : project(cut < 1 ? [mid[0], mid[1], Math.min(mid[2], limit)] : mid, g);
-            hidden = hidden || testable;
+            hidden = true;
           }
           return { g, anchor, hidden, name: partOf(g).name, sub: partOf(g).note ?? fill(t.dims || '{a} × {b} × {c} mm', { a: fmt(dims[0], 0, w.locale), b: fmt(dims[1], 0, w.locale), c: fmt(dims[2], 1, w.locale).replace(/\.0$/, '') }, w.locale) };
         }).sort((a, b) => a.anchor[1] - b.anchor[1]);
@@ -2815,7 +2862,7 @@ function meshWidget(w) {
       const template = s.filename ? t.statusFile : t.status;
       return { status: template ? w.fill(template, vals) : fallback, values: vals };
     },
-    reset() { mesh = StudioMesh.parseOBJ(w.assets.obj); info = meshBounds(mesh); pieces = meshPieces(mesh); },
+    reset() { mesh = StudioMesh.parseOBJ(w.assets.obj); info = meshBounds(mesh); pieces = meshPieces(mesh); pieceIds = idsOf(pieces); },
   };
 }
 KINDS['cad-orbit'] = KINDS['cad-explode'] = KINDS['cad-section'] = KINDS['cad-import'] = meshWidget;

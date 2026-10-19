@@ -38,6 +38,7 @@ No API key, account, telemetry or cloud service is involved.
 | Player 4 | Presets `draw`, `count`, `grow-x/y`, `blur`, `zoom`, `rise`, `wipe-up`; `data-delay`, `data-stagger`, `data-easing`; `data-states` transformations; slide transitions; presenter window (current/next/notes/timer); black screen, help sheet, number-jump, swipe, idle-hiding fullscreen controls. |
 | Library | Rebuilt as finished pages with real (fictional) content: 104 diagram studies, 64 motion studies, 24 interactions, 36 compositions, 12 template packs (72 pages), and worked example decks. Headlines are computed from each page's data. |
 | Taste guardrails | `slop_check.py` reads computed styles: dot grids, glows, gradient text, glass, shadowed cards, spaced caps, `·` chains, emoji, chips, faded numerals, stacked letters, colored headline phrases that label nothing, ▲ for increases in Japanese. The visual-design guide explains identity without ornament. |
+| Native PowerPoint | The structured route (`studio.mjs` → editable PPTX) was recomposed on a 12-column page system: readable type, round ticks, direct labels, real tables and native charts, with Japanese phrase wrapping. PDF exports keep a searchable text layer (alternate glyphs, CJK radicals). |
 | Tooling | `craft.mjs init` copies the engine, theme and a computed starter; `catalog.mjs take` copies a study with its dependencies and CSS; `preview.mjs`, `contact-sheet.py` (both deck routes), `build-studies.mjs` (CSS bundles + standalone SVGs), `build-thumbs.py` and a searchable visual gallery. |
 
 ## Build an original deck

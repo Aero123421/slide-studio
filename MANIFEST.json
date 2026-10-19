@@ -17,8 +17,8 @@
     },
     {
       "path": "CHANGELOG.md",
-      "bytes": 12478,
-      "sha256": "f4c7e8f4abdfe4e7fc6e35642fd1ce3da13659a6d39e6bb761ae6df688658f96"
+      "bytes": 13375,
+      "sha256": "b4c59d4eed28360ffcd58882e16db4ede9337a8b0205cc62c717cf73582a6fcd"
     },
     {
       "path": "CONTRIBUTING.md",
@@ -32,13 +32,13 @@
     },
     {
       "path": "README.ja.md",
-      "bytes": 9763,
-      "sha256": "54fc6984cb7c338fd8780d04990a6f5c6336f84a58df3d210a6100818898548d"
+      "bytes": 10161,
+      "sha256": "acb297f1f06797f8d9d874a52a666d90e64267aa225866751206af2b5ca0be81"
     },
     {
       "path": "README.md",
-      "bytes": 9504,
-      "sha256": "632b42a16daeba6bd6476a10c4efbdf0512910aa7cf5a5f83edc3fb7c81671a5"
+      "bytes": 9805,
+      "sha256": "1570505f6581471b1c833d7eaefc452a4f215d77ed0d4715f71a92be71634099"
     },
     {
       "path": "SKILL.md",
@@ -1147,8 +1147,8 @@
     },
     {
       "path": "assets/runtime/widgets.js",
-      "bytes": 130414,
-      "sha256": "1001c503d35428c90c6cd4400c6b3449458e38f1ad65cbdeefceed2d7718a393"
+      "bytes": 132378,
+      "sha256": "2d32661c3b674b998f6cc922e212cc75560d1a800cb63789e1343284200adc06"
     },
     {
       "path": "assets/story.schema.json",
@@ -2757,8 +2757,8 @@
     },
     {
       "path": "gallery/interactions.html",
-      "bytes": 826582,
-      "sha256": "241d45e4618b6e36e0d2df0fccafd96b404eeb7f50a857810cb2a07ab58ba96c"
+      "bytes": 828546,
+      "sha256": "f7f9985ccfcbb44764e75d5102d090aec7f1a1176b33b1d70bded21ef425e367"
     },
     {
       "path": "gallery/languages.html",
@@ -2782,8 +2782,8 @@
     },
     {
       "path": "gallery/research.html",
-      "bytes": 293873,
-      "sha256": "31e3ed13e424ef721165bb4a2325d70200e56d9cc03123f9a6247d33a1c72cd9"
+      "bytes": 295837,
+      "sha256": "684e307a004edee1b1517c33f937f8b0a1b5128f4e269a8bec141bd156b2d726"
     },
     {
       "path": "gallery/templates.html",

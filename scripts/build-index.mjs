@@ -21,15 +21,15 @@ const PACKS = {
 
 // Worked example decks (gallery/<id>.html), with the thumbnail deck-<id>.webp.
 const EXAMPLES = [
-  { id: 'research', title: 'Research narrative', purpose: 'A complete research talk from question to limits, with one interaction fed by the same data as the static pages.', language: 'en' },
-  { id: 'from-scratch', title: 'Deriving a deck from a brief', purpose: 'A short deck and the README that walks through brief → claims → evidence → composition.', language: 'en' },
-  { id: 'constraint-layout', title: 'Layout computed from measured text', purpose: 'A diagram whose positions are derived from label sizes, so longer labels reflow without breaking dependencies.', language: 'en' },
-  { id: 'languages', title: 'One page in ten languages', purpose: 'The same page re-composed per script: CJK wrapping, RTL, Devanagari, German compounds, locale number formats.', language: 'en' },
-  { id: 'images', title: 'Image handling', purpose: 'Twelve ways to place an image honestly: contain, crop, bleed, inset, pairs, cutouts, overlays and full scientific figures.', language: 'en' },
-  { id: 'repair-lab', title: 'Repair lab (before/after)', purpose: 'Twelve named failures and their repairs, each pair about the same content.', language: 'ja' },
-  { id: 'period-comparison', title: 'One condition, one comparison', purpose: 'An interactive period selector where headline, marks, totals and condition always agree.', language: 'ja' },
-  { id: 'transfer-talk', title: 'A three-page explanation', purpose: 'A short original talk that applies the repairs to new content.', language: 'ja' },
-  { id: 'brand', title: 'Brand proof', purpose: 'A captured company brand applied to six standard pages, driven entirely by brand tokens.', language: 'en' },
+  { id: 'research', title: 'Research talk: a leak-detection study', purpose: 'Ten pages from question to next study; every sentence is checked against data.json, and one interaction uses the same 64 sites as the static pages.', language: 'en' },
+  { id: 'from-scratch', title: 'From a brief to a decision deck', purpose: 'Four pages asking a transit board to keep a bus lane, with a README that walks brief → claims → evidence → composition.', language: 'en' },
+  { id: 'constraint-layout', title: 'Layout computed from measured text', purpose: 'One chain-of-custody procedure drawn three times (summary, full, Japanese); positions are derived from measured labels and reflow into rows that fit.', language: 'en' },
+  { id: 'languages', title: 'One data page in ten languages', purpose: 'A library board page re-composed per language: CJK phrase breaks, right-to-left Arabic, lakh and 万 number scales, German compounds, French spacing.', language: 'en' },
+  { id: 'images', title: 'Image handling: one magazine issue', purpose: 'Twelve pages from one fictional magazine, one image technique each: contain, crop, bleed, inset, pairs, cutouts, measured annotation and a full scientific figure.', language: 'en' },
+  { id: 'repair-lab', title: 'Repair lab (before/after)', purpose: 'Twelve realistic failures and their repairs on real subjects; the difference between the two versions of each page is the repair.', language: 'ja' },
+  { id: 'period-comparison', title: 'One condition, one comparison', purpose: 'A system-replacement decision where the selected period drives headline, bars, totals and the cheapest-plan strip together.', language: 'ja' },
+  { id: 'transfer-talk', title: 'A three-page explanation', purpose: 'A short talk on a cooling-plate test that applies the repairs to new content.', language: 'ja' },
+  { id: 'brand', title: 'Brand proof', purpose: 'A six-page board paper for a fictional utility, driven entirely by brand tokens: type, grid, colors and figure colors.', language: 'en' },
 ].map(e => ({ ...e, href: `${e.id}.html` }));
 
 // Language of each study, read from its module (studies declare language:'ja' when Japanese).

@@ -1,4 +1,4 @@
-<!doctype html><html lang="ja" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="generator" content="Slide Studio 4.0.0"><title>One condition, one coherent comparison</title><style>/* Slide Studio player — infrastructure only. Composition, typography and
+<!doctype html><html lang="ja" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="generator" content="Slide Studio 4.0.0"><title>受発注システム3案の総額比較</title><style>/* Slide Studio player — infrastructure only. Composition, typography and
    image use belong to the author's CSS. */
 :root { --studio-w: 1280px; --studio-h: 720px; --studio-scale: 1; --studio-bar: 52px; color-scheme: light; }
 * { box-sizing: border-box; }
@@ -68,10 +68,9 @@ body.overview .slide { display: block; transform-origin: top left; transform: sc
 .pv-time { display: flex; gap: 14px; align-items: center; font: 600 22px/1 "JetBrains Mono", Menlo, Consolas, monospace; }
 .pv-main { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(280px, 1fr); gap: 18px; padding: 18px; min-height: 0; }
 .pv-current-wrap { display: flex; align-items: center; min-width: 0; }
-.pv-frame { position: relative; width: 100%; aspect-ratio: var(--studio-ratio, 16 / 9); overflow: hidden; border-radius: 6px; background: #000; }
+.pv-frame { position: relative; width: 100%; aspect-ratio: var(--studio-ratio, 16 / 9); overflow: hidden; border-radius: 6px; background: #000; color: #17252d; }
 .pv-frame .slide { position: absolute; left: 0; top: 0; display: block; transform-origin: top left; transform: scale(var(--pv-scale, .5)); }
 .pv-side { display: grid; grid-template-rows: auto auto auto 1fr; gap: 8px; min-height: 0; }
-.pv-next { opacity: .92; }
 .pv-label { margin: 6px 0 0; color: #8d99a7; font-size: 13px; text-transform: uppercase; letter-spacing: .06em; }
 .pv-notes { overflow: auto; background: #161b22; border-radius: 6px; padding: 16px 18px; white-space: pre-wrap; font-size: 21px; line-height: 1.5; color: #f3f5f8; min-height: 0; }
 .pv-foot { display: flex; justify-content: center; gap: 12px; padding: 10px 18px 14px; }
@@ -92,19 +91,104 @@ body.overview .slide { display: block; transform-origin: top left; transform: sc
 }
 
 :root{--studio-w:1280px;--studio-h:720px;--studio-ratio:1280/720}@media print{@page{size:13.333333333333334in 7.5in}}
+/* Slide Studio study frame — the shared page grammar of the diagram and motion
+   libraries. Each study is a finished example slide: a claim, the evidence at
+   working size, an annotation where the eye should land, a quiet source line.
+   Colors and fonts come from a color-system class on the slide (cs-<id>). */
+.st {
+  --st-x: 64px; --st-top: 48px; --st-fig-top: 176px; --st-bottom: 62px;
+  background: var(--ss-paper, #fff); color: var(--ss-ink, #17202b);
+  font-family: var(--ss-font-sans, Inter, "Helvetica Neue", "Segoe UI", "Hiragino Sans", "Noto Sans JP", sans-serif);
+  font-feature-settings: "kern" 1;
+}
+.st :where(h1, h2, h3, p, figure, ul, ol, dl, dd) { margin: 0; }
 
-.slide{padding:68px;background:#fafaf7;color:#16323c;font-family:'Noto Sans CJK JP',sans-serif}h1{font-size:46px;line-height:1.3;margin:0}.periods{display:flex;gap:14px;margin:34px 0 30px}.periods button{font-family:inherit;font-size:24px;padding:11px 24px;color:#16323c;background:transparent;border:1px solid #809b9e;cursor:pointer}.periods button[aria-pressed=true]{background:#1e646a;color:white}.chart{width:1120px;height:295px}p{font-size:24px;line-height:1.5}.condition{margin-top:18px!important}.source{position:absolute;bottom:25px;left:68px;font-size:17px;color:#4b656b}
-body[data-export=true] .periods{visibility:hidden!important}
-</style></head><body><main class="studio-stage"><section class="slide " id="period-comparison" role="group" aria-roledescription="slide" aria-label="期間ごとの費用比較" aria-hidden="true">
-<h1 id="period-title" data-region="title">36か月の合計は、C案が最小。</h1>
-<div class="periods" data-interactive role="group" aria-label="比較する期間"><button type="button" data-months="12" aria-pressed="false">12か月</button><button type="button" data-months="36" aria-pressed="true">36か月</button><button type="button" data-months="60" aria-pressed="false">60か月</button></div>
-<svg class="chart" data-region="primary" role="img" aria-label="3案の総額。同じゼロ起点、単位は万円。" viewBox="0 0 1120 295">
-<line x1="140" y1="12" x2="140" y2="250" stroke="#708d92" stroke-width="1"/>
-<text x="10" y="52" font-size="28" fill="#16323c">A案</text><rect id="bar-A" x="140" y="20" width="402.90000000000003" height="46" fill="#387d81"/><text id="value-A" x="562.9000000000001" y="52" font-size="28" fill="#16323c">408</text><text x="10" y="137" font-size="28" fill="#16323c">B案</text><rect id="bar-B" x="140" y="105" width="450.29999999999995" height="46" fill="#387d81"/><text id="value-B" x="610.3" y="137" font-size="28" fill="#16323c">456</text><text x="10" y="222" font-size="28" fill="#16323c">C案</text><rect id="bar-C" x="140" y="190" width="391.05" height="46" fill="#387d81"/><text id="value-C" x="551.05" y="222" font-size="28" fill="#16323c">396</text>
-<text x="140" y="287" font-size="23" fill="#16323c">0</text><text x="930" y="287" text-anchor="end" font-size="23" fill="#16323c">800万円</text>
-</svg><p class="condition" id="period-condition">表示条件：36か月。初期費用＋月額×36。追加費用と税は含まない。</p>
-<p class="source">説明用の架空見積もり。除外費用を含めた最安を保証する比較ではありません。</p>
-</section></main><nav class="studio-controls" aria-label="スライド"><button id="studio-prev" type="button" aria-label="前へ" >←</button><span id="studio-position" class="studio-position"></span><button id="studio-next" type="button" aria-label="次へ" >→</button><select id="studio-jump" aria-label="スライド"><option value="0">1. 期間ごとの費用比較</option></select><button id="studio-overview" type="button" aria-label="一覧" >一覧</button><button id="studio-notes-btn" type="button" aria-label="ノート" aria-expanded="false" aria-controls="studio-notes">ノート</button><button id="studio-presenter" type="button" aria-label="発表者ビュー" >発表者ビュー</button><button id="studio-reset" type="button" aria-label="リセット" >リセット</button><button id="studio-full" type="button" aria-label="全画面" >全画面</button><button id="studio-help-btn" type="button" aria-label="キーボード操作" aria-expanded="false">?</button></nav><aside id="studio-notes" class="studio-notes" aria-label="ノート"></aside><div id="studio-announcer" class="sr-only studio-announcer" aria-live="polite"></div><script type="application/json" id="slide-studio-meta">{"version":4,"width":1280,"height":720,"title":"One condition, one coherent comparison","language":"ja","direction":"ltr","labels":{"prev":"前へ","next":"次へ","jump":"スライド","overview":"一覧","notes":"ノート","reset":"リセット","full":"全画面","presenter":"発表者ビュー","help":"キーボード操作","blank":"黒画面","goto":"番号を入力してEnter"},"transition":"none","readingMode":"live","sample":false,"mode":"workshop","copyRules":[{"id":"ja-stage-direction","level":"error","pattern":"(?:学会|口頭|研究)?発表(?:時|中)(?:に|で|は)?[ 　]*(?:切[り]?替[え]?|切替|クリック|再生|操作)|ここで(?:クリック|切[り]?替[え]?|動画を再生)|(?:要差し替え|後で修正|仮置きのまま)"},{"id":"en-stage-direction","level":"error","pattern":"\\b(?:switch|click|play|toggle) (?:here|during (?:the )?(?:conference|presentation|talk))\\b|\\b(?:replace this (?:text|title|image)|insert (?:your )?(?:title|content) here|speaker cue:)","flags":"i"},{"id":"placeholder","level":"error","pattern":"\\b(?:Lorem ipsum|TODO|FIXME|TBD)\\b|(?:ここにタイトル|ここに本文|テキストを入力)","flags":"i"},{"id":"ja-empty-claim","level":"warning","pattern":"(?:さらなる価値提供|革新的なソリューション|未来を切り拓く|シームレスな体験|圧倒的な価値)"},{"id":"en-empty-claim","level":"warning","pattern":"\\b(?:unlock (?:the )?(?:full )?potential|revolutionary solution|seamless experience|game-changing|transform the future)\\b","flags":"i"},{"id":"ja-export-production-cue","level":"error","pattern":"配布用メモ[：:]|(?:印刷[・／/]PDF|印刷・PDF|PDF・印刷)(?:では|時は)[^。\\n]{0,60}(?:表示が残|固定され|操作用)|(?:投影時|発表時)の操作用"},{"id":"en-export-production-cue","level":"error","pattern":"\\b(?:presenter-only cue|production note|export-only instruction)\\s*:","flags":"i"},{"id":"ja-performed-sincerity","level":"warning","pattern":"正直に(?:言います|お知らせ|お伝え)|本当の価値|価値を紡ぐ"},{"id":"ja-status-label","level":"error","pattern":"(?:登壇用|発表用|社内用|作業用|提出用)(?:ドラフト|下書き)"}],"slides":[{"id":"period-comparison","title":"期間ごとの費用比較","notes":"Change 12→36→60→12 months. The winning offer changes from B to C and back; the headline must change along with the bars. Static export preserves the currently selected, fully labelled horizon.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"live","spaceIntent":""}]}</script><script>/* Slide Studio player — deterministic presentation states.
+/* Headline: the page's claim, in the deck's display face. */
+.st-head { position: absolute; left: var(--st-x); top: var(--st-top); max-width: 1040px; font: 650 38px/1.14 var(--ss-font-display, var(--ss-font-sans, Inter, sans-serif)); letter-spacing: -.012em; text-wrap: balance; }
+.st-head em { font-style: normal; color: var(--ss-accent, #2457c5); }
+.st-head .st-quiet { color: var(--ss-muted, #5a6676); font-weight: 500; }
+.st-dek { position: absolute; left: var(--st-x); top: calc(var(--st-top) + 98px); max-width: 900px; font: 400 20px/1.45 var(--ss-font-sans, Inter, sans-serif); color: var(--ss-muted, #5a6676); text-wrap: pretty; }
+.st-head.st-one + .st-dek { top: calc(var(--st-top) + 56px); }
+
+/* Evidence region: figures are authored at the region's size so labels render ~1:1. */
+.st-fig { position: absolute; left: var(--st-x); right: var(--st-x); top: var(--st-fig-top); bottom: var(--st-bottom); display: flex; align-items: center; justify-content: center; }
+.st-fig > svg { width: 100%; height: 100%; display: block; overflow: visible; }
+.st-fig.st-top { align-items: flex-start; }
+
+/* Layout variants */
+.st--rail .st-fig { right: calc(var(--st-x) + 352px); }
+.st-rail { position: absolute; right: var(--st-x); top: var(--st-fig-top); bottom: var(--st-bottom); width: 312px; display: flex; flex-direction: column; justify-content: center; gap: 26px; }
+.st--left .st-fig { left: calc(var(--st-x) + 352px); }
+.st--left .st-rail { left: var(--st-x); right: auto; }
+.st--full .st-fig { left: 0; right: 0; top: 0; bottom: 0; }
+.st--tall .st-fig { top: 132px; }
+
+/* Rail content: one number or short finding per block, never a card stack. */
+.st-kpi { display: grid; gap: 6px; }
+.st-kpi b { font: 650 54px/1 var(--ss-font-display, var(--ss-font-sans, Inter, sans-serif)); letter-spacing: -.02em; font-variant-numeric: tabular-nums lining-nums; color: var(--ss-ink, #17202b); }
+.st-kpi b.st-accent { color: var(--ss-accent, #2457c5); }
+.st-kpi span { font: 400 18px/1.4 var(--ss-font-sans, Inter, sans-serif); color: var(--ss-muted, #5a6676); }
+.st-text { font: 400 19px/1.5 var(--ss-font-sans, Inter, sans-serif); color: var(--ss-ink, #17202b); }
+.st-text strong { font-weight: 650; }
+.st-text.st-muted { color: var(--ss-muted, #5a6676); }
+.st-rule { height: 1px; background: var(--ss-rule, #d5dbe3); border: 0; margin: 0; }
+
+/* Big type */
+.st-num { font: 650 128px/.9 var(--ss-font-display, var(--ss-font-sans, Inter, sans-serif)); letter-spacing: -.035em; font-variant-numeric: tabular-nums lining-nums; }
+.st-num small { font-size: .38em; letter-spacing: 0; font-weight: 500; margin-left: .12em; color: var(--ss-muted, #5a6676); }
+.st-kpi .st-num, .st-kpi b.st-num { font: 650 128px/.9 var(--ss-font-display, var(--ss-font-sans, Inter, sans-serif)); letter-spacing: -.035em; } /* a hero number inside a KPI block keeps hero size */
+
+/* Source line: honest provenance, readable size. */
+.st-source { position: absolute; left: var(--st-x); right: var(--st-x); bottom: 22px; display: flex; justify-content: space-between; gap: 24px; font: 400 15px/1.3 var(--ss-font-sans, Inter, sans-serif); color: var(--ss-muted, #5a6676); }
+.st-source b { font-weight: 600; color: var(--ss-ink, #17202b); }
+
+/* Japanese and other CJK pages: looser leading, no negative tracking. */
+.st:lang(ja) .st-head, .st:lang(zh) .st-head, .st:lang(ko) .st-head { line-height: 1.32; letter-spacing: 0; font-weight: 700; font-size: 36px; }
+.st:lang(ja) .st-dek, .st:lang(ja) .st-text { line-height: 1.65; }
+
+/* Motion helpers: elements that move keep their geometry box as the origin. */
+.st [data-states], .st [data-motion] { transform-box: fill-box; }
+.st .st-origin-left { transform-origin: 0% 50%; }
+.st .st-origin-bottom { transform-origin: 50% 100%; }
+.st .st-origin-center { transform-origin: 50% 50%; }
+
+/* Japanese: break headlines and short text between phrases (Chromium; others fall back to normal breaking). */
+.st:lang(ja) .st-head, .st:lang(ja) .st-dek, .st:lang(ja) .st-text, .st:lang(ja) .st-kpi span { word-break: auto-phrase; line-break: strict; }
+
+/* Wa Ai — light */
+.cs-wa-ai{--ss-paper:#f5f7f8;--ss-surface:#e8eef1;--ss-ink:#182a3e;--ss-muted:#4d6072;--ss-rule:#c9d3da;--ss-grid:#dde3e8;--ss-accent:#264c78;--ss-on-accent:#ffffff;--ss-positive:#2f7a5a;--ss-negative:#b1453a;--ss-highlight:#264c78;--ss-context:#c1ccd3;--ss-cat-1:#264c78;--ss-on-cat-1:#f5f7f8;--ss-cat-2:#2a8a99;--ss-on-cat-2:#f5f7f8;--ss-cat-3:#b25a2a;--ss-on-cat-3:#f5f7f8;--ss-cat-4:#6f6b64;--ss-on-cat-4:#f5f7f8;--ss-cat-5:#264c78;--ss-on-cat-5:#f5f7f8;--ss-cat-6:#2a8a99;--ss-on-cat-6:#f5f7f8;--ss-cat-7:#b25a2a;--ss-on-cat-7:#f5f7f8;--ss-cat-8:#6f6b64;--ss-on-cat-8:#f5f7f8;--ss-seq-1:#e2ebf2;--ss-on-seq-1:#182a3e;--ss-seq-2:#bfd2e3;--ss-on-seq-2:#182a3e;--ss-seq-3:#97b6cf;--ss-on-seq-3:#182a3e;--ss-seq-4:#6a95b8;--ss-on-seq-4:#182a3e;--ss-seq-5:#43749f;--ss-on-seq-5:#f5f7f8;--ss-seq-6:#27527b;--ss-on-seq-6:#f5f7f8;--ss-seq-7:#172f4d;--ss-on-seq-7:#f5f7f8;--ss-div-1:#a0501f;--ss-on-div-1:#f5f7f8;--ss-div-2:#cd9570;--ss-on-div-2:#182a3e;--ss-div-3:#e7cbb7;--ss-on-div-3:#182a3e;--ss-div-4:#eff2f3;--ss-on-div-4:#182a3e;--ss-div-5:#bcd0e0;--ss-on-div-5:#182a3e;--ss-div-6:#7ca0bf;--ss-on-div-6:#182a3e;--ss-div-7:#2f6392;--ss-on-div-7:#f5f7f8;--ss-font-sans:"Helvetica Neue","Segoe UI","Liberation Sans",Arial,sans-serif,"Hiragino Sans","Noto Sans JP","Yu Gothic","Meiryo","IPAPGothic",sans-serif;--ss-font-display:"Hiragino Sans","Noto Sans JP","Yu Gothic","Meiryo","IPAPGothic","Helvetica Neue",sans-serif,"Hiragino Sans","Noto Sans JP","Yu Gothic","Meiryo","IPAPGothic",sans-serif;--ss-font-serif:"Iowan Old Style","Charter","Bitstream Charter",Georgia,Caladea,"Hiragino Mincho ProN","Noto Serif JP","Yu Mincho",serif;--ss-font-mono:"JetBrains Mono","SFMono-Regular",Menlo,Consolas,"DejaVu Sans Mono",monospace;color-scheme:light}
+
+/* Period page: Latin-first Japanese stack; headline 36, body 20, labels 16–18, source 15. */
+.period { --ss-font-sans: "Inter","Helvetica Neue","Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic UI","Yu Gothic",Meiryo,"IPAPGothic","IPAGothic",sans-serif; --ss-font-display: var(--ss-font-sans); }
+.period .st-head { max-width: 820px; font: 700 36px/1.4 var(--ss-font-display); letter-spacing: .02em; font-feature-settings: "palt" 1; }
+.period .st-dek { top: 112px; max-width: 820px; font-size: 20px; line-height: 1.6; }
+.period .periods { position: absolute; right: 64px; top: 50px; display: flex; align-items: center; gap: 0; }
+.period .periods span { margin-right: 14px; font-size: 16px; color: var(--ss-muted); }
+.period .periods button { min-width: 96px; padding: 9px 0; font: 600 20px/1.2 var(--ss-font-sans); color: var(--ss-ink); background: var(--ss-paper); border: 1.5px solid var(--ss-ink); cursor: pointer; }
+.period .periods button + button { margin-left: -1.5px; }
+.period .periods button:first-of-type { border-radius: 6px 0 0 6px; }
+.period .periods button:last-of-type { border-radius: 0 6px 6px 0; }
+.period .periods button[aria-pressed="true"] { background: var(--ss-ink); color: var(--ss-paper); }
+.period .st-fig { top: 186px; bottom: auto; height: 440px; }
+.period .period-monthly { fill: var(--ss-context); }
+.period .period-initial { fill: var(--ss-muted); }
+.period .is-min .period-monthly { fill: var(--ss-seq-3); }
+.period .is-min .period-initial { fill: var(--ss-accent); }
+.period .period-value { font-size: 22px; font-weight: 700; fill: var(--ss-ink); font-variant-numeric: tabular-nums; }
+.period .is-min .period-value { fill: var(--ss-accent); }
+.period .period-unit { font-size: 17px; font-weight: 500; }
+.period .period-run rect { fill: var(--ss-surface); }
+.period .period-run text { fill: var(--ss-ink); }
+.period .period-run.is-on rect { fill: var(--ss-accent); }
+.period .period-run.is-on text { fill: var(--ss-on-accent); }
+.period .period-condition { position: absolute; left: 64px; right: 64px; top: 630px; margin: 0; font-size: 20px; line-height: 1.5; }
+body[data-export="true"] .period .periods { visibility: hidden !important; }
+</style></head><body><main class="studio-stage"><section class="slide st cs-wa-ai period" id="period-comparison" role="group" aria-roledescription="slide" aria-label="期間ごとの総額比較" aria-hidden="true"><h1 class="st-head" id="period-title" data-region="title">36か月で比べると、総額はC案が最小</h1>
+<p class="st-dek">受発注システム更新の3案。初期費用と月額の分け方が違うため、使う期間で順位が入れ替わる。</p>
+<div class="periods" data-interactive role="group" aria-label="比較する期間"><span aria-hidden="true">比べる期間</span><button type="button" data-months="12" aria-pressed="false">12か月</button><button type="button" data-months="36" aria-pressed="true">36か月</button><button type="button" data-months="60" aria-pressed="false">60か月</button></div>
+<figure class="st-fig" data-region="primary"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1152 440" width="1152" height="440" role="img" aria-labelledby="period-fig-title period-fig-desc" id="period-fig" class="ss-fig" direction="ltr" style="overflow:visible;direction:ltr;font-family:var(--ss-font-sans,&quot;Inter&quot;,&quot;Helvetica Neue&quot;,&quot;Segoe UI&quot;,&quot;Hiragino Sans&quot;,&quot;Noto Sans JP&quot;,&quot;Yu Gothic&quot;,system-ui,sans-serif);"><title id="period-fig-title">3案の総額と、期間ごとにもっとも安い案</title><desc id="period-fig-desc">同じゼロ起点で、総額＝初期費用＋月額×期間。20か月まではB案、20〜30か月はA案、30か月からはC案がもっとも安い。</desc><g class="ss-axis"><line x1="300" x2="300" y1="4" y2="244" stroke-width="1.4" class="ss-zero" style="stroke:var(--ss-ink,#17202b);"/><text x="300" y="271.84" font-size="16" text-anchor="middle" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">0</text><line x1="497.5" x2="497.5" y1="4" y2="244" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><text x="497.5" y="271.84" font-size="16" text-anchor="middle" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">200</text><line x1="695" x2="695" y1="4" y2="244" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><text x="695" y="271.84" font-size="16" text-anchor="middle" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">400</text><line x1="892.5" x2="892.5" y1="4" y2="244" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><text x="892.5" y="271.84" font-size="16" text-anchor="middle" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">600</text><line x1="1090" x2="1090" y1="4" y2="244" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><text x="1090" y="271.84" font-size="16" text-anchor="middle" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">800万円</text></g><text x="306" y="26" font-size="17" font-weight="600" style="fill:var(--ss-muted);">初期費用</text><text x="426.5" y="26" font-size="17" font-weight="600" id="monthly-key" style="fill:var(--ss-muted);">月額×36か月</text><g id="row-A" class="period-row"><text x="0" y="56" font-size="24" font-weight="700" style="fill:var(--ss-ink);">A案</text><text x="0" y="82" font-size="18" style="fill:var(--ss-muted);">現行パッケージを更新</text><rect id="bar-A" class="period-monthly" x="300" y="42" width="402.9" height="40"/><rect class="period-initial" x="300" y="42" width="118.5" height="40"/><text class="period-value" y="70"><tspan id="value-A" x="714.9000000000001">408</tspan><tspan class="period-unit" dx="2">万円</tspan></text></g><g id="row-B" class="period-row"><text x="0" y="134" font-size="24" font-weight="700" style="fill:var(--ss-ink);">B案</text><text x="0" y="160" font-size="18" style="fill:var(--ss-muted);">クラウド型に移行</text><rect id="bar-B" class="period-monthly" x="300" y="120" width="450.3" height="40"/><rect class="period-initial" x="300" y="120" width="59.25" height="40"/><text class="period-value" y="148"><tspan id="value-B" x="762.3">456</tspan><tspan class="period-unit" dx="2">万円</tspan></text></g><g id="row-C" class="period-row is-min"><text x="0" y="212" font-size="24" font-weight="700" style="fill:var(--ss-ink);">C案</text><text x="0" y="238" font-size="18" style="fill:var(--ss-muted);">買い取り＋保守契約</text><rect id="bar-C" class="period-monthly" x="300" y="198" width="391.05" height="40"/><rect class="period-initial" x="300" y="198" width="177.75" height="40"/><text class="period-value" y="226"><tspan id="value-C" x="703.05">396</tspan><tspan class="period-unit" dx="2">万円</tspan></text></g><text x="0" y="372" font-size="22" font-weight="700" style="fill:var(--ss-ink);">もっとも安い案</text><text x="0" y="398" font-size="18" style="fill:var(--ss-muted);">使う期間ごと</text><g class="period-run" data-from="0" data-to="20"><rect x="301" y="352" width="261.33" height="48"/><text x="431.67" y="383" font-size="20" text-anchor="middle" font-weight="700">B案</text></g><g class="period-run" data-from="20" data-to="30"><rect x="564.33" y="352" width="129.67" height="48"/><text x="629.17" y="383" font-size="20" text-anchor="middle" font-weight="700">A案</text></g><g class="period-run is-on" data-from="30" data-to="60"><rect x="696" y="352" width="393" height="48"/><text x="892.5" y="383" font-size="20" text-anchor="middle" font-weight="700">C案</text></g><g class="ss-axis"><text x="300" y="427.84" font-size="16" text-anchor="middle" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">0か月</text><text x="563.33" y="427.84" font-size="16" text-anchor="middle" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">20か月</text><text x="695" y="427.84" font-size="16" text-anchor="middle" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">30か月</text><text x="1090" y="427.84" font-size="16" text-anchor="middle" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">60か月</text></g><g id="period-marker" transform="translate(774 0)"><text x="0" y="322" font-size="17" text-anchor="middle" font-weight="700" id="period-marker-label" style="fill:var(--ss-ink);">36か月</text><path d="M-7 330H7L0 340Z" style="fill:var(--ss-ink);"/><path d="M0 340V412" stroke-width="2.5" style="stroke:var(--ss-ink);"/></g></svg></figure>
+<p class="period-condition" id="period-condition">表示条件：36か月。総額＝初期費用＋月額×36。追加の作業費と税は含まない。</p>
+<p class="st-source" data-region="source"><span>架空の見積もり・3社、2026年9月時点（税抜）。除いた費用を含めた最安を保証する比較ではない</span></p></section></main><nav class="studio-controls" aria-label="スライド"><button id="studio-prev" type="button" aria-label="前へ" >←</button><span id="studio-position" class="studio-position"></span><button id="studio-next" type="button" aria-label="次へ" >→</button><select id="studio-jump" aria-label="スライド"><option value="0">1. 期間ごとの総額比較</option></select><button id="studio-overview" type="button" aria-label="一覧" >一覧</button><button id="studio-notes-btn" type="button" aria-label="ノート" aria-expanded="false" aria-controls="studio-notes">ノート</button><button id="studio-presenter" type="button" aria-label="発表者ビュー" >発表者ビュー</button><button id="studio-reset" type="button" aria-label="リセット" >リセット</button><button id="studio-full" type="button" aria-label="全画面" >全画面</button><button id="studio-help-btn" type="button" aria-label="キーボード操作" aria-expanded="false">?</button></nav><aside id="studio-notes" class="studio-notes" aria-label="ノート"></aside><div id="studio-announcer" class="sr-only studio-announcer" aria-live="polite"></div><script type="application/json" id="slide-studio-meta">{"version":4,"width":1280,"height":720,"title":"受発注システム3案の総額比較","language":"ja","direction":"ltr","labels":{"prev":"前へ","next":"次へ","jump":"スライド","overview":"一覧","notes":"ノート","reset":"リセット","full":"全画面","presenter":"発表者ビュー","help":"キーボード操作","blank":"黒画面","goto":"番号を入力してEnter"},"transition":"none","readingMode":"read","sample":false,"mode":"workshop","copyRules":[{"id":"ja-stage-direction","level":"error","pattern":"(?:学会|口頭|研究)?発表(?:時|中)(?:に|で|は)?[ 　]*(?:切[り]?替[え]?|切替|クリック|再生|操作)|ここで(?:クリック|切[り]?替[え]?|動画を再生)|(?:要差し替え|後で修正|仮置きのまま)"},{"id":"en-stage-direction","level":"error","pattern":"\\b(?:switch|click|play|toggle) (?:here|during (?:the )?(?:conference|presentation|talk))\\b|\\b(?:replace this (?:text|title|image)|insert (?:your )?(?:title|content) here|speaker cue:)","flags":"i"},{"id":"placeholder","level":"error","pattern":"\\b(?:Lorem ipsum|TODO|FIXME|TBD)\\b|(?:ここにタイトル|ここに本文|テキストを入力)","flags":"i"},{"id":"ja-empty-claim","level":"warning","pattern":"(?:さらなる価値提供|革新的なソリューション|未来を切り拓く|シームレスな体験|圧倒的な価値)"},{"id":"en-empty-claim","level":"warning","pattern":"\\b(?:unlock (?:the )?(?:full )?potential|revolutionary solution|seamless experience|game-changing|transform the future)\\b","flags":"i"},{"id":"ja-export-production-cue","level":"error","pattern":"配布用メモ[：:]|(?:印刷[・／/]PDF|印刷・PDF|PDF・印刷)(?:では|時は)[^。\\n]{0,60}(?:表示が残|固定され|操作用)|(?:投影時|発表時)の操作用"},{"id":"en-export-production-cue","level":"error","pattern":"\\b(?:presenter-only cue|production note|export-only instruction)\\s*:","flags":"i"},{"id":"ja-performed-sincerity","level":"warning","pattern":"正直に(?:言います|お知らせ|お伝え)|本当の価値|価値を紡ぐ"},{"id":"ja-status-label","level":"error","pattern":"(?:登壇用|発表用|社内用|作業用|提出用)(?:ドラフト|下書き)"}],"slides":[{"id":"period-comparison","title":"期間ごとの総額比較","notes":"Select 12 → 36 → 60 → 12 months. The cheapest plan changes from B to C and back, and the headline, condition line, totals, bar lengths, highlighted row and strip marker change with it, because all of them read one snapshot. The strip shows why: B is cheapest below 20 months, A between 20 and 30, C beyond 30 (computed crossovers). The static export keeps the selected horizon, fully labelled, and hides the selector.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"read","spaceIntent":""}]}</script><script>/* Slide Studio player — deterministic presentation states.
  *
  * Contract
  * - A slide's state is (slide index, build step). Every route (button, key,
@@ -117,9 +201,9 @@ body[data-export=true] .periods{visibility:hidden!important}
  *   inputs, sliders, editors, media or [data-interactive] regions.
  *
  * Authoring hooks (see references/motion-and-interaction.md)
- *   data-step="n"            visible from build n (0 = start); data-until="m" hides after m
+ *   data-step="n"            visible from build n (0 = start); data-until="m" hides after m (alone: visible 0..m)
  *   data-motion="preset"     entry effect when the element appears
- *   data-delay="ms"          wait before the entry effect (stagger by hand)
+ *   data-delay="ms"          wait before the entry effect or data-states change (stagger by hand)
  *   data-stagger="ms"        animate the element's children one after another
  *   data-duration="ms"       effect length (default 500, max 1600)
  *   data-easing="name|css"   standard | emphasized | decelerate | accelerate | linear | smooth | any CSS easing
@@ -130,7 +214,7 @@ body[data-export=true] .periods{visibility:hidden!important}
   const meta = JSON.parse(document.getElementById('slide-studio-meta').textContent);
   const slides = [...document.querySelectorAll('.slide')];
   const mq = matchMedia('(prefers-reduced-motion: reduce)');
-  const warnings = [], widgets = new Map(), tracks = new WeakMap(), animations = new Set();
+  const warnings = [], widgets = new Map(), tracks = new WeakMap(), animations = new Set(), counting = new Set();
   const lastSteps = Array(slides.length).fill(0);
   const labels = meta.labels || {};
   let current = 0, step = 0, overview = false, restore = null, enteredIndex = null;
@@ -142,8 +226,10 @@ body[data-export=true] .periods{visibility:hidden!important}
 
   // ------------------------------------------------------------ build bookkeeping
 
-  const max = i => Math.max(0, ...[...slides[i].querySelectorAll('[data-step],[data-states]')].flatMap(el => {
+  const max = i => Math.max(0, ...[...slides[i].querySelectorAll('[data-step],[data-until],[data-states]')].flatMap(el => {
     const v = [Number(el.dataset.step) || 0];
+    // data-until="m" hides the element after build m, so build m + 1 must exist.
+    if (el.dataset.until !== undefined) v.push(Number(el.dataset.until) + 1);
     try { if (el.dataset.states) v.push(...Object.keys(JSON.parse(el.dataset.states)).map(Number)); } catch { /* reported below */ }
     return v.filter(Number.isFinite);
   }));
@@ -270,7 +356,9 @@ body[data-export=true] .periods{visibility:hidden!important}
     const duration = durationOf(el, 1100), start = performance.now() + delay;
     let raf = 0, done;
     const finished = new Promise(r => { done = r; });
-    const stop = () => { cancelAnimationFrame(raf); node.data = final; done(); };
+    const record = { node, final };
+    const stop = () => { cancelAnimationFrame(raf); node.data = final; counting.delete(record); done(); };
+    counting.add(record);
     const frame = now => {
       const t = Math.min(1, Math.max(0, (now - start) / duration)), e = 1 - (1 - t) ** 3;
       node.data = t >= 1 ? final : format(from + (target - from) * e);
@@ -308,8 +396,8 @@ body[data-export=true] .periods{visibility:hidden!important}
 
   /** Static state for a slide root (also used on presenter clones). */
   function applyStatic(root, at, original = root) {
-    for (const el of root.querySelectorAll('[data-step]')) {
-      const on = at >= Number(el.dataset.step) && (el.dataset.until === undefined || at <= Number(el.dataset.until));
+    for (const el of root.querySelectorAll('[data-step],[data-until]')) {
+      const on = at >= Number(el.dataset.step ?? 0) && (el.dataset.until === undefined || at <= Number(el.dataset.until));
       el.dataset.studioHidden = String(!on);
     }
     const originals = [...original.querySelectorAll('[data-states]')];
@@ -322,8 +410,8 @@ body[data-export=true] .periods{visibility:hidden!important}
 
   function apply(i, at, animate) {
     const slide = slides[i];
-    for (const el of slide.querySelectorAll('[data-step]')) {
-      const on = at >= Number(el.dataset.step) && (el.dataset.until === undefined || at <= Number(el.dataset.until));
+    for (const el of slide.querySelectorAll('[data-step],[data-until]')) {
+      const on = at >= Number(el.dataset.step ?? 0) && (el.dataset.until === undefined || at <= Number(el.dataset.until));
       const was = el.dataset.studioHidden === 'false';
       el.dataset.studioHidden = String(!on);
       el.setAttribute('aria-hidden', String(!on));
@@ -338,7 +426,10 @@ body[data-export=true] .periods{visibility:hidden!important}
       const tr = tracks.get(el);
       if (!tr) continue;
       const to = stateAt(tr, at);
-      transition(el, to, animate);
+      // data-delay (and a parent's data-stagger) sequence transformations the same way as entries.
+      const parent = el.parentElement, gap = parent && parent.dataset.stagger !== undefined ? Math.max(0, Number(parent.dataset.stagger) || 0) : 0;
+      const delay = Math.min(2400, delayOf(el) + (gap ? [...parent.children].indexOf(el) * gap : 0));
+      transition(el, to, animate, null, { delay });
       const hidden = el.dataset.studioHidden === 'true' || to.opacity === 0 || to.opacity === '0' || to.visibility === 'hidden';
       el.setAttribute('aria-hidden', String(hidden));
       el.inert = hidden;
@@ -386,7 +477,7 @@ body[data-export=true] .periods{visibility:hidden!important}
     step = Math.max(0, Math.min(max(current), Math.floor(Number(n) || 0)));
     if (exporting) step = max(current);
     const changed = previous !== current;
-    if (changed) { pauseSlide(previous); for (const el of slides[current].querySelectorAll('[data-step]')) el.dataset.studioHidden = 'true'; }
+    if (changed) { pauseSlide(previous); for (const el of slides[current].querySelectorAll('[data-step],[data-until]')) el.dataset.studioHidden = 'true'; }
     document.body.dataset.export = String(exporting);
     slides.forEach((sl, j) => {
       const active = j === current;
@@ -487,7 +578,12 @@ body[data-export=true] .periods{visibility:hidden!important}
   const elapsed = () => { const s = Math.max(0, Math.floor(((presenterPaused || Date.now()) - presenterStart) / 1000)); return `${Math.floor(s / 60)}:${pad2(s % 60)}`; };
 
   function cloneSlide(i, at) {
-    const src = slides[i], c = src.cloneNode(true);
+    const src = slides[i];
+    // Clone committed text, not a number caught mid-count.
+    const live = [...counting].map(r => [r, r.node.data]);
+    for (const [r] of live) r.node.data = r.final;
+    const c = src.cloneNode(true);
+    for (const [r, v] of live) r.node.data = v;
     // IDs stay: the clone lives in the presenter document, and SVG url(#…) references need them.
     c.inert = true; c.classList.add('is-current'); c.setAttribute('aria-hidden', 'true');
     if (at !== null) applyStatic(c, at, src);
@@ -684,12 +780,29 @@ body[data-export=true] .periods{visibility:hidden!important}
   document.body.dataset.studioReady = 'true';
 })();
 </script><script>
-(()=>{const snapshots={"12":{"months":12,"rows":[{"id":"A","initial":120,"monthly":8,"total":216},{"id":"B","initial":60,"monthly":11,"total":192},{"id":"C","initial":180,"monthly":6,"total":252}],"title":"12か月の合計は、B案が最小。","condition":"表示条件：12か月。初期費用＋月額×12。追加費用と税は含まない。"},"36":{"months":36,"rows":[{"id":"A","initial":120,"monthly":8,"total":408},{"id":"B","initial":60,"monthly":11,"total":456},{"id":"C","initial":180,"monthly":6,"total":396}],"title":"36か月の合計は、C案が最小。","condition":"表示条件：36か月。初期費用＋月額×36。追加費用と税は含まない。"},"60":{"months":60,"rows":[{"id":"A","initial":120,"monthly":8,"total":600},{"id":"B","initial":60,"monthly":11,"total":720},{"id":"C","initial":180,"monthly":6,"total":540}],"title":"60か月の合計は、C案が最小。","condition":"表示条件：60か月。初期費用＋月額×60。追加費用と税は含まない。"}},buttons=[...document.querySelectorAll('[data-months]')];
- function apply(months){const s=snapshots[months];if(!s)throw Error('Unknown comparison horizon');
- document.querySelector('#period-title').textContent=s.title;document.querySelector('#period-condition').textContent=s.condition;
- for(const r of s.rows){const width=r.total/800*790;document.querySelector('#bar-'+r.id).setAttribute('width',String(width));const value=document.querySelector('#value-'+r.id);value.textContent=String(r.total);value.setAttribute('x',String(160+width));}
- for(const b of buttons)b.setAttribute('aria-pressed',String(+b.dataset.months===s.months));
- document.querySelector('#period-comparison').dataset.selectedMonths=String(months);
- }
- for(const b of buttons)b.addEventListener('click',()=>apply(+b.dataset.months));apply(36);
+(() => {
+  const snapshots = {"12":{"months":12,"rows":[{"id":"A","initial":120,"monthly":8,"total":216},{"id":"B","initial":60,"monthly":11,"total":192},{"id":"C","initial":180,"monthly":6,"total":252}],"winners":["B"],"title":"12か月で比べると、総額はB案が最小","condition":"表示条件：12か月。総額＝初期費用＋月額×12。追加の作業費と税は含まない。"},"36":{"months":36,"rows":[{"id":"A","initial":120,"monthly":8,"total":408},{"id":"B","initial":60,"monthly":11,"total":456},{"id":"C","initial":180,"monthly":6,"total":396}],"winners":["C"],"title":"36か月で比べると、総額はC案が最小","condition":"表示条件：36か月。総額＝初期費用＋月額×36。追加の作業費と税は含まない。"},"60":{"months":60,"rows":[{"id":"A","initial":120,"monthly":8,"total":600},{"id":"B","initial":60,"monthly":11,"total":720},{"id":"C","initial":180,"monthly":6,"total":540}],"winners":["C"],"title":"60か月で比べると、総額はC案が最小","condition":"表示条件：60か月。総額＝初期費用＋月額×60。追加の作業費と税は含まない。"}}, X0 = 300, STRIP = { x0: 300, px: 13.166666666666666 };
+  const $ = s => document.querySelector(s), buttons = [...document.querySelectorAll('[data-months]')];
+  function apply(months) {
+    const s = snapshots[months];
+    if (!s) throw Error('Unknown comparison horizon');
+    $('#period-title').textContent = s.title;
+    $('#period-condition').textContent = s.condition;
+    for (const r of s.rows) {
+      const width = r.total / 800 * 790;
+      $('#bar-' + r.id).setAttribute('width', String(width));
+      const value = $('#value-' + r.id);
+      value.textContent = String(r.total);
+      value.setAttribute('x', String(X0 + width + 12));
+      $('#row-' + r.id).classList.toggle('is-min', s.winners.includes(r.id));
+    }
+    $('#monthly-key').textContent = '月額×' + months + 'か月';
+    $('#period-marker-label').textContent = months + 'か月';
+    $('#period-marker').setAttribute('transform', 'translate(' + (STRIP.x0 + months * STRIP.px) + ' 0)');
+    for (const run of document.querySelectorAll('.period-run')) run.classList.toggle('is-on', months > +run.dataset.from && months <= +run.dataset.to);
+    for (const b of buttons) b.setAttribute('aria-pressed', String(+b.dataset.months === s.months));
+    document.querySelector('#period-comparison').dataset.selectedMonths = String(months);
+  }
+  for (const b of buttons) b.addEventListener('click', () => apply(+b.dataset.months));
+  apply(36);
 })();</script></body></html>

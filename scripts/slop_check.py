@@ -173,7 +173,11 @@ def load_html(path):
     with sync_playwright() as p:
         b=p.chromium.launch(**({'executable_path':exe} if exe else {}))
         try:
-            pg=b.new_page(viewport={'width':1280,'height':800});pg.route('http*://**',lambda r:r.abort());pg.goto(Path(path).resolve().as_uri());pg.wait_for_timeout(300)
+            pg=b.new_page(viewport={'width':1280,'height':800});pg.route('http*://**',lambda r:r.abort());pg.goto(Path(path).resolve().as_uri())
+            # Wait for the player (as qa.py does) so every slide is measured at its final build;
+            # a plain HTML page without Slide Studio metadata is measured as loaded.
+            pg.wait_for_function("(!document.getElementById('slide-studio-meta')&&!document.getElementById('slide-studio-scene'))||(window.slideStudio&&(document.body.dataset.studioReady==='true'||!window.slideStudio.kind))",timeout=20000)
+            pg.evaluate('document.fonts.ready');pg.wait_for_timeout(150)
             slides=pg.evaluate(HTML_JS)
             try:
                 meta=pg.evaluate('()=>{const m=document.getElementById("slide-studio-meta")||document.getElementById("slide-studio-scene");return m?JSON.parse(m.textContent):null}')

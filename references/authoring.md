@@ -162,7 +162,8 @@ reducedMotion. `data-static="show"` elements appear only in export,
 - `layout.mjs` — `allocate` (weighted regions), `dagLayers`, `labelRail`,
   `routeOrthogonal`: explicit fit checks that throw instead of shrinking
   (`examples/constraint-layout/deck.mjs` shows a full derivation).
-- `studio-kit.mjs` — `h`, `states`, `grid`, `position`, `port`, `connector`,
+- `studio-kit.mjs` — `h`, `states`, `grid`, `position`, `port`, `connector`
+  (`via` puts the middle leg in a chosen gutter so it never crosses a box),
   `scaleLinear`, `contrast`, `checkBounds`, `svg`.
 - `quant.mjs` and `semantic-graph.mjs` — units-checked arithmetic and relation
   validation ([Evidence](evidence-and-diagrams.md)).

@@ -1,4 +1,4 @@
-<!doctype html><html lang="ja" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="generator" content="Slide Studio 4.0.0"><title>A complete small measurement story</title><style>/* Slide Studio player — infrastructure only. Composition, typography and
+<!doctype html><html lang="ja" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="generator" content="Slide Studio 4.0.0"><title>新しい冷却プレートの評価（中間報告）</title><style>/* Slide Studio player — infrastructure only. Composition, typography and
    image use belong to the author's CSS. */
 :root { --studio-w: 1280px; --studio-h: 720px; --studio-scale: 1; --studio-bar: 52px; color-scheme: light; }
 * { box-sizing: border-box; }
@@ -68,10 +68,9 @@ body.overview .slide { display: block; transform-origin: top left; transform: sc
 .pv-time { display: flex; gap: 14px; align-items: center; font: 600 22px/1 "JetBrains Mono", Menlo, Consolas, monospace; }
 .pv-main { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(280px, 1fr); gap: 18px; padding: 18px; min-height: 0; }
 .pv-current-wrap { display: flex; align-items: center; min-width: 0; }
-.pv-frame { position: relative; width: 100%; aspect-ratio: var(--studio-ratio, 16 / 9); overflow: hidden; border-radius: 6px; background: #000; }
+.pv-frame { position: relative; width: 100%; aspect-ratio: var(--studio-ratio, 16 / 9); overflow: hidden; border-radius: 6px; background: #000; color: #17252d; }
 .pv-frame .slide { position: absolute; left: 0; top: 0; display: block; transform-origin: top left; transform: scale(var(--pv-scale, .5)); }
 .pv-side { display: grid; grid-template-rows: auto auto auto 1fr; gap: 8px; min-height: 0; }
-.pv-next { opacity: .92; }
 .pv-label { margin: 6px 0 0; color: #8d99a7; font-size: 13px; text-transform: uppercase; letter-spacing: .06em; }
 .pv-notes { overflow: auto; background: #161b22; border-radius: 6px; padding: 16px 18px; white-space: pre-wrap; font-size: 21px; line-height: 1.5; color: #f3f5f8; min-height: 0; }
 .pv-foot { display: flex; justify-content: center; gap: 12px; padding: 10px 18px 14px; }
@@ -92,21 +91,153 @@ body.overview .slide { display: block; transform-origin: top left; transform: sc
 }
 
 :root{--studio-w:1280px;--studio-h:720px;--studio-ratio:1280/720}@media print{@page{size:13.333333333333334in 7.5in}}
+/* Slide Studio study frame — the shared page grammar of the diagram and motion
+   libraries. Each study is a finished example slide: a claim, the evidence at
+   working size, an annotation where the eye should land, a quiet source line.
+   Colors and fonts come from a color-system class on the slide (cs-<id>). */
+.st {
+  --st-x: 64px; --st-top: 48px; --st-fig-top: 176px; --st-bottom: 62px;
+  background: var(--ss-paper, #fff); color: var(--ss-ink, #17202b);
+  font-family: var(--ss-font-sans, Inter, "Helvetica Neue", "Segoe UI", "Hiragino Sans", "Noto Sans JP", sans-serif);
+  font-feature-settings: "kern" 1;
+}
+.st :where(h1, h2, h3, p, figure, ul, ol, dl, dd) { margin: 0; }
 
-.slide{padding:64px;background:#fafaf7;color:#152c36;font-family:'Noto Sans CJK JP',Arial,sans-serif}
-h1{font-size:46px;line-height:1.24;font-weight:650;max-width:1140px;letter-spacing:-.025em}
-p{font-size:27px;line-height:1.5}.sub{margin-top:20px!important;color:#3b5660;max-width:1060px}
-.main{position:absolute;left:64px;right:64px;top:210px;bottom:70px}.source{position:absolute;left:64px;bottom:26px;font-size:17px;color:#52676f}
-.side{position:absolute;right:0;top:0;width:30%}.big{font-size:72px;line-height:1.1;font-weight:600}.quiet{color:#2b7370}.split{display:grid;grid-template-columns:1.5fr 1fr;gap:56px;height:100%}
-svg{width:100%;height:100%;font-family:inherit}.small{font-size:16px;line-height:1.4}.before h1{font-size:38px}.before .tiny{font-size:15px;line-height:1.6}
-.lab-phase{position:absolute;left:64px;top:22px;font-size:15px;letter-spacing:.06em;color:#52676f}.main.split{height:auto}.split>div{min-width:0;min-height:0}
-.cards{display:flex;gap:18px}.card{flex:1;border:1px solid #c6ccca;border-radius:14px;padding:22px;background:#fff}
-.dark{background:#112832;color:#f5f3e7}.dark .sub,.dark .source{color:#c0d4d4}.dark .card{color:#152c36}
-table{border-collapse:collapse;width:100%;font-size:24px;line-height:1.5}th,td{padding:21px 16px;text-align:left;border-bottom:1px solid #b8c9cd}th{font-size:20px;background:#163f4b;color:#fff;font-weight:500}td:first-child{font-weight:650}
-img{object-fit:cover}.image-wide{position:absolute;left:0;top:0;width:100%;height:100%;max-width:none!important}.image-panel{position:absolute;left:66px;top:230px;width:460px;height:300px;object-fit:cover}
-</style></head><body><main class="studio-stage"><section class="slide " id="protocol" role="group" aria-roledescription="slide" aria-label="何を比べたか" aria-hidden="true"><h1 data-region="title">同じ試料を、条件Aと条件Bで測る。</h1><div class="main"><svg xmlns="http://www.w3.org/2000/svg" role="img" aria-label="説明図" viewBox="0 0 1000 340"><text x="120" y="120" font-size="40" fill="#152c36" text-anchor="start">条件A</text><line x1="300" y1="107" x2="650" y2="107" stroke="#2b7370" stroke-width="3"/><text x="475" y="87" font-size="40" fill="#152c36" text-anchor="start">→</text><text x="710" y="120" font-size="40" fill="#152c36" text-anchor="start">条件B</text><text x="475" y="235" font-size="30" fill="#152c36" text-anchor="middle">全6試料。A、Bの順で測定。</text></svg></div><p class="source" data-region="source">説明用の架空実験。</p></section>
-<section class="slide " id="paired-result" role="group" aria-roledescription="slide" aria-label="5試料の結果" aria-hidden="true"><h1 data-region="title">5試料中4試料で、条件Bの温度が低い。</h1><p class="sub">平均差 −1.2℃（条件B − 条件A）。1試料は欠測。</p><div class="main" style="top:218px" data-region="primary"><svg xmlns="http://www.w3.org/2000/svg" role="img" aria-label="同じ試料の条件Aと条件Bの温度を結ぶ。Bの値は4試料で低く、1試料で高い。" viewBox="0 0 1000 440"><line x1="200" y1="30" x2="200" y2="355" stroke="#c1cecf" stroke-width="2"/><line x1="770" y1="30" x2="770" y2="355" stroke="#c1cecf" stroke-width="2"/><line x1="200" y1="216.11111111111111" x2="762" y2="280.55555555555554" stroke="#2b7370" stroke-width="3"/><circle cx="200" cy="216.11111111111111" r="7" fill="#2b7370"/><circle cx="762" cy="280.55555555555554" r="7" fill="#2b7370"/><text x="168" y="224.11111111111111" font-size="24" fill="#2b7370" text-anchor="end">12</text><line x1="200" y1="248.33333333333334" x2="778" y2="280.55555555555554" stroke="#2b7370" stroke-width="3"/><circle cx="200" cy="248.33333333333334" r="7" fill="#2b7370"/><circle cx="778" cy="280.55555555555554" r="7" fill="#2b7370"/><text x="168" y="256.33333333333337" font-size="24" fill="#2b7370" text-anchor="end">11</text><line x1="200" y1="151.66666666666669" x2="770" y2="216.11111111111111" stroke="#2b7370" stroke-width="3"/><circle cx="200" cy="151.66666666666669" r="7" fill="#2b7370"/><circle cx="770" cy="216.11111111111111" r="7" fill="#2b7370"/><text x="168" y="159.66666666666669" font-size="24" fill="#2b7370" text-anchor="end">14</text><line x1="200" y1="183.88888888888889" x2="762" y2="151.66666666666669" stroke="#ae593b" stroke-width="3"/><circle cx="200" cy="183.88888888888889" r="7" fill="#ae593b"/><circle cx="762" cy="151.66666666666669" r="7" fill="#ae593b"/><text x="168" y="191.88888888888889" font-size="24" fill="#ae593b" text-anchor="end">13</text><line x1="200" y1="87.22222222222223" x2="778" y2="151.66666666666669" stroke="#2b7370" stroke-width="3"/><circle cx="200" cy="87.22222222222223" r="7" fill="#2b7370"/><circle cx="778" cy="151.66666666666669" r="7" fill="#2b7370"/><text x="168" y="95.22222222222223" font-size="24" fill="#2b7370" text-anchor="end">16</text><text x="802" y="288.55555555555554" font-size="24" fill="#152c36" text-anchor="start">10（2試料）</text><text x="802" y="224.11111111111111" font-size="24" fill="#152c36" text-anchor="start">12</text><text x="802" y="159.66666666666669" font-size="24" fill="#152c36" text-anchor="start">14（2試料）</text><text x="200" y="403" font-size="27" fill="#152c36" text-anchor="middle">条件A</text><text x="770" y="403" font-size="27" fill="#152c36" text-anchor="middle">条件B</text></svg></div><p class="source" data-region="source">説明用の架空実験。差の標本標準偏差は1.3℃。</p></section>
-<section class="slide " id="next-measurement" role="group" aria-roledescription="slide" aria-label="次に確認すること" aria-hidden="true"><h1 data-region="title">条件Bの効果とまでは、まだ言い切れない。</h1><div class="main"><table><thead><tr><th>今回の制約</th><th>次の測定で変えること</th></tr></thead><tbody><tr><td>測定順序が固定</td><td>順序を無作為化して比較する</td></tr><tr><td>1試料に欠測</td><td>欠測の理由も記録する</td></tr><tr><td>対象はこの6試料だけ</td><td>条件を増やし、再現性を確かめる</td></tr></tbody></table></div><p class="source" data-region="source">説明用の架空実験。次の測定案であり、実施済みではありません。</p></section></main><nav class="studio-controls" aria-label="スライド"><button id="studio-prev" type="button" aria-label="前へ" >←</button><span id="studio-position" class="studio-position"></span><button id="studio-next" type="button" aria-label="次へ" >→</button><select id="studio-jump" aria-label="スライド"><option value="0">1. 何を比べたか</option><option value="1">2. 5試料の結果</option><option value="2">3. 次に確認すること</option></select><button id="studio-overview" type="button" aria-label="一覧" >一覧</button><button id="studio-notes-btn" type="button" aria-label="ノート" aria-expanded="false" aria-controls="studio-notes">ノート</button><button id="studio-presenter" type="button" aria-label="発表者ビュー" >発表者ビュー</button><button id="studio-reset" type="button" aria-label="リセット" >リセット</button><button id="studio-full" type="button" aria-label="全画面" >全画面</button><button id="studio-help-btn" type="button" aria-label="キーボード操作" aria-expanded="false">?</button></nav><aside id="studio-notes" class="studio-notes" aria-label="ノート"></aside><div id="studio-announcer" class="sr-only studio-announcer" aria-live="polite"></div><script type="application/json" id="slide-studio-meta">{"version":4,"width":1280,"height":720,"title":"A complete small measurement story","language":"ja","direction":"ltr","labels":{"prev":"前へ","next":"次へ","jump":"スライド","overview":"一覧","notes":"ノート","reset":"リセット","full":"全画面","presenter":"発表者ビュー","help":"キーボード操作","blank":"黒画面","goto":"番号を入力してEnter"},"transition":"none","readingMode":"live","sample":false,"mode":"workshop","copyRules":[{"id":"ja-stage-direction","level":"error","pattern":"(?:学会|口頭|研究)?発表(?:時|中)(?:に|で|は)?[ 　]*(?:切[り]?替[え]?|切替|クリック|再生|操作)|ここで(?:クリック|切[り]?替[え]?|動画を再生)|(?:要差し替え|後で修正|仮置きのまま)"},{"id":"en-stage-direction","level":"error","pattern":"\\b(?:switch|click|play|toggle) (?:here|during (?:the )?(?:conference|presentation|talk))\\b|\\b(?:replace this (?:text|title|image)|insert (?:your )?(?:title|content) here|speaker cue:)","flags":"i"},{"id":"placeholder","level":"error","pattern":"\\b(?:Lorem ipsum|TODO|FIXME|TBD)\\b|(?:ここにタイトル|ここに本文|テキストを入力)","flags":"i"},{"id":"ja-empty-claim","level":"warning","pattern":"(?:さらなる価値提供|革新的なソリューション|未来を切り拓く|シームレスな体験|圧倒的な価値)"},{"id":"en-empty-claim","level":"warning","pattern":"\\b(?:unlock (?:the )?(?:full )?potential|revolutionary solution|seamless experience|game-changing|transform the future)\\b","flags":"i"},{"id":"ja-export-production-cue","level":"error","pattern":"配布用メモ[：:]|(?:印刷[・／/]PDF|印刷・PDF|PDF・印刷)(?:では|時は)[^。\\n]{0,60}(?:表示が残|固定され|操作用)|(?:投影時|発表時)の操作用"},{"id":"en-export-production-cue","level":"error","pattern":"\\b(?:presenter-only cue|production note|export-only instruction)\\s*:","flags":"i"},{"id":"ja-performed-sincerity","level":"warning","pattern":"正直に(?:言います|お知らせ|お伝え)|本当の価値|価値を紡ぐ"},{"id":"ja-status-label","level":"error","pattern":"(?:登壇用|発表用|社内用|作業用|提出用)(?:ドラフト|下書き)"}],"slides":[{"id":"protocol","title":"何を比べたか","notes":"Protocol before interpretation. No efficacy claim.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"live","spaceIntent":""},{"id":"paired-result","title":"5試料の結果","notes":"All plotted values, sample count, mean and sample SD come from the same synthetic paired result. One pair worsens; this remains visible.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"live","spaceIntent":""},{"id":"next-measurement","title":"次に確認すること","notes":"Limitations stay next to concrete changes; no invented sample-size guarantee or inspirational conclusion.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"live","spaceIntent":""}]}</script><script>/* Slide Studio player — deterministic presentation states.
+/* Headline: the page's claim, in the deck's display face. */
+.st-head { position: absolute; left: var(--st-x); top: var(--st-top); max-width: 1040px; font: 650 38px/1.14 var(--ss-font-display, var(--ss-font-sans, Inter, sans-serif)); letter-spacing: -.012em; text-wrap: balance; }
+.st-head em { font-style: normal; color: var(--ss-accent, #2457c5); }
+.st-head .st-quiet { color: var(--ss-muted, #5a6676); font-weight: 500; }
+.st-dek { position: absolute; left: var(--st-x); top: calc(var(--st-top) + 98px); max-width: 900px; font: 400 20px/1.45 var(--ss-font-sans, Inter, sans-serif); color: var(--ss-muted, #5a6676); text-wrap: pretty; }
+.st-head.st-one + .st-dek { top: calc(var(--st-top) + 56px); }
+
+/* Evidence region: figures are authored at the region's size so labels render ~1:1. */
+.st-fig { position: absolute; left: var(--st-x); right: var(--st-x); top: var(--st-fig-top); bottom: var(--st-bottom); display: flex; align-items: center; justify-content: center; }
+.st-fig > svg { width: 100%; height: 100%; display: block; overflow: visible; }
+.st-fig.st-top { align-items: flex-start; }
+
+/* Layout variants */
+.st--rail .st-fig { right: calc(var(--st-x) + 352px); }
+.st-rail { position: absolute; right: var(--st-x); top: var(--st-fig-top); bottom: var(--st-bottom); width: 312px; display: flex; flex-direction: column; justify-content: center; gap: 26px; }
+.st--left .st-fig { left: calc(var(--st-x) + 352px); }
+.st--left .st-rail { left: var(--st-x); right: auto; }
+.st--full .st-fig { left: 0; right: 0; top: 0; bottom: 0; }
+.st--tall .st-fig { top: 132px; }
+
+/* Rail content: one number or short finding per block, never a card stack. */
+.st-kpi { display: grid; gap: 6px; }
+.st-kpi b { font: 650 54px/1 var(--ss-font-display, var(--ss-font-sans, Inter, sans-serif)); letter-spacing: -.02em; font-variant-numeric: tabular-nums lining-nums; color: var(--ss-ink, #17202b); }
+.st-kpi b.st-accent { color: var(--ss-accent, #2457c5); }
+.st-kpi span { font: 400 18px/1.4 var(--ss-font-sans, Inter, sans-serif); color: var(--ss-muted, #5a6676); }
+.st-text { font: 400 19px/1.5 var(--ss-font-sans, Inter, sans-serif); color: var(--ss-ink, #17202b); }
+.st-text strong { font-weight: 650; }
+.st-text.st-muted { color: var(--ss-muted, #5a6676); }
+.st-rule { height: 1px; background: var(--ss-rule, #d5dbe3); border: 0; margin: 0; }
+
+/* Big type */
+.st-num { font: 650 128px/.9 var(--ss-font-display, var(--ss-font-sans, Inter, sans-serif)); letter-spacing: -.035em; font-variant-numeric: tabular-nums lining-nums; }
+.st-num small { font-size: .38em; letter-spacing: 0; font-weight: 500; margin-left: .12em; color: var(--ss-muted, #5a6676); }
+.st-kpi .st-num, .st-kpi b.st-num { font: 650 128px/.9 var(--ss-font-display, var(--ss-font-sans, Inter, sans-serif)); letter-spacing: -.035em; } /* a hero number inside a KPI block keeps hero size */
+
+/* Source line: honest provenance, readable size. */
+.st-source { position: absolute; left: var(--st-x); right: var(--st-x); bottom: 22px; display: flex; justify-content: space-between; gap: 24px; font: 400 15px/1.3 var(--ss-font-sans, Inter, sans-serif); color: var(--ss-muted, #5a6676); }
+.st-source b { font-weight: 600; color: var(--ss-ink, #17202b); }
+
+/* Japanese and other CJK pages: looser leading, no negative tracking. */
+.st:lang(ja) .st-head, .st:lang(zh) .st-head, .st:lang(ko) .st-head { line-height: 1.32; letter-spacing: 0; font-weight: 700; font-size: 36px; }
+.st:lang(ja) .st-dek, .st:lang(ja) .st-text { line-height: 1.65; }
+
+/* Motion helpers: elements that move keep their geometry box as the origin. */
+.st [data-states], .st [data-motion] { transform-box: fill-box; }
+.st .st-origin-left { transform-origin: 0% 50%; }
+.st .st-origin-bottom { transform-origin: 50% 100%; }
+.st .st-origin-center { transform-origin: 50% 50%; }
+
+/* Japanese: break headlines and short text between phrases (Chromium; others fall back to normal breaking). */
+.st:lang(ja) .st-head, .st:lang(ja) .st-dek, .st:lang(ja) .st-text, .st:lang(ja) .st-kpi span { word-break: auto-phrase; line-break: strict; }
+
+/* Wa Ai — light */
+.cs-wa-ai{--ss-paper:#f5f7f8;--ss-surface:#e8eef1;--ss-ink:#182a3e;--ss-muted:#4d6072;--ss-rule:#c9d3da;--ss-grid:#dde3e8;--ss-accent:#264c78;--ss-on-accent:#ffffff;--ss-positive:#2f7a5a;--ss-negative:#b1453a;--ss-highlight:#264c78;--ss-context:#c1ccd3;--ss-cat-1:#264c78;--ss-on-cat-1:#f5f7f8;--ss-cat-2:#2a8a99;--ss-on-cat-2:#f5f7f8;--ss-cat-3:#b25a2a;--ss-on-cat-3:#f5f7f8;--ss-cat-4:#6f6b64;--ss-on-cat-4:#f5f7f8;--ss-cat-5:#264c78;--ss-on-cat-5:#f5f7f8;--ss-cat-6:#2a8a99;--ss-on-cat-6:#f5f7f8;--ss-cat-7:#b25a2a;--ss-on-cat-7:#f5f7f8;--ss-cat-8:#6f6b64;--ss-on-cat-8:#f5f7f8;--ss-seq-1:#e2ebf2;--ss-on-seq-1:#182a3e;--ss-seq-2:#bfd2e3;--ss-on-seq-2:#182a3e;--ss-seq-3:#97b6cf;--ss-on-seq-3:#182a3e;--ss-seq-4:#6a95b8;--ss-on-seq-4:#182a3e;--ss-seq-5:#43749f;--ss-on-seq-5:#f5f7f8;--ss-seq-6:#27527b;--ss-on-seq-6:#f5f7f8;--ss-seq-7:#172f4d;--ss-on-seq-7:#f5f7f8;--ss-div-1:#a0501f;--ss-on-div-1:#f5f7f8;--ss-div-2:#cd9570;--ss-on-div-2:#182a3e;--ss-div-3:#e7cbb7;--ss-on-div-3:#182a3e;--ss-div-4:#eff2f3;--ss-on-div-4:#182a3e;--ss-div-5:#bcd0e0;--ss-on-div-5:#182a3e;--ss-div-6:#7ca0bf;--ss-on-div-6:#182a3e;--ss-div-7:#2f6392;--ss-on-div-7:#f5f7f8;--ss-font-sans:"Helvetica Neue","Segoe UI","Liberation Sans",Arial,sans-serif,"Hiragino Sans","Noto Sans JP","Yu Gothic","Meiryo","IPAPGothic",sans-serif;--ss-font-display:"Hiragino Sans","Noto Sans JP","Yu Gothic","Meiryo","IPAPGothic","Helvetica Neue",sans-serif,"Hiragino Sans","Noto Sans JP","Yu Gothic","Meiryo","IPAPGothic",sans-serif;--ss-font-serif:"Iowan Old Style","Charter","Bitstream Charter",Georgia,Caladea,"Hiragino Mincho ProN","Noto Serif JP","Yu Mincho",serif;--ss-font-mono:"JetBrains Mono","SFMono-Regular",Menlo,Consolas,"DejaVu Sans Mono",monospace;color-scheme:light}
+
+/* ── Repair lab rules (lab + talk). Indigo accent = "this"; red = the editor's mark and worsening values. ──
+   Type scale: headline 36 · second clause 28 · KPI 54 · body 20 · labels 16–18 · source 15.
+   Grid: 64 px margins; evidence 1152×482 from y 176; rail 312 px (figure 800). */
+.lab {
+  --ss-font-sans: "Inter","Helvetica Neue","Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic UI","Yu Gothic",Meiryo,"IPAPGothic","IPAGothic",sans-serif;
+  --ss-font-display: var(--ss-font-sans);
+  word-break: auto-phrase; line-break: strict;
+}
+.lab .st-head { max-width: 1110px; font: 700 36px/1.4 var(--ss-font-display); letter-spacing: .02em; font-feature-settings: "palt" 1; }
+.lab .st-head .st-quiet { display: block; margin-top: 4px; font-size: 28px; line-height: 1.45; font-weight: 500; letter-spacing: .02em; }
+.lab .nw { white-space: nowrap; }
+.lab .st-kpi b small { margin-left: .12em; font-size: .4em; font-weight: 600; letter-spacing: 0; color: var(--ss-muted); }
+.lab .st-kpi b.is-accent { color: var(--ss-accent); }
+.lab .st-kpi span { font-size: 18px; line-height: 1.6; color: var(--ss-ink); }
+.lab .st-text { font-size: 20px; line-height: 1.7; }
+.lab .st-source .lab-tag { text-align: right; }
+.lab .lab-tag b { margin-right: .8em; font-weight: 700; color: var(--ss-ink); }
+.lab .lab-tag b.is-before { color: var(--ss-negative); }
+
+/* Diagnosis mark (BEFORE pages): a ring on the faulty element and one short note, revealed at build 1. */
+.lab .lab-fault { position: relative; }
+.lab .lab-ring { position: absolute; inset: -5px -9px; border: 2.5px solid var(--ss-negative); border-radius: 10px; pointer-events: none; }
+.lab .lab-note { position: absolute; z-index: 2; margin: 0; padding: 10px 16px 12px; background: var(--ss-paper); border: 2px solid var(--ss-negative); border-radius: 8px;
+  font: 600 18px/1.6 var(--ss-font-sans); color: var(--ss-negative); }
+.lab .lab-note span { display: block; font-weight: 400; color: var(--ss-ink); }
+.lab svg .lab-svg-ring { fill: none; stroke: var(--ss-negative); stroke-width: 2.5; }
+.lab .lab-wf { --ss-positive: var(--ss-ink); }   /* waterfall: delta bars take the accent, their labels stay ink */
+
+/* Reading tables (pair 9, talk page 3). Hairlines, tabular figures, units in the header. */
+.lab .lab-table { position: absolute; left: 64px; top: 196px; width: 1152px; border-collapse: collapse; font-size: 22px; line-height: 1.5; font-variant-numeric: tabular-nums; }
+.lab .lab-table th { padding: 0 20px 12px 0; border-bottom: 1.5px solid var(--ss-ink); font: 600 16px/1.4 var(--ss-font-sans); color: var(--ss-muted); text-align: left; vertical-align: bottom; }
+.lab .lab-table td { padding: 18px 20px 18px 0; border-bottom: 1px solid var(--ss-rule); vertical-align: top; }
+.lab .lab-table td:last-child, .lab .lab-table th:last-child { padding-right: 0; }
+.lab .lab-table .n { text-align: right; }
+.lab .lab-table .is-best { color: var(--ss-accent); font-weight: 700; }
+.lab .lab-table .is-open { font-weight: 700; }
+
+/* The flawed card pattern some BEFORE pages show (not used on AFTER pages). */
+.lab .lab-cards { position: absolute; left: 64px; right: 64px; top: 188px; display: flex; gap: 18px; }
+.lab .lab-card { flex: 1; padding: 16px 18px; background: var(--ss-paper); border: 1px solid var(--ss-rule); border-radius: 14px; }
+.lab .lab-card h3 { margin: 0 0 6px; font-size: 17px; }
+.lab .lab-card p { margin: 0; font-size: 14px; line-height: 1.6; color: var(--ss-muted); }
+
+/* Under-figure line for conditions and checks (pairs 6 and 12). */
+.lab .lab-under { position: absolute; left: 64px; right: 64px; margin: 0; font-size: 20px; line-height: 1.6; }
+.lab .lab-under b { font-weight: 700; }
+.lab .lab-tiny { position: absolute; left: 64px; margin: 0; font-size: 12px; color: var(--ss-muted); }
+
+/* Talk pages: live reading, so body text is one step larger. */
+.talk .talk-steps { position: absolute; left: 812px; right: 64px; top: 196px; margin: 0; padding: 0; list-style: none; counter-reset: step; }
+.talk .talk-steps li { position: relative; padding: 0 0 22px 48px; margin-bottom: 22px; border-bottom: 1px solid var(--ss-rule); counter-increment: step; }
+.talk .talk-steps li::before { content: counter(step); position: absolute; left: 0; top: 0; font: 700 26px/1.3 var(--ss-font-sans); color: var(--ss-accent); }
+.talk .talk-steps b { display: block; font-size: 24px; line-height: 1.45; }
+.talk .talk-steps span { display: block; margin-top: 4px; font-size: 22px; line-height: 1.55; color: var(--ss-muted); }
+.talk .st-kpi span, .talk .st-text, .talk .lab-under { font-size: 22px; line-height: 1.55; }
+.talk .lab-table { font-size: 22px; line-height: 1.55; }
+.talk .lab-table td { padding: 22px 28px 22px 0; }
+.talk .lab-table td:first-child { width: 330px; font-weight: 700; }
+.talk .lab-table td:nth-child(2) { width: 430px; }
+</style></head><body><main class="studio-stage"><section class="slide st cs-wa-ai lab talk" id="protocol" role="group" aria-roledescription="slide" aria-label="何を比べたか" aria-hidden="true"><h1 class="st-head" data-region="title">6台のモジュールを、従来プレートと新プレートの両方で測った<span class="st-quiet">比べるのは温度上昇（最高セル温度 − 室温）。2C放電30分、室温25℃でそろえた</span></h1>
+<figure class="st-fig" data-region="primary" style="right:auto;width:700px;top:200px;bottom:70px"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 450" width="700" height="450" role="img" aria-labelledby="rig-section-title rig-section-desc" id="rig-section" class="ss-fig" direction="ltr" style="overflow:visible;direction:ltr;font-family:var(--ss-font-sans,&quot;Inter&quot;,&quot;Helvetica Neue&quot;,&quot;Segoe UI&quot;,&quot;Hiragino Sans&quot;,&quot;Noto Sans JP&quot;,&quot;Yu Gothic&quot;,system-ui,sans-serif);"><title id="rig-section-title">電池モジュールと冷却プレートの断面（模式図）</title><desc id="rig-section-desc">12本のセルが冷却プレートの上に並び、8点の熱電対で温度を測る。</desc><rect x="14" y="96" width="34" height="200" rx="4" stroke-width="1.5" style="fill:var(--ss-surface);stroke:var(--ss-muted);"/><rect x="54" y="96" width="34" height="200" rx="4" stroke-width="1.5" style="fill:var(--ss-surface);stroke:var(--ss-muted);"/><rect x="94" y="96" width="34" height="200" rx="4" stroke-width="1.5" style="fill:var(--ss-surface);stroke:var(--ss-muted);"/><rect x="134" y="96" width="34" height="200" rx="4" stroke-width="1.5" style="fill:var(--ss-surface);stroke:var(--ss-muted);"/><rect x="174" y="96" width="34" height="200" rx="4" stroke-width="1.5" style="fill:var(--ss-surface);stroke:var(--ss-muted);"/><rect x="214" y="96" width="34" height="200" rx="4" stroke-width="1.5" style="fill:var(--ss-surface);stroke:var(--ss-muted);"/><rect x="254" y="96" width="34" height="200" rx="4" stroke-width="1.5" style="fill:var(--ss-surface);stroke:var(--ss-muted);"/><rect x="294" y="96" width="34" height="200" rx="4" stroke-width="1.5" style="fill:var(--ss-surface);stroke:var(--ss-muted);"/><rect x="334" y="96" width="34" height="200" rx="4" stroke-width="1.5" style="fill:var(--ss-surface);stroke:var(--ss-muted);"/><rect x="374" y="96" width="34" height="200" rx="4" stroke-width="1.5" style="fill:var(--ss-surface);stroke:var(--ss-muted);"/><rect x="414" y="96" width="34" height="200" rx="4" stroke-width="1.5" style="fill:var(--ss-surface);stroke:var(--ss-muted);"/><rect x="454" y="96" width="34" height="200" rx="4" stroke-width="1.5" style="fill:var(--ss-surface);stroke:var(--ss-muted);"/><path d="M14 82V72H488V82" fill="none" stroke-width="1.5" style="stroke:var(--ss-muted);"/><text x="251" y="56" font-size="22" text-anchor="middle" font-weight="700" style="fill:var(--ss-ink);">セル 12本</text><circle cx="71" cy="126" r="7" style="fill:var(--ss-accent);"/><circle cx="111" cy="126" r="7" style="fill:var(--ss-accent);"/><circle cx="191" cy="126" r="7" style="fill:var(--ss-accent);"/><circle cx="231" cy="126" r="7" style="fill:var(--ss-accent);"/><circle cx="311" cy="126" r="7" style="fill:var(--ss-accent);"/><circle cx="351" cy="126" r="7" style="fill:var(--ss-accent);"/><circle cx="431" cy="126" r="7" style="fill:var(--ss-accent);"/><circle cx="471" cy="126" r="7" style="fill:var(--ss-accent);"/><path d="M480 126H530" fill="none" stroke-width="1.5" style="stroke:var(--ss-accent);"/><text x="540" y="133.92" font-size="22" font-weight="700" style="fill:var(--ss-accent);">熱電対 8点</text><text x="540" y="167.92" font-size="22" style="fill:var(--ss-muted);">最高値を記録</text><rect x="6" y="300" width="490" height="48" rx="4" style="fill:var(--ss-ink);"/><circle cx="42" cy="324" r="9" style="fill:var(--ss-paper);"/><circle cx="125.6" cy="324" r="9" style="fill:var(--ss-paper);"/><circle cx="209.2" cy="324" r="9" style="fill:var(--ss-paper);"/><circle cx="292.8" cy="324" r="9" style="fill:var(--ss-paper);"/><circle cx="376.4" cy="324" r="9" style="fill:var(--ss-paper);"/><circle cx="460" cy="324" r="9" style="fill:var(--ss-paper);"/><path d="M500 324H530" fill="none" stroke-width="1.5" style="stroke:var(--ss-ink);"/><text x="540" y="317.92" font-size="22" font-weight="700" style="fill:var(--ss-ink);">冷却プレート</text><text x="540" y="356.28" font-size="22" style="fill:var(--ss-muted);"><tspan x="540" y="356.28">交換して比べる</tspan><tspan x="540" dy="31.9">冷却水20℃・毎分4L</tspan></text></svg></figure>
+<ol class="talk-steps" data-region="support"><li><b>従来プレートで測る</b><span>2C放電30分。8点の最高温度を記録</span></li><li><b>2時間置き、プレートを交換</b><span>セルが室温に戻ったことを確かめる</span></li><li><b>新プレートで同じ条件を測る</b><span>順序は6台とも「従来→新」で同じ</span></li></ol>
+<p class="st-source" data-region="source"><span>架空のデータ・試験室B、2026年9月。図は模式図で、寸法は実物と異なる</span></p></section>
+<section class="slide st cs-wa-ai lab talk st--rail" id="paired-result" role="group" aria-roledescription="slide" aria-label="結果：5台の差" aria-hidden="true"><h1 class="st-head" data-region="title">5台中4台で、新プレートの温度上昇が小さかった<span class="st-quiet">平均の差は−1.1℃（新 − 従来）。M4は0.9℃大きく、M5は欠測</span></h1>
+<figure class="st-fig" data-region="primary"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 482" width="800" height="482" role="img" aria-labelledby="cooling-slope-title cooling-slope-desc" id="cooling-slope" class="ss-fig" direction="ltr" style="overflow:visible;direction:ltr;font-family:var(--ss-font-sans,&quot;Inter&quot;,&quot;Helvetica Neue&quot;,&quot;Segoe UI&quot;,&quot;Hiragino Sans&quot;,&quot;Noto Sans JP&quot;,&quot;Yu Gothic&quot;,system-ui,sans-serif);"><title id="cooling-slope-title">モジュール別の温度上昇（℃）、従来プレートと新プレート</title><desc id="cooling-slope-desc">5台のうち4台で新プレートの温度上昇が小さい。M4は大きくなった。</desc><line x1="112.86" x2="112.86" y1="54" y2="474" stroke-width="1.5" style="stroke:var(--ss-rule,#d5dbe3);"/><line x1="687.14" x2="687.14" y1="54" y2="474" stroke-width="1.5" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="112.86" y="20.28" font-size="22" text-anchor="middle" font-weight="700" style="fill:var(--ss-muted,#5a6676);">従来プレート（℃）</text><text x="687.14" y="20.28" font-size="22" text-anchor="middle" font-weight="700" style="fill:var(--ss-muted,#5a6676);">新プレート（℃）</text><g class="ss-slope"><line x1="112.86" y1="313.24" x2="687.14" y2="446.9" stroke-width="3.5" stroke-linecap="round" style="stroke:var(--ss-accent);"/><circle cx="112.86" cy="313.24" r="6" style="fill:var(--ss-accent);"/><circle cx="687.14" cy="446.9" r="6" style="fill:var(--ss-accent);"/></g><g class="ss-slope"><line x1="112.86" y1="411.72" x2="687.14" y2="468" stroke-width="3.5" stroke-linecap="round" style="stroke:var(--ss-accent);"/><circle cx="112.86" cy="411.72" r="6" style="fill:var(--ss-accent);"/><circle cx="687.14" cy="468" r="6" style="fill:var(--ss-accent);"/></g><g class="ss-slope"><line x1="112.86" y1="186.62" x2="687.14" y2="334.34" stroke-width="3.5" stroke-linecap="round" style="stroke:var(--ss-accent);"/><circle cx="112.86" cy="186.62" r="6" style="fill:var(--ss-accent);"/><circle cx="687.14" cy="334.34" r="6" style="fill:var(--ss-accent);"/></g><g class="ss-slope"><line x1="112.86" y1="264" x2="687.14" y2="200.69" stroke-width="3.5" stroke-linecap="round" style="stroke:var(--ss-negative);"/><circle cx="112.86" cy="264" r="6" style="fill:var(--ss-negative);"/><circle cx="687.14" cy="200.69" r="6" style="fill:var(--ss-negative);"/></g><g class="ss-slope"><line x1="112.86" y1="60" x2="687.14" y2="179.59" stroke-width="3.5" stroke-linecap="round" style="stroke:var(--ss-accent);"/><circle cx="112.86" cy="60" r="6" style="fill:var(--ss-accent);"/><circle cx="687.14" cy="179.59" r="6" style="fill:var(--ss-accent);"/></g><path d="M693.14 446.9L699.14 431.6" fill="none" stroke-width="1" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="98.86" y="321.52" font-size="23" text-anchor="end" font-weight="700" style="white-space:pre;fill:var(--ss-ink,#17202b);">M1  12.4</text><text x="701.14" y="439.88" font-size="23" font-weight="700" style="white-space:pre;fill:var(--ss-ink,#17202b);">10.5  M1</text><path d="M693.14 468L699.14 462.2" fill="none" stroke-width="1" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="98.86" y="420" font-size="23" text-anchor="end" font-weight="700" style="white-space:pre;fill:var(--ss-ink,#17202b);">M2  11.0</text><text x="701.14" y="470.48" font-size="23" font-weight="700" style="white-space:pre;fill:var(--ss-ink,#17202b);">10.2  M2</text><text x="98.86" y="194.9" font-size="23" text-anchor="end" font-weight="700" style="white-space:pre;fill:var(--ss-ink,#17202b);">M3  14.2</text><text x="701.14" y="342.62" font-size="23" font-weight="700" style="white-space:pre;fill:var(--ss-ink,#17202b);">12.1  M3</text><path d="M693.14 200.69L699.14 210.19" fill="none" stroke-width="1" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="98.86" y="272.28" font-size="23" text-anchor="end" font-weight="700" style="white-space:pre;fill:var(--ss-ink,#17202b);">M4  13.1</text><text x="701.14" y="218.47" font-size="23" font-weight="700" style="white-space:pre;fill:var(--ss-ink,#17202b);">14.0  M4</text><path d="M106.86 60L100.86 65.8" fill="none" stroke-width="1" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="98.86" y="74.08" font-size="23" text-anchor="end" font-weight="700" style="white-space:pre;fill:var(--ss-ink,#17202b);">M6  16.0</text><text x="701.14" y="187.87" font-size="23" font-weight="700" style="white-space:pre;fill:var(--ss-ink,#17202b);">14.3  M6</text></svg></figure>
+<div class="st-rail" data-region="support">
+  <div class="st-kpi"><b class="is-accent">−1.1<small>℃</small></b><span>平均の差（新 − 従来、5台）</span></div>
+  <hr class="st-rule">
+  <div class="st-kpi"><b>1.2<small>℃</small></b><span>差の標準偏差（n − 1）</span></div>
+  <hr class="st-rule">
+  <p class="st-text">M5は新プレートの測定中に熱電対が断線し、差から除いた</p>
+</div>
+<p class="st-source" data-region="source"><span>架空のデータ・2C放電30分、室温25℃。差はすべて「新 − 従来」で計算</span></p></section>
+<section class="slide st cs-wa-ai lab talk" id="next-measurement" role="group" aria-roledescription="slide" aria-label="次に確かめること" aria-hidden="true"><h1 class="st-head" data-region="title">効果と言い切るには、測り方を3点変えて測り直す<span class="st-quiet">次の測定は12台、11月に行う</span></h1>
+<table class="lab-table" data-region="primary">
+  <thead><tr><th>今回の制約</th><th>なぜ問題か</th><th>次の測定で変えること</th></tr></thead>
+  <tbody><tr><td>測る順序が全台「従来→新」</td><td>2回目のほうが温度が低く出る癖があっても、プレートの差と区別できない</td><td>半数の台は「新 → 従来」の順で測る</td></tr><tr><td>M5が欠測（熱電対の断線）</td><td>差を5台だけで計算している</td><td>各セルに予備の熱電対を2点付ける</td></tr><tr><td>台数が6台</td><td>差のばらつき（標準偏差1.2℃）に対して少ない</td><td>12台に増やす（必要な10台＋予備2台）</td></tr></tbody>
+</table>
+<p class="lab-under" style="top:584px"><b>採用の基準</b>　12台の平均の差が0℃を下回り、その95%信頼区間も0を含まなければ、新プレートを採用する</p>
+<p class="st-source" data-region="source"><span>架空のデータ・必要台数は平均の差1.1℃、標準偏差1.2℃から正規近似で計算（検出力80%、両側5%）</span></p></section></main><nav class="studio-controls" aria-label="スライド"><button id="studio-prev" type="button" aria-label="前へ" >←</button><span id="studio-position" class="studio-position"></span><button id="studio-next" type="button" aria-label="次へ" >→</button><select id="studio-jump" aria-label="スライド"><option value="0">1. 何を比べたか</option><option value="1">2. 結果：5台の差</option><option value="2">3. 次に確かめること</option></select><button id="studio-overview" type="button" aria-label="一覧" >一覧</button><button id="studio-notes-btn" type="button" aria-label="ノート" aria-expanded="false" aria-controls="studio-notes">ノート</button><button id="studio-presenter" type="button" aria-label="発表者ビュー" >発表者ビュー</button><button id="studio-reset" type="button" aria-label="リセット" >リセット</button><button id="studio-full" type="button" aria-label="全画面" >全画面</button><button id="studio-help-btn" type="button" aria-label="キーボード操作" aria-expanded="false">?</button></nav><aside id="studio-notes" class="studio-notes" aria-label="ノート"></aside><div id="studio-announcer" class="sr-only studio-announcer" aria-live="polite"></div><script type="application/json" id="slide-studio-meta">{"version":4,"width":1280,"height":720,"title":"新しい冷却プレートの評価（中間報告）","language":"ja","direction":"ltr","labels":{"prev":"前へ","next":"次へ","jump":"スライド","overview":"一覧","notes":"ノート","reset":"リセット","full":"全画面","presenter":"発表者ビュー","help":"キーボード操作","blank":"黒画面","goto":"番号を入力してEnter"},"transition":"none","readingMode":"live","sample":false,"mode":"workshop","copyRules":[{"id":"ja-stage-direction","level":"error","pattern":"(?:学会|口頭|研究)?発表(?:時|中)(?:に|で|は)?[ 　]*(?:切[り]?替[え]?|切替|クリック|再生|操作)|ここで(?:クリック|切[り]?替[え]?|動画を再生)|(?:要差し替え|後で修正|仮置きのまま)"},{"id":"en-stage-direction","level":"error","pattern":"\\b(?:switch|click|play|toggle) (?:here|during (?:the )?(?:conference|presentation|talk))\\b|\\b(?:replace this (?:text|title|image)|insert (?:your )?(?:title|content) here|speaker cue:)","flags":"i"},{"id":"placeholder","level":"error","pattern":"\\b(?:Lorem ipsum|TODO|FIXME|TBD)\\b|(?:ここにタイトル|ここに本文|テキストを入力)","flags":"i"},{"id":"ja-empty-claim","level":"warning","pattern":"(?:さらなる価値提供|革新的なソリューション|未来を切り拓く|シームレスな体験|圧倒的な価値)"},{"id":"en-empty-claim","level":"warning","pattern":"\\b(?:unlock (?:the )?(?:full )?potential|revolutionary solution|seamless experience|game-changing|transform the future)\\b","flags":"i"},{"id":"ja-export-production-cue","level":"error","pattern":"配布用メモ[：:]|(?:印刷[・／/]PDF|印刷・PDF|PDF・印刷)(?:では|時は)[^。\\n]{0,60}(?:表示が残|固定され|操作用)|(?:投影時|発表時)の操作用"},{"id":"en-export-production-cue","level":"error","pattern":"\\b(?:presenter-only cue|production note|export-only instruction)\\s*:","flags":"i"},{"id":"ja-performed-sincerity","level":"warning","pattern":"正直に(?:言います|お知らせ|お伝え)|本当の価値|価値を紡ぐ"},{"id":"ja-status-label","level":"error","pattern":"(?:登壇用|発表用|社内用|作業用|提出用)(?:ドラフト|下書き)"}],"slides":[{"id":"protocol","title":"何を比べたか","notes":"Protocol before interpretation: what was compared, on which units, under which fixed conditions, in which order. The fixed order is stated here because page 3 lists it as a limitation.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"live","spaceIntent":""},{"id":"paired-result","title":"結果：5台の差","notes":"All plotted values, the count, the mean and the n−1 SD come from paired() with one subtraction order. The worse module stays visible in the negative colour with its label; the missing module is named.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"live","spaceIntent":""},{"id":"next-measurement","title":"次に確かめること","notes":"Limitations sit next to the concrete change that addresses each one. The sample size is computed from the observed mean and SD, not typed; it is a planning estimate, not a promise.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"live","spaceIntent":""}]}</script><script>/* Slide Studio player — deterministic presentation states.
  *
  * Contract
  * - A slide's state is (slide index, build step). Every route (button, key,
@@ -119,9 +250,9 @@ img{object-fit:cover}.image-wide{position:absolute;left:0;top:0;width:100%;heigh
  *   inputs, sliders, editors, media or [data-interactive] regions.
  *
  * Authoring hooks (see references/motion-and-interaction.md)
- *   data-step="n"            visible from build n (0 = start); data-until="m" hides after m
+ *   data-step="n"            visible from build n (0 = start); data-until="m" hides after m (alone: visible 0..m)
  *   data-motion="preset"     entry effect when the element appears
- *   data-delay="ms"          wait before the entry effect (stagger by hand)
+ *   data-delay="ms"          wait before the entry effect or data-states change (stagger by hand)
  *   data-stagger="ms"        animate the element's children one after another
  *   data-duration="ms"       effect length (default 500, max 1600)
  *   data-easing="name|css"   standard | emphasized | decelerate | accelerate | linear | smooth | any CSS easing
@@ -132,7 +263,7 @@ img{object-fit:cover}.image-wide{position:absolute;left:0;top:0;width:100%;heigh
   const meta = JSON.parse(document.getElementById('slide-studio-meta').textContent);
   const slides = [...document.querySelectorAll('.slide')];
   const mq = matchMedia('(prefers-reduced-motion: reduce)');
-  const warnings = [], widgets = new Map(), tracks = new WeakMap(), animations = new Set();
+  const warnings = [], widgets = new Map(), tracks = new WeakMap(), animations = new Set(), counting = new Set();
   const lastSteps = Array(slides.length).fill(0);
   const labels = meta.labels || {};
   let current = 0, step = 0, overview = false, restore = null, enteredIndex = null;
@@ -144,8 +275,10 @@ img{object-fit:cover}.image-wide{position:absolute;left:0;top:0;width:100%;heigh
 
   // ------------------------------------------------------------ build bookkeeping
 
-  const max = i => Math.max(0, ...[...slides[i].querySelectorAll('[data-step],[data-states]')].flatMap(el => {
+  const max = i => Math.max(0, ...[...slides[i].querySelectorAll('[data-step],[data-until],[data-states]')].flatMap(el => {
     const v = [Number(el.dataset.step) || 0];
+    // data-until="m" hides the element after build m, so build m + 1 must exist.
+    if (el.dataset.until !== undefined) v.push(Number(el.dataset.until) + 1);
     try { if (el.dataset.states) v.push(...Object.keys(JSON.parse(el.dataset.states)).map(Number)); } catch { /* reported below */ }
     return v.filter(Number.isFinite);
   }));
@@ -272,7 +405,9 @@ img{object-fit:cover}.image-wide{position:absolute;left:0;top:0;width:100%;heigh
     const duration = durationOf(el, 1100), start = performance.now() + delay;
     let raf = 0, done;
     const finished = new Promise(r => { done = r; });
-    const stop = () => { cancelAnimationFrame(raf); node.data = final; done(); };
+    const record = { node, final };
+    const stop = () => { cancelAnimationFrame(raf); node.data = final; counting.delete(record); done(); };
+    counting.add(record);
     const frame = now => {
       const t = Math.min(1, Math.max(0, (now - start) / duration)), e = 1 - (1 - t) ** 3;
       node.data = t >= 1 ? final : format(from + (target - from) * e);
@@ -310,8 +445,8 @@ img{object-fit:cover}.image-wide{position:absolute;left:0;top:0;width:100%;heigh
 
   /** Static state for a slide root (also used on presenter clones). */
   function applyStatic(root, at, original = root) {
-    for (const el of root.querySelectorAll('[data-step]')) {
-      const on = at >= Number(el.dataset.step) && (el.dataset.until === undefined || at <= Number(el.dataset.until));
+    for (const el of root.querySelectorAll('[data-step],[data-until]')) {
+      const on = at >= Number(el.dataset.step ?? 0) && (el.dataset.until === undefined || at <= Number(el.dataset.until));
       el.dataset.studioHidden = String(!on);
     }
     const originals = [...original.querySelectorAll('[data-states]')];
@@ -324,8 +459,8 @@ img{object-fit:cover}.image-wide{position:absolute;left:0;top:0;width:100%;heigh
 
   function apply(i, at, animate) {
     const slide = slides[i];
-    for (const el of slide.querySelectorAll('[data-step]')) {
-      const on = at >= Number(el.dataset.step) && (el.dataset.until === undefined || at <= Number(el.dataset.until));
+    for (const el of slide.querySelectorAll('[data-step],[data-until]')) {
+      const on = at >= Number(el.dataset.step ?? 0) && (el.dataset.until === undefined || at <= Number(el.dataset.until));
       const was = el.dataset.studioHidden === 'false';
       el.dataset.studioHidden = String(!on);
       el.setAttribute('aria-hidden', String(!on));
@@ -340,7 +475,10 @@ img{object-fit:cover}.image-wide{position:absolute;left:0;top:0;width:100%;heigh
       const tr = tracks.get(el);
       if (!tr) continue;
       const to = stateAt(tr, at);
-      transition(el, to, animate);
+      // data-delay (and a parent's data-stagger) sequence transformations the same way as entries.
+      const parent = el.parentElement, gap = parent && parent.dataset.stagger !== undefined ? Math.max(0, Number(parent.dataset.stagger) || 0) : 0;
+      const delay = Math.min(2400, delayOf(el) + (gap ? [...parent.children].indexOf(el) * gap : 0));
+      transition(el, to, animate, null, { delay });
       const hidden = el.dataset.studioHidden === 'true' || to.opacity === 0 || to.opacity === '0' || to.visibility === 'hidden';
       el.setAttribute('aria-hidden', String(hidden));
       el.inert = hidden;
@@ -388,7 +526,7 @@ img{object-fit:cover}.image-wide{position:absolute;left:0;top:0;width:100%;heigh
     step = Math.max(0, Math.min(max(current), Math.floor(Number(n) || 0)));
     if (exporting) step = max(current);
     const changed = previous !== current;
-    if (changed) { pauseSlide(previous); for (const el of slides[current].querySelectorAll('[data-step]')) el.dataset.studioHidden = 'true'; }
+    if (changed) { pauseSlide(previous); for (const el of slides[current].querySelectorAll('[data-step],[data-until]')) el.dataset.studioHidden = 'true'; }
     document.body.dataset.export = String(exporting);
     slides.forEach((sl, j) => {
       const active = j === current;
@@ -489,7 +627,12 @@ img{object-fit:cover}.image-wide{position:absolute;left:0;top:0;width:100%;heigh
   const elapsed = () => { const s = Math.max(0, Math.floor(((presenterPaused || Date.now()) - presenterStart) / 1000)); return `${Math.floor(s / 60)}:${pad2(s % 60)}`; };
 
   function cloneSlide(i, at) {
-    const src = slides[i], c = src.cloneNode(true);
+    const src = slides[i];
+    // Clone committed text, not a number caught mid-count.
+    const live = [...counting].map(r => [r, r.node.data]);
+    for (const [r] of live) r.node.data = r.final;
+    const c = src.cloneNode(true);
+    for (const [r, v] of live) r.node.data = v;
     // IDs stay: the clone lives in the presenter document, and SVG url(#…) references need them.
     c.inert = true; c.classList.add('is-current'); c.setAttribute('aria-hidden', 'true');
     if (at !== null) applyStatic(c, at, src);

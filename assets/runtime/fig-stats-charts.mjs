@@ -619,7 +619,7 @@ export function forestPlot(o) {
   }
   if (o.xLabel) parts.push(textLines([o.xLabel], { x: o.reference != null ? x(o.reference) : box.x + box.w / 2, y: box.y + box.h + 52, size: size - 1, anchor: 'middle', fill: t.c('muted') }));
   const resolve = a => { const r = rows.find(q => q.label === a.at) || (o.summary?.label === a.at ? o.summary : null); return r && { x: x(r.high), y: yb.center(r.label) }; };
-  return finish(o, ctx, parts, resolve, { x, box });
+  return finish(o, ctx, parts, resolve, { x, y: yb, box, rows, colX });
 }
 
 /**

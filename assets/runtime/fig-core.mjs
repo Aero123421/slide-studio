@@ -237,7 +237,9 @@ export function svgRoot({ id, width, height, title, desc, className = '', theme:
   return el('svg', {
     xmlns: 'http://www.w3.org/2000/svg', viewBox: `0 0 ${n(width)} ${n(height)}`, width: n(width), height: n(height),
     role: 'img', 'aria-labelledby': labelled, id, class: `ss-fig ${className}`.trim(),
-    'font-family': t.font(font), style: `overflow:visible;${style}`,
+    // Axes and anchors are geometry: a right-to-left page must not flip start/end anchors.
+    // Text runs inside still order their own script correctly (bidi), e.g. Arabic labels.
+    direction: 'ltr', 'font-family': t.font(font), style: `overflow:visible;direction:ltr;${style}`,
   }, `<title id="${esc(id)}-title">${esc(title)}</title>`, desc ? `<desc id="${esc(id)}-desc">${esc(desc)}</desc>` : '', ...children);
 }
 
@@ -289,7 +291,7 @@ export function measureText(text, size = 16, { weight = 400, family = 'sans', le
 
 // Kinsoku: characters that may not start / end a line in Japanese and Chinese.
 const NO_START = new Set([...'、。，．,.：:；;？?！!）)］]｝}」』】〕〉》〙〗’”…‥ー々ゝゞヽヾぁぃぅぇぉっゃゅょゎァィゥェォッャュョヮヵヶ・%％']);
-const NO_END = new Set([...'（(［[｛{「『【〔〈《〘〖‘“$＄¥￥£']);
+const NO_END = new Set([...'（(［[｛{「『【〔〈《〘〖‘“$＄¥￥£€−±']); // a sign or currency stays with its number
 
 const CJK_RE = /[　-ヿ㐀-鿿가-힯＀-￯]/;
 const HIRAGANA_ONLY = /^[ぁ-ゟー]+$/u;
@@ -305,8 +307,11 @@ function tokenize(line, merge = true) {
   let raw;
   if (segmenter && CJK_RE.test(text)) {
     raw = [];
+    let glue = false; // after a no-break space (−80\u00a0°C) the next segment joins the same token
     for (const { segment } of segmenter.segment(text)) {
       const prev = raw[raw.length - 1];
+      if (prev && glue) { raw[raw.length - 1] += segment; glue = /[\u00A0\u202F\u2007]$/.test(segment); continue; }
+      if (prev && /^[\u00A0\u202F\u2007]+$/.test(segment)) { raw[raw.length - 1] += segment; glue = true; continue; }
       // Particles and okurigana stay with what precedes them (年度|に, 6%|まで, Python|で).
       if (prev && HIRAGANA_ONLY.test(segment) && !/\s$/.test(prev) && !NO_END.has([...prev].at(-1))) raw[raw.length - 1] += segment;
       else if (prev && /^\s+$/.test(segment)) raw[raw.length - 1] += segment;
@@ -512,7 +517,9 @@ export function fmt(v, { locale = 'en', digits, compact = false, sign = false, p
     notation: compact ? 'compact' : 'standard', compactDisplay: 'short',
   });
   const text = nf.format(Math.abs(x));
-  const isZero = Number(text.replace(/[^\d.]/g, '')) === 0;
+  // Zero after rounding to the shown digits; decided on the number, not the text, so locales
+  // with their own digits (ar-EG ٣٫٤) keep their sign.
+  const isZero = Math.round(Math.abs(x) * 10 ** d) === 0;
   const s = x < 0 && !isZero ? minus : sign && x > 0 && !isZero ? '+' : '';
   return `${s}${prefix}${text}${suffix}`;
 }

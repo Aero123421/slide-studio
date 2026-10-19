@@ -68,10 +68,23 @@ finished example with computed headlines.
   code points (Inter's figure punctuation and tabular digits: the page is printed again
   with those substitutions off) or when a CJK font shares a glyph between a radical and its
   ideograph (the text layer is rewritten from ⽉/⻑ to 月/長).
+- **Interactions with real subjects**: the 24 studies are pages from fictional decks (a
+  sepsis alert threshold, a dosing curve, a tide gauge during a typhoon, a bus network
+  with a closed bridge, a parcel-rate matrix, a measured model ablation…), six in
+  Japanese, each computing its headline from the data it passes to the widget.
+  `widgets.js` takes richer, optional config per kind — control labels with units, axes,
+  per-kind data, status and readout templates, documented parameter models (`dosing`,
+  `decay`, `logistic`) — draws real axes and direct labels, and renders meshes with a
+  depth buffer so hidden surfaces are exact at every angle. Decks that pass no data get
+  the original fixtures and behaviour (a browser check keeps it so).
+- Player: switching reduced motion *off* no longer settles a build that is still running
+  (only switching it on does); a late media-change event used to cut a delayed build short.
 - Tests: figure-engine suite (every chart renders a finite, accessible SVG with unique
   ids), HTML style-signal tests for `slop_check.py`, Player 4 browser suite
-  (`tests/player_browser.py`), and integrity regressions for clipped, hidden and
-  tight-leaded text.
+  (`tests/player_browser.py`), integrity regressions for clipped, hidden and
+  tight-leaded text, searchable-PDF checks for Inter and Japanese, and a gallery-index
+  check (every study has a card and a thumbnail; search, kind and language filters
+  return the counts computed from the catalog).
 
 ### Also in 4.0 (prepared after 3.4)
 

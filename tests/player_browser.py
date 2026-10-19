@@ -136,6 +136,19 @@ def main():
                     expect(float(page.evaluate("getComputedStyle(document.getElementById('mover')).opacity")) == 1, 'ends in the new state')
                 check('data-until on its own, and data-delay on data-states', until_and_delay)
 
+                def media_change():
+                    frames = 'new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))'
+                    opacity = lambda: float(page.evaluate("getComputedStyle(document.getElementById('mover')).opacity"))
+                    # Switching reduced motion off while a build is in its delay must not cut the build short.
+                    page.emulate_media(reduced_motion='reduce'); page.evaluate('SlideStudio.show(4,0)'); page.evaluate(frames)
+                    page.emulate_media(reduced_motion='no-preference'); page.keyboard.press('ArrowRight'); page.evaluate(frames)
+                    expect(abs(opacity() - 0.2) < 0.05, f'build still waiting after reduced motion was switched off (opacity {opacity()})')
+                    # Switching it on mid-build settles the build at once.
+                    page.evaluate('SlideStudio.show(4,0)'); page.keyboard.press('ArrowRight'); page.emulate_media(reduced_motion='reduce'); page.evaluate(frames)
+                    expect(opacity() == 1 and page.evaluate('document.getAnimations().length') == 0, 'reduced motion switched on settles a running build')
+                    page.emulate_media(reduced_motion='no-preference'); page.evaluate('SlideStudio.finish()')
+                check('switching reduced motion mid-build', media_change)
+
                 check('no page errors or player warnings', lambda: (expect(not errors, str(errors[:3])), expect(not state()['warnings'], str(state()['warnings']))))
             finally:
                 browser.close()

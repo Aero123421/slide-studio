@@ -56,6 +56,14 @@ one remedy: its labels need taller lines (1.6 leading), so the headline is one l
 figure uses the grammar's tall band (top 132 px) — more room, same type sizes. Other
 remedies: shorten a label, allow a third row, or split the procedure over two pages.
 
+## Review notes
+
+`slop_check.py` reports two warnings on this deck, and both stay with a reason, as the
+review loop asks: `card-rows-everywhere` (the boxes are the steps of one procedure joined
+by hand-off arrows, not attribute cards) and `near-duplicate-pages` (the summary and the
+full procedure repeat the same steps on purpose — that is what this example shows). In a
+real deck you would present only the page the audience needs.
+
 ## Adapting it
 
 Replace `steps` (each with `title`, `holder`, `detail` per language) and `flow`. Mark the

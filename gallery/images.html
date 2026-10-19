@@ -858,7 +858,9 @@ body.overview .slide { display: block; transform-origin: top left; transform: sc
 
   document.addEventListener('visibilitychange', () => { if (document.hidden) pauseSlide(current); else show(current, step); });
   window.addEventListener('resize', scale);
-  mq.addEventListener('change', () => { finish(); for (let i = 0; i < slides.length; i++) pauseSlide(i); show(current, step); });
+  // Reduced motion switched on: settle running motion and media now. Switched off: nothing is
+  // animating, and the next build animates again, so leave a running build alone.
+  mq.addEventListener('change', () => { if (!mq.matches) return; finish(); for (let i = 0; i < slides.length; i++) pauseSlide(i); show(current, step); });
   window.addEventListener('beforeprint', () => { restore = { current, step, exporting, widgets: [...widgets].map(([id, w]) => [id, call(w, 'snapshot')]) }; prepareExport(); });
   window.addEventListener('afterprint', () => {
     if (!restore) return;

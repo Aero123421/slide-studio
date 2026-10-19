@@ -6,7 +6,7 @@ const clinics = [                            // referrals a month; median wait, 
   { clinic: 'Orthopaedics', referrals: 410, median: 14.5, sigma: 0.55 },
   { clinic: 'Dermatology', referrals: 360, median: 12.8, sigma: 0.50 },
   { clinic: 'Ophthalmology', referrals: 520, median: 9.6, sigma: 0.42 },
-  { clinic: 'Ear, nose and throat', referrals: 280, median: 8.1, sigma: 0.50 },
+  { clinic: 'ENT', referrals: 280, median: 8.1, sigma: 0.50 },
   { clinic: 'Cardiology', referrals: 240, median: 6.4, sigma: 0.42 },
   { clinic: 'Gastroenterology', referrals: 300, median: 10.9, sigma: 0.48 },
   { clinic: 'Neurology', referrals: 150, median: 11.6, sigma: 0.52 },
@@ -24,7 +24,7 @@ const rows = clinics.map(c => ({
 const byWithin = [...rows].sort((a, b) => a.within - b.within), worst = byWithin[0];
 const below = rows.filter(r => r.within < standard.share);
 const largest = [...rows].sort((a, b) => b.referrals - a.referrals)[0];
-const words = ['No', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten'];
+const words = ['No', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten'], small = n => (n <= 10 ? words[n].toLowerCase() : String(n));
 const ID = 'interaction-table';
 
 export default {
@@ -38,7 +38,7 @@ Static: The export keeps the starting order (lowest share first). Sort by referr
   sources: [{ type: 'original-example', file: 'assets/interactions/table.mjs' }],
   exportPolicy: 'final',
   className: 'st cs-navy-classic-light',
-  content: `<h1 class="st-head">${words[below.length]} of ${rows.length} clinics miss the ${standard.share}% standard; ${worst.clinic} sees only ${Math.round(worst.within)}% of patients within ${standard.weeks} weeks</h1>
+  content: `<h1 class="st-head">${words[below.length]} of ${small(rows.length)} clinics miss the ${standard.share}% standard; ${worst.clinic} sees only ${Math.round(worst.within)}% of patients within ${standard.weeks} weeks</h1>
 <p class="st-dek">Northvale Health Board (fictional), outpatient referrals, quarter to September 2026.</p>
 <div class="widget" data-interactive="" id="${ID}-widget" data-region="primary"><div class="w-plot"></div><div class="w-controls"></div><output aria-live="polite" class="w-status"></output></div>
 <p class="st-source" data-region="source"><span>Illustrative data · waits summarised from a log-normal fit per clinic</span><span>Interaction · Sortable table</span></p>`,
@@ -49,11 +49,11 @@ Static: The export keeps the starting order (lowest share first). Sort by referr
     data: {
       id: 'clinic', rows,
       columns: [
-        { key: 'clinic', name: 'Clinic', align: 'left' },
-        { key: 'referrals', name: 'Referrals', unit: 'a month', ascending: false },
-        { key: 'median', name: 'Median wait', unit: 'weeks', digits: 1, ascending: false },
-        { key: 'p90', name: '90% seen within', unit: 'weeks', digits: 1, ascending: false },
-        { key: 'within', name: `Seen within ${standard.weeks} weeks`, unit: `% of patients; line at the ${standard.share}% standard`, digits: 0, suffix: '%', bar: { max: 100, ref: standard.share }, flag: { below: standard.share } },
+        { key: 'clinic', name: 'Clinic', short: 'clinic name', align: 'left' },
+        { key: 'referrals', name: 'Referrals', short: 'referrals', unit: 'a month', ascending: false },
+        { key: 'median', name: 'Median wait', short: 'median wait', unit: 'weeks', digits: 1, ascending: false },
+        { key: 'p90', name: '90% seen within', short: 'the wait 90% are seen within', unit: 'weeks', digits: 1, ascending: false },
+        { key: 'within', name: `Seen within ${standard.weeks} weeks`, short: `share seen within ${standard.weeks} weeks`, unit: `% of patients; line at the ${standard.share}% standard`, digits: 0, suffix: '%', bar: { max: 100, ref: standard.share }, flag: { below: standard.share } },
       ],
     },
     text: {

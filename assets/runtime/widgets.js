@@ -137,20 +137,21 @@ const path = (d, { stroke = C.ink, width = 2, fill = 'none', dash, join = 'round
   tag('path', { d, ...extra, style: css({ fill, stroke, 'stroke-width': width, 'stroke-dasharray': dash, 'stroke-linejoin': join, 'stroke-linecap': cap, opacity }) });
 const polyline = (pts, opts) => (pts.length ? path('M' + pts.map(p => `${r2(p[0])} ${r2(p[1])}`).join('L'), opts) : '');
 /** Text with figure-engine alignment: valign top|middle|bottom|baseline; lines for multi-line labels. */
-function text(x, y, s, { size = 16, fill = C.ink, weight, anchor = 'start', valign = 'baseline', halo, italic, lh = 1.25, extra, cls } = {}) {
+function text(x, y, s, { size = 16, fill = C.ink, weight, anchor = 'start', valign = 'baseline', halo, italic, lh = 1.25, extra, cls, num } = {}) {
   const list = Array.isArray(s) ? s : [s], k = list.length, step = size * lh;
   let y0 = y;
   if (valign === 'top') y0 = y + size * 0.76;
   else if (valign === 'middle') y0 = y - ((k - 1) * step) / 2 + size * 0.36;
   else if (valign === 'bottom') y0 = y - (k - 1) * step;
   const a = { x: r2(x), y: r2(y0), 'text-anchor': anchor === 'start' ? null : anchor, class: cls, ...extra,
-    style: css({ fill, 'font-size': size + 'px', 'font-weight': weight, 'font-style': italic ? 'italic' : null,
+    style: css({ fill, 'font-size': size + 'px', 'font-weight': weight, 'font-style': italic ? 'italic' : null, 'font-variant-numeric': num ? 'tabular-nums' : null,
       ...(halo ? { stroke: halo, 'stroke-width': '4px', 'stroke-linejoin': 'round', 'paint-order': 'stroke' } : {}) }) };
   if (k === 1) return tag('text', a, esc(list[0]));
   return tag('text', a, list.map((l, i) => tag('tspan', { x: r2(x), dy: i ? r2(step) : null }, esc(l))).join(''));
 }
+// Tabular figures are set per numeric label: in Inter they also widen hyphens inside words.
 const svgRoot = (W, H, body, label) => tag('svg', { viewBox: `0 0 ${r2(W)} ${r2(H)}`, role: 'img', 'aria-label': label,
-  style: css({ 'font-family': FONT, 'font-variant-numeric': 'tabular-nums' }) }, body);
+  style: css({ 'font-family': FONT }) }, body);
 const arrowHead = (x, y, angle, size = 9, fill = C.ink) => {
   const a = angle, p = (d, s) => [x - size * Math.cos(a) + d * Math.sin(a) * s, y - size * Math.sin(a) - d * Math.cos(a) * s];
   const [l, r] = [p(1, size * 0.55), p(-1, size * 0.55)];
@@ -191,7 +192,7 @@ function axisX(x, { y, values, format = String, grid, size = 16, family, zeroLin
     if (grid) out += line(px, grid[0], px, grid[1], { stroke: zeroLine && v === 0 ? C.ink : C.grid, width: zeroLine && v === 0 ? 1.4 : 1 });
     const label = typeof v === 'object' ? v.label : format(v), w = textWidth(label, size, 400, family);
     if (px - w / 2 < right + 10) continue;
-    out += text(px, y + 8, label, { size, fill: C.muted, anchor: 'middle', valign: 'top' });
+    out += text(px, y + 8, label, { size, fill: C.muted, anchor: 'middle', valign: 'top', num: true });
     right = px + w / 2;
   }
   return out;
@@ -202,7 +203,7 @@ function axisY(y, { x, values, format = String, grid, size = 16, zeroLine = true
   for (const v of values) {
     const py = y(v);
     if (grid) out += line(grid[0], py, grid[1], py, { stroke: zeroLine && v === 0 ? C.ink : C.grid, width: zeroLine && v === 0 ? 1.4 : 1 });
-    out += text(x - 10, py, format(v), { size, fill: C.muted, anchor: 'end', valign: 'middle' });
+    out += text(x - 10, py, format(v), { size, fill: C.muted, anchor: 'end', valign: 'middle', num: true });
   }
   return out;
 }
@@ -274,7 +275,7 @@ function mount(config, defaultAssets) {
   const valueText = (s, v) => {
     if (s.values) { const i = s.values.indexOf(v); return s.labels?.[i] ?? fill(s.format || '{v}', { v: fmt(v, s.digits ?? 0, locale) }, locale); }
     if (s.labels && isNum(v)) return s.labels[Math.round((v - (s.min ?? 0)) / (s.step || 1))] ?? String(v);
-    return fill(s.format || '{v}', { v: typeof v === 'number' ? fmt(v, s.digits ?? 0, locale) : v }, locale);
+    return fill(s.format || '{v}', { v: typeof v === 'number' ? fmt(v, s.digits ?? 0, locale, false, !s.plain) : v }, locale);
   };
 
   function slider(key, s, container = panel) {
@@ -917,7 +918,7 @@ KINDS.table = w => {
       const caption = d.caption ?? (d.rows ? '' : 'Synthetic values · numeric sort');
       w.draw(`<table class="w-table">${caption ? `<caption>${esc(caption)}</caption>` : ''}<thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`);
       const first = sortedRows[0], last = sortedRows[sortedRows.length - 1];
-      const vals = { column: col.name, direction: s.ascending ? (t.ascending || 'ascending') : (t.descending || 'descending'),
+      const vals = { column: col.short || col.name, direction: s.ascending ? (t.ascending || 'ascending') : (t.descending || 'descending'),
         first: first[idKey], last: last[idKey], firstValue: cell(col, first[col.key]), lastValue: cell(col, last[col.key]), count: rows.length };
       if (col.flag) vals.flagged = rows.filter(r => (col.flag.below !== undefined ? r[col.key] < col.flag.below : r[col.key] > col.flag.above)).length;
       return { status: w.fill(t.status || (s.ascending ? 'Ascending' : 'Descending'), vals), values: vals };
@@ -964,7 +965,7 @@ KINDS.brushing = w => {
         out += text(b.r + 14, b.t - 18, t.medianTitle || 'Median', { size: 16, fill: C.muted, valign: 'bottom' });
       }
       w.draw(svgRoot(W, H, out, t.figure || 'Scatter plot with a selected range'));
-      const vals = { k: picked.length, n: pts.length, low: w.ax(lo, ax.x, own ? 0 : 2), high: w.ax(hi, ax.x, own ? 0 : 2),
+      const vals = { k: picked.length, n: pts.length, others: rest.length, low: w.ax(lo, ax.x, own ? 0 : 2), high: w.ax(hi, ax.x, own ? 0 : 2),
         median: w.fmt(mSel, dg), rest: w.fmt(mRest, dg), ratio: isNum(mSel / mRest) ? w.fmt(mSel / mRest, 1) : '–' };
       return { status: w.fill(t.status || 'Selected {k} / {n} observations. Range changes both selection and count.', vals), values: vals };
     },
@@ -994,7 +995,7 @@ KINDS.histogram = w => {
       counts.forEach((c, i) => {
         const x0 = x(domain[0] + i * width) + gapPx / 2, x1 = x(domain[0] + (i + 1) * width) - gapPx / 2, isPeak = d.domain && peaks.includes(i);
         out += rect(x0, y(c), x1 - x0, y(0) - y(c), { fill: isPeak ? C.accent : d.domain ? C.context : C.ink, opacity: isPeak || d.domain ? null : 0.78 });
-        if (x1 - x0 >= w.tw(String(c), 16) + 4 && c) out += text((x0 + x1) / 2, y(c) - 6, String(c), { size: 16, anchor: 'middle', valign: 'bottom', fill: C.muted });
+        if (x1 - x0 >= w.tw(String(c), 16) + 4 && c) out += text((x0 + x1) / 2, y(c) - 6, String(c), { size: 16, anchor: 'middle', valign: 'bottom', fill: C.muted, num: true });
       });
       // Rug: every observation, unchanged by binning.
       for (const v of values) out += line(x(v), b.b - 9, x(v), b.b - 1, { stroke: C.ink, width: 1, opacity: 0.45 });
@@ -1028,41 +1029,45 @@ KINDS.bootstrap = w => {
       const means = []; for (let k = first; k <= s.seed; k++) means.push(mean(resample(k, n).map(i => values[i])));
       const enough = means.length >= (d.minDraws ?? 20), lo = enough ? quantile(means, 0.025) : NaN, hi = enough ? quantile(means, 0.975) : NaN;
       if (enough) { s.low = lo; s.high = hi; } else { delete s.low; delete s.high; }
-      const { width: W, height: H } = w.size(), ax = w.axes, dg = ax.x?.digits ?? 2;
+      const { width: W, height: H } = w.size(), ax = w.axes, dg = ax.x?.digits ?? 2, sg = ax.x?.signed;
       const xd = ax.x?.min !== undefined ? [ax.x.min, ax.x.max] : niceDomain(Math.min(...values), Math.max(...values), 6);
       const b = box(W, H, { l: 24, r: 24, t: 40, b: 62 });
-      const x = linear(xd, [b.l, b.r]);
-      const topH = b.h * 0.42, midY = b.t + topH, botTop = midY + 46, botB = b.b;
+      const x = linear(xd, [b.l, b.r]), dataMean = mean(values);
+      const topB = b.t + b.h * 0.4, botTop = topB + 52, rowY = botTop + 34, dotTop = rowY + 24;
       let out = '';
       for (const v of ticks(xd[0], xd[1], 8)) out += line(x(v), b.t - 10, x(v), b.b, { stroke: v === 0 ? C.ink : C.grid, width: v === 0 ? 1.4 : 1 });
       // Top: the observations; dots stacked above each show how often this resample drew it.
-      out += text(b.l, b.t - 14, fill(t.dataTitle || 'The {n} observations · this resample draws {n} with replacement', { n: values.length }, w.locale), { size: 16, fill: C.muted, valign: 'bottom' });
-      const times = values.map((_, i) => pick.filter(p => p === i).length), base = midY - 8;
-      const lv = stackLevels(values.map(x), 7);
+      out += text(b.l, b.t - 14, fill(t.dataTitle || 'The {n} observations; dots above each show how often this resample drew it', { n: values.length }, w.locale), { size: 16, fill: C.muted, valign: 'bottom' });
+      const times = values.map((_, i) => pick.filter(p => p === i).length), base = topB - 10, lv = stackLevels(values.map(x), 7);
+      const labelRows = [b.t + 6, b.t + 30];
+      const marks = [{ v: dataMean, col: C.ink, dash: '5 4', label: fill(t.observedLabel || 'mean of the data {v}', { v: fmt(dataMean, dg, w.locale, sg) }, w.locale) },
+        { v: m, col: C.accent, label: fill(t.meanLabel || 'resample mean {v}', { v: fmt(m, dg, w.locale, sg) }, w.locale) }];
+      marks.forEach((mk, k) => {
+        const px = x(mk.v), right = px > (b.l + b.r) / 2, ly = labelRows[k];
+        out += line(px, ly - 4, px, topB + 2, { stroke: mk.col, width: k ? 2.4 : 1.6, dash: mk.dash });
+        out += text(px + (right ? -8 : 8), ly, mk.label, { size: 16, weight: 650, fill: mk.col, valign: 'top', anchor: right ? 'end' : 'start', halo: C.paper, num: true });
+      });
       values.forEach((v, i) => {
         const cy = base - lv[i] * 4;
         out += circle(x(v), cy, 7, { fill: C.paper, stroke: C.ink, width: 1.6 });
         for (let k = 0; k < times[i]; k++) out += circle(x(v), cy - 18 - k * 13, 5, { fill: C.accent });
       });
-      const dataMean = mean(values);
-      out += line(x(m), b.t - 4, x(m), midY + 4, { stroke: C.accent, width: 2.4 });
-      out += text(x(m) + (x(m) > b.r - 200 ? -8 : 8), b.t + 6, fill(t.meanLabel || 'resample mean {v}', { v: fmt(m, dg, w.locale, ax.x?.signed) }, w.locale), { size: 16, weight: 650, fill: C.accent, valign: 'top', anchor: x(m) > b.r - 200 ? 'end' : 'start', halo: C.paper });
-      // Bottom: the distribution of all resample means so far.
-      out += text(b.l, botTop - 12, fill(t.meansTitle || '{k|resample mean|resample means}', { k: means.length }, w.locale), { size: 16, fill: C.muted, valign: 'bottom' });
+      // Bottom: the distribution of all resample means so far, with its central 95%.
+      out += text(b.l, botTop, fill(t.meansTitle || '{k|resample mean|resample means}', { k: means.length }, w.locale), { size: 16, fill: C.muted, valign: 'bottom' });
       const r = 3.2, colW = r * 2.1, cols = new Map();
       for (const v of means) { const c = Math.round(x(v) / colW); cols.set(c, (cols.get(c) || 0) + 1); }
-      const tallest = Math.max(1, ...cols.values()), dy = Math.min(r * 2.1, (botB - botTop - 24) / tallest);
-      for (const [c, k] of cols) for (let j = 0; j < k; j++) out += circle(c * colW, botB - 6 - j * dy, r, { fill: C.ink, opacity: 0.8 });
-      out += line(x(dataMean), botTop, x(dataMean), botB, { stroke: C.ink, width: 1.6, dash: '5 4' });
+      const tallest = Math.max(1, ...cols.values()), dy = Math.min(r * 2.1, (b.b - dotTop - 8) / tallest);
+      for (const [c, k] of cols) for (let j = 0; j < k; j++) out += circle(c * colW, b.b - 6 - j * dy, r, { fill: C.ink, opacity: 0.8 });
+      out += line(x(dataMean), rowY + 12, x(dataMean), b.b, { stroke: C.ink, width: 1.6, dash: '5 4' });
       if (enough) {
-        const yb = botTop + 8;
-        out += line(x(lo), yb, x(hi), yb, { stroke: C.accent, width: 3 }) + line(x(lo), yb - 7, x(lo), yb + 7, { stroke: C.accent, width: 3 }) + line(x(hi), yb - 7, x(hi), yb + 7, { stroke: C.accent, width: 3 });
-        const lab = fill(t.intervalLabel || '95% of resample means: {lo} to {hi}', { lo: fmt(lo, dg, w.locale, ax.x?.signed), hi: fmt(hi, dg, w.locale, ax.x?.signed) }, w.locale);
-        const lw = w.tw(lab, 16, 650), lx = clamp((x(lo) + x(hi)) / 2, b.l + lw / 2, b.r - lw / 2);
-        out += text(lx, yb + 12, lab, { size: 16, weight: 650, fill: C.accent, anchor: 'middle', valign: 'top', halo: C.paper });
+        out += line(x(lo), rowY, x(hi), rowY, { stroke: C.accent, width: 3 }) + line(x(lo), rowY - 7, x(lo), rowY + 7, { stroke: C.accent, width: 3 }) + line(x(hi), rowY - 7, x(hi), rowY + 7, { stroke: C.accent, width: 3 });
+        out += text(x(lo) - 10, rowY, fmt(lo, dg, w.locale, sg), { size: 16, weight: 650, fill: C.accent, anchor: 'end', valign: 'middle', num: true });
+        out += text(x(hi) + 10, rowY, fmt(hi, dg, w.locale, sg), { size: 16, weight: 650, fill: C.accent, valign: 'middle', num: true });
+        const lab = t.intervalLabel || '95% of means';
+        out += text((x(lo) + x(hi)) / 2, rowY - 10, lab, { size: 16, weight: 650, fill: C.accent, anchor: 'middle', valign: 'bottom', halo: C.paper });
       }
       out += line(b.l, b.b, b.r, b.b, { stroke: C.ink, width: 1.4 });
-      out += axisX(x, { y: b.b, values: ticks(xd[0], xd[1], 8), format: v => fmt(v, ax.x?.tickDigits ?? 1, w.locale, ax.x?.signed) });
+      out += axisX(x, { y: b.b, values: ticks(xd[0], xd[1], 8), format: v => fmt(v, ax.x?.tickDigits ?? 1, w.locale, sg) });
       out += xTitle(b, ax.x?.title, b.b + 36);
       w.draw(svgRoot(W, H, out, t.figure || 'Observations, one resample, and the distribution of resample means'));
       const vals = { mean: fmt(m, d.values ? dg : 3, w.locale, ax.x?.signed), draws: means.length, lo: fmt(lo, dg, w.locale, ax.x?.signed), hi: fmt(hi, dg, w.locale, ax.x?.signed),
@@ -1111,7 +1116,7 @@ KINDS.ablation = w => {
           if (moe) out += line(x(r.v - moe), cy, x(r.v + moe), cy, { stroke: current ? C.accent : C.context, width: current ? 3 : 2.4 });
           out += circle(x(r.v), cy, current ? 8 : 6, { fill: current ? C.accent : C.ink });
           out += text(b.l - 14, cy, r.name, { size: 17, weight: current ? 700 : 400, anchor: 'end', valign: 'middle', fill: current ? C.accent : C.ink });
-          out += text(x(r.v + moe) + 10, cy, fmt(r.v, dg, w.locale), { size: 16, weight: current ? 700 : 400, valign: 'middle', fill: current ? C.accent : C.muted });
+          out += text(x(r.v + moe) + 10, cy, fmt(r.v, dg, w.locale), { size: 16, weight: current ? 700 : 400, valign: 'middle', fill: current ? C.accent : C.muted, halo: C.paper, num: true });
         });
       } else {
         // Additive model: base plus the included components as a stacked bar.

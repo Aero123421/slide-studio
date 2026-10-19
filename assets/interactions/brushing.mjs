@@ -40,14 +40,14 @@ Static: The export shows the starting brush (${brush[0]}–${brush[1]}). For a w
     initial: { low: brush[0], high: brush[1] },
     data: { points: homes },
     controls: {
-      low: { label: 'Built from (year)', min: 1900, max: 2020, step: 1 },
-      high: { label: 'Built up to (year)', min: 1900, max: 2020, step: 1 },
+      low: { label: 'Built from (year)', min: 1900, max: 2020, step: 1, plain: true },
+      high: { label: 'Built up to (year)', min: 1900, max: 2020, step: 1, plain: true },
     },
     axes: { x: { title: 'Year built', min: 1900, max: 2020, ticks: [1900, 1920, 1940, 1960, 1980, 2000, 2020], digits: 0, plain: true },
       y: { title: 'Heating demand (kWh per m² a year)', min: 0, max: 250, ticks: [0, 50, 100, 150, 200, 250], digits: 0 } },
     text: {
       selectedMedian: 'selected {v}', restMedian: 'others {v}', medianTitle: 'Medians',
-      status: 'Built {low}–{high}: {k|home|homes}, median {median} kWh/m²; the other homes {rest}. Ratio {ratio}.',
+      status: 'Built {low}–{high}: {k|home|homes} with a median {median}\u00a0kWh/m²; the other {others}, {rest}\u00a0kWh/m² ({ratio} times).',
       figure: 'Heating demand by year built, with a selected range',
     },
   }],

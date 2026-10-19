@@ -1,80 +1,79 @@
-// Template: 戦略提案（コンサル型）· 推奨案とその根拠. Synthetic example content; replace data and copy.
-// The margin bridge (baseline + levers) produces the 2029 figure used in the hero panel and the title.
-const P = 'tpl-strategy-recommendation';
-const base = {label: ['2026年度', '見込み'], v: 2.0};
-const levers = [
-  {label: ['付帯作業の', '有償化'], v: 1.2, when: '27年度〜'},
-  {label: ['高採算業種へ', '営業集中'], v: 0.4, when: '27年度〜'},
-  {label: ['拠点統合', '川口→戸田'], v: 1.4, when: '28年度〜'},
-  {label: ['仕分けの', '部分自動化'], v: 1.1, when: '29年度〜'}
-];
-const target = 6.0, invest = 24, payback = 4.2;
-const end = Math.round((base.v + levers.reduce((s, l) => s + l.v, 0)) * 10) / 10;
+// Template: 戦略提案（経営会議向け）· 推奨案と営業利益のブリッジ. Synthetic example content; replace data and copy.
+// Bridge from the 2025 actual to the 2029 plan: market effects in grey, the plan's levers in the
+// accent, totals in ink. Running totals, margins and the headline come from `steps`.
+import { el, textLines, linear, band, fmt } from '../../runtime/figure.mjs';
 
-const W = 740, H = 262, L = 44, R = 736, T = 30, B = 190, yMax = 7;
-const cols = [{...base, kind: 'total'}, ...levers.map(l => ({...l, kind: 'step'})), {label: ['2029年度', '計画'], v: end, kind: 'total'}];
-const slot = (R - L) / cols.length, bw = slot * 0.56;
-const y = v => B - v / yMax * (B - T);
+const ID = 'tpl-strategy-recommendation';
+const option = {key: 'B', name: '店舗と物流の再設計', invest: 14.0, linked: [1.7, 2.6]}; // 推奨案：投資（億円）と投資による年間効果（2.2・2.3）
+const sales = {from: 240, to: 270};               // 売上高（億円）：2025年度実績、2029年度計画
+const steps = [                                   // 億円。kind: total（合計）／plan（打ち手）／market（外部要因）
+  {label: ['2025年度', '実績'], v: 3.6, kind: 'total'},
+  {label: ['売上の', '伸び'], v: 2.4, kind: 'market'},
+  {label: ['粗利率の', '改善'], v: 5.2, kind: 'plan', levers: '1.1・1.2'},
+  {label: ['物流費の', '削減'], v: 7.4, kind: 'plan', levers: '2.1〜2.4'},
+  {label: ['販促費の', '見直し'], v: 2.0, kind: 'plan', levers: '3.1'},
+  {label: ['運賃・人件費', 'の上昇'], v: -4.4, kind: 'market'},
+  {label: ['2029年度', '計画'], kind: 'total'},  // 値は自動で合計
+];
+const conditions = [                              // 実現の条件：期限と内容（ロードマップと同じ日付）
+  {when: '2027年4月', what: '送料無料ラインを4,980円に改定する'},
+  {when: '2028年3月', what: '店舗受け取りを全118店に広げる'},
+  {when: '2028年10月', what: '物流センターの自動仕分けを本稼働させる'},
+];
+
+// ---- derived: running totals (the last total is the sum, never typed)
+const r1 = v => Math.round(v * 10) / 10, f1 = v => fmt(v, {digits: 1});
 let run = 0;
-const bars = cols.map((c, i) => {
-  const x = L + i * slot + (slot - bw) / 2;
-  let lo, hi;
-  if (c.kind === 'total') { lo = 0; hi = c.v; run = c.v; } else { lo = run; hi = run + c.v; run = hi; }
-  const fill = c.kind === 'total' ? (i === 0 ? '#8d949a' : '#0d5c4f') : '#3d8878';
-  const next = i < cols.length - 1 ? `<line x1="${(x + bw).toFixed(1)}" x2="${(x + slot).toFixed(1)}" y1="${y(hi).toFixed(1)}" y2="${y(hi).toFixed(1)}" stroke="#8d949a" stroke-dasharray="3 3"/>` : '';
-  const val = c.kind === 'total' ? `${c.v.toFixed(1)}%` : `+${c.v.toFixed(1)}`;
-  return `${next}<rect x="${x.toFixed(1)}" y="${y(hi).toFixed(1)}" width="${bw.toFixed(1)}" height="${(y(lo) - y(hi)).toFixed(1)}" fill="${fill}"/>
-    <text x="${(x + bw / 2).toFixed(1)}" y="${(y(hi) - 8).toFixed(1)}" text-anchor="middle" style="font:400 ${c.kind === 'total' ? 20 : 17}px var(--s-fig);fill:${i === cols.length - 1 ? '#0d5c4f' : '#1c2024'}">${val}</text>
-    <text x="${(x + bw / 2).toFixed(1)}" y="${B + 22}" text-anchor="middle" class="s-sv-b">${c.label[0]}</text>
-    <text x="${(x + bw / 2).toFixed(1)}" y="${B + 42}" text-anchor="middle" class="s-sv-m">${c.label[1]}</text>
-    ${c.when ? `<text x="${(x + bw / 2).toFixed(1)}" y="${B + 62}" text-anchor="middle" style="font:600 15px var(--s-jp);fill:#8a5a04">${c.when}</text>` : ''}`;
+const bars = steps.map((s, i) => {
+  if (s.kind === 'total') { const v = i === 0 ? s.v : r1(run); run = v; return {...s, v, lo: 0, hi: v}; }
+  const lo = run; run = r1(run + s.v); return {...s, lo: Math.min(lo, run), hi: Math.max(lo, run), from: lo, to: run};
+});
+const start = bars[0].v, end = bars.at(-1).v;
+const margin = {from: r1(start / sales.from * 100), to: r1(end / sales.to * 100)};
+const planSum = r1(steps.filter(s => s.kind === 'plan').reduce((t, s) => t + s.v, 0));
+const signed = v => (v < 0 ? `−${f1(-v)}` : `+${f1(v)}`);
+const payback = option.invest / option.linked.reduce((t, v) => t + v, 0); // 3.3年（比較表と同じ式）
+
+// ---- geometry (figure at x=64, y=192; 858 × 420 = columns 1–9)
+const W = 858, H = 420, base = 318, top = 34;
+const x = band(bars.map((_, i) => i), [0, W], {inner: 0.36, outer: 0.08});
+const yMax = Math.max(...bars.map(b => b.hi));
+const y = linear([0, yMax], [base, top]);
+const color = b => b.kind === 'total' ? 'var(--st-ink)' : b.kind === 'plan' ? 'var(--st-accent)' : 'var(--st-context)';
+const marks = bars.map((b, i) => {
+  const x0 = x(i), w = x.bw, cx = x0 + w / 2;
+  const link = i < bars.length - 1 ? el('line', {x1: x0 + w, x2: x(i + 1), y1: y(b.kind === 'total' ? b.v : b.to), y2: y(b.kind === 'total' ? b.v : b.to), stroke: 'var(--st-link)', 'stroke-width': 1, 'stroke-dasharray': '3 3'}) : '';
+  const val = b.kind === 'total' ? f1(b.v) : signed(b.v);
+  const valCls = b.kind === 'plan' ? 'sv-n sv-a' : 'sv-n';
+  const label = textLines(b.label, {x: cx, y: base + 26, anchor: 'middle', lineHeight: 1.3, cls: b.kind === 'total' ? 'sv-q' : 'sv-l', attrs: b.kind === 'total' ? {style: 'font-size:16px'} : {}});
+  const sub = b.kind === 'total' ? textLines([`利益率 ${f1(i === 0 ? margin.from : margin.to)}%`], {x: cx, y: base + 74, anchor: 'middle', cls: 'sv-b'})
+    : b.levers ? textLines([b.levers], {x: cx, y: base + 74, anchor: 'middle', cls: 'sv-b'}) : '';
+  return link + el('rect', {x: x0, y: y(b.hi), width: w, height: Math.max(1.5, y(b.lo) - y(b.hi)), fill: color(b)})
+    + textLines([val], {x: cx, y: y(b.hi) - 10, anchor: 'middle', cls: valCls, attrs: {style: `font-weight:700;font-size:${b.kind === 'total' ? 22 : 18}px`}})
+    + label + sub;
 }).join('');
-const tgt = `<line x1="${L}" x2="${R}" y1="${y(target)}" y2="${y(target)}" stroke="#c98a12" stroke-width="1.6" stroke-dasharray="6 4"/>
-  <text x="${L}" y="${y(target) - 8}" style="font:700 15px var(--s-jp);fill:#8a5a04">目標 ${target.toFixed(1)}%</text>`;
+const axis = el('line', {x1: 0, x2: W, y1: base, y2: base, stroke: 'var(--st-ink)', 'stroke-width': 1});
 
-const reasons = [
-  {h: '投資を自己資金で賄える', p: `必要投資${invest}億円は営業キャッシュフローの3年分以内。案Aの60億円は借入の上限に近い。`},
-  {h: '早く出る利益で次を賄う', p: '料金改定の効果は半年後から出る。初年度の増益分で自動化投資の約4割を賄える。'},
-  {h: '段階ごとに見直せる', p: '2027年3月と2028年3月に判断の場を置き、効果が未達なら自動化の範囲を縮める。'}
-];
-
-const track = ['論点', '優先度', '選択肢', '推奨', '実行'].map((t, i) => `<span${i === 3 ? ' class="on"' : ''}>${t}</span>`).join('');
+const svg = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-labelledby="${ID}-t ${ID}-d">
+  <title id="${ID}-t">営業利益の増減：2025年度実績から2029年度計画へ（億円）</title>
+  <desc id="${ID}-d">2025年度実績${f1(start)}億円（利益率${f1(margin.from)}%）。${bars.slice(1, -1).map(b => `${b.label.join('')} ${signed(b.v)}`).join('、')}。2029年度計画${f1(end)}億円（利益率${f1(margin.to)}%）。打ち手による改善は計${f1(planSum)}億円。</desc>
+  ${axis}${marks}
+</svg>`;
 
 export default {
   study: true,
-  id: 'tpl-strategy-recommendation',
-  title: '推奨案とその根拠',
+  id: ID,
   language: 'ja',
-  notes: 'Purpose: 推奨案を1つに絞って言い切り、目標に届く道筋（利益率ブリッジ）と選ぶ理由3つを並べる。\nModify: base・levers（利益率への寄与pt、開始時期）・target・invest・payback を差し替える。2029年度の値は自動で合計される。\nInvariant: ブリッジの合計＝推奨パネルの数値＝見出しの数値。理由は比較表の評価軸に対応させ、各理由に数字か条件を1つ入れる。\nStatic: 3つの理由は順に表示される。最終状態ですべて表示。',
+  title: 'Recommendation and operating-profit bridge to 2029',
+  notes: 'Purpose: 推奨案を1つに絞って言い切り、営業利益が2025年度の実績から2029年度の計画までどう積み上がるかを示す。\nModify: option（推奨案）、sales（売上高）、steps（増減要因と金額、kind）、conditions（実現の条件と期限）を差し替える。最後の合計、利益率、見出しの数値は自動で計算される。\nInvariant: 合計＝前の合計＋増減の和（入力で上書きしない）。外部要因（売上の伸び・コスト上昇）は灰色、打ち手は強調色に分け、マイナスの要因も必ず載せる。条件の日付はロードマップと一致させる。\nStatic: 静的ページ。',
   sources: [],
   exportPolicy: 'final',
-  className: 'tpl-strategy s-rec',
-  content: `<div class="s-wrap">
-  
-  <h1 class="s-title" data-region="title">推奨は<em>案C 段階導入</em>。料金改定で早く利益を確保し、<br>その利益で拠点統合と自動化を進める</h1>
-  <div class="s-track" aria-label="章の位置">${track}</div>
-  <div class="s-rule"></div>
-  <section class="s-rec-hero" data-region="primary">
-    <p class="s-lab">推奨案</p>
-    <h2>案C 段階導入で、<br>${cols.at(-1).label[0]}に営業利益率<br>${end.toFixed(1)}%を目指す</h2>
-    <p>効果の早い打ち手から順に実行し、各段階の成果を確かめてから次の投資に進む。</p>
-    <div class="s-kpis">
-      <div><strong>${end.toFixed(1)}<small>%</small></strong><span>2029年度 営業利益率</span></div>
-      <div><strong>${invest}<small>億円</small></strong><span>総投資・回収${payback}年</span></div>
-    </div>
-  </section>
-  <div class="s-rec-bridge" data-region="support">
-    <svg viewBox="0 0 ${W} ${H}" role="img" aria-labelledby="${P}-t ${P}-d">
-      <title id="${P}-t">営業利益率のブリッジ（%）</title>
-      <desc id="${P}-d">2026年度見込み${base.v.toFixed(1)}%に、${levers.map(l => `${l.label.join('')} +${l.v}pt`).join('、')}を加え、2029年度${end.toFixed(1)}%。目標${target.toFixed(1)}%。</desc>
-      <text x="${L}" y="12" class="s-sv-m">営業利益率（%）と打ち手ごとの寄与（pt）</text>
-      <line x1="${L}" x2="${R}" y1="${B}" y2="${B}" stroke="#1c2024" stroke-width="1.2"/>
-      ${tgt}${bars}
-    </svg>
-  </div>
-  <div class="s-why" data-region="support">
-    ${reasons.map((r, i) => `<div data-step="${i + 1}" data-motion="lift"><span class="s-n">${i + 1}</span><h3>${r.h}</h3><p>${r.p}</p></div>`).join('')}
-  </div>
-  <div class="s-foot"><span data-region="source">例示データ · 寄与は各施策が満年度で効いた場合の利益率への効果</span><span>北辰コンサルティング<b>5</b></span></div>
-</div>`
+  className: 'tpl-strategy st-rec',
+  content: `<h1 class="st-title" data-region="title">案${option.key}を推奨する。<br>2029年度の営業利益は${f1(end)}億円、利益率は${f1(margin.to)}%になる</h1>
+<p class="st-exh">営業利益の増減<span>億円、2025年度実績→2029年度計画</span></p>
+<figure class="st-fig" style="left:64px;top:206px;width:${W}px;height:${H}px" data-region="primary">${svg}</figure>
+<p class="st-cond-h">実現の条件</p>
+<ol class="st-cond" data-region="support">${conditions.map(c => `<li><b>${c.when}まで</b>${c.what}</li>`).join('')}
+  <li><b>投資</b>${f1(option.invest)}億円。${f1(payback)}年で回収する</li></ol>
+<div class="st-foot" data-region="source"><p>注：売上高は${sales.from}億円から${sales.to}億円へ（年3%）。運賃は年4%、人件費は年3%の上昇を見込む。番号は論点ツリーの打ち手<br>出典：青柳リビング EC事業部門の管理会計（2025年度）、白峰パートナーズ分析</p><p>EC事業の収益改善<b>5</b></p></div>`,
 };

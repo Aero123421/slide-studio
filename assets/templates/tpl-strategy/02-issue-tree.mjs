@@ -1,84 +1,115 @@
-// Template: 戦略提案（コンサル型）· 論点ツリー. Synthetic example content; replace data and copy.
-// A root question → sub-issues → testable questions. Box positions and bracket connectors are computed from the tree.
-const P = 'tpl-strategy-issue-tree';
-const root = ['EC物流の営業利益率を', '2029年度に6%へ', '上げるには何をすべきか'];
-const branches = [
-  {no: '1', title: ['単価と荷主構成で', '収益を増やせるか'], leaves: [
-    {no: '1.1', q: '付帯作業（検品・流通加工）を有償化できるか', h: '上位20荷主の8割が料金改定を受け入れる', fx: '+1.2pt', st: 'done'},
-    {no: '1.2', q: '粗利の高い荷主に営業を集中できるか', h: '食品・化粧品・医療材の3業種で新規の6割を確保', fx: '+0.4pt', st: 'done'}]},
-  {no: '2', title: ['倉庫と拠点の', 'コストを下げられるか'], leaves: [
-    {no: '2.1', q: '3拠点を2拠点に統合できるか', h: '川口の荷量は戸田の空き区画で吸収できる', fx: '+1.4pt', st: 'done'},
-    {no: '2.2', q: '仕分け工程を部分的に自動化できるか', h: '仕分けの作業時間を35%削減できる', fx: '+1.1pt', st: 'wip'}]},
-  {no: '3', title: ['投資を回収し、', '移行を実行できるか'], leaves: [
-    {no: '3.1', q: '必要な投資を5年以内に回収できるか', h: '投資24億円、回収期間4.2年', fx: '—', st: 'wip'},
-    {no: '3.2', q: '移行期間中も現場の人員を維持できるか', h: '配置転換を先行させれば離職を抑えられる', fx: '—', st: 'todo'}]}
+// Template: 戦略提案（経営会議向け）· 論点ツリー. Synthetic example content; replace data and copy.
+// Root question → 3 sub-issues → 8 testable questions, each with a quantified hypothesis and its
+// 2029 profit effect. Positions, connectors, bars and every total are computed from `tree`.
+import { el, textLines, wrapText, fmt } from '../../runtime/figure.mjs';
+// Note: SVG labels that must keep a number with its unit (2029年度) take explicit lines; the
+// engine's wrapText can split "2029|年度" and compound nouns, so the root question is pre-broken.
+
+const ID = 'tpl-strategy-issue-tree';
+const plan = {                     // 億円（2029年度の値は計画）
+  sales2025: 240, op2025: 3.6,     // EC事業の売上高・営業利益（2025年度実績）
+  year: 2029, sales2029: 270,      // 目標年度と売上高の前提（年3%成長）
+  targetMargin: 6,                 // 目標営業利益率（%）
+  volume: 2.4,                     // 売上の伸びによる増益
+  headwind: -4.4,                  // 運賃・人件費の上昇
+};
+const rootQ = ['EC事業の', '営業利益率を、', '2029年度に6%', 'まで上げられるか']; // 主論点（改行位置を指定）
+const tree = [                     // v = 2029年度の営業利益への効果（億円）
+  {no: '1', q: '粗利率を上げられるか', leaves: [
+    {no: '1.1', q: '値引き販売を減らしても、客数を保てるか', h: '平均値引率を14%から10%に下げても、客数の減少は2%以内', v: 3.0},
+    {no: '1.2', q: '自社企画品（PB）の比率を上げられるか', h: 'PB比率を22%から32%へ上げれば、粗利率は0.8ポイント上がる', v: 2.2}]},
+  {no: '2', q: '物流費を下げられるか', focus: true, leaves: [
+    {no: '2.1', q: '送料無料の基準額を上げられるか', h: '3,980円を4,980円にすると、1件あたり配送費が10%下がる', v: 2.4},
+    {no: '2.2', q: '店舗での受け取りを広げられるか', h: '受け取り比率を9%から18%にすると、宅配が10%減る', v: 1.7},
+    {no: '2.3', q: '物流センターの仕分けを自動化できるか', h: '仕分けの作業時間を40%削減できる（投資9億円）', v: 2.6},
+    {no: '2.4', q: '配送会社の料金を下げられるか', h: '3社で再入札すれば、1個あたり運賃が3%下がる', v: 0.7}]},
+  {no: '3', q: '販促費を効率化できるか', leaves: [
+    {no: '3.1', q: '広告費を効果の高い媒体に寄せられるか', h: '費用対効果が下位3割の出稿を止めても、売上減は1%以内', v: 2.0},
+    {no: '3.2', q: 'ポイント付与率を下げられるか', h: '1.5%を1.0%に下げられるが、上位顧客の離反が懸念される', v: 1.2}]},
 ];
-const status = {done: {t: '検証済', fill: '#0d5c4f', ink: '#ffffff', stroke: '#0d5c4f'}, wip: {t: '検証中', fill: '#f8edd6', ink: '#8a5a04', stroke: '#c98a12'}, todo: {t: '未着手', fill: '#ffffff', ink: '#646a71', stroke: '#b8bdc2'}};
-const leaves = branches.flatMap(b => b.leaves);
-const doneFx = leaves.filter(l => l.st === 'done').reduce((s, l) => s + parseFloat(l.fx), 0);
-const counts = Object.fromEntries(Object.keys(status).map(k => [k, leaves.filter(l => l.st === k).length]));
 
-const W = 1192, H = 420, head = 30, lh = 52, lgap = 8, bgap = 18;
-const rootX = 16, rootW = 212, subX = 276, subW = 214, leafX = 540, leafW = 652;
-// vertical layout: leaves stacked, extra gap between branches
-let yy = head + 4;
-const lay = branches.map(b => {
-  const ys = b.leaves.map((_, i) => { const y = yy; yy += lh + (i < b.leaves.length - 1 ? lgap : 0); return y; });
-  yy += bgap;
-  return {...b, ys, top: ys[0], bot: ys.at(-1) + lh};
+// ---- derived numbers (never retyped)
+const sum = a => a.reduce((s, x) => s + x, 0);
+const r1 = v => Math.round(v * 10) / 10;
+const target = r1(plan.sales2029 * plan.targetMargin / 100);                    // 16.2
+const required = r1(target - plan.op2025 - plan.volume - plan.headwind);       // 14.6
+const margin2025 = r1(plan.op2025 / plan.sales2025 * 100);                     // 1.5
+const branches = tree.map(b => ({...b, total: r1(sum(b.leaves.map(l => l.v)))}));
+const focus = branches.find(b => b.focus);
+const share = focus.total / required;                                          // 0.51
+const f1 = v => fmt(v, {digits: 1});
+
+// ---- geometry (SVG coordinates; the figure sits at x=64, y=178 on the slide)
+const W = 1152, X = {root: 0, rootW: 156, br1: 176, br: 196, brW: 152, br2: 370, leaf: 392, bar: 980, end: 1152};
+const LH = 42, LG = 5, BG = 14, TOP = 44;
+const vmax = Math.max(...branches.flatMap(b => b.leaves.map(l => l.v)));
+const barX = v => X.bar + v / vmax * 110;
+let y = TOP;
+const lay = branches.map((b, bi) => {
+  if (bi) y += BG;
+  const leaves = b.leaves.map((l, li) => { if (li) y += LG; const top = y; y += LH; return {...l, top, cy: top + 11}; });
+  return {...b, leaves, mid: (leaves[0].top + leaves.at(-1).top + LH) / 2};
 });
-const rootTop = lay[0].top, rootBot = lay.at(-1).bot, rootMid = (rootTop + rootBot) / 2;
-const elbow = (x1, y1, x2, y2) => { const mx = (x1 + x2) / 2; return `<path d="M${x1} ${y1} H${mx} V${y2} H${x2}" fill="none" stroke="#8d949a" stroke-width="1.3"/>`; };
-const lines = lay.map(b => {
-  const mid = (b.top + b.bot) / 2;
-  return elbow(rootX + rootW, rootMid, subX, mid) + b.ys.map(y => elbow(subX + subW, mid, leafX, y + lh / 2)).join('');
-}).join('');
-const subBoxes = lay.map(b => {
-  const mid = (b.top + b.bot) / 2, h = b.bot - b.top;
-  return `<rect x="${subX}" y="${b.top}" width="${subW}" height="${h}" fill="#f1f7f5"/>
-    <text x="${subX + 20}" y="${mid - 8}" style="font:400 26px var(--s-fig);fill:#0d5c4f">${b.no}</text>
-    <text x="${subX + 50}" y="${mid - 10}" class="s-sv-t">${b.title[0]}</text><text x="${subX + 50}" y="${mid + 14}" class="s-sv-t">${b.title[1]}</text>`;
-}).join('');
-const leafBoxes = lay.flatMap(b => b.leaves.map((l, i) => {
-  const y = b.ys[i], s = status[l.st];
-  return `<rect x="${leafX + 0.5}" y="${y + 0.5}" width="${leafW - 1}" height="${lh - 1}" fill="#ffffff" stroke="#dcdfe2"/>
-    <text x="${leafX + 14}" y="${y + 22}" style="font:400 16px var(--s-fig);fill:#0d5c4f">${l.no}</text>
-    <text x="${leafX + 52}" y="${y + 22}" class="s-sv-t">${l.q}</text>
-    <text x="${leafX + 52}" y="${y + 43}" class="s-sv-m">仮説：${l.h}</text>
-    <text x="${leafX + leafW - 112}" y="${y + 33}" text-anchor="end" style="font:400 20px var(--s-fig);fill:${l.fx === '—' ? '#8d949a' : '#1c2024'}">${l.fx}</text>
-    <rect x="${leafX + leafW - 90}" y="${y + 13}" width="76" height="26" fill="${s.fill}" stroke="${s.stroke}"/>
-    <text x="${leafX + leafW - 52}" y="${y + 31}" text-anchor="middle" style="font:700 15px var(--s-jp);fill:${s.ink}">${s.t}</text>`;
-})).join('');
-const rootBox = `<rect x="${rootX}" y="${rootTop}" width="${rootW}" height="${rootBot - rootTop}" fill="#0d5c4f"/>
-  <text x="${rootX + 18}" y="${rootMid - 58}" style="font:700 15px var(--s-jp);fill:#bfe0d8;letter-spacing:.14em">主論点</text>
-  ${root.map((t, i) => `<text x="${rootX + 18}" y="${rootMid - 18 + i * 28}" style="font:700 18px var(--s-jp);fill:#ffffff">${t}</text>`).join('')}`;
-const heads = [[rootX, '主論点'], [subX, 'サブ論点'], [leafX, '検証すべき問いと仮説'], [leafX + leafW - 112, '利益率効果', 'end'], [leafX + leafW - 52, '状態', 'middle']]
-  .map(([x, t, a]) => `<text x="${x}" y="18" ${a ? `text-anchor="${a}"` : ''} class="s-sv-m" style="font-weight:600">${t}</text>`).join('');
+const H = y + 2;
+const rootMid = (lay[0].mid + lay.at(-1).mid) / 2;
+const line = (x1, y1, x2, y2, extra = {}) => el('line', {x1, y1, x2, y2, stroke: 'var(--st-link)', 'stroke-width': 1.2, ...extra});
 
-const track = ['論点', '優先度', '選択肢', '推奨', '実行'].map((t, i) => `<span${i === 0 ? ' class="on"' : ''}>${t}</span>`).join('');
+const head = [
+  textLines(['主論点'], {x: X.root, y: 16, cls: 'sv-h'}),
+  textLines(['論点'], {x: X.br, y: 16, cls: 'sv-h'}),
+  textLines(['検証する問いと定量仮説'], {x: X.leaf, y: 16, cls: 'sv-h'}),
+  textLines([`${plan.year}年度の効果（億円）`], {x: X.end, y: 16, anchor: 'end', cls: 'sv-h'}),
+  el('line', {x1: 0, x2: W, y1: 29.5, y2: 29.5, stroke: 'var(--st-ink)', 'stroke-width': 1}),
+];
+const rootLines = rootQ;
+const rootH = rootLines.length * 28 + 14 + 2 * 22;
+const rootTop = rootMid - rootH / 2;
+const root = [
+  textLines(rootLines, {x: X.root, y: rootTop + 20, lineHeight: 1.4, size: 20, cls: 'sv-r'}),
+  textLines([`2025年度実績 ${f1(margin2025)}%`, `必要な改善 ${f1(required)}億円`], {x: X.root, y: rootTop + rootLines.length * 28 + 30, lineHeight: 1.375, cls: 'sv-b'}),
+  line(X.rootW + 6, rootMid, X.br1, rootMid),
+  line(X.br1, lay[0].mid, X.br1, lay.at(-1).mid),
+];
+const tiers = lay.map((b, bi) => {
+  const qLines = wrapText(b.q, X.brW, 18, {weight: 700});
+  const bh = qLines.length * 24 + 26, top = b.mid - bh / 2;
+  const tone = b.focus ? 'var(--st-accent)' : 'var(--st-context)';
+  const sep = bi ? el('line', {x1: X.br, x2: W, y1: b.leaves[0].top - BG / 2 - 1, y2: b.leaves[0].top - BG / 2 - 1, stroke: 'var(--st-faint)', 'stroke-width': 1}) : '';
+  const leaves = b.leaves.map(l => [
+    textLines([`${l.no}　${l.q}`], {x: X.leaf, y: l.top + 17, cls: 'sv-q'}),
+    textLines([l.h], {x: X.leaf + 37, y: l.top + 39, cls: 'sv-b'}),
+    el('rect', {x: X.bar, y: l.top + 5, width: barX(l.v) - X.bar, height: 13, fill: tone}),
+    textLines([f1(l.v)], {x: X.end, y: l.top + 18, anchor: 'end', cls: 'sv-n'}),
+    line(X.br2, l.cy, X.leaf - 8, l.cy),
+  ].join('')).join('');
+  return [
+    sep,
+    line(X.br1, b.mid, X.br - 8, b.mid),
+    textLines(qLines, {x: X.br, y: top + 18, lineHeight: 1.333, cls: 'sv-q'}),
+    textLines([`計 ${f1(b.total)}億円`], {x: X.br, y: top + qLines.length * 24 + 20, cls: b.focus ? 'sv-b sv-a' : 'sv-b', attrs: b.focus ? {style: 'font-weight:700'} : {}}),
+    line(X.br + X.brW + 4, b.mid, X.br2, b.mid),
+    line(X.br2, b.leaves[0].cy, X.br2, b.leaves.at(-1).cy),
+    leaves,
+  ].join('');
+}).join('');
+const zero = el('line', {x1: X.bar, x2: X.bar, y1: TOP - 6, y2: H - 4, stroke: 'var(--st-ink)', 'stroke-width': 1});
+
+const svg = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-labelledby="${ID}-t ${ID}-d">
+  <title id="${ID}-t">論点ツリー：営業利益率6%に向けた論点と定量仮説</title>
+  <desc id="${ID}-d">主論点を${branches.length}つの論点と${branches.reduce((s, b) => s + b.leaves.length, 0)}つの問いに分解。${branches.map(b => `${b.no} ${b.q}（計${f1(b.total)}億円）：${b.leaves.map(l => `${l.no} ${l.q}、${l.h}、${f1(l.v)}億円`).join('。')}`).join('。')}。</desc>
+  ${head.join('')}${root.join('')}${tiers}${zero}
+</svg>`;
 
 export default {
   study: true,
-  id: 'tpl-strategy-issue-tree',
-  title: '論点ツリー — 主論点から検証すべき問いへ',
+  id: ID,
   language: 'ja',
-  notes: 'Purpose: 主論点を漏れなく重複なく分解し、どの問いがどこまで検証できたかを示す。\nModify: root・branches・leaves を書き換える。箱の高さと接続線は葉の数から自動で決まる。状態は done / wip / todo。\nInvariant: 線は「分解」を表し、矢印（順序）ではない。各問いは Yes/No で答えられる形にし、仮説と効果の単位を揃える。\nStatic: Already static.',
+  title: 'Issue tree: where the required profit improvement can come from',
+  notes: 'Purpose: 「6%に届くか」という大きな問いを、検証できる問いと数値の仮説に分け、どこに改善余地が集まっているかを示す。\nModify: plan（売上・利益・前提）と tree（論点・問い・仮説・効果）を差し替える。合計、必要額、棒の長さ、接続線は自動で計算される。focus: true の論点が強調色になる。\nInvariant: 線は分解を表し、順序ではない。各問いは「はい／いいえ」で答えられる形にし、仮説には必ず数値を入れる。効果の単位と年度は全ページでそろえる（2029年度・億円）。\nStatic: 静的ページ。',
   sources: [],
   exportPolicy: 'final',
-  className: 'tpl-strategy s-tree-page',
-  content: `<div class="s-wrap">
-  
-  <h1 class="s-title" data-region="title">${leaves.length}つの問いのうち${counts.done}つは検証を終えた。<br>残る主な論点は<em>自動化の効果と投資回収</em>に絞られた</h1>
-  <div class="s-track" aria-label="章の位置">${track}</div>
-  <div class="s-rule"></div>
-  <div class="s-tree" data-region="primary">
-    <svg viewBox="0 0 ${W} ${H}" role="img" aria-labelledby="${P}-t ${P}-d">
-      <title id="${P}-t">論点ツリー</title>
-      <desc id="${P}-d">主論点を${branches.length}つのサブ論点と${leaves.length}つの問いに分解。${leaves.map(l => `${l.no} ${l.q}（${status[l.st].t}）`).join('、')}。</desc>
-      ${heads}${lines}${rootBox}${subBoxes}${leafBoxes}
-    </svg>
-  </div>
-  <div class="s-so" style="top:604px" data-region="support"><b>示唆</b><p>検証済みの${counts.done}施策だけで+${doneFx.toFixed(1)}pt。目標の6%に届くかは、2.2の自動化効果にかかっている。</p></div>
-  <div class="s-foot"><span data-region="source">例示データ · 効果は2029年度の営業利益率への寄与（ベースライン2.0%）</span><span>北辰コンサルティング<b>2</b></span></div>
-</div>`
+  className: 'tpl-strategy st-tree',
+  content: `<h1 class="st-title" data-region="title">6%に必要な改善は${f1(required)}億円。その${share >= 0.45 && share < 0.55 ? '半分' : `${Math.round(share * 100)}%`}は物流費の見直しで生み出せる</h1>
+<figure class="st-fig" style="left:64px;top:178px;width:${W}px;height:${H}px" data-region="primary">${svg}</figure>
+<div class="st-foot" data-region="source"><p>注：効果は${plan.year}年度の年間効果。売上高は2025年度の${plan.sales2025}億円から年3%伸び、${plan.year}年度に${plan.sales2029}億円となる前提<br>出典：青柳リビング EC事業部門の管理会計（2025年度）、白峰パートナーズ分析</p><p>EC事業の収益改善<b>2</b></p></div>`,
 };

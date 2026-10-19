@@ -1,120 +1,80 @@
-// Template: 学会・研究発表 · 表紙（タイトル・発表者・所属）. Synthetic example content; replace data and copy.
-// Plate illustration is generated from a seeded random walk so it is reproducible; it is a schematic, not measured imagery.
+// Template: 学会発表（日本語） · 表紙. Synthetic example content; replace data and copy.
+// Type-led cover: the title is the whole page. Authors carry superscript affiliation numbers;
+// ○ before a name marks the presenter (the Japanese conference convention).
+// The specimen on the right is the same 50×50-pixel patch as the background page (same geometry,
+// same texture function), so the cover shows the subject itself at pixel scale, not a decoration.
+import { el } from '../../runtime/figure.mjs';
+
 const ID = 'tpl-research-ja-cover';
 const talk = {
-  venue: '構造物画像解析シンポジウム 2026',
-  session: '口頭発表 B-3',
-  date: '2026年11月12日',
-  title: 'ラベル50枚で、細いひび割れを<br>途切れずに捉える',
-  sub: '自己教師あり事前学習と連結性損失による、少数ラベルの画素単位セグメンテーション',
-  authors: [
+  title: ['ラベル50枚で学ぶ', 'ひび割れ検出'],             // two lines, broken between phrases
+  subtitle: '細線を残す擬似ラベルによる半教師あり領域分割',
+  authors: [                                              // aff: indexes into affiliations (1-based)
     { name: '高瀬 美緒', aff: [1], presenter: true },
     { name: '森本 圭', aff: [2] },
-    { name: '堀 直人', aff: [1] }
+    { name: '堀 直人', aff: [1] },
   ],
-  affiliations: ['潮見台大学 大学院情報学研究科', '湊川インフラ技術研究所']
+  affiliations: ['潮見台大学 大学院情報学研究科', '湊川インフラ技術研究所'],
+  venue: '第12回 構造物画像解析シンポジウム',
+  date: { y: 2026, m: 11, d: 12 },                         // the day of the talk
+  session: '口頭発表 B-3',
 };
-
-// --- seeded RNG (mulberry32) so the plate is identical on every build
-function rng(seed) { return () => { seed |= 0; seed = (seed + 0x6D2B79F5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
-const r = rng(20261112);
-const W = 472, PH = 420; // plate width / height in viewBox units
-// aggregate stipple (concrete surface texture)
-let stipple = '';
-for (let i = 0; i < 520; i++) {
-  const x = (r() * W).toFixed(1), y = (r() * PH).toFixed(1), rad = (0.5 + r() * r() * 2.4).toFixed(2);
-  const tone = ['#cfc6b3', '#bdb3a0', '#d9d1c1', '#a99f8c'][Math.floor(r() * 4)];
-  stipple += `<circle cx="${x}" cy="${y}" r="${rad}" fill="${tone}"/>`;
-}
-let stones = '';
-for (let i = 0; i < 26; i++) {
-  const cx = r() * W, cy = r() * PH, rad = 6 + r() * 12, n = 7;
-  const pts = Array.from({ length: n }, (_, k) => { const a = (k / n) * Math.PI * 2 + r() * 0.4; const rr = rad * (0.7 + r() * 0.35); return `${(cx + Math.cos(a) * rr).toFixed(1)},${(cy + Math.sin(a) * rr * 0.8).toFixed(1)}`; }).join(' ');
-  stones += `<polygon points="${pts}" fill="#e3dccb" stroke="#d2c9b5" stroke-width=".8"/>`;
-}
-// crack: jittered walk from upper-left to lower-right, plus one branch
-function walk(x0, y0, x1, y1, steps, amp) {
-  const pts = [[x0, y0]];
-  const dx = (x1 - x0) / steps, dy = (y1 - y0) / steps, len = Math.hypot(dx, dy), nx = -dy / len, ny = dx / len;
-  let off = 0;
-  for (let i = 1; i <= steps; i++) { off = off * 0.55 + (r() - 0.5) * amp; const e = i === steps ? 0 : off; pts.push([x0 + dx * i + nx * e, y0 + dy * i + ny * e]); }
-  return pts;
-}
-const main = walk(18, 58, 454, 350, 34, 22);
-const branchStart = main[14];
-const branch = walk(branchStart[0], branchStart[1], branchStart[0] + 40, 404, 14, 16);
-const d = pts => 'M' + pts.map(p => p.map(v => v.toFixed(1)).join(',')).join(' L');
-// zoom target on the crack
-const zt = main[19];
-const inset = { x: 302, y: 26, s: 144, n: 12 };
-const cell = inset.s / inset.n;
-// pixel rendering of a 2-px-wide crack across the inset grid
-let pix = '', gt = '';
-for (let c = 0; c < inset.n; c++) {
-  const row = Math.round(3 + c * 0.42 + (c % 3 === 1 ? 1 : 0));
-  for (const rr of [row, row + 1]) {
-    if (rr >= inset.n) continue;
-    const x = inset.x + c * cell, y = inset.y + rr * cell;
-    gt += `<rect x="${x + 0.5}" y="${y + 0.5}" width="${cell - 1}" height="${cell - 1}" fill="#1c2433"/>`;
+// Same crack as 02-background.mjs: [x, y, width] in patch pixels
+const crack = {
+  size: 50,
+  main: [[-1, 11, 2.7], [6, 13, 2.6], [12, 16, 2.5], [17, 16.5, 2.3], [22, 20, 2.1], [27, 23, 1.8], [31, 27, 1.6], [36, 29, 1.3], [41, 33, 1.1], [46, 38, 1.0], [51, 40, 0.9]],
+  branch: [[22, 20, 1.3], [24, 26, 1.1], [23, 32, 1.0], [26, 38, 0.9], [28, 44, 0.8], [30, 51, 0.8]],
+};
+const px = 6.4;                                            // drawn size of one image pixel
+const N = crack.size, segs = [crack.main, crack.branch].flatMap(l => l.slice(1).map((p, i) => [l[i], p]));
+const hash = (i, j) => { let h = (i * 374761393 + j * 668265263) ^ 0x5bd1e995; h = Math.imul(h ^ (h >>> 13), 1274126177); return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };
+const smooth = (x, y) => { const i = Math.floor(x), j = Math.floor(y), fx = x - i, fy = y - j, q = t => t * t * (3 - 2 * t);
+  const a = hash(i, j), b = hash(i + 1, j), c = hash(i, j + 1), d = hash(i + 1, j + 1);
+  return a + (b - a) * q(fx) + (c - a) * q(fy) + (a - b - c + d) * q(fx) * q(fy); };
+function value(i, j) {
+  let best = { gap: Infinity, w: 0, d: Infinity };
+  const x = i + 0.5, y = j + 0.5;
+  for (const [[x0, y0, w0], [x1, y1, w1]] of segs) {
+    const vx = x1 - x0, vy = y1 - y0, t = Math.max(0, Math.min(1, ((x - x0) * vx + (y - y0) * vy) / (vx * vx + vy * vy)));
+    const d = Math.hypot(x - (x0 + t * vx), y - (y0 + t * vy)), w = w0 + t * (w1 - w0);
+    if (d - w / 2 < best.gap) best = { gap: d - w / 2, w, d };
   }
+  const cover = Math.max(0, Math.min(1, best.w / 2 - best.d + 0.5));
+  const ground = 0.76 + 0.07 * (smooth(i / 3, j / 3) - 0.5) + 0.05 * (hash(i + 97, j + 31) - 0.5);
+  return Math.max(0, Math.min(1, ground - cover * (0.18 + 0.16 * Math.min(best.w, 3))));
 }
-for (let k = 0; k <= inset.n; k++) {
-  pix += `<line x1="${inset.x + k * cell}" y1="${inset.y}" x2="${inset.x + k * cell}" y2="${inset.y + inset.s}" stroke="#cfc6b2" stroke-width=".6"/>`;
-  pix += `<line x1="${inset.x}" y1="${inset.y + k * cell}" x2="${inset.x + inset.s}" y2="${inset.y + k * cell}" stroke="#cfc6b2" stroke-width=".6"/>`;
+const levels = 40, hex = v => { const k = Math.round(v * 255).toString(16).padStart(2, '0'); return `#${k}${k}${k}`; };
+const runs = [];
+for (let j = 0; j < N; j++) for (let i = 0; i < N;) {
+  const q = Math.round(value(i, j) * (levels - 1)); let k = i + 1;
+  while (k < N && Math.round(value(k, j) * (levels - 1)) === q) k++;
+  runs.push(el('rect', { x: i * px, y: j * px, width: (k - i) * px, height: px, fill: hex(q / (levels - 1)) }));
+  i = k;
 }
-const reg = (x, y, sx, sy) => `<path d="M${x},${y + 14 * sy} V${y} H${x + 14 * sx}" fill="none" stroke="#1c2433" stroke-width="1.2"/>`;
-
-const plate = `<svg viewBox="-10 -10 492 530" role="img" aria-labelledby="${ID}-t ${ID}-d">
-<title id="${ID}-t">床版下面のひび割れと予測マスクの模式図</title>
-<desc id="${ID}-d">コンクリート表面に枝分かれしたひび割れが走り、朱色の帯が予測マスクを示す。拡大図では、ひび割れが幅2画素の細線であることを12×12画素の格子で示す。乱数で生成した模式図であり、実測画像ではない。</desc>
-<defs>
-  <clipPath id="${ID}-clip"><rect x="0" y="0" width="${W}" height="${PH}"/></clipPath>
-  <linearGradient id="${ID}-light" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".45"/><stop offset=".6" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#8f8570" stop-opacity=".18"/></linearGradient>
-</defs>
-<g clip-path="url(#${ID}-clip)">
-  <rect width="${W}" height="${PH}" fill="#e9e3d4"/>
-  ${stones}${stipple}
-  <rect width="${W}" height="${PH}" fill="url(#${ID}-light)"/>
-  <path d="${d(main)}" fill="none" stroke="#b2432a" stroke-opacity=".28" stroke-width="12" stroke-linejoin="round" stroke-linecap="round"/>
-  <path d="${d(branch)}" fill="none" stroke="#b2432a" stroke-opacity=".28" stroke-width="10" stroke-linejoin="round" stroke-linecap="round"/>
-  <path d="${d(main)}" fill="none" stroke="#1c2433" stroke-width="2.2" stroke-linejoin="round"/>
-  <path d="${d(branch)}" fill="none" stroke="#1c2433" stroke-width="1.5" stroke-linejoin="round"/>
-</g>
-${reg(-8, -8, 1, 1)}${reg(W + 8, -8, -1, 1)}${reg(-8, PH + 8, 1, -1)}${reg(W + 8, PH + 8, -1, -1)}
-<circle cx="${zt[0].toFixed(1)}" cy="${zt[1].toFixed(1)}" r="13" fill="none" stroke="#1c2433" stroke-width="1.4"/>
-<line x1="${(zt[0] - 9).toFixed(1)}" y1="${(zt[1] - 10).toFixed(1)}" x2="${inset.x - 6}" y2="${inset.y + inset.s + 32}" stroke="#1c2433" stroke-width="1"/>
-<line x1="${(zt[0] + 12).toFixed(1)}" y1="${(zt[1] - 5).toFixed(1)}" x2="${inset.x + inset.s + 6}" y2="${inset.y + inset.s + 32}" stroke="#1c2433" stroke-width="1"/>
-<rect x="${inset.x - 6}" y="${inset.y - 6}" width="${inset.s + 12}" height="${inset.s + 12}" fill="#fbfaf5" stroke="#1c2433" stroke-width="1.4"/>
-${pix}${gt}
-<rect x="${inset.x - 6}" y="${inset.y + inset.s + 6}" width="${inset.s + 12}" height="26" fill="#1c2433"/>
-<text x="${inset.x + 4}" y="${inset.y + inset.s + 24}" class="s-white">拡大：1マス＝1画素</text>
-<g transform="translate(0,${PH + 34})">
-  <text x="0" y="0" class="s-fig">Fig. 0</text>
-  <text x="56" y="0" class="s-lab">床版下面のひび割れ（黒）と予測マスク（朱の帯）</text>
-  <text x="56" y="24" class="s-lab-s">模式図（縮尺なし）。幅1〜3画素の細線が骨材の模様に紛れる。</text>
-</g>
-</svg>`;
-
-const authors = talk.authors.map(a => `<span${a.presenter ? ' class="rj-pres"' : ''}>${a.name}<sup>${a.aff.join(',')}</sup></span>`).join('<span aria-hidden="true">　</span>');
-const affil = talk.affiliations.map((a, i) => `<sup>${i + 1}</sup>${a}`).join('　');
+const S = N * px;
+const specimen = `<svg width="${S}" height="${S}" viewBox="0 0 ${S} ${S}" role="img" aria-labelledby="${ID}-t"><title id="${ID}-t">点検画像の一部（${N}×${N}画素の模式図）。枝分かれしたひび割れが幅3画素から1画素へ細くなる</title>${runs.join('')}</svg>`;
+const weekday = ['日', '月', '火', '水', '木', '金', '土'][new Date(Date.UTC(talk.date.y, talk.date.m - 1, talk.date.d)).getUTCDay()];
+const dateText = `${talk.date.y}年${talk.date.m}月${talk.date.d}日（${weekday}）`;
+const authors = talk.authors
+  .map(a => `<span class="nw">${a.presenter ? '<i class="pres">○</i>' : ''}${a.name}<sup>${a.aff.join(',')}</sup></span>`).join('');
+const affiliations = talk.affiliations.map((a, i) => `<span class="nw"><sup>${i + 1}</sup>${a}</span>`).join('');
 
 export default {
   study: true,
   id: ID,
-  title: '表紙：ラベル50枚で細いひび割れを捉える',
   language: 'ja',
-  notes: 'Purpose: 研究発表の表紙。何を達成したかを一文のタイトルで示し、発表者・所属・会議情報を一か所にまとめる。\nModify: talk オブジェクトの会議名・日付・タイトル・著者・所属を書き換える。発表者は presenter:true で下線表示。右の図版は研究対象の模式図に差し替える（実測画像を使う場合は出典と撮影条件を図説に書く）。\nInvariant: 所属番号と上付き数字の対応、模式図であることの明記、タイトルは主張を含む文にする。\nStatic: 静的ページ。',
+  title: 'Research talk cover: title, authors, affiliations, venue and date',
+  notes: 'Purpose: 発表の題目と、誰が・どこで・いつ話すのかを一目で伝える表紙。タイトルだけで研究の対象と条件（ラベル50枚・ひび割れ検出）がわかるようにする。\nModify: talk の title（2行に分けた配列）・subtitle・authors・affiliations・venue・date・session を書き換える。発表者に presenter:true を付けると名前の前に○が付く。曜日は date から自動で求める。\nInvariant: タイトルは2行以内で、句の途中で改行しない。著者の上付き数字と所属の番号を一致させる。会議名・日付・セッションは表紙にだけ置き、各ページには繰り返さない。\nStatic: 静的ページ。',
   sources: [],
   exportPolicy: 'final',
   className: 'tpl-research-ja rj-cover',
-  content: `<div class="rj-page">
-<header class="rj-head"><span class="rj-sec"><b>${talk.venue}</b>　${talk.date}</span><span>${talk.session}</span></header>
-<div class="rj-cover-col">
-<h1 class="rj-cover-title" data-region="title">${talk.title}</h1>
-<p class="rj-cover-sub" data-region="support">${talk.sub}</p>
-<div class="rj-authors" data-region="support">${authors}<div class="rj-affil">${affil}</div></div>
+  content: `<p class="rj-venue" data-region="support"><b>${talk.venue}</b><span class="nw">${dateText}</span>　<span class="nw">${talk.session}</span></p>
+<h1 class="rj-title" data-region="title">${talk.title.map(l => `<span class="nw">${l}</span>`).join('<br>')}</h1>
+<p class="rj-sub" data-region="support">${talk.subtitle}</p>
+<figure class="rj-fig rj-specimen" style="left:${1216 - S}px;top:184px" data-region="support">${specimen}<figcaption>点検画像の一部（${N}×${N}画素、模式図）</figcaption></figure>
+<div class="rj-people" data-region="support">
+  <p class="rj-authors">${authors}</p>
+  <p class="rj-affil">${affiliations}</p>
 </div>
-<figure class="rj-fig rj-plate" data-region="primary">${plate}</figure>
-<footer class="rj-foot" data-region="source"><span>記載の会議・所属・氏名・数値はすべて架空の例です</span><span class="rj-folio">1 / 6</span></footer>
-</div>`
+`,
 };

@@ -1,27 +1,94 @@
-<!doctype html><html lang="en" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="generator" content="Slide Studio 3.4.0"><title>Template packs</title><style>/* Infrastructure only. Composition, typography and image use belong to the author. */
-:root{--studio-w:1280px;--studio-h:720px;--studio-scale:1;--studio-bar:52px;color-scheme:light}
-*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:Arial,'Noto Sans',sans-serif}body{background:#181b20;color:#17252d}
-.studio-stage{position:fixed;inset:0 0 var(--studio-bar);display:grid;place-items:center;overflow:hidden}
-.slide{position:absolute;display:none;width:var(--studio-w);height:var(--studio-h);overflow:hidden;background:white;transform:scale(var(--studio-scale));transform-origin:center}
-.slide.is-current{display:block}.slide h1,.slide h2,.slide h3,.slide p,.slide figure{margin:0}.slide img,.slide svg,.slide video,.slide canvas{max-width:100%}
-[data-studio-hidden="true"]{visibility:hidden!important;pointer-events:none!important}[data-motion],[data-states]{transform-box:fill-box}
-/* Scaled slides: hinted SVG text can be drawn at stale positions in Chromium; unhinted metrics keep labels on their geometry. */
-:where(.slide) svg text{text-rendering:geometricPrecision}
-.studio-controls{position:fixed;inset:auto 0 0;min-height:52px;padding:8px 12px;display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;background:#12171e;color:#fff;z-index:100;font:14px/1.2 Arial,sans-serif;direction:ltr}
-.studio-controls button,.studio-controls select{background:transparent;color:inherit;border:1px solid #8996a3;border-radius:3px;padding:6px 10px;font:inherit;cursor:pointer}
-.studio-controls option{color:#17252d;background:white}.studio-controls button:disabled{opacity:.4;cursor:default}.studio-controls button:hover:not(:disabled){background:#344355}
-:focus-visible{outline:3px solid #d28b13;outline-offset:4px}.studio-position{min-width:110px;text-align:center}
-.studio-notes{display:none;position:fixed;inset:auto 16px 70px auto;max-height:65vh;width:min(560px,calc(100vw - 32px));background:#fff;color:#1c2730;padding:26px;overflow:auto;white-space:pre-wrap;z-index:120;font:17px/1.6 sans-serif;border:1px solid #687985}
-.studio-notes.open{display:block}.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(100%)}
-[data-static="show"]{display:none!important}body[data-export="true"] [data-static="hide"]{display:none!important}body[data-export="true"] [data-static="show"]{display:revert!important;visibility:visible!important}
-body[data-export="true"] *{animation:none!important;transition:none!important;caret-color:transparent!important}
-body.overview .studio-stage{position:relative;inset:auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:22px;padding:24px 24px 100px;overflow:visible}
-.studio-thumb{position:relative;aspect-ratio:var(--studio-ratio);overflow:hidden;border:2px solid #8c99a6;cursor:pointer}
-body.overview .slide{display:block;transform-origin:top left;transform:scale(var(--thumb-scale,.25));pointer-events:none}
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}}
-@media print{@page{size:13.333333in 7.5in;margin:0}html,body{margin:0!important;background:white}.studio-stage{position:static;display:block;overflow:visible}.studio-thumb{display:contents!important}.slide{position:relative!important;display:block!important;transform:none!important;margin:0!important;break-after:page;print-color-adjust:exact;-webkit-print-color-adjust:exact}.slide:last-child{break-after:auto}.studio-controls,.studio-notes,.studio-announcer{display:none!important}}
+<!doctype html><html lang="en" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="generator" content="Slide Studio 4.0.0"><title>Template packs</title><style>/* Slide Studio player — infrastructure only. Composition, typography and
+   image use belong to the author's CSS. */
+:root { --studio-w: 1280px; --studio-h: 720px; --studio-scale: 1; --studio-bar: 52px; color-scheme: light; }
+* { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; font-family: Inter, "Helvetica Neue", "Segoe UI", "Hiragino Sans", "Noto Sans JP", Arial, sans-serif; }
+body { background: #15181d; color: #17252d; }
 
-.studio-controls select{max-width:min(300px,40vw);text-overflow:ellipsis}.studio-controls{flex-wrap:wrap}
+.studio-stage { position: fixed; inset: 0 0 var(--studio-bar); display: grid; place-items: center; overflow: hidden; touch-action: pan-y pinch-zoom; }
+.slide { position: absolute; display: none; width: var(--studio-w); height: var(--studio-h); overflow: hidden; background: white; transform: scale(var(--studio-scale)); transform-origin: center; }
+.slide.is-current { display: block; }
+.slide h1, .slide h2, .slide h3, .slide p, .slide figure { margin: 0; }
+.slide img, .slide svg, .slide video, .slide canvas { max-width: 100%; }
+[data-studio-hidden="true"] { visibility: hidden !important; pointer-events: none !important; }
+[data-motion], [data-states] { transform-box: fill-box; }
+/* Scaled slides: hinted SVG text can be drawn at stale positions in Chromium; unhinted metrics keep labels on their geometry. */
+:where(.slide) svg text { text-rendering: geometricPrecision; }
+
+/* Control strip */
+.studio-controls { position: fixed; inset: auto 0 0; min-height: 52px; padding: 8px 12px; display: flex; gap: 8px; align-items: center; justify-content: center; flex-wrap: wrap; background: #101419; color: #fff; z-index: 100; font: 14px/1.2 Inter, "Helvetica Neue", Arial, sans-serif; direction: ltr; transition: opacity .25s ease; }
+.studio-controls button, .studio-controls select { background: transparent; color: inherit; border: 1px solid #5d6976; border-radius: 6px; padding: 6px 10px; font: inherit; cursor: pointer; }
+.studio-controls option { color: #17252d; background: white; }
+.studio-controls button:disabled { opacity: .4; cursor: default; }
+.studio-controls button:hover:not(:disabled) { background: #2b3542; }
+.studio-controls select { max-width: min(300px, 40vw); text-overflow: ellipsis; }
+:focus-visible { outline: 3px solid #d28b13; outline-offset: 4px; }
+.studio-position { min-width: 110px; text-align: center; font-variant-numeric: tabular-nums; }
+
+/* Fullscreen: the stage takes the whole screen; controls float and hide when idle. */
+body.studio-fullscreen .studio-stage { inset: 0; }
+body.studio-fullscreen .studio-controls { background: rgba(16, 20, 25, .86); }
+body.studio-fullscreen.studio-idle .studio-controls { opacity: 0; pointer-events: none; }
+body.studio-fullscreen.studio-idle { cursor: none; }
+
+/* Notes panel */
+.studio-notes { display: none; position: fixed; inset: auto 16px 70px auto; max-height: 65vh; width: min(560px, calc(100vw - 32px)); background: #fff; color: #1c2730; padding: 26px; overflow: auto; white-space: pre-wrap; z-index: 120; font: 17px/1.6 Inter, "Helvetica Neue", "Hiragino Sans", sans-serif; border: 1px solid #687985; border-radius: 10px; box-shadow: 0 18px 50px rgba(0, 0, 0, .35); }
+.studio-notes.open { display: block; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(100%); }
+
+/* Black screen, shortcuts, toast */
+.studio-blackout { position: fixed; inset: 0; background: #000; z-index: 150; display: none; cursor: none; }
+.studio-blackout.on { display: block; }
+.studio-help { position: fixed; inset: 0; z-index: 160; display: none; place-items: center; background: rgba(8, 10, 14, .55); }
+.studio-help.open { display: grid; }
+.studio-help-card { background: #fff; color: #17202b; border-radius: 14px; padding: 26px 30px; min-width: min(460px, 92vw); box-shadow: 0 24px 60px rgba(0, 0, 0, .4); font: 16px/1.4 Inter, "Helvetica Neue", "Hiragino Sans", sans-serif; }
+.studio-help-card h2 { margin: 0 0 14px; font-size: 19px; }
+.studio-help-card dl { display: grid; grid-template-columns: max-content 1fr; gap: 9px 22px; margin: 0; }
+.studio-help-card dt { font: 600 14px/1.5 "JetBrains Mono", Menlo, Consolas, monospace; color: #3b4756; }
+.studio-help-card dd { margin: 0; }
+.studio-toast { position: fixed; left: 50%; top: 18px; translate: -50% 0; z-index: 170; background: rgba(16, 20, 25, .92); color: #fff; padding: 8px 14px; border-radius: 8px; font: 600 15px/1.2 Inter, "Helvetica Neue", sans-serif; opacity: 0; pointer-events: none; transition: opacity .2s ease; }
+.studio-toast.on { opacity: 1; }
+
+/* Static export */
+[data-static="show"] { display: none !important; }
+body[data-export="true"] [data-static="hide"] { display: none !important; }
+body[data-export="true"] [data-static="show"] { display: revert !important; visibility: visible !important; }
+body[data-export="true"] * { animation: none !important; transition: none !important; caret-color: transparent !important; }
+
+/* Overview grid */
+body.overview .studio-stage { position: relative; inset: auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 22px; padding: 24px 24px 100px; overflow: visible; }
+.studio-thumb { position: relative; aspect-ratio: var(--studio-ratio); overflow: hidden; border: 2px solid #5d6976; border-radius: 6px; cursor: pointer; }
+.studio-thumb:hover { border-color: #d28b13; }
+body.overview .slide { display: block; transform-origin: top left; transform: scale(var(--thumb-scale, .25)); pointer-events: none; }
+
+/* Presenter window (styles travel with the deck into the pop-up) */
+.pv-body { background: #0f1216; color: #e9edf2; margin: 0; height: 100vh; display: grid; grid-template-rows: auto 1fr auto; font: 16px/1.4 Inter, "Helvetica Neue", "Hiragino Sans", sans-serif; overflow: hidden; }
+.pv-bar { display: flex; gap: 18px; align-items: center; padding: 12px 18px; border-bottom: 1px solid #252c35; font-variant-numeric: tabular-nums; }
+.pv-title { flex: 1; color: #aab4c0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.pv-time { display: flex; gap: 14px; align-items: center; font: 600 22px/1 "JetBrains Mono", Menlo, Consolas, monospace; }
+.pv-main { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(280px, 1fr); gap: 18px; padding: 18px; min-height: 0; }
+.pv-current-wrap { display: flex; align-items: center; min-width: 0; }
+.pv-frame { position: relative; width: 100%; aspect-ratio: var(--studio-ratio, 16 / 9); overflow: hidden; border-radius: 6px; background: #000; color: #17252d; }
+.pv-frame .slide { position: absolute; left: 0; top: 0; display: block; transform-origin: top left; transform: scale(var(--pv-scale, .5)); }
+.pv-side { display: grid; grid-template-rows: auto auto auto 1fr; gap: 8px; min-height: 0; }
+.pv-label { margin: 6px 0 0; color: #8d99a7; font-size: 13px; text-transform: uppercase; letter-spacing: .06em; }
+.pv-notes { overflow: auto; background: #161b22; border-radius: 6px; padding: 16px 18px; white-space: pre-wrap; font-size: 21px; line-height: 1.5; color: #f3f5f8; min-height: 0; }
+.pv-foot { display: flex; justify-content: center; gap: 12px; padding: 10px 18px 14px; }
+.pv-btn { background: #1d2430; color: #e9edf2; border: 1px solid #3a4553; border-radius: 8px; padding: 8px 18px; font: inherit; cursor: pointer; }
+.pv-btn:hover { background: #283141; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
+}
+@media print {
+  @page { size: 13.333333in 7.5in; margin: 0; }
+  html, body { margin: 0 !important; background: white; }
+  .studio-stage { position: static; display: block; overflow: visible; }
+  .studio-thumb { display: contents !important; }
+  .slide { position: relative !important; display: block !important; transform: none !important; translate: none !important; scale: none !important; margin: 0 !important; break-after: page; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  .slide:last-child { break-after: auto; }
+  .studio-controls, .studio-notes, .studio-announcer, .studio-blackout, .studio-help, .studio-toast { display: none !important; }
+}
 
 :root{--studio-w:1280px;--studio-h:720px;--studio-ratio:1280/720}@media print{@page{size:13.333333333333334in 7.5in}}
 /* Tallyleaf pitch pack — warm editorial investor deck.
@@ -544,46 +611,48 @@ body.overview .slide{display:block;transform-origin:top left;transform:scale(var
     radial-gradient(ellipse 90% 70% at 70% 0%,rgba(57,135,229,.10),transparent 60%),
     linear-gradient(180deg,var(--ar-bg2),var(--ar-bg))}
 .tpl-architecture .ar-bar{position:absolute;left:48px;right:48px;top:22px;height:26px;display:flex;align-items:center;justify-content:space-between;
-  font:500 14px/1 var(--ar-mono);color:var(--ar-mute);letter-spacing:.04em;text-transform:uppercase}
+  font:500 15px/1 var(--ar-mono);color:var(--ar-mute);letter-spacing:.04em;text-transform:uppercase}
 .tpl-architecture .ar-bar b{color:var(--ar-text2);font-weight:600}
 .tpl-architecture .ar-bar .ar-crumb{display:flex;gap:10px;align-items:center}
 .tpl-architecture .ar-bar .ar-crumb i{font-style:normal;color:var(--ar-line)}
-.tpl-architecture .ar-chip{display:inline-flex;align-items:center;gap:7px;padding:5px 9px;border:1px solid var(--ar-line);border-radius:4px;background:rgba(17,27,40,.8);font:500 13px/1 var(--ar-mono);color:var(--ar-text2);text-transform:none;letter-spacing:0}
+.tpl-architecture .ar-chip{display:inline-flex;align-items:center;gap:7px;padding:5px 9px;border:1px solid var(--ar-line);border-radius:4px;background:rgba(17,27,40,.8);font:500 15px/1 var(--ar-mono);color:var(--ar-text2);text-transform:none;letter-spacing:0}
 .tpl-architecture .ar-chip::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--ar-warn)}
 .tpl-architecture .ar-chip.ar-ok::before{background:var(--ar-good)}
 .tpl-architecture .ar-title{position:absolute;left:48px;top:66px;width:1184px;margin:0;font:650 36px/1.2 var(--ar-sans);letter-spacing:-.015em;color:var(--ar-text)}
 .tpl-architecture .ar-title em{font-style:normal;color:var(--ar-sync-l)}
 .tpl-architecture .ar-sub{position:absolute;left:48px;top:116px;width:1100px;margin:0;font:400 18px/1.5 var(--ar-sans);color:var(--ar-text2)}
 .tpl-architecture .ar-foot{position:absolute;left:48px;right:48px;bottom:18px;display:flex;justify-content:space-between;align-items:center;
-  font:400 14px/1.3 var(--ar-mono);color:var(--ar-mute);border-top:1px solid var(--ar-line2);padding-top:10px}
+  font:400 15px/1.3 var(--ar-mono);color:var(--ar-mute);border-top:1px solid var(--ar-line2);padding-top:10px}
 .tpl-architecture .ar-foot .ar-pg{color:var(--ar-text2)}
 .tpl-architecture .ar-fig{position:absolute;margin:0}
 .tpl-architecture .ar-fig svg{display:block;width:100%;height:100%;overflow:visible}
 /* SVG text roles */
 .tpl-architecture .t-lab{font:500 15px var(--ar-sans);fill:var(--ar-text)}
-.tpl-architecture .t-lab2{font:400 14px var(--ar-sans);fill:var(--ar-text2)}
-.tpl-architecture .t-mono{font:500 14px var(--ar-mono);fill:var(--ar-text2)}
-.tpl-architecture .t-mono-s{font:400 13px var(--ar-mono);fill:var(--ar-mute)}
+.tpl-architecture .t-lab2{font:400 15px var(--ar-sans);fill:var(--ar-text2)}
+.tpl-architecture .t-mono{font:500 15px var(--ar-mono);fill:var(--ar-text2)}
+.tpl-architecture .t-mono-s{font:400 15px var(--ar-mono);fill:var(--ar-mute)}
 .tpl-architecture .t-mono-b{font:700 15px var(--ar-mono);fill:var(--ar-text)}
-.tpl-architecture .t-node{font:700 14px var(--ar-mono);fill:var(--ar-text)}
-.tpl-architecture .t-role{font:400 13px var(--ar-sans);fill:var(--ar-mute)}
-.tpl-architecture .t-zone{font:600 13px var(--ar-mono);fill:var(--ar-mute);letter-spacing:.12em}
+.tpl-architecture .t-node{font:700 15px var(--ar-mono);fill:var(--ar-text)}
+.tpl-architecture .t-role{font:400 15px var(--ar-sans);fill:var(--ar-mute)}
+.tpl-architecture .t-zone{font:600 15px var(--ar-mono);fill:var(--ar-mute);letter-spacing:.12em}
 .tpl-architecture .t-head{font:650 16px var(--ar-sans);fill:var(--ar-text)}
-.tpl-architecture .t-axis{font:400 14px var(--ar-mono);fill:var(--ar-mute)}
-.tpl-architecture .t-warn{font:700 14px var(--ar-mono);fill:var(--ar-warn)}
-.tpl-architecture .t-good{font:700 14px var(--ar-mono);fill:var(--ar-good)}
-.tpl-architecture .t-crit{font:700 14px var(--ar-mono);fill:var(--ar-crit)}
-.tpl-architecture .t-dark{font:700 14px var(--ar-mono);fill:#0b1119}
+.tpl-architecture .t-axis{font:400 15px var(--ar-mono);fill:var(--ar-mute)}
+.tpl-architecture .t-warn{font:700 15px var(--ar-mono);fill:var(--ar-warn)}
+.tpl-architecture .t-good{font:700 15px var(--ar-mono);fill:var(--ar-good)}
+.tpl-architecture .t-crit{font:700 15px var(--ar-mono);fill:var(--ar-crit)}
+.tpl-architecture .t-dark{font:700 15px var(--ar-mono);fill:#0b1119}
 
 /* 01 cover */
 .tpl-architecture .ar-cover-kicker{position:absolute;left:48px;top:118px;display:flex;gap:10px;align-items:center}
-.tpl-architecture .ar-cover-title{position:absolute;left:48px;top:156px;width:700px;margin:0;font:700 62px/1.06 var(--ar-sans);letter-spacing:-.03em;color:var(--ar-text)}
+/* Title and subtitle flow together, so a third title line pushes the subtitle down instead of under it. */
+.tpl-architecture .ar-cover-text{position:absolute;left:48px;top:150px;width:690px;display:flex;flex-direction:column;gap:22px}
+.tpl-architecture .ar-cover-title{margin:0;font:700 58px/1.06 var(--ar-sans);letter-spacing:-.03em;color:var(--ar-text);text-wrap:balance}
 .tpl-architecture .ar-cover-title span{color:var(--ar-warn)}
-.tpl-architecture .ar-cover-sub{position:absolute;left:48px;top:334px;width:600px;margin:0;font:400 20px/1.55 var(--ar-sans);color:var(--ar-text2)}
+.tpl-architecture .ar-cover-sub{width:600px;margin:0;font:400 20px/1.55 var(--ar-sans);color:var(--ar-text2)}
 .tpl-architecture .ar-kpis{position:absolute;left:48px;right:48px;top:520px;display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--ar-line);border-bottom:1px solid var(--ar-line)}
 .tpl-architecture .ar-kpi{padding:18px 20px 16px;border-left:1px solid var(--ar-line2)}
 .tpl-architecture .ar-kpi:first-child{border-left:0;padding-left:0}
-.tpl-architecture .ar-kpi .k{font:500 13px/1.2 var(--ar-mono);color:var(--ar-mute);letter-spacing:.06em;text-transform:uppercase}
+.tpl-architecture .ar-kpi .k{font:500 15px/1.2 var(--ar-mono);color:var(--ar-mute);letter-spacing:.06em;text-transform:uppercase}
 .tpl-architecture .ar-kpi .v{margin-top:8px;font:650 38px/1 var(--ar-sans);letter-spacing:-.02em;color:var(--ar-text);font-variant-numeric:tabular-nums}
 .tpl-architecture .ar-kpi .v small{font:500 17px/1 var(--ar-mono);color:var(--ar-text2);margin-left:4px;letter-spacing:0}
 .tpl-architecture .ar-kpi .n{margin-top:8px;font:400 15px/1.35 var(--ar-sans);color:var(--ar-text2)}
@@ -591,19 +660,19 @@ body.overview .slide{display:block;transform-origin:top left;transform:scale(var
 .tpl-architecture .ar-cover-art{position:absolute;left:760px;top:100px;width:472px;height:392px}
 
 /* 02 architecture */
-.tpl-architecture .ar-legend{position:absolute;display:flex;gap:22px;align-items:center;font:400 14px/1 var(--ar-sans);color:var(--ar-text2)}
+.tpl-architecture .ar-legend{position:absolute;display:flex;gap:22px;align-items:center;font:400 15px/1 var(--ar-sans);color:var(--ar-text2)}
 .tpl-architecture .ar-legend span{display:inline-flex;align-items:center;gap:8px}
 .tpl-architecture .ar-legend svg{display:block}
 .tpl-architecture .ar-legend-wrap{flex-wrap:wrap;row-gap:10px;column-gap:18px}
 .tpl-architecture .ar-note{position:absolute;padding:14px 16px;border:1px solid var(--ar-line);border-left:3px solid var(--ar-warn);background:rgba(17,27,40,.92);border-radius:0 6px 6px 0;font:400 15px/1.5 var(--ar-sans);color:var(--ar-text2)}
 .tpl-architecture .ar-note b{color:var(--ar-text);font-weight:600}
-.tpl-architecture .ar-note code{font:500 14px var(--ar-mono);color:var(--ar-warn)}
+.tpl-architecture .ar-note code{font:500 15px var(--ar-mono);color:var(--ar-warn)}
 
 /* 04 latency */
 .tpl-architecture .ar-side{position:absolute;left:948px;top:150px;width:284px}
 .tpl-architecture .ar-stat{padding:14px 0 14px;border-bottom:1px solid var(--ar-line2)}
 .tpl-architecture .ar-stat:first-child{padding-top:0}
-.tpl-architecture .ar-stat .k{font:500 13px/1.3 var(--ar-mono);color:var(--ar-mute);letter-spacing:.05em;text-transform:uppercase}
+.tpl-architecture .ar-stat .k{font:500 15px/1.3 var(--ar-mono);color:var(--ar-mute);letter-spacing:.05em;text-transform:uppercase}
 .tpl-architecture .ar-stat .v{margin-top:6px;font:650 32px/1 var(--ar-sans);color:var(--ar-text);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
 .tpl-architecture .ar-stat .v small{font:500 15px var(--ar-mono);color:var(--ar-text2);margin-left:4px;letter-spacing:0}
 .tpl-architecture .ar-stat .n{margin-top:6px;font:400 15px/1.4 var(--ar-sans);color:var(--ar-text2)}
@@ -613,23 +682,23 @@ body.overview .slide{display:block;transform-origin:top left;transform:scale(var
 .tpl-architecture .ar-metrics{position:absolute;left:48px;right:48px;top:548px;display:grid;grid-template-columns:repeat(3,1fr) 1.4fr;gap:0;border-top:1px solid var(--ar-line)}
 .tpl-architecture .ar-metric{padding:14px 18px 0;border-left:1px solid var(--ar-line2)}
 .tpl-architecture .ar-metric:first-child{padding-left:0;border-left:0}
-.tpl-architecture .ar-metric .k{font:500 13px/1.3 var(--ar-mono);color:var(--ar-mute);letter-spacing:.05em;text-transform:uppercase}
+.tpl-architecture .ar-metric .k{font:500 15px/1.3 var(--ar-mono);color:var(--ar-mute);letter-spacing:.05em;text-transform:uppercase}
 .tpl-architecture .ar-metric .v{margin-top:6px;font:650 30px/1 var(--ar-sans);color:var(--ar-text);font-variant-numeric:tabular-nums}
 .tpl-architecture .ar-metric .n{margin-top:6px;font:400 15px/1.4 var(--ar-sans);color:var(--ar-text2)}
 .tpl-architecture .ar-metric.ar-lesson .v{font:600 18px/1.4 var(--ar-sans);color:var(--ar-text)}
 
 /* 06 risk */
 .tpl-architecture .ar-table{position:absolute;left:560px;top:150px;width:672px;border-collapse:collapse;font:400 15px/1.35 var(--ar-sans);color:var(--ar-text2)}
-.tpl-architecture .ar-table th{font:500 13px/1.2 var(--ar-mono);color:var(--ar-mute);text-transform:uppercase;letter-spacing:.05em;text-align:left;padding:0 8px 9px;border-bottom:1px solid var(--ar-line)}
+.tpl-architecture .ar-table th{font:500 15px/1.2 var(--ar-mono);color:var(--ar-mute);text-transform:uppercase;letter-spacing:.05em;text-align:left;padding:0 8px 9px;border-bottom:1px solid var(--ar-line)}
 .tpl-architecture .ar-table td{padding:8px 8px;border-bottom:1px solid var(--ar-line2);vertical-align:top}
 .tpl-architecture .ar-table td:first-child{padding-left:0}
-.tpl-architecture .ar-table .ar-id{display:inline-block;min-width:32px;padding:3px 0;border-radius:4px;text-align:center;font:700 14px/1.2 var(--ar-mono);color:#0b1119}
+.tpl-architecture .ar-table .ar-id{display:inline-block;min-width:32px;padding:3px 0;border-radius:4px;text-align:center;font:700 15px/1.2 var(--ar-mono);color:#0b1119}
 .tpl-architecture .ar-table .ar-risk{color:var(--ar-text);font-weight:500}
 .tpl-architecture .ar-table .ar-mit{color:var(--ar-text2)}
-.tpl-architecture .ar-table .ar-own{font:500 14px/1.35 var(--ar-mono);color:var(--ar-text2);white-space:nowrap}
-.tpl-architecture .ar-table .ar-score{font:600 14px/1.35 var(--ar-mono);white-space:nowrap;color:var(--ar-text)}
+.tpl-architecture .ar-table .ar-own{font:500 15px/1.35 var(--ar-mono);color:var(--ar-text2);white-space:nowrap}
+.tpl-architecture .ar-table .ar-score{font:600 15px/1.35 var(--ar-mono);white-space:nowrap;color:var(--ar-text)}
 .tpl-architecture .ar-table .ar-score i{font-style:normal;color:var(--ar-mute);margin:0 4px}
-.tpl-architecture .ar-state{display:inline-flex;align-items:center;gap:6px;font:500 14px/1.2 var(--ar-mono);color:var(--ar-text2);white-space:nowrap}
+.tpl-architecture .ar-state{display:inline-flex;align-items:center;gap:6px;font:500 15px/1.2 var(--ar-mono);color:var(--ar-text2);white-space:nowrap}
 .tpl-architecture .ar-state::before{content:"";width:8px;height:8px;border-radius:2px;background:var(--ar-mute)}
 .tpl-architecture .ar-state.done::before{background:var(--ar-good);border-radius:50%}
 .tpl-architecture .ar-state.prog::before{background:var(--ar-warn);transform:rotate(45deg)}
@@ -643,19 +712,19 @@ body.overview .slide{display:block;transform-origin:top left;transform:scale(var
 }
 .tpl-ml-report .ml-page{position:absolute;inset:0;background:var(--ml-bg)}
 .tpl-ml-report .ml-page::before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:linear-gradient(180deg,var(--ml-c1),var(--ml-c2) 50%,var(--ml-c3))}
-.tpl-ml-report .ml-top{position:absolute;left:56px;right:56px;top:24px;display:flex;justify-content:space-between;align-items:center;font:500 14px/1 var(--ml-mono);color:var(--ml-mute)}
+.tpl-ml-report .ml-top{position:absolute;left:56px;right:56px;top:24px;display:flex;justify-content:space-between;align-items:center;font:500 15px/1 var(--ml-mono);color:var(--ml-mute)}
 .tpl-ml-report .ml-badge{display:inline-flex;align-items:center;gap:8px;color:var(--ml-ink)}
 .tpl-ml-report .ml-badge b{font-weight:700;background:var(--ml-ink);color:#fff;padding:4px 7px;border-radius:3px;letter-spacing:.02em}
 .tpl-ml-report .ml-sec{letter-spacing:.08em;text-transform:uppercase}
 .tpl-ml-report .ml-sec em{font-style:normal;color:var(--ml-sig-t);font-weight:700;margin-right:8px}
 .tpl-ml-report .ml-title{position:absolute;left:56px;top:62px;width:1168px;margin:0;font:650 32px/1.2 var(--ml-sans);letter-spacing:-.02em;color:var(--ml-ink)}
-.tpl-ml-report .ml-foot{position:absolute;left:56px;right:56px;bottom:18px;display:flex;justify-content:space-between;align-items:center;font:400 14px/1.3 var(--ml-mono);color:var(--ml-mute);border-top:1px solid var(--ml-rule);padding-top:10px}
+.tpl-ml-report .ml-foot{position:absolute;left:56px;right:56px;bottom:18px;display:flex;justify-content:space-between;align-items:center;font:400 15px/1.3 var(--ml-mono);color:var(--ml-mute);border-top:1px solid var(--ml-rule);padding-top:10px}
 .tpl-ml-report .ml-fig{position:absolute;margin:0}
 .tpl-ml-report .ml-fig svg{display:block;width:100%;height:100%;overflow:visible}
-.tpl-ml-report .ml-figno{font:700 13px/1 var(--ml-mono);color:var(--ml-sig-t);letter-spacing:.06em}
+.tpl-ml-report .ml-figno{font:700 15px/1 var(--ml-mono);color:var(--ml-sig-t);letter-spacing:.06em}
 .tpl-ml-report .ml-cap{position:absolute;font:400 15px/1.5 var(--ml-sans);color:var(--ml-ink2)}
 .tpl-ml-report .ml-cap b{color:var(--ml-ink);font-weight:600}
-.tpl-ml-report .ml-cap code,.tpl-ml-report .ml-note code{font:500 14px var(--ml-mono);color:var(--ml-ink);background:var(--ml-panel2);padding:1px 5px;border-radius:3px}
+.tpl-ml-report .ml-cap code,.tpl-ml-report .ml-note code{font:500 15px var(--ml-mono);color:var(--ml-ink);background:var(--ml-panel2);padding:1px 5px;border-radius:3px}
 .tpl-ml-report .ml-note{position:absolute;padding:14px 16px;background:var(--ml-panel);border-radius:6px;font:400 15px/1.5 var(--ml-sans);color:var(--ml-ink2)}
 .tpl-ml-report .ml-note h3{margin:0 0 6px;font:700 15px/1.2 var(--ml-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ml-mute)}
 .tpl-ml-report .ml-note b{color:var(--ml-ink)}
@@ -663,41 +732,41 @@ body.overview .slide{display:block;transform-origin:top left;transform:scale(var
 .tpl-ml-report .ml-note li{margin:3px 0}
 /* SVG text roles */
 .tpl-ml-report .v-lab{font:500 15px var(--ml-sans);fill:var(--ml-ink)}
-.tpl-ml-report .v-lab2{font:400 14px var(--ml-sans);fill:var(--ml-ink2)}
-.tpl-ml-report .v-axis{font:400 14px var(--ml-mono);fill:var(--ml-mute)}
-.tpl-ml-report .v-axt{font:500 14px var(--ml-sans);fill:var(--ml-ink2)}
+.tpl-ml-report .v-lab2{font:400 15px var(--ml-sans);fill:var(--ml-ink2)}
+.tpl-ml-report .v-axis{font:400 15px var(--ml-mono);fill:var(--ml-mute)}
+.tpl-ml-report .v-axt{font:500 15px var(--ml-sans);fill:var(--ml-ink2)}
 .tpl-ml-report .v-num{font:500 15px var(--ml-mono);fill:var(--ml-ink)}
 .tpl-ml-report .v-num-b{font:700 16px var(--ml-mono);fill:var(--ml-ink)}
 .tpl-ml-report .v-big{font:650 26px var(--ml-sans);fill:var(--ml-ink)}
-.tpl-ml-report .v-sig{font:700 14px var(--ml-mono);fill:var(--ml-sig-t)}
+.tpl-ml-report .v-sig{font:700 15px var(--ml-mono);fill:var(--ml-sig-t)}
 .tpl-ml-report .v-head{font:650 17px var(--ml-sans);fill:var(--ml-ink)}
 .tpl-ml-report .v-white{font:700 16px var(--ml-mono);fill:#fff}
-.tpl-ml-report .v-white2{font:400 13px var(--ml-mono);fill:#dbe7f6}
+.tpl-ml-report .v-white2{font:400 15px var(--ml-mono);fill:#dbe7f6}
 
 /* 01 dataset card */
 .tpl-ml-report .ml-hero{position:absolute;left:56px;top:92px;width:420px}
-.tpl-ml-report .ml-hero .ml-kick{font:600 14px/1.3 var(--ml-mono);color:var(--ml-sig-t);letter-spacing:.08em;text-transform:uppercase}
+.tpl-ml-report .ml-hero .ml-kick{font:600 15px/1.3 var(--ml-mono);color:var(--ml-sig-t);letter-spacing:.08em;text-transform:uppercase}
 .tpl-ml-report .ml-hero h1{margin:12px 0 0;font:700 46px/1.06 var(--ml-sans);letter-spacing:-.03em;color:var(--ml-ink)}
 .tpl-ml-report .ml-hero p{margin:18px 0 0;font:400 18px/1.5 var(--ml-sans);color:var(--ml-ink2)}
 .tpl-ml-report .ml-spec{position:absolute;left:56px;top:382px;width:420px;margin:0;display:grid;grid-template-columns:132px 1fr;border-top:1px solid var(--ml-ink)}
 .tpl-ml-report .ml-spec dt,.tpl-ml-report .ml-spec dd{margin:0;padding:8px 0;border-bottom:1px solid var(--ml-rule);font:400 15px/1.35 var(--ml-sans)}
-.tpl-ml-report .ml-spec dt{font:500 13px/1.6 var(--ml-mono);color:var(--ml-mute);letter-spacing:.04em;text-transform:uppercase}
+.tpl-ml-report .ml-spec dt{font:500 15px/1.6 var(--ml-mono);color:var(--ml-mute);letter-spacing:.04em;text-transform:uppercase}
 .tpl-ml-report .ml-spec dd{color:var(--ml-ink)}
 .tpl-ml-report .ml-card{position:absolute;left:520px;top:92px;width:704px;height:552px;border:1px solid var(--ml-rule);border-radius:8px;background:
   linear-gradient(var(--ml-grid) 1px,transparent 1px) 0 0/16px 16px,linear-gradient(90deg,var(--ml-grid) 1px,transparent 1px) 0 0/16px 16px,#fbfcfd}
 .tpl-ml-report .ml-card-h{position:absolute;left:24px;right:24px;top:18px;display:flex;justify-content:space-between;align-items:baseline}
 .tpl-ml-report .ml-card-h h2{margin:0;font:650 20px/1.2 var(--ml-sans);color:var(--ml-ink)}
-.tpl-ml-report .ml-card-h span{font:500 13px var(--ml-mono);color:var(--ml-mute)}
+.tpl-ml-report .ml-card-h span{font:500 15px var(--ml-mono);color:var(--ml-mute)}
 .tpl-ml-report .ml-facts{position:absolute;left:24px;right:24px;bottom:18px;display:grid;grid-template-columns:repeat(3,1fr);gap:0 20px}
 .tpl-ml-report .ml-facts div{padding-top:10px;border-top:1px solid var(--ml-rule);font:400 15px/1.4 var(--ml-sans);color:var(--ml-ink2)}
-.tpl-ml-report .ml-facts b{display:block;font:600 13px/1.4 var(--ml-mono);letter-spacing:.04em;text-transform:uppercase;color:var(--ml-mute);margin-bottom:3px}
+.tpl-ml-report .ml-facts b{display:block;font:600 15px/1.4 var(--ml-mono);letter-spacing:.04em;text-transform:uppercase;color:var(--ml-mute);margin-bottom:3px}
 
 /* 02/05 side panels */
 .tpl-ml-report .ml-side{position:absolute;top:140px;width:360px}
 .tpl-ml-report .ml-metric{display:grid;grid-template-columns:1fr auto;align-items:baseline;padding:10px 0;border-bottom:1px solid var(--ml-rule);font:400 15px/1.35 var(--ml-sans);color:var(--ml-ink2)}
 .tpl-ml-report .ml-metric:first-child{border-top:1px solid var(--ml-ink)}
 .tpl-ml-report .ml-metric b{font:650 24px/1 var(--ml-sans);color:var(--ml-ink);font-variant-numeric:tabular-nums}
-.tpl-ml-report .ml-metric small{display:block;grid-column:1/-1;font:400 14px/1.35 var(--ml-mono);color:var(--ml-mute);margin-top:4px}
+.tpl-ml-report .ml-metric small{display:block;grid-column:1/-1;font:400 15px/1.35 var(--ml-mono);color:var(--ml-mute);margin-top:4px}
 
 /* 06 model card */
 .tpl-ml-report .ml-mc{position:absolute;left:56px;top:136px;width:1168px;display:grid;grid-template-columns:1fr 1fr 1.1fr;gap:28px}
@@ -712,9 +781,9 @@ body.overview .slide{display:block;transform-origin:top left;transform:scale(var
 .tpl-ml-report .ml-sub h2{margin:0 0 8px;font:700 15px/1.2 var(--ml-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ml-ink)}
 .tpl-ml-report .ml-decision{padding:16px 18px;background:var(--ml-ink);color:#e6edf6;border-radius:6px;font:400 16px/1.5 var(--ml-sans)}
 .tpl-ml-report .ml-decision b{color:#fff}
-.tpl-ml-report .ml-decision .ml-dk{display:block;font:700 13px/1.2 var(--ml-mono);letter-spacing:.08em;text-transform:uppercase;color:#f7a47f;margin-bottom:6px}
+.tpl-ml-report .ml-decision .ml-dk{display:block;font:700 15px/1.2 var(--ml-mono);letter-spacing:.08em;text-transform:uppercase;color:#f7a47f;margin-bottom:6px}
 .tpl-ml-report .ml-bins{width:100%;margin-top:16px;border-collapse:collapse;font:400 15px/1.3 var(--ml-mono);color:var(--ml-ink2);font-variant-numeric:tabular-nums}
-.tpl-ml-report .ml-bins th{font:500 13px/1.2 var(--ml-mono);color:var(--ml-mute);text-align:right;padding:0 6px 6px;border-bottom:1px solid var(--ml-ink)}
+.tpl-ml-report .ml-bins th{font:500 15px/1.2 var(--ml-mono);color:var(--ml-mute);text-align:right;padding:0 6px 6px;border-bottom:1px solid var(--ml-ink)}
 .tpl-ml-report .ml-bins td{text-align:right;padding:5px 6px;border-bottom:1px solid var(--ml-rule)}
 .tpl-ml-report .ml-bins th:first-child,.tpl-ml-report .ml-bins td:first-child{text-align:left;padding-left:0}
 .tpl-ml-report .ml-bins tr.ml-on td{color:var(--ml-ink);font-weight:700;background:#fdf1ec}
@@ -2317,8 +2386,8 @@ body.overview .slide{display:block;transform-origin:top left;transform:scale(var
 <section class="slide tpl-architecture ar-cover" id="tpl-architecture-cover" role="group" aria-roledescription="slide" aria-label="Postmortem cover: checkout p99 regression" aria-hidden="true"><div class="ar-page">
 <div class="ar-bar"><span class="ar-crumb"><b>INC-2317</b><i>/</i>Postmortem &amp; design review</span><span>Checkout platform · 12 Aug 2026</span></div>
 <div class="ar-cover-kicker"><span class="ar-chip">SEV-2 · resolved, actions open</span><span class="ar-chip ar-ok">Blameless review</span></div>
-<h1 class="ar-cover-title" data-region="title">Checkout p99 hit <span>1.9 s</span> after a cache-key change</h1>
-<p class="ar-cover-sub" data-region="support">12 Aug 2026, 14:05–16:52 UTC, triggered by pricing-svc v4.18. What broke on the pricing read path, and four changes that keep a cache miss from reaching customers.</p>
+<div class="ar-cover-text"><h1 class="ar-cover-title" data-region="title">Checkout p99 hit <span>1.9 s</span> after a cache-key change</h1>
+<p class="ar-cover-sub" data-region="support">12 Aug 2026, 14:05–16:52 UTC, triggered by pricing-svc v4.18. What broke on the pricing read path, and four changes that keep a cache miss from reaching customers.</p></div>
 <figure class="ar-fig ar-cover-art" data-region="primary"><svg viewBox="0 0 472 392" role="img" aria-labelledby="tpl-architecture-cover-t tpl-architecture-cover-d">
 <title id="tpl-architecture-cover-t">Waterfall of one slow checkout trace</title>
 <desc id="tpl-architecture-cover-d">A synthetic trace of POST /checkout taking 1962 ms. The price-cache GET misses after 2 ms, and the fallback catalog-db query takes 1,846 ms, which accounts for almost all of the request time.</desc>
@@ -2562,7 +2631,7 @@ body.overview .slide{display:block;transform-origin:top left;transform:scale(var
 <rect x="1.5" y="42" width="9" height="9" fill="#fff" stroke="#7c8591" stroke-width="1.8"/><text x="20" y="51" class="v-lab">raw scores</text><text x="20" y="69" class="v-lab2">booster output</text>
 <line x1="6" y1="86" x2="6" y2="104" stroke="#0f172a" stroke-width="1.3"/><text x="20" y="100" class="v-lab2">95% Wilson interval</text>
 <line x1="-2" y1="126" x2="14" y2="126" stroke="#0f172a" stroke-dasharray="5 4"/><text x="20" y="131" class="v-lab2">perfect calibration</text></g>
-<text x="54" y="450" text-anchor="end" class="v-axis">10⁴</text><text x="54" y="504" text-anchor="end" class="v-axis">1</text><line x1="64" y1="504" x2="424" y2="504" stroke="#94a3b8"/><rect x="67" y="445.9474123025678" width="30" height="58.05258769743223" rx="2" fill="#104281" fill-opacity=".85"/><text x="82" y="440.9474123025678" text-anchor="middle" class="v-axis" style="font-size:12px">4249</text><rect x="103" y="468.5202568925775" width="30" height="35.4797431074225" rx="2" fill="#104281" fill-opacity=".85"/><text x="118" y="463.5202568925775" text-anchor="middle" class="v-axis" style="font-size:12px">165</text><rect x="139" y="473.3789783618605" width="30" height="30.621021638139467" rx="2" fill="#104281" fill-opacity=".85"/><text x="154" y="468.3789783618605" text-anchor="middle" class="v-axis" style="font-size:12px">82</text><rect x="175" y="476.4115860863874" width="30" height="27.588413913612627" rx="2" fill="#104281" fill-opacity=".85"/><text x="190" y="471.4115860863874" text-anchor="middle" class="v-axis" style="font-size:12px">53</text><rect x="211" y="480.13821289865166" width="30" height="23.861787101348362" rx="2" fill="#104281" fill-opacity=".85"/><text x="226" y="475.13821289865166" text-anchor="middle" class="v-axis" style="font-size:12px">31</text><rect x="247" y="479.7037769619538" width="30" height="24.2962230380462" rx="2" fill="#104281" fill-opacity=".85"/><text x="262" y="474.7037769619538" text-anchor="middle" class="v-axis" style="font-size:12px">33</text><rect x="283" y="480.8454714985245" width="30" height="23.154528501475507" rx="2" fill="#104281" fill-opacity=".85"/><text x="298" y="475.8454714985245" text-anchor="middle" class="v-axis" style="font-size:12px">28</text><rect x="319" y="479.7037769619538" width="30" height="24.2962230380462" rx="2" fill="#104281" fill-opacity=".85"/><text x="334" y="474.7037769619538" text-anchor="middle" class="v-axis" style="font-size:12px">33</text><rect x="355" y="478.1954582924842" width="30" height="25.804541707515767" rx="2" fill="#104281" fill-opacity=".85"/><text x="370" y="473.1954582924842" text-anchor="middle" class="v-axis" style="font-size:12px">41</text><rect x="391" y="473.1292971885713" width="30" height="30.870702811428686" rx="2" fill="#104281" fill-opacity=".85"/><text x="406" y="468.1292971885713" text-anchor="middle" class="v-axis" style="font-size:12px">85</text><text x="434" y="500" class="v-axis">windows per bin</text><text x="434" y="518" class="v-axis">(log scale)</text>
+<text x="54" y="450" text-anchor="end" class="v-axis">10⁴</text><text x="54" y="504" text-anchor="end" class="v-axis">1</text><line x1="64" y1="504" x2="424" y2="504" stroke="#94a3b8"/><rect x="67" y="445.9474123025678" width="30" height="58.05258769743223" rx="2" fill="#104281" fill-opacity=".85"/><text x="82" y="440.9474123025678" text-anchor="middle" class="v-axis" style="font-size:15px">4249</text><rect x="103" y="468.5202568925775" width="30" height="35.4797431074225" rx="2" fill="#104281" fill-opacity=".85"/><text x="118" y="463.5202568925775" text-anchor="middle" class="v-axis" style="font-size:15px">165</text><rect x="139" y="473.3789783618605" width="30" height="30.621021638139467" rx="2" fill="#104281" fill-opacity=".85"/><text x="154" y="468.3789783618605" text-anchor="middle" class="v-axis" style="font-size:15px">82</text><rect x="175" y="476.4115860863874" width="30" height="27.588413913612627" rx="2" fill="#104281" fill-opacity=".85"/><text x="190" y="471.4115860863874" text-anchor="middle" class="v-axis" style="font-size:15px">53</text><rect x="211" y="480.13821289865166" width="30" height="23.861787101348362" rx="2" fill="#104281" fill-opacity=".85"/><text x="226" y="475.13821289865166" text-anchor="middle" class="v-axis" style="font-size:15px">31</text><rect x="247" y="479.7037769619538" width="30" height="24.2962230380462" rx="2" fill="#104281" fill-opacity=".85"/><text x="262" y="474.7037769619538" text-anchor="middle" class="v-axis" style="font-size:15px">33</text><rect x="283" y="480.8454714985245" width="30" height="23.154528501475507" rx="2" fill="#104281" fill-opacity=".85"/><text x="298" y="475.8454714985245" text-anchor="middle" class="v-axis" style="font-size:15px">28</text><rect x="319" y="479.7037769619538" width="30" height="24.2962230380462" rx="2" fill="#104281" fill-opacity=".85"/><text x="334" y="474.7037769619538" text-anchor="middle" class="v-axis" style="font-size:15px">33</text><rect x="355" y="478.1954582924842" width="30" height="25.804541707515767" rx="2" fill="#104281" fill-opacity=".85"/><text x="370" y="473.1954582924842" text-anchor="middle" class="v-axis" style="font-size:15px">41</text><rect x="391" y="473.1292971885713" width="30" height="30.870702811428686" rx="2" fill="#104281" fill-opacity=".85"/><text x="406" y="468.1292971885713" text-anchor="middle" class="v-axis" style="font-size:15px">85</text><text x="434" y="500" class="v-axis">windows per bin</text><text x="434" y="518" class="v-axis">(log scale)</text>
 </svg></figure>
 <div class="ml-side" style="left:800px;top:136px;width:424px" data-region="support">
   <div class="ml-figno" style="margin-bottom:10px">P(FAILING) · TEST SPLIT · n = 4,800</div>
@@ -3790,7 +3859,7 @@ body.overview .slide{display:block;transform-origin:top left;transform:scale(var
 </div></section>
 <section class="slide tpl-keynote kn-number" id="tpl-keynote-number" role="group" aria-roledescription="slide" aria-label="Giant number: 4 h 16 min between the solar and demand peaks" aria-hidden="true"><div class="kn-page" style="background:radial-gradient(900px 420px at 30% 110%,rgba(255,122,61,.18),transparent 70%),radial-gradient(700px 400px at 90% -10%,rgba(79,134,255,.16),transparent 70%),#07080d">
 <p class="kn-abs kn-eyebrow" style="left:76px;top:66px">The number that runs our evenings</p>
-<p class="kn-abs kn-giant kn-num" data-region="title" role="heading" aria-level="2" style="left:64px;top:128px">4<small>h</small>16<small>min</small></p>
+<p class="kn-abs kn-giant kn-num" data-region="title" role="heading" aria-level="2" data-qa-overlap="The 260 px numerals' font box extends above their ink; the eyebrow clears the glyphs." style="left:64px;top:128px">4<small>h</small>16<small>min</small></p>
 <p class="kn-abs kn-context" style="left:800px;top:146px;width:410px">between the hour our solar farms produce the most and the hour the city <em>needs</em> the most.</p>
 <div class="kn-abs" data-region="primary" data-step="1" data-motion="lift" style="left:72px;top:410px;width:1136px"><svg viewBox="0 0 1136 236" width="1136" height="236" role="img" aria-labelledby="tpl-keynote-number-t tpl-keynote-number-d" font-family="Inter,'Helvetica Neue','Liberation Sans',Arial,sans-serif">
 <title id="tpl-keynote-number-t">Solar output and city demand over one day</title>
@@ -3872,120 +3941,590 @@ body.overview .slide{display:block;transform-origin:top left;transform:scale(var
 <h2 class="kn-abs kn-close-h" data-region="title" style="left:68px;top:128px">Move the <span style="color:var(--kn-sun)">hour.</span></h2>
 <ol class="kn-abs kn-asks" data-region="primary" style="left:76px;right:76px;top:340px"><li data-step="1" data-motion="lift"><b>01</b><p>Price the hour</p><span>Publish tariffs that change by the hour, not by the season.</span></li><li data-step="2" data-motion="lift"><b>02</b><p>Automate the shift</p><span>Let heat pumps, chargers and cold stores respond on their own.</span></li><li data-step="3" data-motion="lift"><b>03</b><p>Report the evening</p><span>Put the evening peak next to the annual total in every report.</span></li></ol>
 <div class="kn-foot" style="bottom:26px;left:auto;right:76px;justify-content:flex-end;gap:36px;color:#c3c2c8"><span>Solstice Grid Forum 2026</span><span style="text-transform:none;letter-spacing:.02em">solstice-forum.example/keynote</span></div>
-</div></section></main><nav class="studio-controls" aria-label="Slide"><button id="studio-prev" type="button" aria-label="Previous" >←</button><span id="studio-position" class="studio-position"></span><button id="studio-next" type="button" aria-label="Next" >→</button><select id="studio-jump" aria-label="Slide"><option value="0">1. Tallyleaf seed pitch — cover</option><option value="1">2. Problem — a week of over-ordering</option><option value="2">3. Market sizing — TAM, SAM, SOM</option><option value="3">4. Business model and unit economics</option><option value="4">5. Traction — ARR growth and milestones</option><option value="5">6. Team and the ask</option><option value="6">7. 2026年度 第2四半期 業績レビュー — 表紙</option><option value="7">8. KPIタイル — 8四半期の推移と計画比</option><option value="8">9. 営業利益の前年差ウォーターフォール</option><option value="9">10. 商談ファネルとボトルネック</option><option value="10">11. 契約コホート別の継続率ヒートマップ</option><option value="11">12. 次四半期の重点施策と決裁事項</option><option value="12">13. EC物流事業の収益改善に向けた戦略提案 — 表紙</option><option value="13">14. 論点ツリー — 主論点から検証すべき問いへ</option><option value="14">15. 2×2優先度マトリクス — 効果と実行の容易さ</option><option value="15">16. 選択肢比較表 — ハーベイボールによる評価</option><option value="16">17. 推奨案とその根拠</option><option value="17">18. 実行ロードマップ（ガント）</option><option value="18">19. 表紙：ラベル50枚で細いひび割れを捉える</option><option value="19">20. 背景と問い：細いひび割れほどラベルが足りない</option><option value="20">21. 手法：事前学習・微調整・評価の3段階</option><option value="21">22. 結果：ラベル50枚で全ラベル学習との差は5.7ポイント</option><option value="22">23. アブレーション：事前学習と連結性損失の寄与</option><option value="23">24. 結論と限界・今後の課題</option><option value="24">25. Postmortem cover: checkout p99 regression</option><option value="25">26. Layered system architecture with the incident path</option><option value="26">27. Request sequence: cache hit versus miss</option><option value="27">28. Latency percentiles over time</option><option value="28">29. Incident timeline with detection and recovery times</option><option value="29">30. Risk matrix with owned mitigations</option><option value="30">31. Evaluation report cover and dataset card</option><option value="31">32. Confusion matrix normalised by true class</option><option value="32">33. ROC and precision–recall curves with operating threshold</option><option value="33">34. Feature importance with uncertainty</option><option value="34">35. Calibration: reliability diagram before and after isotonic</option><option value="35">36. Model card: intended use, limitations and subgroup results</option><option value="36">37. 平均の落とし穴：表紙と学習目標</option><option value="37">38. 概念図：加重平均は人数という重りでつり合う点</option><option value="38">39. 例題：2店舗の客単価を会社全体の1つの数字にまとめる</option><option value="39">40. よくある誤り：平均どうしをそのまま足して割る</option><option value="40">41. 理解度チェック：2部署の平均残業時間をまとめる</option><option value="41">42. まとめ：平均をまとめるときは合計÷合計</option><option value="42">43. The Long Minute — essay opener</option><option value="43">44. Image-led spread: the cup</option><option value="44">45. Pull quote from the essay</option><option value="45">46. Illustrated timeline: fruit to cup</option><option value="46">47. Big-number spread: three numbers make a recipe</option><option value="47">48. Closing page and next issue</option><option value="48">49. 2025年度インパクトレポート：表紙と成果の数字</option><option value="49">50. 地域別の活動：参加者数と拠点数</option><option value="50">51. 事業の流れ：インプットからアウトカムまで</option><option value="51">52. 予算の内訳：支出と収入</option><option value="52">53. 受益者の声（例示用の架空の声）</option><option value="53">54. 次年度計画：目標とロードマップ</option><option value="54">55. Launch hero: Fernhook 2.0 returns automation</option><option value="55">56. Feature grid: six jobs Fernhook 2.0 now does</option><option value="56">57. Before and after: the return workflow on one time axis</option><option value="57">58. Pricing: three plans priced by monthly returns</option><option value="58">59. Integration map: one scan sets off refund, restock and update</option><option value="59">60. Closing: turn it on today, three steps and rollout dates</option><option value="60">61. 全体ステータス：RAG表示と一言要約</option><option value="61">62. マイルストーン：基準計画と見込み、今日の位置</option><option value="62">63. バーンダウン：計画線・実績線・完了見込み</option><option value="63">64. RACI表：作業ごとの責任分担</option><option value="64">65. リスク・課題一覧：影響×発生確度</option><option value="65">66. 決定事項と次のアクション</option><option value="66">67. Keynote opener: Move the hour, not the mountain</option><option value="67">68. Chapter divider: Time is the new capacity</option><option value="68">69. Giant number: 4 h 16 min between the solar and demand peaks</option><option value="69">70. Then vs now: plants chased demand; demand now follows the sun</option><option value="70">71. Quote: the cheapest kilowatt-hour is the one we move</option><option value="71">72. Closing: move the hour, and three things to do next</option></select><button id="studio-overview" type="button" aria-label="Overview" >Overview</button><button id="studio-notes-btn" type="button" aria-label="Notes" aria-expanded="false" aria-controls="studio-notes">Notes</button><button id="studio-reset" type="button" aria-label="Reset" >Reset</button><button id="studio-full" type="button" aria-label="Fullscreen" >Fullscreen</button></nav><aside id="studio-notes" class="studio-notes" aria-label="Notes"></aside><div id="studio-announcer" class="sr-only studio-announcer" aria-live="polite"></div><script type="application/json" id="slide-studio-meta">{"version":3,"width":1280,"height":720,"title":"Template packs","language":"en","direction":"ltr","readingMode":"reference","sample":true,"mode":"workshop","copyRules":[{"id":"ja-stage-direction","level":"error","pattern":"(?:学会|口頭|研究)?発表(?:時|中)(?:に|で|は)?[ 　]*(?:切[り]?替[え]?|切替|クリック|再生|操作)|ここで(?:クリック|切[り]?替[え]?|動画を再生)|(?:要差し替え|後で修正|仮置きのまま)"},{"id":"en-stage-direction","level":"error","pattern":"\\b(?:switch|click|play|toggle) (?:here|during (?:the )?(?:conference|presentation|talk))\\b|\\b(?:replace this (?:text|title|image)|insert (?:your )?(?:title|content) here|speaker cue:)","flags":"i"},{"id":"placeholder","level":"error","pattern":"\\b(?:Lorem ipsum|TODO|FIXME|TBD)\\b|(?:ここにタイトル|ここに本文|テキストを入力)","flags":"i"},{"id":"ja-empty-claim","level":"warning","pattern":"(?:さらなる価値提供|革新的なソリューション|未来を切り拓く|シームレスな体験|圧倒的な価値)"},{"id":"en-empty-claim","level":"warning","pattern":"\\b(?:unlock (?:the )?(?:full )?potential|revolutionary solution|seamless experience|game-changing|transform the future)\\b","flags":"i"},{"id":"ja-export-production-cue","level":"error","pattern":"配布用メモ[：:]|(?:印刷[・／/]PDF|印刷・PDF|PDF・印刷)(?:では|時は)[^。\\n]{0,60}(?:表示が残|固定され|操作用)|(?:投影時|発表時)の操作用"},{"id":"en-export-production-cue","level":"error","pattern":"\\b(?:presenter-only cue|production note|export-only instruction)\\s*:","flags":"i"},{"id":"ja-performed-sincerity","level":"warning","pattern":"正直に(?:言います|お知らせ|お伝え)|本当の価値|価値を紡ぐ"},{"id":"ja-status-label","level":"error","pattern":"(?:登壇用|発表用|社内用|作業用|提出用)(?:ドラフト|下書き)"}],"slides":[{"id":"tpl-pitch-cover","title":"Tallyleaf seed pitch — cover","notes":"Purpose: Open an investor pitch with the company name, the one-line job the product does and the round.\nModify: Rename the company, rewrite the headline as the customer outcome, adjust the round line; redraw the mark function if your brand has one.\nInvariant: One promise in the headline; the mark is drawn once and reused at every size.\nStatic: Already static; the hero field is the brand illustration.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-pitch-problem","title":"Problem — a week of over-ordering","notes":"Purpose: Make the customer problem concrete by following one purchase through time, then size it.\nModify: Rewrite the five stations from a real customer interview; recompute the stat band from your own purchase and waste figures.\nInvariant: Arrows mean “then” (sequence); the costly moment is the only red station; stats derive from the same inputs as the headline.\nStatic: Already static.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-pitch-market","title":"Market sizing — TAM, SAM, SOM","notes":"Purpose: Size the market bottom-up so an investor can check every number.\nModify: Edit locations and ACV in the tiers array; values, circle areas, labels and leaders recompute.\nInvariant: Circle area ∝ value (radius uses √); each value shows its own multiplication; SOM is a stated plan assumption, not a forecast.\nStatic: Already static.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-pitch-unit-economics","title":"Business model and unit economics","notes":"Purpose: Show how one location makes money and how fast it repays its acquisition cost.\nModify: Edit price, costs, cac and churn at the top; the bar, curve, payback marker and KPI rail recompute.\nInvariant: Payback and LTV use the same churn; the curve starts at −CAC; margins derive from the listed costs.\nStatic: Already static.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-pitch-traction","title":"Traction — ARR growth and milestones","notes":"Purpose: Prove momentum with one honest growth series and name what caused the inflections.\nModify: Replace the months and locations arrays (or feed ARR directly); milestones reference month indexes.\nInvariant: Bars share a zero baseline; the headline multiple is computed from the same series; milestones are dated, not decorative.\nStatic: Milestones appear on step 1; the final state shows all of them.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-pitch-team-ask","title":"Team and the ask","notes":"Purpose: Close with who will execute and exactly what the money buys.\nModify: Replace the team array (initials derive from names), the raise, the use-of-funds shares and the target milestones.\nInvariant: Shares sum to 100% and dollar amounts derive from the raise; target ARR = locations × ACV.\nStatic: Already static.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-qbr-cover","title":"2026年度 第2四半期 業績レビュー — 表紙","notes":"Purpose: 会議の対象期間と結論の3指標を最初の1枚で示す。\nModify: fy・q を変えると四半期ダイヤルと月表示が追従する。summary の3指標は本文ページの値と一致させる。\nInvariant: 3指標は良否の向きを色と記号の両方で示す。ダイヤルは期間を表す図であり装飾ではない。\nStatic: Already static.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-qbr-kpi-tiles","title":"KPIタイル — 8四半期の推移と計画比","notes":"Purpose: 主要KPI 6つの今期値・計画比・前年比・推移を一覧し、未達の指標を一目で示す。\nModify: kpis 配列に8四半期の値・今期計画・良い方向（better）を入れる。バッジの符号と色、赤枠は自動で決まる。\nInvariant: 解約率のように「下がるのが良い」指標は better:'down' で色を反転。前年比は4四半期前との比較。スパークラインは形を見るもので、値はタイルの数字で読む。\nStatic: Already static.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-qbr-waterfall","title":"営業利益の前年差ウォーターフォール","notes":"Purpose: 前年同期から当期への営業利益の変化を、要因ごとの増減に分解して示す。\nModify: start と steps（符号付き、億円）を差し替える。当期値・棒の位置・接続線・見出しの差額は自動計算。\nInvariant: 始点＋各要因＝終点。増加は緑、減少は赤、合計は紺。共通のゼロ基準を持つ縦軸。\nStatic: 右側の3つの注記は段階表示。最終状態ですべて表示される。","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-qbr-funnel","title":"商談ファネルとボトルネック","notes":"Purpose: 獲得ファネルの各段階の件数と転換率を前期と比べ、最も悪化した段階とその影響額を示す。\nModify: stages に今期・前期の件数を入れる。転換率、ボトルネック（前期差が最も悪い段階）、影響額は自動計算。\nInvariant: 棒の幅は件数に比例（受注が細いのは実際に少ないため）。影響額は「その段階だけ前期の転換率だった場合」の仮定で、下流の転換率は今期値を使う。\nStatic: Already static.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-qbr-cohort-heatmap","title":"契約コホート別の継続率ヒートマップ","notes":"Purpose: 契約月ごとのコホートが何か月目にどれだけ残っているかを並べ、施策前後の差を示す。\nModify: grid を実データ（行＝契約月、列＝経過月、未観測は null）に置き換える。changeAt は施策後の最初のコホート。\nInvariant: 色は単一色相の明度（濃いほど継続率が高い）で、数値も各セルに表示。比較は同じ経過月（M3）で行い、未観測セルは平均に含めない。\nStatic: Already static.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-qbr-next-quarter","title":"次四半期の重点施策と決裁事項","notes":"Purpose: 今回の分析から導いた次四半期の施策を、根拠・KPI・責任者・日程つきで示し、会議で決める事項を明記する。\nModify: items に施策を追加・削除する（4〜5件が目安）。span と ms は月単位（0＝10月初め、3＝12月末）。plan は準備期間（点線）。\nInvariant: 各施策は根拠ページとKPI（現状→目標）を1つずつ持つ。決裁事項は1件に絞り、金額と期待効果を並べる。\nStatic: Already static.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-strategy-cover","title":"EC物流事業の収益改善に向けた戦略提案 — 表紙","notes":"Purpose: 提案の対象・問い・到達目標を表紙で明示する。\nModify: 宛先、題名、目標値（from・to・year）、日付と提案者を差し替える。右の正方形の配置は chosen と rec で変えられる。\nInvariant: 副題は「何を・いつまでに・どこからどこへ」を1文で言う。表紙に結論を詰め込みすぎない。\nStatic: Already static.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-strategy-issue-tree","title":"論点ツリー — 主論点から検証すべき問いへ","notes":"Purpose: 主論点を漏れなく重複なく分解し、どの問いがどこまで検証できたかを示す。\nModify: root・branches・leaves を書き換える。箱の高さと接続線は葉の数から自動で決まる。状態は done / wip / todo。\nInvariant: 線は「分解」を表し、矢印（順序）ではない。各問いは Yes/No で答えられる形にし、仮説と効果の単位を揃える。\nStatic: Already static.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-strategy-priority-matrix","title":"2×2優先度マトリクス — 効果と実行の容易さ","notes":"Purpose: 候補となる打ち手を「効果」と「実行の容易さ」の2軸で並べ、最優先の組み合わせを決める。\nModify: moves の ease（1〜5）・impact（億円）・inv（億円）を差し替える。閾値 easeCut・impactCut を変えると象限と右の一覧が追従する。lab はラベルの位置（t/r/l）。\nInvariant: 円の面積は投資額に比例（半径は平方根）。象限の境界は明記した閾値で、目分量で分けない。\nStatic: Already static.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-strategy-options","title":"選択肢比較表 — ハーベイボールによる評価","notes":"Purpose: 実現手段の選択肢を同じ評価軸で並べ、推奨案がどの点で優れ、どの点で劣るかを見せる。\nModify: options・criteria（各案の点数0〜4と一言コメント）・quant を差し替える。合計と推奨列の強調は自動。\nInvariant: 評価軸はすべて「●ほど良い」の向きに揃える（例：投資負担の「軽さ」）。定性評価と定量値を分けて示す。推奨案の弱点も隠さない。\nStatic: Already static.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-strategy-recommendation","title":"推奨案とその根拠","notes":"Purpose: 推奨案を1つに絞って言い切り、目標に届く道筋（利益率ブリッジ）と選ぶ理由3つを並べる。\nModify: base・levers（利益率への寄与pt、開始時期）・target・invest・payback を差し替える。2029年度の値は自動で合計される。\nInvariant: ブリッジの合計＝推奨パネルの数値＝見出しの数値。理由は比較表の評価軸に対応させ、各理由に数字か条件を1つ入れる。\nStatic: 3つの理由は順に表示される。最終状態ですべて表示。","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-strategy-roadmap","title":"実行ロードマップ（ガント）","notes":"Purpose: 推奨案を実行する順序・期間・判断の時期を1枚で示し、今日決めてほしいことで締める。\nModify: years（四半期の並び）、phases、streams（a・b は開始・終了の四半期番号、soft は継続・準備）、gates を差し替える。\nInvariant: 各ワークストリームは論点ツリーの番号に対応させる。判断ゲートは日付と「何を決めるか」を書く。最後の枠には会議で決める事項を1つだけ置く。\nStatic: Already static.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-research-ja-cover","title":"表紙：ラベル50枚で細いひび割れを捉える","notes":"Purpose: 研究発表の表紙。何を達成したかを一文のタイトルで示し、発表者・所属・会議情報を一か所にまとめる。\nModify: talk オブジェクトの会議名・日付・タイトル・著者・所属を書き換える。発表者は presenter:true で下線表示。右の図版は研究対象の模式図に差し替える（実測画像を使う場合は出典と撮影条件を図説に書く）。\nInvariant: 所属番号と上付き数字の対応、模式図であることの明記、タイトルは主張を含む文にする。\nStatic: 静的ページ。","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-research-ja-background","title":"背景と問い：細いひび割れほどラベルが足りない","notes":"Purpose: 研究の動機（データの偏りと細線の途切れ）を概念図で示し、検証する問いを一文で置く。\nModify: data オブジェクトの枚数・作業時間を実データに合わせる。格子は 1マス＝perTile 枚で自動生成される。(b) の画素図は研究対象の典型的な失敗に描き替える。\nInvariant: 概念図の格子は枚数に比例させる（1マスの単位を明記）。問いは検証可能な条件（枚数・比較対象・指標）を含める。\nStatic: 静的ページ。","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-research-ja-method","title":"手法：事前学習・微調整・評価の3段階","notes":"Purpose: 手法を処理の順序どおりに示し、各段階の入力・目的・出力と、段階間で受け渡すものを明示する。\nModify: stages 配列の名称・入力データ・仕様行、handoffs の受け渡しラベルを書き換える。段階数を変える場合は BW と GAP を 1152px に収まるよう再計算する。\nInvariant: 実線矢印は処理の順序と受け渡し、破線はデータ入力。評価データが学習に使われていないことを図中に書く。損失の定義は脚注に残す。\nStatic: 各段階は順に表示される（reveal）。最終状態で3段階すべてが読める。","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-research-ja-result","title":"結果：ラベル50枚で全ラベル学習との差は5.7ポイント","notes":"Purpose: 主結果を信頼区間付きで示し、主条件（50枚）の値と比較対象との差を読み取れるようにする。\nModify: series の mean と sd（シードごとの標本標準偏差）、runs と tCrit（自由度 runs−1 の t 値）、full、focusN を書き換える。誤差棒・読み取り値・説明文はすべて同じ配列から計算される。\nInvariant: 誤差棒の定義（何の区間か・何回の試行か・計算法）を図の横に明記する。差は平均値の差であり、差の信頼区間ではないことを混同しない。対数目盛であることを軸名に書く。\nStatic: 静的ページ。","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-research-ja-ablation","title":"アブレーション：事前学習と連結性損失の寄与","notes":"Purpose: 構成要素を1つずつ外した結果と、ハイパーパラメータの感度を1枚の表で比べる。\nModify: ref と groups の各行（mIoU の平均・SD、clDice、途切れ数）を書き換える。区間・差・区間図は同じ値から計算される。行を増やす場合は groups に追加する。\nInvariant: 全行の条件（ラベル枚数・シード・評価データ）を表の下に明記する。差の向き（各行 − 提案法）を列見出しに書く。区間図は全行で同じ目盛を使う。\nStatic: 静的ページ。","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-research-ja-conclusion","title":"結論と限界・今後の課題","notes":"Purpose: 発表の締め。結論（数値つき）、限界（適用範囲の外側）、今後の課題を並べ、最後に持ち帰ってほしい一文で終える。\nModify: r の数値は結果・アブレーションのページと同じ値にする。各列の項目は2〜3個に絞る。連絡先は実際の所属に合わせる。\nInvariant: 結論には条件（ラベル枚数・評価データ）を添える。限界は結論と同じ重みで見せ、小さな注記に押し込まない。\nStatic: 静的ページ。","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-architecture-cover","title":"Postmortem cover: checkout p99 regression","notes":"Purpose: Open a postmortem or design review with what happened, when, and how much it cost users, before any cause is discussed.\nModify: Edit inc, kpis and the trace spans (start/end in ms). The waterfall scale, bar widths and duration labels are computed from the trace array.\nInvariant: Every KPI names its unit and window. The trace is labelled as one representative request, not a distribution. Keep the review blameless: name systems and changes, not people.\nStatic: Static page.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-architecture-system","title":"Layered system architecture with the incident path","notes":"Purpose: Show where each component lives (network zone), how requests and events move, and which path failed, so the review can discuss a design change rather than a symptom.\nModify: Edit zones, nodes (N) and edges (E). Node ports are computed from node boxes; keep edges orthogonal and re-route when you move a node. Mark failing components with hot:true.\nInvariant: Arrow styles carry meaning (solid = synchronous request in call direction, dashed = asynchronous event flow, dotted = replication). Zone bands are real network boundaries. The incident highlight follows actual call edges only.\nStatic: Static page.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-architecture-sequence","title":"Request sequence: cache hit versus miss","notes":"Purpose: Show the order of calls for one request and exactly where the failing branch adds time, so the fix can be placed on the right hop.\nModify: Edit lanes and msgs (from, to, text, type). Frames are declared inline with {frame:\"hit\"|\"miss\"|\"end\"}; y positions and activation bars are computed from message order.\nInvariant: Solid arrows are calls in call direction, dashed arrows are returns. An alt frame holds mutually exclusive branches; give each branch its guard and frequency. The vertical axis is order, not time; durations are written on the messages.\nStatic: Static page.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-architecture-latency","title":"Latency percentiles over time","notes":"Purpose: Show how far and for how long latency left its objective, with the change events that explain the shape.\nModify: Replace the generator with real per-bucket percentiles in data (t, p50, p95, p99), and edit events and SLO. The window, peak, side-panel numbers and description are derived from data.\nInvariant: Percentiles are computed per bucket from raw requests, never averaged across buckets. State the bucket size, population and log scale. p50/p95/p99 use one ordered hue; the SLO keeps the critical color.\nStatic: Static page.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-architecture-timeline","title":"Incident timeline with detection and recovery times","notes":"Purpose: Reconstruct what the system did and what responders did on one time axis, and derive detection, mitigation and recovery times from the same timestamps.\nModify: Edit events (t, lane, kind, lines, optional mark). Positions, label levels, the impact band and all durations are computed; marks impact, alert, cause, mitigate and recovered must exist.\nInvariant: One time zone, stated once. System events (diamonds) and response events (circles) stay on separate sides of the axis. Durations are computed from the marked events, never typed.\nStatic: Static page.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-architecture-risks","title":"Risk matrix with owned mitigations","notes":"Purpose: Close the review with the risks this incident exposed, what each action is expected to change, and who owns it by when.\nModify: Edit risks (now/after as [likelihood, impact], owner, due, status) and the band thresholds. Cell colours, markers, arrows, scores and the headline counts are computed.\nInvariant: The arrow means planned effect of the mitigation, not a measured result. Score = likelihood × impact on 1–5 scales, and the scale definitions stay visible. Every action has one owning team and a date.\nStatic: Static page.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-ml-report-dataset","title":"Evaluation report cover and dataset card","notes":"Purpose: Open an evaluation report by naming the model, the decision requested and the data it was tested on, before any metric appears.\nModify: Edit splits (period, pumps, per-class counts) and the class definitions. Percentages, bar segments and the shift note are computed from counts. Replace the facts with your own provenance.\nInvariant: Class order Healthy → Degraded → Failing and its colour ramp are fixed across the report. Splits are time-based and the test period is after all training data. Say how labels were created and what is known to be missing.\nStatic: Static page.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-ml-report-confusion","title":"Confusion matrix normalised by true class","notes":"Purpose: Show where each true class ends up, so the audience sees which mistakes the model makes, not only how many.\nModify: The shared test-set block is repeated on pages 02, 03, 05 and 06 (modules cannot import each other); replace it identically on all four. Replace the shared rows block with real test predictions; the matrix, shares, totals, per-class metrics and title are computed from it. Change THRESHOLD only together with the ROC/PR page.\nInvariant: State the normalisation (rows = true class, each row sums to 100%) and keep counts visible. Class order Healthy → Degraded → Failing on both axes and every page. Colour encodes the row share with one hue.\nStatic: Static page.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-ml-report-curves","title":"ROC and precision–recall curves with operating threshold","notes":"Purpose: Show ranking quality (ROC) and the alert trade-off that matters with a rare class (precision–recall) side by side, with the thresholds under discussion marked on both.\nModify: The shared test-set block is repeated on pages 02, 03, 05 and 06 (modules cannot import each other); replace it identically on all four. Replace the shared rows block with real predictions; curves, AUC, AP, threshold points and the caption are computed. Edit MARKS and THRESHOLD to discuss other operating points.\nInvariant: Say it is one-vs-rest and which class is positive. Show the chance line on ROC and the prevalence baseline on PR. Thresholds refer to calibrated probabilities and are the same points on both panels.\nStatic: Static page.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-ml-report-importance","title":"Feature importance with uncertainty","notes":"Purpose: Show which inputs the model relies on for the decision that matters, with the spread across repeats, so small or null effects are not over-read.\nModify: Replace features with your permutation-importance results (mean and interval per feature), and REPEATS / BASE_AP. Order, interval styling and the null count are computed.\nInvariant: Name the metric, the split, the number of repeats and the interval definition. Keep the zero line. Intervals that include zero are drawn hollow and grey. Importance describes the model, not causes in the pumps.\nStatic: Static page.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-ml-report-calibration","title":"Calibration: reliability diagram before and after isotonic","notes":"Purpose: Show whether predicted probabilities can be read as risks, because thresholds and alert budgets are set on them.\nModify: The shared test-set block is repeated on pages 02, 03, 05 and 06 (modules cannot import each other); replace it identically on all four. Replace the shared rows block with real predictions (raw and calibrated scores); bins, observed shares, Wilson intervals, ECE, Brier score and the histogram are computed.\nInvariant: Equal-width bins, stated. The diagonal is the reference. Show how many windows fall in each bin (most are near zero for a rare class) and put an interval on each observed share. Fit the calibrator on validation, never on the test split.\nStatic: Static page.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-ml-report-modelcard","title":"Model card: intended use, limitations and subgroup results","notes":"Purpose: Close the report with what the model is for, what it must not be used for, what is known to be weak, and the decision requested with its safeguards.\nModify: The shared test-set block is repeated on pages 02, 03, 05 and 06 (modules cannot import each other); replace it identically on all four. Rewrite the three lists for your model. Replace the shared rows block and the site assignment with real subgroup labels; recall and Wilson intervals are computed. Keep the decision box to one request plus its conditions.\nInvariant: Limitations carry the same visual weight as intended use. Subgroup results show n and an interval, and the weakest subgroup is named in the limitations. Out-of-scope uses are stated plainly.\nStatic: Static page.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-lecture-goals","title":"平均の落とし穴：表紙と学習目標","notes":"Purpose: 講義の題名・対象・所要時間と、受講後にできるようになることを最初に約束する。\nModify: course と goals を差し替える。目標は「〜できる」で終わる観察可能な行動にし、3つ以内に保つ。天秤の皿の数値は以降の例題と同じデータにそろえる。\nInvariant: 目標は測れる動詞で書く。イラストは本題（重さの違うものの平均）を予告するもので、装飾だけの図にしない。\nStatic: 静的ページ。","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-lecture-concept","title":"概念図：加重平均は人数という重りでつり合う点","notes":"Purpose: 加重平均を「重りでつり合う支点」という1枚の絵で理解させる。\nModify: stores の単価と人数を変えると、支点・単純平均の位置・距離のラベルがすべて再計算される。1ブロック＝unit 人。\nInvariant: 横軸は数直線（等間隔の目盛り）。支点は計算した加重平均の位置に置き、左右のモーメント（距離×人数）が等しいことを右下で確かめる。単純平均は比較用に点線で示す。\nStatic: 静的ページ。","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-lecture-example","title":"例題：2店舗の客単価を会社全体の1つの数字にまとめる","notes":"Purpose: 手順を1段ずつ見せ、受講者が自分の電卓で追いかけられるようにする。\nModify: stores を差し替えると、表・各ステップの式・答え・単純平均との差がすべて再計算される。手順の文言は「何をするか」を動詞で書く。\nInvariant: 途中式は省略しない。答えは単位つきで示し、単純平均との違いを一言で添える。\nStatic: クリックごとにステップ1→2→3→答えの順に現れる。最終状態ではすべての式と答えが読める。","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-lecture-mistake","title":"よくある誤り：平均どうしをそのまま足して割る","notes":"Purpose: 誤った計算と正しい計算を同じ縮尺の図で並べ、どこで考え違いが起きるかを示す。\nModify: stores を差し替えると、両方の式・てんびんの傾き・ズレの金額と割合が再計算される。\nInvariant: 左右のカードは同じ横軸・同じ重りの絵で比べる（縮尺をそろえる）。誤りを責める言い方ではなく、原因（重りを無視）を1文で説明する。\nStatic: 静的ページ。","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-lecture-check","title":"理解度チェック：2部署の平均残業時間をまとめる","notes":"Purpose: 例題と同じ考え方を別の場面（人数と残業時間）で使えるか、その場で確かめる。\nModify: teams と options を差し替える。誤答の選択肢には、典型的な誤り（単純平均など）を1つ入れる。正答は teams から計算し、options に同じ値がないとイラストの丸が付かない。\nInvariant: 問いの数値とイラスト（1アイコン＝1人、帯の長さ＝時間）は同じデータから描く。解答は計算式つきで示す。\nStatic: 1回目のクリックで正答の丸と解答注記が現れる。最終状態では解答まで読める。配布資料で答えを隠したい場合は、解答注記を別ページに移す。","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-lecture-summary","title":"まとめ：平均をまとめるときは合計÷合計","notes":"Purpose: 講義の要点を3つに絞り、明日の仕事で使う行動に言い換えて持ち帰らせる。次回の内容につなげる。\nModify: takeaways の見出しは1文の結論、本文はその理由か使い方にする。アイコンは各要点の内容を表すものに描き替える。\nInvariant: 要点は3つまで。学習目標（1枚目）と対応させる：説明する→1、計算する→2、見抜く→3。\nStatic: 静的ページ。","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-editorial-opener","title":"The Long Minute — essay opener","notes":"Purpose: Open a visual essay with one dramatic typographic statement, a one-sentence dek and a single drawn image.\nModify: Change issue and story. Keep the title to two or three short words so it can run at display size; move the drawing further right (or use a photograph) if the words are longer.\nInvariant: The title is the first read, the drawing the second, the dek the third. The drawing is cropped deliberately by the right edge; keep the crop inside the SVG viewport.\nStatic: Static page.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-editorial-spread","title":"Image-led spread: the cup","notes":"Purpose: Let one photograph carry the page, with a single column of essay text that tells the reader why it matters.\nModify: Swap the photograph (keep it near its native resolution; this 600×400 image is shown at about 1.08×), the caption and the column. Keep the column to one idea and roughly 60–80 words.\nInvariant: Picture first, headline second, body third. The caption states what the picture shows; the credit line stays visible.\nStatic: Static page.","sources":[{"type":"image","file":"assets/media/study-01.jpg","license":"CC0"}],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-editorial-quote","title":"Pull quote from the essay","notes":"Purpose: Stop the reader on one sentence that carries the essay’s argument, with a short side column that sets it up.\nModify: Replace quote with a sentence taken from your own text (or a real, sourced statement with its source). Keep it under about 20 words so it holds at display size. Replace the side column with the paragraph that leads into it.\nInvariant: Do not attribute a sentence to an invented expert or a person who did not say it. One highlighted word at most.\nStatic: Static page.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-editorial-timeline","title":"Illustrated timeline: fruit to cup","notes":"Purpose: Show a sequence of stages and how long each takes, when durations differ by orders of magnitude.\nModify: Edit stages (name, duration in seconds, label) and the drawings. The vertical positions, grid and total in the lede are computed from the same array.\nInvariant: Left-to-right is the order of the process; height is duration on a log scale that is named in the lede and labelled on the axis. Durations are typical illustrative values, stated in the source line.\nStatic: Static page.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-editorial-numbers","title":"Big-number spread: three numbers make a recipe","notes":"Purpose: Give a few numbers the scale of a headline, each with a caption that says what it counts, plus the figures derived from them.\nModify: Change recipe (dose, yield, time). The ratio, flow rate, bar lengths and stopwatch sector are computed from it.\nInvariant: Every big number carries its unit and a caption. Bars share one zero and one scale. The source line says these values are illustrative.\nStatic: Static page.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-editorial-closing","title":"Closing page and next issue","notes":"Purpose: End the essay on one line the reader can carry away, then point to what comes next and credit the images.\nModify: Replace the closing line (keep it short enough for display size), the next-issue teaser and the colophon credits.\nInvariant: One closing line, not a list of takeaways. Credits for every photograph used in the piece stay on the page.\nStatic: Static page.","sources":[{"type":"image","file":"assets/media/study-01.jpg","license":"CC0"}],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-impact-report-highlights","title":"2025年度インパクトレポート：表紙と成果の数字","notes":"Purpose: 表紙で1年間のいちばん大きな変化を1文で示し、成果を4つの大きな数字と前年度比で一覧させる。\nModify: org と kpis を差し替える。参加者数と拠点数は regions の合計から計算しているので、地域別ページと同じ表を使う。率の変化は「ポイント」、人数・回数の変化は「%」で表す。\nInvariant: 大きな数字には必ず単位・定義（何を数えたか）・比較対象を添える。数字は4つまで。\nStatic: 静的ページ。","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-impact-report-regions","title":"地域別の活動：参加者数と拠点数","notes":"Purpose: 地域ごとの参加者数・拠点数を、地理を捏造しない抽象的なタイル図と順位表で示し、次年度の拠点計画の根拠にする。\nModify: regions の人数・拠点数・タイル位置（col,row）を差し替える。見出しの割合、最も混み合う地域、表の並び・棒・合計はすべて計算で出る。実在の地名を使う場合も、正確な地図を用意できなければタイル図のままにする。\nInvariant: タイル図は位置関係の目安であり、面積や距離に意味はない（ページ上で明記する）。合計は表紙の参加者数・拠点数と一致させる。\nStatic: 静的ページ。","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-impact-report-logic","title":"事業の流れ：インプットからアウトカムまで","notes":"Purpose: 1年間の事業を「投じた資源→行ったこと→直接の結果→子どもに起きた変化」の順に並べ、成果の数字がどこから来たかを1枚で説明する（ロジックモデル）。\nModify: cols の数値と説明を差し替える。インプットの金額は予算ページの支出合計、アウトプットの参加者数は表紙・地域別ページと同じ値にする。\nInvariant: 矢印は想定する因果の流れであり、アウトカムの変化が事業だけによるとは限らない（ページ下の注記を残す）。アウトカムの割合には調査方法と回答数を添える。\nStatic: 静的ページ。","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-impact-report-budget","title":"予算の内訳：支出と収入","notes":"Purpose: お金の出入りを1枚で示し、支出のうち子どもと接する現場に使った割合を見出しで伝える。\nModify: spend と income（万円）を差し替える。合計・割合・ドーナツの角度・積み上げの高さ・ラベル位置・繰越額はすべて計算で出る。field: true の項目が見出しの「現場」の割合に入る。\nInvariant: ドーナツの中央の合計＝支出の各項目の合計、積み上げの高さ＝収入の合計。収入−支出＝繰越を下段で必ず示す。割合は小数1桁で四捨五入。\nStatic: 静的ページ。","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-impact-report-voices","title":"受益者の声（例示用の架空の声）","notes":"Purpose: 数字では伝わらない変化を、子ども・保護者・支える側の3つの立場の声で補う。\nModify: voices を、本人の同意を得た実際の声に差し替える。属性は個人が特定されない粒度（学年・拠点・活動年数程度）にとどめる。タグは声が示す変化を短く言い換える。\nInvariant: 架空の声を実在の声として見せない。実際の声に替えるまでは「架空」の表示と注記を残す。アバターは実在の人物の似顔絵にしない。\nStatic: 静的ページ。","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-impact-report-next","title":"次年度計画：目標とロードマップ","notes":"Purpose: 今年度の結果から次年度の重点を導き、数値目標と四半期ごとの実行計画を1枚で約束する。\nModify: goals の目標値と方法、plan の期間（四半期の番号 0〜3）とマイルストーンを差し替える。現状値は表紙・地域別ページと同じ regions から計算する。\nInvariant: 目標は現状値と並べ、増分（%・ポイント・か所）を計算で示す。計画は約束ではなく予定として書き、確定していない項目は断定しない。\nStatic: 静的ページ。","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-launch-hero","title":"Launch hero: Fernhook 2.0 returns automation","notes":"Purpose: Open a launch with one promise, the availability facts and a believable picture of the product.\nModify: Change product, queue rows, KPI tiles and reason chips in the arrays at the top; the mockup redraws from them. Keep the headline to two lines.\nInvariant: Screens use sample data and say so; the phone-to-notification connector shows cause and effect, so keep it pointing from the customer action to the automated result.\nStatic: Final state is the whole page; no builds.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-launch-features","title":"Feature grid: six jobs Fernhook 2.0 now does","notes":"Purpose: Show what is new as concrete jobs, each with plan availability, so the audience can map features to their own work.\nModify: Edit the features array; keep six or three items so the 3-column grid stays full. Draw new icons with the same 64px tile, 2.4px line and single coral accent.\nInvariant: Plan tags must agree with the pricing page. Describe the job a feature does, not an adjective.\nStatic: No builds; the grid reads at once.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-launch-before-after","title":"Before and after: the return workflow on one time axis","notes":"Purpose: Prove the headline benefit with the workflow itself: which steps disappear and where the time went.\nModify: Edit the before/after step arrays (hours per part). Bars, durations, refund markers and the three summary figures recompute. Keep maxH at or above the longest lane.\nInvariant: Both lanes share one hour axis starting at zero. Keep unchanged steps (carrier transit) visible so the gain is not overstated.\nStatic: The \"with 2.0\" lane builds in at step 1; the final state shows both lanes.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-launch-pricing","title":"Pricing: three plans priced by monthly returns","notes":"Purpose: Let each buyer find their plan by volume and see what the upgrade adds.\nModify: Edit the tiers array (price, included volume, overage, feature flags). Unit-cost bars and labels recompute from price / included.\nInvariant: Bars share a zero and one scale. Feature rows are identical across plans, so absence is shown, not hidden. Plan availability must match the feature page.\nStatic: No builds.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-launch-integrations","title":"Integration map: one scan sets off refund, restock and update","notes":"Purpose: Show where the product sits among existing systems and which single event creates the customer-visible benefit.\nModify: Edit nodes (position, title, subtitle, glyph) and edges (from, to, label, kind). Paths and label pills recompute from node boxes.\nInvariant: Arrow direction is the direction data moves. Grey means continuous sync; coral marks only the chain started by one scan, numbered in order. Do not colour other edges coral.\nStatic: No builds; the legend explains both line types.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-launch-closing","title":"Closing: turn it on today, three steps and rollout dates","notes":"Purpose: End with the concrete next action, how to adopt safely, and when each plan gets access.\nModify: Edit steps (keep three) and rollout dates; change the URL line. The loop backdrop is decorative and can stay.\nInvariant: Label future items as planned, not promised. Steps are imperative actions the customer takes, in order.\nStatic: The three steps build in order; the final state shows all of them.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-project-status-summary","title":"全体ステータス：RAG表示と一言要約","notes":"Purpose: 定例の冒頭で、全体の状態・その理由・判断が必要な領域を1枚で伝える。\nModify: overall（全体RAG・前回・要約）とareas（領域ごとのRAG・前回比・状況）、kpis を書き換える。表・信号・KPIは配列から描画される。\nInvariant: RAGは色だけでなく形（●▲■）と言葉を併記する。全体の判定は最も悪い領域を無視しない。KPIの計画値は同じ基準日のものを使う。\nStatic: ビルドなし。1枚で読み切れる。","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-project-status-milestones","title":"マイルストーン：基準計画と見込み、今日の位置","notes":"Purpose: 基準計画に対してどこがどれだけずれ、最終期限に影響するかを1本の日付軸で示す。\nModify: phases の base／fc（YYYY-MM-DD）、status、buffer と today を書き換える。棒・菱形・遅れ・予備日・下段の数値は日付から計算される。\nInvariant: 基準計画は消さずに残す。遅れは営業日で数え、予備日の残数と矛盾させない。今日の線は報告基準日に合わせる。\nStatic: ビルドなし。","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-project-status-burndown","title":"バーンダウン：計画線・実績線・完了見込み","notes":"Purpose: 残作業の推移を計画と比べ、現在のペースでいつ終わるかを数字で示す。\nModify: start、planWeeks、initialScope、remaining（週次の残ポイント）、scopeChanges、today を書き換える。線・差分・見込み日・見出しの数値は自動で再計算される。\nInvariant: 縦軸は0から始める。計画線は当初計画のまま残し、スコープ追加は注記で示す。見込みの計算期間（lookback）を明記する。\nStatic: 見込み線はステップ1で表示。最終状態ですべて読める。","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-project-status-raci","title":"RACI表：作業ごとの責任分担","notes":"Purpose: 誰が実行し、誰が最終的に責任を持つかを作業ごとに合意し、負荷の偏りを見つける。\nModify: roles と tasks を書き換える。A＝1名の確認、R の件数、右下の注記は自動で再計算される。key: true の行は薄く強調される。\nInvariant: 各行の A は必ず1名。A と R を兼ねる場合は A/R と書く。役割名は個人名ではなく役割で書く。\nStatic: ビルドなし。","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-project-status-risks","title":"リスク・課題一覧：影響×発生確度","notes":"Purpose: リスクと課題を同じ尺度で並べ、今週どれに手を打つかを決める。\nModify: items（ID、種別、内容、影響、確度、対策、担当、期限）を書き換える。マトリクスの位置・スコア・並び順・色帯は自動で再計算される。\nInvariant: スコア＝影響×確度。課題（すでに起きていること）は確度5として扱い、形でリスクと区別する。対策には担当と期限を必ず付ける。\nStatic: ビルドなし。","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-project-status-decisions","title":"決定事項と次のアクション","notes":"Purpose: 定例の最後に、決まったこと・誰がいつまでに何をするか・次回の議題を確認する。\nModify: decisions、actions（内容・担当・期限・新規／継続）、next、today を書き換える。並び順・残日数・期限超過は自動で計算される。\nInvariant: 決定事項には決定者と理由を残す。アクションは担当1名と日付の期限を持つ。期限超過を隠さない。\nStatic: ビルドなし。","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-keynote-opener","title":"Keynote opener: Move the hour, not the mountain","notes":"Purpose: Open a keynote with the whole argument in one line and a picture of it: the sun behind the mountain.\nModify: Change the two title lines, the italic subline and the event strings. Change SEED for another ridge pattern; keep ridgeTop below the title block.\nInvariant: The title is a claim the talk defends, not a topic label. The backdrop is decoration and carries no data.\nStatic: No builds; the opener reads at once.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-keynote-chapter","title":"Chapter divider: Time is the new capacity","notes":"Purpose: Mark a turn in the talk and say, in one line, what this chapter will prove.\nModify: Edit chapters and current; the outlined numeral and the chapter rail update. Change SEED for another contour pattern.\nInvariant: The chapter title is the claim of the section. The contour field is decoration; the outlined numeral is the only accent.\nStatic: No builds.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-keynote-number","title":"Giant number: 4 h 16 min between the solar and demand peaks","notes":"Purpose: Make one number unforgettable and show exactly where it comes from.\nModify: Replace solarRaw and demandRaw with your metered hourly profiles (or an array lookup). The peaks, the giant number, the bracket and the labels recompute.\nInvariant: The giant number equals the bracket on the chart. Say how the curves are scaled; do not compare their heights as quantities.\nStatic: The context chart builds in at step 1; the final state shows number and chart together.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-keynote-then-now","title":"Then vs now: plants chased demand; demand now follows the sun","notes":"Purpose: Compress the talk's turn into two opposing sentences, each backed by a small schematic.\nModify: Edit the two statements and years. In the right schematic change SHIFT (share of the evening bump that moves); the midday addition is recomputed so total energy stays equal.\nInvariant: Both halves are labelled schematic; do not add units or read values off them. Keep the statements parallel in grammar so the contrast is real.\nStatic: The \"now\" half wipes in at step 1; the final state shows both halves.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-keynote-quote","title":"Quote: the cheapest kilowatt-hour is the one we move","notes":"Purpose: Give the audience one sentence to repeat after the talk.\nModify: Edit quote.lead (highlighted), quote.rest and quote.by. Change SEED for another particle pattern.\nInvariant: Quote only words that were actually said or written, and attribute them to their real source. This example is an original line attributed to the programme, not to a person.\nStatic: No builds.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-keynote-closing","title":"Closing: move the hour, and three things to do next","notes":"Purpose: Close on the thesis and leave the audience with three concrete things to do.\nModify: Edit asks (keep three, verb first), the event and link. The ridgeline backdrop mirrors the opener; change SEED freely.\nInvariant: Each ask is an action someone in the room can take. The headline repeats the opener's claim, shortened.\nStatic: The asks build in order; the final state shows all three.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""}]}</script><script>/* Deterministic presentation states. Widgets own their content, not global navigation.
- * A transition never owns the final state: target styles are committed before animating.
- * Exports and reduced-motion enter the same stable states without cosmetic movement. */
-(()=>{'use strict';
- const meta=JSON.parse(document.getElementById('slide-studio-meta').textContent);
- const slides=[...document.querySelectorAll('.slide')],mq=matchMedia('(prefers-reduced-motion: reduce)');
- const warnings=[],widgets=new Map(),tracks=new WeakMap(),animations=new Set(),lastSteps=Array(slides.length).fill(0);
- let current=0,step=0,exporting=new URLSearchParams(location.search).has('static'),overview=false,restore=null,enteredIndex=null;
- const $=id=>document.getElementById(id),warn=e=>{warnings.push(String(e));console.warn('[Slide Studio]',e)};
- const call=(widget,method,...args)=>{try{return widget?.[method]?.(...args)}catch(e){warn(`${method}: ${e.message}`)}};
- const max=i=>Math.max(0,...[...slides[i].querySelectorAll('[data-step],[data-states]')].flatMap(el=>{
-  const v=[Number(el.dataset.step)||0];try{if(el.dataset.states)v.push(...Object.keys(JSON.parse(el.dataset.states)).map(Number))}catch{}return v.filter(Number.isFinite)}));
- for(const slide of slides)for(const el of slide.querySelectorAll('[data-states]')){
-  try{const map=JSON.parse(el.dataset.states),keys=Object.keys(map).map(Number).sort((a,b)=>a-b);if(!map['0']||keys.some(k=>!Number.isInteger(k)||k<0))throw Error('state 0 and nonnegative integer keys required');const base={};for(const state of Object.values(map)){
-   if(!state||typeof state!=='object'||Array.isArray(state))throw Error('CSS property map required');
-   for(const key of Object.keys(state)){if(!(key in el.style)&&!key.startsWith('--'))throw Error(`unknown CSS property ${key}`);base[key]=key.startsWith('--')?el.style.getPropertyValue(key):el.style[key]||getComputedStyle(el)[key];}}
-   tracks.set(el,{map,keys,base});
-  }catch(e){warn(`${slide.id}: ${e.message}`)}
- }
- function finish(){for(const a of animations){try{a.finish();a.cancel()}catch{a.cancel()}}animations.clear()}
- function transition(el,to,animate,entryFrom=null){
-  const from={};for(const [k,v]of Object.entries(to)){from[k]=k.startsWith('--')?getComputedStyle(el).getPropertyValue(k):getComputedStyle(el)[k];k.startsWith('--')?el.style.setProperty(k,String(v)):el.style[k]=String(v)}
-  if(!animate||mq.matches||exporting||!el.animate)return;
-  const requested=el.dataset.duration===undefined?500:Number(el.dataset.duration);const duration=Number.isFinite(requested)?Math.min(1600,Math.max(0,requested)):500;
-  try{const a=el.animate([entryFrom||from,to],{duration,easing:el.dataset.easing||'cubic-bezier(.22,.68,.2,1)',fill:'none'});animations.add(a);a.finished.then(()=>{animations.delete(a);a.cancel()}).catch(()=>animations.delete(a))}catch(e){warn(e.message)}
- }
- // Entry effects are a decoration on a committed state, never a second navigator.
- const entryEffects={
-  reveal:[{opacity:0},{opacity:1}],
-  lift:[{opacity:0,transform:'translateY(20px)'},{opacity:1,transform:'translateY(0px)'}],
-  slide:[{opacity:0,transform:'translateX(-28px)'},{opacity:1,transform:'translateX(0px)'}],
-  wipe:[{clipPath:'inset(0 100% 0 0)'},{clipPath:'inset(0 0% 0 0)'}],
-  trace:[{strokeDashoffset:'1'},{strokeDashoffset:'0'}],
-  focus:[{opacity:0.2},{opacity:1}],
-  settle:[{opacity:0,transform:'scale(.96)'},{opacity:1,transform:'scale(1)'}]
- };
- function context(i=current){return {slide:slides[i],index:i,step:i===current?step:lastSteps[i],exporting,reducedMotion:mq.matches,active:i===current&&!overview&&!exporting}}
- function apply(i,at,animate){
-  const slide=slides[i];
-  for(const el of slide.querySelectorAll('[data-step]')){
-   const on=at>=Number(el.dataset.step)&&(el.dataset.until===undefined||at<=Number(el.dataset.until));
-   const was=el.dataset.studioHidden==='false';
-   el.dataset.studioHidden=String(!on);el.setAttribute('aria-hidden',String(!on));el.inert=!on;
-   if(on&&el.dataset.motion&&!el.hasAttribute('data-states')){
-    const effect=entryEffects[el.dataset.motion];
-    if(effect)transition(el,effect[1],animate&&!was,effect[0]);
-    else if(!el.dataset.motionWarned){warn('Unknown entry effect: '+el.dataset.motion);el.dataset.motionWarned='true'}
-   }
+</div></section></main><nav class="studio-controls" aria-label="Slide"><button id="studio-prev" type="button" aria-label="Previous" >←</button><span id="studio-position" class="studio-position"></span><button id="studio-next" type="button" aria-label="Next" >→</button><select id="studio-jump" aria-label="Slide"><option value="0">1. Tallyleaf seed pitch — cover</option><option value="1">2. Problem — a week of over-ordering</option><option value="2">3. Market sizing — TAM, SAM, SOM</option><option value="3">4. Business model and unit economics</option><option value="4">5. Traction — ARR growth and milestones</option><option value="5">6. Team and the ask</option><option value="6">7. 2026年度 第2四半期 業績レビュー — 表紙</option><option value="7">8. KPIタイル — 8四半期の推移と計画比</option><option value="8">9. 営業利益の前年差ウォーターフォール</option><option value="9">10. 商談ファネルとボトルネック</option><option value="10">11. 契約コホート別の継続率ヒートマップ</option><option value="11">12. 次四半期の重点施策と決裁事項</option><option value="12">13. EC物流事業の収益改善に向けた戦略提案 — 表紙</option><option value="13">14. 論点ツリー — 主論点から検証すべき問いへ</option><option value="14">15. 2×2優先度マトリクス — 効果と実行の容易さ</option><option value="15">16. 選択肢比較表 — ハーベイボールによる評価</option><option value="16">17. 推奨案とその根拠</option><option value="17">18. 実行ロードマップ（ガント）</option><option value="18">19. 表紙：ラベル50枚で細いひび割れを捉える</option><option value="19">20. 背景と問い：細いひび割れほどラベルが足りない</option><option value="20">21. 手法：事前学習・微調整・評価の3段階</option><option value="21">22. 結果：ラベル50枚で全ラベル学習との差は5.7ポイント</option><option value="22">23. アブレーション：事前学習と連結性損失の寄与</option><option value="23">24. 結論と限界・今後の課題</option><option value="24">25. Postmortem cover: checkout p99 regression</option><option value="25">26. Layered system architecture with the incident path</option><option value="26">27. Request sequence: cache hit versus miss</option><option value="27">28. Latency percentiles over time</option><option value="28">29. Incident timeline with detection and recovery times</option><option value="29">30. Risk matrix with owned mitigations</option><option value="30">31. Evaluation report cover and dataset card</option><option value="31">32. Confusion matrix normalised by true class</option><option value="32">33. ROC and precision–recall curves with operating threshold</option><option value="33">34. Feature importance with uncertainty</option><option value="34">35. Calibration: reliability diagram before and after isotonic</option><option value="35">36. Model card: intended use, limitations and subgroup results</option><option value="36">37. 平均の落とし穴：表紙と学習目標</option><option value="37">38. 概念図：加重平均は人数という重りでつり合う点</option><option value="38">39. 例題：2店舗の客単価を会社全体の1つの数字にまとめる</option><option value="39">40. よくある誤り：平均どうしをそのまま足して割る</option><option value="40">41. 理解度チェック：2部署の平均残業時間をまとめる</option><option value="41">42. まとめ：平均をまとめるときは合計÷合計</option><option value="42">43. The Long Minute — essay opener</option><option value="43">44. Image-led spread: the cup</option><option value="44">45. Pull quote from the essay</option><option value="45">46. Illustrated timeline: fruit to cup</option><option value="46">47. Big-number spread: three numbers make a recipe</option><option value="47">48. Closing page and next issue</option><option value="48">49. 2025年度インパクトレポート：表紙と成果の数字</option><option value="49">50. 地域別の活動：参加者数と拠点数</option><option value="50">51. 事業の流れ：インプットからアウトカムまで</option><option value="51">52. 予算の内訳：支出と収入</option><option value="52">53. 受益者の声（例示用の架空の声）</option><option value="53">54. 次年度計画：目標とロードマップ</option><option value="54">55. Launch hero: Fernhook 2.0 returns automation</option><option value="55">56. Feature grid: six jobs Fernhook 2.0 now does</option><option value="56">57. Before and after: the return workflow on one time axis</option><option value="57">58. Pricing: three plans priced by monthly returns</option><option value="58">59. Integration map: one scan sets off refund, restock and update</option><option value="59">60. Closing: turn it on today, three steps and rollout dates</option><option value="60">61. 全体ステータス：RAG表示と一言要約</option><option value="61">62. マイルストーン：基準計画と見込み、今日の位置</option><option value="62">63. バーンダウン：計画線・実績線・完了見込み</option><option value="63">64. RACI表：作業ごとの責任分担</option><option value="64">65. リスク・課題一覧：影響×発生確度</option><option value="65">66. 決定事項と次のアクション</option><option value="66">67. Keynote opener: Move the hour, not the mountain</option><option value="67">68. Chapter divider: Time is the new capacity</option><option value="68">69. Giant number: 4 h 16 min between the solar and demand peaks</option><option value="69">70. Then vs now: plants chased demand; demand now follows the sun</option><option value="70">71. Quote: the cheapest kilowatt-hour is the one we move</option><option value="71">72. Closing: move the hour, and three things to do next</option></select><button id="studio-overview" type="button" aria-label="Overview" >Overview</button><button id="studio-notes-btn" type="button" aria-label="Notes" aria-expanded="false" aria-controls="studio-notes">Notes</button><button id="studio-presenter" type="button" aria-label="Presenter view" >Presenter view</button><button id="studio-reset" type="button" aria-label="Reset" >Reset</button><button id="studio-full" type="button" aria-label="Fullscreen" >Fullscreen</button><button id="studio-help-btn" type="button" aria-label="Keyboard shortcuts" aria-expanded="false">?</button></nav><aside id="studio-notes" class="studio-notes" aria-label="Notes"></aside><div id="studio-announcer" class="sr-only studio-announcer" aria-live="polite"></div><script type="application/json" id="slide-studio-meta">{"version":4,"width":1280,"height":720,"title":"Template packs","language":"en","direction":"ltr","labels":{"prev":"Previous","next":"Next","jump":"Slide","overview":"Overview","notes":"Notes","reset":"Reset","full":"Fullscreen","presenter":"Presenter view","help":"Keyboard shortcuts","blank":"Black screen","goto":"Go to slide"},"transition":"none","readingMode":"reference","sample":true,"mode":"workshop","copyRules":[{"id":"ja-stage-direction","level":"error","pattern":"(?:学会|口頭|研究)?発表(?:時|中)(?:に|で|は)?[ 　]*(?:切[り]?替[え]?|切替|クリック|再生|操作)|ここで(?:クリック|切[り]?替[え]?|動画を再生)|(?:要差し替え|後で修正|仮置きのまま)"},{"id":"en-stage-direction","level":"error","pattern":"\\b(?:switch|click|play|toggle) (?:here|during (?:the )?(?:conference|presentation|talk))\\b|\\b(?:replace this (?:text|title|image)|insert (?:your )?(?:title|content) here|speaker cue:)","flags":"i"},{"id":"placeholder","level":"error","pattern":"\\b(?:Lorem ipsum|TODO|FIXME|TBD)\\b|(?:ここにタイトル|ここに本文|テキストを入力)","flags":"i"},{"id":"ja-empty-claim","level":"warning","pattern":"(?:さらなる価値提供|革新的なソリューション|未来を切り拓く|シームレスな体験|圧倒的な価値)"},{"id":"en-empty-claim","level":"warning","pattern":"\\b(?:unlock (?:the )?(?:full )?potential|revolutionary solution|seamless experience|game-changing|transform the future)\\b","flags":"i"},{"id":"ja-export-production-cue","level":"error","pattern":"配布用メモ[：:]|(?:印刷[・／/]PDF|印刷・PDF|PDF・印刷)(?:では|時は)[^。\\n]{0,60}(?:表示が残|固定され|操作用)|(?:投影時|発表時)の操作用"},{"id":"en-export-production-cue","level":"error","pattern":"\\b(?:presenter-only cue|production note|export-only instruction)\\s*:","flags":"i"},{"id":"ja-performed-sincerity","level":"warning","pattern":"正直に(?:言います|お知らせ|お伝え)|本当の価値|価値を紡ぐ"},{"id":"ja-status-label","level":"error","pattern":"(?:登壇用|発表用|社内用|作業用|提出用)(?:ドラフト|下書き)"}],"slides":[{"id":"tpl-pitch-cover","title":"Tallyleaf seed pitch — cover","notes":"Purpose: Open an investor pitch with the company name, the one-line job the product does and the round.\nModify: Rename the company, rewrite the headline as the customer outcome, adjust the round line; redraw the mark function if your brand has one.\nInvariant: One promise in the headline; the mark is drawn once and reused at every size.\nStatic: Already static; the hero field is the brand illustration.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-pitch-problem","title":"Problem — a week of over-ordering","notes":"Purpose: Make the customer problem concrete by following one purchase through time, then size it.\nModify: Rewrite the five stations from a real customer interview; recompute the stat band from your own purchase and waste figures.\nInvariant: Arrows mean “then” (sequence); the costly moment is the only red station; stats derive from the same inputs as the headline.\nStatic: Already static.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-pitch-market","title":"Market sizing — TAM, SAM, SOM","notes":"Purpose: Size the market bottom-up so an investor can check every number.\nModify: Edit locations and ACV in the tiers array; values, circle areas, labels and leaders recompute.\nInvariant: Circle area ∝ value (radius uses √); each value shows its own multiplication; SOM is a stated plan assumption, not a forecast.\nStatic: Already static.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-pitch-unit-economics","title":"Business model and unit economics","notes":"Purpose: Show how one location makes money and how fast it repays its acquisition cost.\nModify: Edit price, costs, cac and churn at the top; the bar, curve, payback marker and KPI rail recompute.\nInvariant: Payback and LTV use the same churn; the curve starts at −CAC; margins derive from the listed costs.\nStatic: Already static.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-pitch-traction","title":"Traction — ARR growth and milestones","notes":"Purpose: Prove momentum with one honest growth series and name what caused the inflections.\nModify: Replace the months and locations arrays (or feed ARR directly); milestones reference month indexes.\nInvariant: Bars share a zero baseline; the headline multiple is computed from the same series; milestones are dated, not decorative.\nStatic: Milestones appear on step 1; the final state shows all of them.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-pitch-team-ask","title":"Team and the ask","notes":"Purpose: Close with who will execute and exactly what the money buys.\nModify: Replace the team array (initials derive from names), the raise, the use-of-funds shares and the target milestones.\nInvariant: Shares sum to 100% and dollar amounts derive from the raise; target ARR = locations × ACV.\nStatic: Already static.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-qbr-cover","title":"2026年度 第2四半期 業績レビュー — 表紙","notes":"Purpose: 会議の対象期間と結論の3指標を最初の1枚で示す。\nModify: fy・q を変えると四半期ダイヤルと月表示が追従する。summary の3指標は本文ページの値と一致させる。\nInvariant: 3指標は良否の向きを色と記号の両方で示す。ダイヤルは期間を表す図であり装飾ではない。\nStatic: Already static.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-qbr-kpi-tiles","title":"KPIタイル — 8四半期の推移と計画比","notes":"Purpose: 主要KPI 6つの今期値・計画比・前年比・推移を一覧し、未達の指標を一目で示す。\nModify: kpis 配列に8四半期の値・今期計画・良い方向（better）を入れる。バッジの符号と色、赤枠は自動で決まる。\nInvariant: 解約率のように「下がるのが良い」指標は better:'down' で色を反転。前年比は4四半期前との比較。スパークラインは形を見るもので、値はタイルの数字で読む。\nStatic: Already static.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-qbr-waterfall","title":"営業利益の前年差ウォーターフォール","notes":"Purpose: 前年同期から当期への営業利益の変化を、要因ごとの増減に分解して示す。\nModify: start と steps（符号付き、億円）を差し替える。当期値・棒の位置・接続線・見出しの差額は自動計算。\nInvariant: 始点＋各要因＝終点。増加は緑、減少は赤、合計は紺。共通のゼロ基準を持つ縦軸。\nStatic: 右側の3つの注記は段階表示。最終状態ですべて表示される。","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-qbr-funnel","title":"商談ファネルとボトルネック","notes":"Purpose: 獲得ファネルの各段階の件数と転換率を前期と比べ、最も悪化した段階とその影響額を示す。\nModify: stages に今期・前期の件数を入れる。転換率、ボトルネック（前期差が最も悪い段階）、影響額は自動計算。\nInvariant: 棒の幅は件数に比例（受注が細いのは実際に少ないため）。影響額は「その段階だけ前期の転換率だった場合」の仮定で、下流の転換率は今期値を使う。\nStatic: Already static.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-qbr-cohort-heatmap","title":"契約コホート別の継続率ヒートマップ","notes":"Purpose: 契約月ごとのコホートが何か月目にどれだけ残っているかを並べ、施策前後の差を示す。\nModify: grid を実データ（行＝契約月、列＝経過月、未観測は null）に置き換える。changeAt は施策後の最初のコホート。\nInvariant: 色は単一色相の明度（濃いほど継続率が高い）で、数値も各セルに表示。比較は同じ経過月（M3）で行い、未観測セルは平均に含めない。\nStatic: Already static.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-qbr-next-quarter","title":"次四半期の重点施策と決裁事項","notes":"Purpose: 今回の分析から導いた次四半期の施策を、根拠・KPI・責任者・日程つきで示し、会議で決める事項を明記する。\nModify: items に施策を追加・削除する（4〜5件が目安）。span と ms は月単位（0＝10月初め、3＝12月末）。plan は準備期間（点線）。\nInvariant: 各施策は根拠ページとKPI（現状→目標）を1つずつ持つ。決裁事項は1件に絞り、金額と期待効果を並べる。\nStatic: Already static.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-strategy-cover","title":"EC物流事業の収益改善に向けた戦略提案 — 表紙","notes":"Purpose: 提案の対象・問い・到達目標を表紙で明示する。\nModify: 宛先、題名、目標値（from・to・year）、日付と提案者を差し替える。右の正方形の配置は chosen と rec で変えられる。\nInvariant: 副題は「何を・いつまでに・どこからどこへ」を1文で言う。表紙に結論を詰め込みすぎない。\nStatic: Already static.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-strategy-issue-tree","title":"論点ツリー — 主論点から検証すべき問いへ","notes":"Purpose: 主論点を漏れなく重複なく分解し、どの問いがどこまで検証できたかを示す。\nModify: root・branches・leaves を書き換える。箱の高さと接続線は葉の数から自動で決まる。状態は done / wip / todo。\nInvariant: 線は「分解」を表し、矢印（順序）ではない。各問いは Yes/No で答えられる形にし、仮説と効果の単位を揃える。\nStatic: Already static.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-strategy-priority-matrix","title":"2×2優先度マトリクス — 効果と実行の容易さ","notes":"Purpose: 候補となる打ち手を「効果」と「実行の容易さ」の2軸で並べ、最優先の組み合わせを決める。\nModify: moves の ease（1〜5）・impact（億円）・inv（億円）を差し替える。閾値 easeCut・impactCut を変えると象限と右の一覧が追従する。lab はラベルの位置（t/r/l）。\nInvariant: 円の面積は投資額に比例（半径は平方根）。象限の境界は明記した閾値で、目分量で分けない。\nStatic: Already static.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-strategy-options","title":"選択肢比較表 — ハーベイボールによる評価","notes":"Purpose: 実現手段の選択肢を同じ評価軸で並べ、推奨案がどの点で優れ、どの点で劣るかを見せる。\nModify: options・criteria（各案の点数0〜4と一言コメント）・quant を差し替える。合計と推奨列の強調は自動。\nInvariant: 評価軸はすべて「●ほど良い」の向きに揃える（例：投資負担の「軽さ」）。定性評価と定量値を分けて示す。推奨案の弱点も隠さない。\nStatic: Already static.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-strategy-recommendation","title":"推奨案とその根拠","notes":"Purpose: 推奨案を1つに絞って言い切り、目標に届く道筋（利益率ブリッジ）と選ぶ理由3つを並べる。\nModify: base・levers（利益率への寄与pt、開始時期）・target・invest・payback を差し替える。2029年度の値は自動で合計される。\nInvariant: ブリッジの合計＝推奨パネルの数値＝見出しの数値。理由は比較表の評価軸に対応させ、各理由に数字か条件を1つ入れる。\nStatic: 3つの理由は順に表示される。最終状態ですべて表示。","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-strategy-roadmap","title":"実行ロードマップ（ガント）","notes":"Purpose: 推奨案を実行する順序・期間・判断の時期を1枚で示し、今日決めてほしいことで締める。\nModify: years（四半期の並び）、phases、streams（a・b は開始・終了の四半期番号、soft は継続・準備）、gates を差し替える。\nInvariant: 各ワークストリームは論点ツリーの番号に対応させる。判断ゲートは日付と「何を決めるか」を書く。最後の枠には会議で決める事項を1つだけ置く。\nStatic: Already static.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-research-ja-cover","title":"表紙：ラベル50枚で細いひび割れを捉える","notes":"Purpose: 研究発表の表紙。何を達成したかを一文のタイトルで示し、発表者・所属・会議情報を一か所にまとめる。\nModify: talk オブジェクトの会議名・日付・タイトル・著者・所属を書き換える。発表者は presenter:true で下線表示。右の図版は研究対象の模式図に差し替える（実測画像を使う場合は出典と撮影条件を図説に書く）。\nInvariant: 所属番号と上付き数字の対応、模式図であることの明記、タイトルは主張を含む文にする。\nStatic: 静的ページ。","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-research-ja-background","title":"背景と問い：細いひび割れほどラベルが足りない","notes":"Purpose: 研究の動機（データの偏りと細線の途切れ）を概念図で示し、検証する問いを一文で置く。\nModify: data オブジェクトの枚数・作業時間を実データに合わせる。格子は 1マス＝perTile 枚で自動生成される。(b) の画素図は研究対象の典型的な失敗に描き替える。\nInvariant: 概念図の格子は枚数に比例させる（1マスの単位を明記）。問いは検証可能な条件（枚数・比較対象・指標）を含める。\nStatic: 静的ページ。","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-research-ja-method","title":"手法：事前学習・微調整・評価の3段階","notes":"Purpose: 手法を処理の順序どおりに示し、各段階の入力・目的・出力と、段階間で受け渡すものを明示する。\nModify: stages 配列の名称・入力データ・仕様行、handoffs の受け渡しラベルを書き換える。段階数を変える場合は BW と GAP を 1152px に収まるよう再計算する。\nInvariant: 実線矢印は処理の順序と受け渡し、破線はデータ入力。評価データが学習に使われていないことを図中に書く。損失の定義は脚注に残す。\nStatic: 各段階は順に表示される（reveal）。最終状態で3段階すべてが読める。","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-research-ja-result","title":"結果：ラベル50枚で全ラベル学習との差は5.7ポイント","notes":"Purpose: 主結果を信頼区間付きで示し、主条件（50枚）の値と比較対象との差を読み取れるようにする。\nModify: series の mean と sd（シードごとの標本標準偏差）、runs と tCrit（自由度 runs−1 の t 値）、full、focusN を書き換える。誤差棒・読み取り値・説明文はすべて同じ配列から計算される。\nInvariant: 誤差棒の定義（何の区間か・何回の試行か・計算法）を図の横に明記する。差は平均値の差であり、差の信頼区間ではないことを混同しない。対数目盛であることを軸名に書く。\nStatic: 静的ページ。","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-research-ja-ablation","title":"アブレーション：事前学習と連結性損失の寄与","notes":"Purpose: 構成要素を1つずつ外した結果と、ハイパーパラメータの感度を1枚の表で比べる。\nModify: ref と groups の各行（mIoU の平均・SD、clDice、途切れ数）を書き換える。区間・差・区間図は同じ値から計算される。行を増やす場合は groups に追加する。\nInvariant: 全行の条件（ラベル枚数・シード・評価データ）を表の下に明記する。差の向き（各行 − 提案法）を列見出しに書く。区間図は全行で同じ目盛を使う。\nStatic: 静的ページ。","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-research-ja-conclusion","title":"結論と限界・今後の課題","notes":"Purpose: 発表の締め。結論（数値つき）、限界（適用範囲の外側）、今後の課題を並べ、最後に持ち帰ってほしい一文で終える。\nModify: r の数値は結果・アブレーションのページと同じ値にする。各列の項目は2〜3個に絞る。連絡先は実際の所属に合わせる。\nInvariant: 結論には条件（ラベル枚数・評価データ）を添える。限界は結論と同じ重みで見せ、小さな注記に押し込まない。\nStatic: 静的ページ。","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-architecture-cover","title":"Postmortem cover: checkout p99 regression","notes":"Purpose: Open a postmortem or design review with what happened, when, and how much it cost users, before any cause is discussed.\nModify: Edit inc, kpis and the trace spans (start/end in ms). The waterfall scale, bar widths and duration labels are computed from the trace array.\nInvariant: Every KPI names its unit and window. The trace is labelled as one representative request, not a distribution. Keep the review blameless: name systems and changes, not people.\nStatic: Static page.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-architecture-system","title":"Layered system architecture with the incident path","notes":"Purpose: Show where each component lives (network zone), how requests and events move, and which path failed, so the review can discuss a design change rather than a symptom.\nModify: Edit zones, nodes (N) and edges (E). Node ports are computed from node boxes; keep edges orthogonal and re-route when you move a node. Mark failing components with hot:true.\nInvariant: Arrow styles carry meaning (solid = synchronous request in call direction, dashed = asynchronous event flow, dotted = replication). Zone bands are real network boundaries. The incident highlight follows actual call edges only.\nStatic: Static page.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-architecture-sequence","title":"Request sequence: cache hit versus miss","notes":"Purpose: Show the order of calls for one request and exactly where the failing branch adds time, so the fix can be placed on the right hop.\nModify: Edit lanes and msgs (from, to, text, type). Frames are declared inline with {frame:\"hit\"|\"miss\"|\"end\"}; y positions and activation bars are computed from message order.\nInvariant: Solid arrows are calls in call direction, dashed arrows are returns. An alt frame holds mutually exclusive branches; give each branch its guard and frequency. The vertical axis is order, not time; durations are written on the messages.\nStatic: Static page.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-architecture-latency","title":"Latency percentiles over time","notes":"Purpose: Show how far and for how long latency left its objective, with the change events that explain the shape.\nModify: Replace the generator with real per-bucket percentiles in data (t, p50, p95, p99), and edit events and SLO. The window, peak, side-panel numbers and description are derived from data.\nInvariant: Percentiles are computed per bucket from raw requests, never averaged across buckets. State the bucket size, population and log scale. p50/p95/p99 use one ordered hue; the SLO keeps the critical color.\nStatic: Static page.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-architecture-timeline","title":"Incident timeline with detection and recovery times","notes":"Purpose: Reconstruct what the system did and what responders did on one time axis, and derive detection, mitigation and recovery times from the same timestamps.\nModify: Edit events (t, lane, kind, lines, optional mark). Positions, label levels, the impact band and all durations are computed; marks impact, alert, cause, mitigate and recovered must exist.\nInvariant: One time zone, stated once. System events (diamonds) and response events (circles) stay on separate sides of the axis. Durations are computed from the marked events, never typed.\nStatic: Static page.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-architecture-risks","title":"Risk matrix with owned mitigations","notes":"Purpose: Close the review with the risks this incident exposed, what each action is expected to change, and who owns it by when.\nModify: Edit risks (now/after as [likelihood, impact], owner, due, status) and the band thresholds. Cell colours, markers, arrows, scores and the headline counts are computed.\nInvariant: The arrow means planned effect of the mitigation, not a measured result. Score = likelihood × impact on 1–5 scales, and the scale definitions stay visible. Every action has one owning team and a date.\nStatic: Static page.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-ml-report-dataset","title":"Evaluation report cover and dataset card","notes":"Purpose: Open an evaluation report by naming the model, the decision requested and the data it was tested on, before any metric appears.\nModify: Edit splits (period, pumps, per-class counts) and the class definitions. Percentages, bar segments and the shift note are computed from counts. Replace the facts with your own provenance.\nInvariant: Class order Healthy → Degraded → Failing and its colour ramp are fixed across the report. Splits are time-based and the test period is after all training data. Say how labels were created and what is known to be missing.\nStatic: Static page.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-ml-report-confusion","title":"Confusion matrix normalised by true class","notes":"Purpose: Show where each true class ends up, so the audience sees which mistakes the model makes, not only how many.\nModify: The shared test-set block is repeated on pages 02, 03, 05 and 06 (modules cannot import each other); replace it identically on all four. Replace the shared rows block with real test predictions; the matrix, shares, totals, per-class metrics and title are computed from it. Change THRESHOLD only together with the ROC/PR page.\nInvariant: State the normalisation (rows = true class, each row sums to 100%) and keep counts visible. Class order Healthy → Degraded → Failing on both axes and every page. Colour encodes the row share with one hue.\nStatic: Static page.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-ml-report-curves","title":"ROC and precision–recall curves with operating threshold","notes":"Purpose: Show ranking quality (ROC) and the alert trade-off that matters with a rare class (precision–recall) side by side, with the thresholds under discussion marked on both.\nModify: The shared test-set block is repeated on pages 02, 03, 05 and 06 (modules cannot import each other); replace it identically on all four. Replace the shared rows block with real predictions; curves, AUC, AP, threshold points and the caption are computed. Edit MARKS and THRESHOLD to discuss other operating points.\nInvariant: Say it is one-vs-rest and which class is positive. Show the chance line on ROC and the prevalence baseline on PR. Thresholds refer to calibrated probabilities and are the same points on both panels.\nStatic: Static page.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-ml-report-importance","title":"Feature importance with uncertainty","notes":"Purpose: Show which inputs the model relies on for the decision that matters, with the spread across repeats, so small or null effects are not over-read.\nModify: Replace features with your permutation-importance results (mean and interval per feature), and REPEATS / BASE_AP. Order, interval styling and the null count are computed.\nInvariant: Name the metric, the split, the number of repeats and the interval definition. Keep the zero line. Intervals that include zero are drawn hollow and grey. Importance describes the model, not causes in the pumps.\nStatic: Static page.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-ml-report-calibration","title":"Calibration: reliability diagram before and after isotonic","notes":"Purpose: Show whether predicted probabilities can be read as risks, because thresholds and alert budgets are set on them.\nModify: The shared test-set block is repeated on pages 02, 03, 05 and 06 (modules cannot import each other); replace it identically on all four. Replace the shared rows block with real predictions (raw and calibrated scores); bins, observed shares, Wilson intervals, ECE, Brier score and the histogram are computed.\nInvariant: Equal-width bins, stated. The diagonal is the reference. Show how many windows fall in each bin (most are near zero for a rare class) and put an interval on each observed share. Fit the calibrator on validation, never on the test split.\nStatic: Static page.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-ml-report-modelcard","title":"Model card: intended use, limitations and subgroup results","notes":"Purpose: Close the report with what the model is for, what it must not be used for, what is known to be weak, and the decision requested with its safeguards.\nModify: The shared test-set block is repeated on pages 02, 03, 05 and 06 (modules cannot import each other); replace it identically on all four. Rewrite the three lists for your model. Replace the shared rows block and the site assignment with real subgroup labels; recall and Wilson intervals are computed. Keep the decision box to one request plus its conditions.\nInvariant: Limitations carry the same visual weight as intended use. Subgroup results show n and an interval, and the weakest subgroup is named in the limitations. Out-of-scope uses are stated plainly.\nStatic: Static page.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-lecture-goals","title":"平均の落とし穴：表紙と学習目標","notes":"Purpose: 講義の題名・対象・所要時間と、受講後にできるようになることを最初に約束する。\nModify: course と goals を差し替える。目標は「〜できる」で終わる観察可能な行動にし、3つ以内に保つ。天秤の皿の数値は以降の例題と同じデータにそろえる。\nInvariant: 目標は測れる動詞で書く。イラストは本題（重さの違うものの平均）を予告するもので、装飾だけの図にしない。\nStatic: 静的ページ。","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-lecture-concept","title":"概念図：加重平均は人数という重りでつり合う点","notes":"Purpose: 加重平均を「重りでつり合う支点」という1枚の絵で理解させる。\nModify: stores の単価と人数を変えると、支点・単純平均の位置・距離のラベルがすべて再計算される。1ブロック＝unit 人。\nInvariant: 横軸は数直線（等間隔の目盛り）。支点は計算した加重平均の位置に置き、左右のモーメント（距離×人数）が等しいことを右下で確かめる。単純平均は比較用に点線で示す。\nStatic: 静的ページ。","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-lecture-example","title":"例題：2店舗の客単価を会社全体の1つの数字にまとめる","notes":"Purpose: 手順を1段ずつ見せ、受講者が自分の電卓で追いかけられるようにする。\nModify: stores を差し替えると、表・各ステップの式・答え・単純平均との差がすべて再計算される。手順の文言は「何をするか」を動詞で書く。\nInvariant: 途中式は省略しない。答えは単位つきで示し、単純平均との違いを一言で添える。\nStatic: クリックごとにステップ1→2→3→答えの順に現れる。最終状態ではすべての式と答えが読める。","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-lecture-mistake","title":"よくある誤り：平均どうしをそのまま足して割る","notes":"Purpose: 誤った計算と正しい計算を同じ縮尺の図で並べ、どこで考え違いが起きるかを示す。\nModify: stores を差し替えると、両方の式・てんびんの傾き・ズレの金額と割合が再計算される。\nInvariant: 左右のカードは同じ横軸・同じ重りの絵で比べる（縮尺をそろえる）。誤りを責める言い方ではなく、原因（重りを無視）を1文で説明する。\nStatic: 静的ページ。","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-lecture-check","title":"理解度チェック：2部署の平均残業時間をまとめる","notes":"Purpose: 例題と同じ考え方を別の場面（人数と残業時間）で使えるか、その場で確かめる。\nModify: teams と options を差し替える。誤答の選択肢には、典型的な誤り（単純平均など）を1つ入れる。正答は teams から計算し、options に同じ値がないとイラストの丸が付かない。\nInvariant: 問いの数値とイラスト（1アイコン＝1人、帯の長さ＝時間）は同じデータから描く。解答は計算式つきで示す。\nStatic: 1回目のクリックで正答の丸と解答注記が現れる。最終状態では解答まで読める。配布資料で答えを隠したい場合は、解答注記を別ページに移す。","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-lecture-summary","title":"まとめ：平均をまとめるときは合計÷合計","notes":"Purpose: 講義の要点を3つに絞り、明日の仕事で使う行動に言い換えて持ち帰らせる。次回の内容につなげる。\nModify: takeaways の見出しは1文の結論、本文はその理由か使い方にする。アイコンは各要点の内容を表すものに描き替える。\nInvariant: 要点は3つまで。学習目標（1枚目）と対応させる：説明する→1、計算する→2、見抜く→3。\nStatic: 静的ページ。","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-editorial-opener","title":"The Long Minute — essay opener","notes":"Purpose: Open a visual essay with one dramatic typographic statement, a one-sentence dek and a single drawn image.\nModify: Change issue and story. Keep the title to two or three short words so it can run at display size; move the drawing further right (or use a photograph) if the words are longer.\nInvariant: The title is the first read, the drawing the second, the dek the third. The drawing is cropped deliberately by the right edge; keep the crop inside the SVG viewport.\nStatic: Static page.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-editorial-spread","title":"Image-led spread: the cup","notes":"Purpose: Let one photograph carry the page, with a single column of essay text that tells the reader why it matters.\nModify: Swap the photograph (keep it near its native resolution; this 600×400 image is shown at about 1.08×), the caption and the column. Keep the column to one idea and roughly 60–80 words.\nInvariant: Picture first, headline second, body third. The caption states what the picture shows; the credit line stays visible.\nStatic: Static page.","sources":[{"type":"image","file":"assets/media/study-01.jpg","license":"CC0"}],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-editorial-quote","title":"Pull quote from the essay","notes":"Purpose: Stop the reader on one sentence that carries the essay’s argument, with a short side column that sets it up.\nModify: Replace quote with a sentence taken from your own text (or a real, sourced statement with its source). Keep it under about 20 words so it holds at display size. Replace the side column with the paragraph that leads into it.\nInvariant: Do not attribute a sentence to an invented expert or a person who did not say it. One highlighted word at most.\nStatic: Static page.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-editorial-timeline","title":"Illustrated timeline: fruit to cup","notes":"Purpose: Show a sequence of stages and how long each takes, when durations differ by orders of magnitude.\nModify: Edit stages (name, duration in seconds, label) and the drawings. The vertical positions, grid and total in the lede are computed from the same array.\nInvariant: Left-to-right is the order of the process; height is duration on a log scale that is named in the lede and labelled on the axis. Durations are typical illustrative values, stated in the source line.\nStatic: Static page.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-editorial-numbers","title":"Big-number spread: three numbers make a recipe","notes":"Purpose: Give a few numbers the scale of a headline, each with a caption that says what it counts, plus the figures derived from them.\nModify: Change recipe (dose, yield, time). The ratio, flow rate, bar lengths and stopwatch sector are computed from it.\nInvariant: Every big number carries its unit and a caption. Bars share one zero and one scale. The source line says these values are illustrative.\nStatic: Static page.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-editorial-closing","title":"Closing page and next issue","notes":"Purpose: End the essay on one line the reader can carry away, then point to what comes next and credit the images.\nModify: Replace the closing line (keep it short enough for display size), the next-issue teaser and the colophon credits.\nInvariant: One closing line, not a list of takeaways. Credits for every photograph used in the piece stay on the page.\nStatic: Static page.","sources":[{"type":"image","file":"assets/media/study-01.jpg","license":"CC0"}],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-impact-report-highlights","title":"2025年度インパクトレポート：表紙と成果の数字","notes":"Purpose: 表紙で1年間のいちばん大きな変化を1文で示し、成果を4つの大きな数字と前年度比で一覧させる。\nModify: org と kpis を差し替える。参加者数と拠点数は regions の合計から計算しているので、地域別ページと同じ表を使う。率の変化は「ポイント」、人数・回数の変化は「%」で表す。\nInvariant: 大きな数字には必ず単位・定義（何を数えたか）・比較対象を添える。数字は4つまで。\nStatic: 静的ページ。","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-impact-report-regions","title":"地域別の活動：参加者数と拠点数","notes":"Purpose: 地域ごとの参加者数・拠点数を、地理を捏造しない抽象的なタイル図と順位表で示し、次年度の拠点計画の根拠にする。\nModify: regions の人数・拠点数・タイル位置（col,row）を差し替える。見出しの割合、最も混み合う地域、表の並び・棒・合計はすべて計算で出る。実在の地名を使う場合も、正確な地図を用意できなければタイル図のままにする。\nInvariant: タイル図は位置関係の目安であり、面積や距離に意味はない（ページ上で明記する）。合計は表紙の参加者数・拠点数と一致させる。\nStatic: 静的ページ。","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-impact-report-logic","title":"事業の流れ：インプットからアウトカムまで","notes":"Purpose: 1年間の事業を「投じた資源→行ったこと→直接の結果→子どもに起きた変化」の順に並べ、成果の数字がどこから来たかを1枚で説明する（ロジックモデル）。\nModify: cols の数値と説明を差し替える。インプットの金額は予算ページの支出合計、アウトプットの参加者数は表紙・地域別ページと同じ値にする。\nInvariant: 矢印は想定する因果の流れであり、アウトカムの変化が事業だけによるとは限らない（ページ下の注記を残す）。アウトカムの割合には調査方法と回答数を添える。\nStatic: 静的ページ。","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-impact-report-budget","title":"予算の内訳：支出と収入","notes":"Purpose: お金の出入りを1枚で示し、支出のうち子どもと接する現場に使った割合を見出しで伝える。\nModify: spend と income（万円）を差し替える。合計・割合・ドーナツの角度・積み上げの高さ・ラベル位置・繰越額はすべて計算で出る。field: true の項目が見出しの「現場」の割合に入る。\nInvariant: ドーナツの中央の合計＝支出の各項目の合計、積み上げの高さ＝収入の合計。収入−支出＝繰越を下段で必ず示す。割合は小数1桁で四捨五入。\nStatic: 静的ページ。","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-impact-report-voices","title":"受益者の声（例示用の架空の声）","notes":"Purpose: 数字では伝わらない変化を、子ども・保護者・支える側の3つの立場の声で補う。\nModify: voices を、本人の同意を得た実際の声に差し替える。属性は個人が特定されない粒度（学年・拠点・活動年数程度）にとどめる。タグは声が示す変化を短く言い換える。\nInvariant: 架空の声を実在の声として見せない。実際の声に替えるまでは「架空」の表示と注記を残す。アバターは実在の人物の似顔絵にしない。\nStatic: 静的ページ。","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-impact-report-next","title":"次年度計画：目標とロードマップ","notes":"Purpose: 今年度の結果から次年度の重点を導き、数値目標と四半期ごとの実行計画を1枚で約束する。\nModify: goals の目標値と方法、plan の期間（四半期の番号 0〜3）とマイルストーンを差し替える。現状値は表紙・地域別ページと同じ regions から計算する。\nInvariant: 目標は現状値と並べ、増分（%・ポイント・か所）を計算で示す。計画は約束ではなく予定として書き、確定していない項目は断定しない。\nStatic: 静的ページ。","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-launch-hero","title":"Launch hero: Fernhook 2.0 returns automation","notes":"Purpose: Open a launch with one promise, the availability facts and a believable picture of the product.\nModify: Change product, queue rows, KPI tiles and reason chips in the arrays at the top; the mockup redraws from them. Keep the headline to two lines.\nInvariant: Screens use sample data and say so; the phone-to-notification connector shows cause and effect, so keep it pointing from the customer action to the automated result.\nStatic: Final state is the whole page; no builds.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-launch-features","title":"Feature grid: six jobs Fernhook 2.0 now does","notes":"Purpose: Show what is new as concrete jobs, each with plan availability, so the audience can map features to their own work.\nModify: Edit the features array; keep six or three items so the 3-column grid stays full. Draw new icons with the same 64px tile, 2.4px line and single coral accent.\nInvariant: Plan tags must agree with the pricing page. Describe the job a feature does, not an adjective.\nStatic: No builds; the grid reads at once.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-launch-before-after","title":"Before and after: the return workflow on one time axis","notes":"Purpose: Prove the headline benefit with the workflow itself: which steps disappear and where the time went.\nModify: Edit the before/after step arrays (hours per part). Bars, durations, refund markers and the three summary figures recompute. Keep maxH at or above the longest lane.\nInvariant: Both lanes share one hour axis starting at zero. Keep unchanged steps (carrier transit) visible so the gain is not overstated.\nStatic: The \"with 2.0\" lane builds in at step 1; the final state shows both lanes.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-launch-pricing","title":"Pricing: three plans priced by monthly returns","notes":"Purpose: Let each buyer find their plan by volume and see what the upgrade adds.\nModify: Edit the tiers array (price, included volume, overage, feature flags). Unit-cost bars and labels recompute from price / included.\nInvariant: Bars share a zero and one scale. Feature rows are identical across plans, so absence is shown, not hidden. Plan availability must match the feature page.\nStatic: No builds.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-launch-integrations","title":"Integration map: one scan sets off refund, restock and update","notes":"Purpose: Show where the product sits among existing systems and which single event creates the customer-visible benefit.\nModify: Edit nodes (position, title, subtitle, glyph) and edges (from, to, label, kind). Paths and label pills recompute from node boxes.\nInvariant: Arrow direction is the direction data moves. Grey means continuous sync; coral marks only the chain started by one scan, numbered in order. Do not colour other edges coral.\nStatic: No builds; the legend explains both line types.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-launch-closing","title":"Closing: turn it on today, three steps and rollout dates","notes":"Purpose: End with the concrete next action, how to adopt safely, and when each plan gets access.\nModify: Edit steps (keep three) and rollout dates; change the URL line. The loop backdrop is decorative and can stay.\nInvariant: Label future items as planned, not promised. Steps are imperative actions the customer takes, in order.\nStatic: The three steps build in order; the final state shows all of them.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-project-status-summary","title":"全体ステータス：RAG表示と一言要約","notes":"Purpose: 定例の冒頭で、全体の状態・その理由・判断が必要な領域を1枚で伝える。\nModify: overall（全体RAG・前回・要約）とareas（領域ごとのRAG・前回比・状況）、kpis を書き換える。表・信号・KPIは配列から描画される。\nInvariant: RAGは色だけでなく形（●▲■）と言葉を併記する。全体の判定は最も悪い領域を無視しない。KPIの計画値は同じ基準日のものを使う。\nStatic: ビルドなし。1枚で読み切れる。","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-project-status-milestones","title":"マイルストーン：基準計画と見込み、今日の位置","notes":"Purpose: 基準計画に対してどこがどれだけずれ、最終期限に影響するかを1本の日付軸で示す。\nModify: phases の base／fc（YYYY-MM-DD）、status、buffer と today を書き換える。棒・菱形・遅れ・予備日・下段の数値は日付から計算される。\nInvariant: 基準計画は消さずに残す。遅れは営業日で数え、予備日の残数と矛盾させない。今日の線は報告基準日に合わせる。\nStatic: ビルドなし。","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-project-status-burndown","title":"バーンダウン：計画線・実績線・完了見込み","notes":"Purpose: 残作業の推移を計画と比べ、現在のペースでいつ終わるかを数字で示す。\nModify: start、planWeeks、initialScope、remaining（週次の残ポイント）、scopeChanges、today を書き換える。線・差分・見込み日・見出しの数値は自動で再計算される。\nInvariant: 縦軸は0から始める。計画線は当初計画のまま残し、スコープ追加は注記で示す。見込みの計算期間（lookback）を明記する。\nStatic: 見込み線はステップ1で表示。最終状態ですべて読める。","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-project-status-raci","title":"RACI表：作業ごとの責任分担","notes":"Purpose: 誰が実行し、誰が最終的に責任を持つかを作業ごとに合意し、負荷の偏りを見つける。\nModify: roles と tasks を書き換える。A＝1名の確認、R の件数、右下の注記は自動で再計算される。key: true の行は薄く強調される。\nInvariant: 各行の A は必ず1名。A と R を兼ねる場合は A/R と書く。役割名は個人名ではなく役割で書く。\nStatic: ビルドなし。","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-project-status-risks","title":"リスク・課題一覧：影響×発生確度","notes":"Purpose: リスクと課題を同じ尺度で並べ、今週どれに手を打つかを決める。\nModify: items（ID、種別、内容、影響、確度、対策、担当、期限）を書き換える。マトリクスの位置・スコア・並び順・色帯は自動で再計算される。\nInvariant: スコア＝影響×確度。課題（すでに起きていること）は確度5として扱い、形でリスクと区別する。対策には担当と期限を必ず付ける。\nStatic: ビルドなし。","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-project-status-decisions","title":"決定事項と次のアクション","notes":"Purpose: 定例の最後に、決まったこと・誰がいつまでに何をするか・次回の議題を確認する。\nModify: decisions、actions（内容・担当・期限・新規／継続）、next、today を書き換える。並び順・残日数・期限超過は自動で計算される。\nInvariant: 決定事項には決定者と理由を残す。アクションは担当1名と日付の期限を持つ。期限超過を隠さない。\nStatic: ビルドなし。","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-keynote-opener","title":"Keynote opener: Move the hour, not the mountain","notes":"Purpose: Open a keynote with the whole argument in one line and a picture of it: the sun behind the mountain.\nModify: Change the two title lines, the italic subline and the event strings. Change SEED for another ridge pattern; keep ridgeTop below the title block.\nInvariant: The title is a claim the talk defends, not a topic label. The backdrop is decoration and carries no data.\nStatic: No builds; the opener reads at once.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-keynote-chapter","title":"Chapter divider: Time is the new capacity","notes":"Purpose: Mark a turn in the talk and say, in one line, what this chapter will prove.\nModify: Edit chapters and current; the outlined numeral and the chapter rail update. Change SEED for another contour pattern.\nInvariant: The chapter title is the claim of the section. The contour field is decoration; the outlined numeral is the only accent.\nStatic: No builds.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-keynote-number","title":"Giant number: 4 h 16 min between the solar and demand peaks","notes":"Purpose: Make one number unforgettable and show exactly where it comes from.\nModify: Replace solarRaw and demandRaw with your metered hourly profiles (or an array lookup). The peaks, the giant number, the bracket and the labels recompute.\nInvariant: The giant number equals the bracket on the chart. Say how the curves are scaled; do not compare their heights as quantities.\nStatic: The context chart builds in at step 1; the final state shows number and chart together.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-keynote-then-now","title":"Then vs now: plants chased demand; demand now follows the sun","notes":"Purpose: Compress the talk's turn into two opposing sentences, each backed by a small schematic.\nModify: Edit the two statements and years. In the right schematic change SHIFT (share of the evening bump that moves); the midday addition is recomputed so total energy stays equal.\nInvariant: Both halves are labelled schematic; do not add units or read values off them. Keep the statements parallel in grammar so the contrast is real.\nStatic: The \"now\" half wipes in at step 1; the final state shows both halves.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-keynote-quote","title":"Quote: the cheapest kilowatt-hour is the one we move","notes":"Purpose: Give the audience one sentence to repeat after the talk.\nModify: Edit quote.lead (highlighted), quote.rest and quote.by. Change SEED for another particle pattern.\nInvariant: Quote only words that were actually said or written, and attribute them to their real source. This example is an original line attributed to the programme, not to a person.\nStatic: No builds.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"tpl-keynote-closing","title":"Closing: move the hour, and three things to do next","notes":"Purpose: Close on the thesis and leave the audience with three concrete things to do.\nModify: Edit asks (keep three, verb first), the event and link. The ridgeline backdrop mirrors the opener; change SEED freely.\nInvariant: Each ask is an action someone in the room can take. The headline repeats the opener's claim, shortened.\nStatic: The asks build in order; the final state shows all three.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""}]}</script><script>/* Slide Studio player — deterministic presentation states.
+ *
+ * Contract
+ * - A slide's state is (slide index, build step). Every route (button, key,
+ *   swipe, API, presenter window, URL hash) calls show(i, step).
+ * - Target styles are committed synchronously; animation is a removable layer
+ *   on top. finish() completes every running animation at its target, so a
+ *   direct jump, reverse navigation, reduced motion and export all reach the
+ *   same committed state.
+ * - Widgets own their content; global navigation never consumes keys from
+ *   inputs, sliders, editors, media or [data-interactive] regions.
+ *
+ * Authoring hooks (see references/motion-and-interaction.md)
+ *   data-step="n"            visible from build n (0 = start); data-until="m" hides after m
+ *   data-motion="preset"     entry effect when the element appears
+ *   data-delay="ms"          wait before the entry effect (stagger by hand)
+ *   data-stagger="ms"        animate the element's children one after another
+ *   data-duration="ms"       effect length (default 500, max 1600)
+ *   data-easing="name|css"   standard | emphasized | decelerate | accelerate | linear | smooth | any CSS easing
+ *   data-states='{"0":{…},"2":{…}}'  cumulative CSS state per build (transformations)
+ */
+(() => {
+  'use strict';
+  const meta = JSON.parse(document.getElementById('slide-studio-meta').textContent);
+  const slides = [...document.querySelectorAll('.slide')];
+  const mq = matchMedia('(prefers-reduced-motion: reduce)');
+  const warnings = [], widgets = new Map(), tracks = new WeakMap(), animations = new Set(), counting = new Set();
+  const lastSteps = Array(slides.length).fill(0);
+  const labels = meta.labels || {};
+  let current = 0, step = 0, overview = false, restore = null, enteredIndex = null;
+  let exporting = new URLSearchParams(location.search).has('static');
+  const $ = id => document.getElementById(id);
+  const warn = e => { warnings.push(String(e)); console.warn('[Slide Studio]', e); };
+  const call = (widget, method, ...args) => { try { return widget?.[method]?.(...args); } catch (e) { warn(`${method}: ${e.message}`); } };
+  const rtl = () => document.documentElement.dir === 'rtl';
+
+  // ------------------------------------------------------------ build bookkeeping
+
+  const max = i => Math.max(0, ...[...slides[i].querySelectorAll('[data-step],[data-states]')].flatMap(el => {
+    const v = [Number(el.dataset.step) || 0];
+    try { if (el.dataset.states) v.push(...Object.keys(JSON.parse(el.dataset.states)).map(Number)); } catch { /* reported below */ }
+    return v.filter(Number.isFinite);
+  }));
+
+  function parseTrack(el) {
+    const map = JSON.parse(el.dataset.states), keys = Object.keys(map).map(Number).sort((a, b) => a - b);
+    if (!map['0'] || keys.some(k => !Number.isInteger(k) || k < 0)) throw Error('state 0 and nonnegative integer keys required');
+    const base = {};
+    for (const state of Object.values(map)) {
+      if (!state || typeof state !== 'object' || Array.isArray(state)) throw Error('CSS property map required');
+      for (const key of Object.keys(state)) {
+        if (!(key in el.style) && !key.startsWith('--')) throw Error(`unknown CSS property ${key}`);
+        base[key] = key.startsWith('--') ? el.style.getPropertyValue(key) : el.style[key] || getComputedStyle(el)[key];
+      }
+    }
+    return { map, keys, base };
   }
-  for(const el of slide.querySelectorAll('[data-states]')){const track=tracks.get(el);if(!track)continue;const to={...track.base};for(const k of track.keys)if(k<=at)Object.assign(to,track.map[k]);transition(el,to,animate);const hidden=el.dataset.studioHidden==='true'||to.opacity===0||to.opacity==='0'||to.visibility==='hidden';el.setAttribute('aria-hidden',String(hidden));el.inert=hidden}
-  lastSteps[i]=at;slide.dataset.currentStep=String(at);for(const [id,w] of widgets)if(slide.contains($(id)))call(w,'onStep',{...context(i),step:at});
- }
- function scale(){const bar=document.querySelector('.studio-controls').getBoundingClientRect().height;document.documentElement.style.setProperty('--studio-bar',bar+'px');const r=Math.min(innerWidth/meta.width,Math.max(1,innerHeight-bar)/meta.height);document.documentElement.style.setProperty('--studio-scale',String(r));if(overview)document.querySelectorAll('.studio-thumb').forEach(w=>w.style.setProperty('--thumb-scale',w.clientWidth/meta.width))}
- function pauseSlide(i){if(enteredIndex===i)enteredIndex=null;for(const el of slides[i].querySelectorAll('video,audio'))el.pause();for(const [id,w]of widgets)if(slides[i].contains($(id)))call(w,'onLeave',context(i))}
- function show(i,n=0,{animate=false}={}){
-  finish();const previous=current;current=Math.max(0,Math.min(slides.length-1,Math.floor(Number(i)||0)));step=Math.max(0,Math.min(max(current),Math.floor(Number(n)||0)));if(exporting)step=max(current);
-  if(previous!==current){pauseSlide(previous);for(const el of slides[current].querySelectorAll('[data-step]'))el.dataset.studioHidden='true'}document.body.dataset.export=String(exporting);
-  slides.forEach((sl,j)=>{const active=j===current;sl.classList.toggle('is-current',active);sl.setAttribute('aria-hidden',String(!active));sl.inert=!active||overview;if(active||exporting)apply(j,exporting?max(j):step,animate&&active)});
-  $('studio-position').textContent=`${current+1} / ${slides.length} · ${step} / ${max(current)}`;$('studio-prev').disabled=!current&&!step;$('studio-next').disabled=current===slides.length-1&&(exporting||step===max(current));
-  const s=meta.slides[current];$('studio-notes').textContent=(s.notes||'')+(s.sources?.length?'\n\n'+s.sources.map(x=>typeof x==='string'?x:JSON.stringify(x)).join('\n'):'');$('studio-announcer').textContent=s.title;
-  $('studio-jump').value=String(current);history.replaceState(null,'','#'+encodeURIComponent(s.id));
-  for(const [id,w]of widgets)if(slides[current].contains($(id))){if(exporting)call(w,'onExport',context());else if(enteredIndex!==current&&!overview&&!document.hidden)call(w,'onEnter',context())}
-  enteredIndex=(!exporting&&!overview&&!document.hidden)?current:null;
-  window.dispatchEvent(new CustomEvent('studio:state',{detail:context()}));scale();
- }
- function next(){if(!exporting&&step<max(current))show(current,step+1,{animate:true});else if(current<slides.length-1)show(current+1,0,{animate:true})}
- function prev(){if(!exporting&&step>0)show(current,step-1,{animate:true});else if(current)show(current-1,max(current-1),{animate:true})}
- function toggleOverview(){
-  overview=!overview;document.body.classList.toggle('overview',overview);finish();
-  if(overview)pauseSlide(current);
-  slides.forEach((sl,i)=>{let w=sl.parentElement;if(overview){w=document.createElement('div');w.className='studio-thumb';w.tabIndex=0;w.setAttribute('role','button');w.setAttribute('aria-label',meta.slides[i].title);sl.before(w);w.append(sl);sl.inert=true;apply(i,max(i),false);w.onclick=()=>{toggleOverview();show(i)};w.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggleOverview();show(i)}}}else if(w.classList.contains('studio-thumb')){w.before(sl);w.remove()}});
-  if(!overview)show(current,step);scale();
- }
- function setExport(on){exporting=!!on;if(overview)toggleOverview();if(exporting)for(let i=0;i<slides.length;i++)pauseSlide(i);show(current,step)}
- function prepareExport(){setExport(true);for(const [id,w] of widgets){const i=slides.findIndex(sl=>sl.contains($(id)));call(w,'onExport',context(i<0?current:i));}window.dispatchEvent(new CustomEvent('studio:export'))}
- function reset(){for(const [id,w]of widgets)if(slides[current].contains($(id)))call(w,'reset');show(current,0)}
- $('studio-prev').onclick=prev;$('studio-next').onclick=next;$('studio-overview').onclick=toggleOverview;$('studio-reset').onclick=reset;
- $('studio-jump').onchange=e=>show(Number(e.target.value));
- $('studio-notes-btn').onclick=()=>{const on=$('studio-notes').classList.toggle('open');$('studio-notes-btn').setAttribute('aria-expanded',String(on))};
- $('studio-full').onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await document.documentElement.requestFullscreen()}catch{warn('Fullscreen unavailable')}};
- // Navigation buttons are not content widgets. Arrow/Page keys still navigate when
- // those buttons keep focus after a mouse click; Space/Enter retain native activation.
- document.addEventListener('keydown',e=>{
-  if(e.defaultPrevented||e.ctrlKey||e.metaKey||e.altKey||e.isComposing||e.keyCode===229)return;
-  const target=e.composedPath().find(x=>x instanceof Element)||document.body;
-  if(e.key==='Escape'){
-   if(overview){e.preventDefault();toggleOverview();return}
-   if($('studio-notes').classList.contains('open')){e.preventDefault();$('studio-notes').classList.remove('open');$('studio-notes-btn').setAttribute('aria-expanded','false');return}
+  for (const slide of slides) for (const el of slide.querySelectorAll('[data-states]')) {
+    try { tracks.set(el, parseTrack(el)); } catch (e) { warn(`${slide.id}: ${e.message}`); }
   }
-  const navigationKey=['ArrowRight','ArrowLeft','PageDown','PageUp',' ','Enter','Home','End'].includes(e.key);
-  if(e.repeat&&navigationKey){
-   // Do not steal a slider's held arrow key. Only suppress presentation navigation.
-   if(!target.closest('input,textarea,select,[contenteditable],[data-interactive]'))e.preventDefault();
-   return;
+  const stateAt = (track, at) => { const to = { ...track.base }; for (const k of track.keys) if (k <= at) Object.assign(to, track.map[k]); return to; };
+
+  // ------------------------------------------------------------ animation layer
+
+  const EASE = {
+    standard: 'cubic-bezier(.2,0,0,1)', emphasized: 'cubic-bezier(.3,0,0,1)', decelerate: 'cubic-bezier(0,0,0,1)',
+    accelerate: 'cubic-bezier(.3,0,1,1)', linear: 'linear', smooth: 'cubic-bezier(.45,0,.2,1)',
+  };
+  const DEFAULT_EASE = 'cubic-bezier(.22,.68,.2,1)';
+  const easing = el => { const e = el.dataset.easing; return e ? EASE[e] || e : DEFAULT_EASE; };
+  const durationOf = (el, fallback = 500) => {
+    const requested = el.dataset.duration === undefined ? fallback : Number(el.dataset.duration);
+    return Number.isFinite(requested) ? Math.min(1600, Math.max(0, requested)) : fallback;
+  };
+  const delayOf = el => { const d = Number(el.dataset.delay); return Number.isFinite(d) ? Math.min(2400, Math.max(0, d)) : 0; };
+  const motionAllowed = animate => animate && !mq.matches && !exporting;
+
+  function track(a) {
+    animations.add(a);
+    a.finished?.then(() => { animations.delete(a); a.cancel?.(); }).catch(() => animations.delete(a));
+    return a;
   }
-  if(overview)return;
-  const onNav=!!target.closest('.studio-controls');
-  if(target.closest('input,textarea,select,video,audio,[contenteditable],[data-interactive],[role="slider"],[role="textbox"],[role="combobox"],[role="grid"]'))return;
-  if(target.closest('button,a,summary,[role="button"]')&&(!onNav||[' ','Enter'].includes(e.key)))return;
-  if(['ArrowRight','PageDown',' ','Enter'].includes(e.key)){e.preventDefault();next()}
-  else if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();prev()}
-  else if(e.key==='Home'){e.preventDefault();show(0)}
-  else if(e.key==='End'){e.preventDefault();show(slides.length-1,max(slides.length-1))}
-  else if(e.key.toLowerCase()==='o'){e.preventDefault();toggleOverview()}
-  else if(e.key.toLowerCase()==='r'){e.preventDefault();reset()}
-  else if(e.key.toLowerCase()==='n'){e.preventDefault();$('studio-notes-btn').click()}
- });
- document.addEventListener('visibilitychange',()=>{if(document.hidden)pauseSlide(current);else show(current,step)});
- window.addEventListener('resize',scale);mq.addEventListener('change',()=>{finish();for(let i=0;i<slides.length;i++)pauseSlide(i);show(current,step)});
- window.addEventListener('beforeprint',()=>{restore={current,step,exporting,widgets:[...widgets].map(([id,w])=>[id,call(w,'snapshot')])};prepareExport()});
- window.addEventListener('afterprint',()=>{if(!restore)return;exporting=restore.exporting;for(const [id,s]of restore.widgets)call(widgets.get(id),'restore',s);show(restore.current,restore.step);restore=null});
- const api={kind:'craft',version:3,meta,show,next,prev,finish,reset,setExport,prepareExport,showAllBuilds:prepareExport,overview:toggleOverview,
-  register(id,widget){if(widgets.has(id))throw Error('Duplicate widget ID: '+id);if(!$(id))throw Error('Missing widget root: '+id);widgets.set(id,widget);if(slides[current].contains($(id)))call(widget,exporting?'onExport':'onEnter',context());return()=>{call(widget,'dispose');widgets.delete(id)}},
-  getWidgetState:id=>call(widgets.get(id),'snapshot'),getState:()=>({current,step,maxBuild:max(current),exporting,overview,reducedMotion:mq.matches,warnings:[...warnings],widgets:[...widgets.keys()]})};
- window.slideStudio=window.SlideStudio=api;let id='';try{id=decodeURIComponent(location.hash.slice(1))}catch{}const initial=meta.slides.findIndex(s=>s.id===id);show(initial<0?0:initial);document.body.dataset.studioReady='true';
+  function finish() {
+    for (const a of animations) { try { a.finish(); a.cancel?.(); } catch { a.cancel?.(); } }
+    animations.clear();
+  }
+
+  /** Commit `to` on the element now; optionally animate from `from` (or the old value) as a removable layer. */
+  function transition(el, to, animate, from = null, { delay = 0, duration, keyframes } = {}) {
+    const old = {};
+    for (const [k, v] of Object.entries(to)) {
+      old[k] = k.startsWith('--') ? getComputedStyle(el).getPropertyValue(k) : getComputedStyle(el)[k];
+      if (k.startsWith('--')) el.style.setProperty(k, String(v)); else el.style[k] = String(v);
+    }
+    if (!motionAllowed(animate) || !el.animate) return;
+    try {
+      const frames = keyframes || [from || old, to];
+      track(el.animate(frames, { duration: duration ?? durationOf(el), delay, easing: easing(el), fill: delay ? 'backwards' : 'none' }));
+    } catch (e) { warn(e.message); }
+  }
+
+  // Entry presets use individual transform properties (translate/scale), so they
+  // compose with an element's own transform attribute instead of replacing it.
+  const ENTRY = {
+    reveal: [{ opacity: 0 }, { opacity: 1 }],
+    focus: [{ opacity: 0.2 }, { opacity: 1 }],
+    lift: [{ opacity: 0, translate: '0 20px' }, { opacity: 1, translate: '0 0' }],
+    rise: [{ opacity: 0, translate: '0 48px' }, { opacity: 1, translate: '0 0' }],
+    slide: [{ opacity: 0, translate: '-28px 0' }, { opacity: 1, translate: '0 0' }],
+    settle: [{ opacity: 0, scale: '0.96' }, { opacity: 1, scale: '1' }],
+    zoom: [{ opacity: 0, scale: '0.86' }, { opacity: 1, scale: '1' }],
+    blur: [{ opacity: 0, filter: 'blur(10px)' }, { opacity: 1, filter: 'blur(0px)' }],
+    'grow-x': [{ scale: '0 1' }, { scale: '1 1' }],
+    'grow-y': [{ scale: '1 0' }, { scale: '1 1' }],
+    wipe: [{ clipPath: 'inset(0 100% 0 0)' }, { clipPath: 'inset(0 0% 0 0)' }],
+    'wipe-up': [{ clipPath: 'inset(100% 0 0 0)' }, { clipPath: 'inset(0% 0 0 0)' }],
+    trace: [{ strokeDashoffset: '1' }, { strokeDashoffset: '0' }],
+    draw: null, count: null, // special-cased below
+  };
+  const GEOMETRY = 'path,line,polyline,polygon,circle,ellipse,rect';
+  const hasStroke = el => { const s = getComputedStyle(el); return s.stroke && s.stroke !== 'none' && parseFloat(s.strokeWidth) > 0; };
+
+  /** Draw strokes on: dash offset for solid strokes, a left-to-right wipe for dashed ones. */
+  function drawOn(el, animate, delay) {
+    const targets = el instanceof SVGGeometryElement ? [el] : [...el.querySelectorAll(GEOMETRY)];
+    if (!motionAllowed(animate)) return;
+    const duration = durationOf(el, 900);
+    for (const t of targets) {
+      if (!t.animate) continue;
+      try {
+        if (!hasStroke(t)) { track(t.animate([{ opacity: 0 }, { opacity: 1 }], { duration: duration * 0.6, delay: delay + duration * 0.4, easing: easing(el), fill: 'backwards' })); continue; }
+        const dashed = getComputedStyle(t).strokeDasharray !== 'none';
+        if (!t.hasAttribute('pathLength') && !dashed) t.setAttribute('pathLength', '1');
+        const frames = dashed
+          ? [{ clipPath: rtl() ? 'inset(0 0 0 100%)' : 'inset(0 100% 0 0)' }, { clipPath: 'inset(0 0 0 0)' }]
+          : [{ strokeDasharray: '1 1', strokeDashoffset: '1' }, { strokeDasharray: '1 1', strokeDashoffset: '0' }];
+        track(t.animate(frames, { duration, delay, easing: easing(el), fill: 'backwards' }));
+      } catch (e) { warn(e.message); }
+    }
+  }
+
+  /** Count a number up to its committed text. The DOM always holds the final text except mid-animation. */
+  function countUp(el, animate, delay) {
+    if (!motionAllowed(animate)) return;
+    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    let node;
+    while ((node = walker.nextNode()) && !/\d/.test(node.data));
+    if (!node) return;
+    const final = node.data;
+    const m = /([-−+]?)(\d[\d,  ]*)(\.\d+)?/.exec(final);
+    if (!m) return;
+    const [all, sign, int, dec = ''] = m, head = final.slice(0, m.index), tail = final.slice(m.index + all.length);
+    const target = Number(int.replace(/[^\d]/g, '') + dec) * (sign === '-' || sign === '−' ? -1 : 1);
+    if (!Number.isFinite(target)) return;
+    const from = Number(el.dataset.countFrom ?? 0), digits = Math.max(0, dec.length - 1), grouped = /[,  ]/.test(int);
+    const sep = (int.match(/[,  ]/) || [','])[0];
+    const format = v => {
+      const abs = Math.abs(v).toFixed(digits);
+      let [ip, fp] = abs.split('.');
+      if (grouped) ip = ip.replace(/\B(?=(\d{3})+(?!\d))/g, sep);
+      const s = v < 0 ? (sign === '-' ? '-' : '−') : sign === '+' ? '+' : '';
+      return head + s + ip + (fp ? '.' + fp : '') + tail;
+    };
+    const duration = durationOf(el, 1100), start = performance.now() + delay;
+    let raf = 0, done;
+    const finished = new Promise(r => { done = r; });
+    const record = { node, final };
+    const stop = () => { cancelAnimationFrame(raf); node.data = final; counting.delete(record); done(); };
+    counting.add(record);
+    const frame = now => {
+      const t = Math.min(1, Math.max(0, (now - start) / duration)), e = 1 - (1 - t) ** 3;
+      node.data = t >= 1 ? final : format(from + (target - from) * e);
+      if (t < 1) raf = requestAnimationFrame(frame); else stop();
+    };
+    node.data = format(from);
+    raf = requestAnimationFrame(frame);
+    track({ finish: stop, cancel: stop, finished });
+  }
+
+  function enter(el, animate, extraDelay = 0) {
+    const name = el.dataset.motion, delay = delayOf(el) + extraDelay;
+    if (!(name in ENTRY)) { if (!el.dataset.motionWarned) { warn('Unknown entry effect: ' + name); el.dataset.motionWarned = 'true'; } return; }
+    if (el.dataset.stagger !== undefined) {
+      const gap = Math.max(0, Number(el.dataset.stagger) || 0);
+      [...el.children].forEach((child, i) => {
+        child.dataset.motion ??= name;
+        if (child.dataset.duration === undefined && el.dataset.duration !== undefined) child.dataset.duration = el.dataset.duration;
+        if (child.dataset.easing === undefined && el.dataset.easing !== undefined) child.dataset.easing = el.dataset.easing;
+        enter(child, animate, delay + i * gap);
+      });
+      return;
+    }
+    if (name === 'draw') return drawOn(el, animate, delay);
+    if (name === 'count') return countUp(el, animate, delay);
+    const [from, to] = ENTRY[name];
+    transition(el, to, animate, from, { delay });
+  }
+
+  // ------------------------------------------------------------ applying states
+
+  function context(i = current) {
+    return { slide: slides[i], index: i, step: i === current ? step : lastSteps[i], exporting, reducedMotion: mq.matches, active: i === current && !overview && !exporting };
+  }
+
+  /** Static state for a slide root (also used on presenter clones). */
+  function applyStatic(root, at, original = root) {
+    for (const el of root.querySelectorAll('[data-step]')) {
+      const on = at >= Number(el.dataset.step) && (el.dataset.until === undefined || at <= Number(el.dataset.until));
+      el.dataset.studioHidden = String(!on);
+    }
+    const originals = [...original.querySelectorAll('[data-states]')];
+    [...root.querySelectorAll('[data-states]')].forEach((el, k) => {
+      const tr = tracks.get(originals[k]);
+      if (!tr) return;
+      for (const [key, v] of Object.entries(stateAt(tr, at))) { if (key.startsWith('--')) el.style.setProperty(key, String(v)); else el.style[key] = String(v); }
+    });
+  }
+
+  function apply(i, at, animate) {
+    const slide = slides[i];
+    for (const el of slide.querySelectorAll('[data-step]')) {
+      const on = at >= Number(el.dataset.step) && (el.dataset.until === undefined || at <= Number(el.dataset.until));
+      const was = el.dataset.studioHidden === 'false';
+      el.dataset.studioHidden = String(!on);
+      el.setAttribute('aria-hidden', String(!on));
+      el.inert = !on;
+      if (on && el.dataset.motion && !el.hasAttribute('data-states')) {
+        if (!(el.dataset.motion in ENTRY)) { if (!el.dataset.motionWarned) { warn('Unknown entry effect: ' + el.dataset.motion); el.dataset.motionWarned = 'true'; } }
+        else if (animate && !was) enter(el, animate);
+        else if (!was && ENTRY[el.dataset.motion]) transition(el, ENTRY[el.dataset.motion][1], false);
+      }
+    }
+    for (const el of slide.querySelectorAll('[data-states]')) {
+      const tr = tracks.get(el);
+      if (!tr) continue;
+      const to = stateAt(tr, at);
+      transition(el, to, animate);
+      const hidden = el.dataset.studioHidden === 'true' || to.opacity === 0 || to.opacity === '0' || to.visibility === 'hidden';
+      el.setAttribute('aria-hidden', String(hidden));
+      el.inert = hidden;
+    }
+    lastSteps[i] = at;
+    slide.dataset.currentStep = String(at);
+    for (const [id, w] of widgets) if (slide.contains($(id))) call(w, 'onStep', { ...context(i), step: at });
+  }
+
+  // ------------------------------------------------------------ slide transitions
+
+  const TRANSITIONS = {
+    fade: () => [{ opacity: 0 }, { opacity: 1 }],
+    rise: () => [{ opacity: 0, translate: '0 24px' }, { opacity: 1, translate: '0 0' }],
+    push: forward => [{ opacity: 0, translate: `${(forward !== rtl() ? 1 : -1) * 4}% 0` }, { opacity: 1, translate: '0 0' }],
+    zoom: () => [{ opacity: 0, scale: '0.97' }, { opacity: 1, scale: '1' }],
+  };
+  function slideTransition(i, forward) {
+    const kind = meta.slides[i]?.transition || meta.transition || 'none';
+    if (kind === 'none') return;
+    const make = TRANSITIONS[kind];
+    if (!make) { warn('Unknown slide transition: ' + kind); return; }
+    try { track(slides[i].animate(make(forward), { duration: kind === 'fade' ? 340 : 460, easing: EASE.standard })); } catch (e) { warn(e.message); }
+  }
+
+  // ------------------------------------------------------------ navigation
+
+  function scale() {
+    const fs = document.body.classList.contains('studio-fullscreen');
+    const bar = fs ? 0 : document.querySelector('.studio-controls').getBoundingClientRect().height;
+    document.documentElement.style.setProperty('--studio-bar', bar + 'px');
+    const r = Math.min(innerWidth / meta.width, Math.max(1, innerHeight - bar) / meta.height);
+    document.documentElement.style.setProperty('--studio-scale', String(r));
+    if (overview) document.querySelectorAll('.studio-thumb').forEach(w => w.style.setProperty('--thumb-scale', w.clientWidth / meta.width));
+  }
+  function pauseSlide(i) {
+    if (enteredIndex === i) enteredIndex = null;
+    for (const el of slides[i].querySelectorAll('video,audio')) el.pause();
+    for (const [id, w] of widgets) if (slides[i].contains($(id))) call(w, 'onLeave', context(i));
+  }
+  function show(i, n = 0, { animate = false } = {}) {
+    finish();
+    const previous = current;
+    current = Math.max(0, Math.min(slides.length - 1, Math.floor(Number(i) || 0)));
+    step = Math.max(0, Math.min(max(current), Math.floor(Number(n) || 0)));
+    if (exporting) step = max(current);
+    const changed = previous !== current;
+    if (changed) { pauseSlide(previous); for (const el of slides[current].querySelectorAll('[data-step]')) el.dataset.studioHidden = 'true'; }
+    document.body.dataset.export = String(exporting);
+    slides.forEach((sl, j) => {
+      const active = j === current;
+      sl.classList.toggle('is-current', active);
+      sl.setAttribute('aria-hidden', String(!active));
+      sl.inert = !active || overview;
+      if (active || exporting) apply(j, exporting ? max(j) : step, animate && active);
+    });
+    if (changed && motionAllowed(animate) && !overview) slideTransition(current, current > previous);
+    $('studio-position').textContent = `${current + 1} / ${slides.length} · ${step} / ${max(current)}`;
+    $('studio-prev').disabled = !current && !step;
+    $('studio-next').disabled = current === slides.length - 1 && (exporting || step === max(current));
+    const s = meta.slides[current];
+    $('studio-notes').textContent = (s.notes || '') + (s.sources?.length ? '\n\n' + s.sources.map(x => (typeof x === 'string' ? x : JSON.stringify(x))).join('\n') : '');
+    $('studio-announcer').textContent = s.title;
+    $('studio-jump').value = String(current);
+    try { history.replaceState(null, '', '#' + encodeURIComponent(s.id)); } catch { /* sandboxed frames */ }
+    for (const [id, w] of widgets) if (slides[current].contains($(id))) {
+      if (exporting) call(w, 'onExport', context());
+      else if (enteredIndex !== current && !overview && !document.hidden) call(w, 'onEnter', context());
+    }
+    enteredIndex = !exporting && !overview && !document.hidden ? current : null;
+    window.dispatchEvent(new CustomEvent('studio:state', { detail: context() }));
+    scale();
+  }
+  function next() { if (!exporting && step < max(current)) show(current, step + 1, { animate: true }); else if (current < slides.length - 1) show(current + 1, 0, { animate: true }); }
+  function prev() { if (!exporting && step > 0) show(current, step - 1, { animate: true }); else if (current) show(current - 1, max(current - 1), { animate: true }); }
+
+  function toggleOverview() {
+    overview = !overview;
+    document.body.classList.toggle('overview', overview);
+    finish();
+    if (overview) pauseSlide(current);
+    slides.forEach((sl, i) => {
+      let w = sl.parentElement;
+      if (overview) {
+        w = document.createElement('div');
+        w.className = 'studio-thumb'; w.tabIndex = 0; w.setAttribute('role', 'button'); w.setAttribute('aria-label', meta.slides[i].title);
+        sl.before(w); w.append(sl); sl.inert = true; apply(i, max(i), false);
+        w.onclick = () => { toggleOverview(); show(i); };
+        w.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleOverview(); show(i); } };
+      } else if (w.classList.contains('studio-thumb')) { w.before(sl); w.remove(); }
+    });
+    if (!overview) show(current, step);
+    scale();
+  }
+  function setExport(on) { exporting = !!on; if (overview) toggleOverview(); if (exporting) for (let i = 0; i < slides.length; i++) pauseSlide(i); show(current, step); }
+  function prepareExport() {
+    setExport(true);
+    for (const [id, w] of widgets) { const i = slides.findIndex(sl => sl.contains($(id))); call(w, 'onExport', context(i < 0 ? current : i)); }
+    window.dispatchEvent(new CustomEvent('studio:export'));
+  }
+  function reset() { for (const [id, w] of widgets) if (slides[current].contains($(id))) call(w, 'reset'); show(current, 0); }
+
+  // ------------------------------------------------------------ chrome: blackout, help, toast
+
+  function toggleBlackout(force) {
+    let el = $('studio-blackout');
+    if (!el) { el = document.createElement('div'); el.id = 'studio-blackout'; el.className = 'studio-blackout'; el.setAttribute('aria-hidden', 'true'); el.onclick = () => toggleBlackout(false); document.body.append(el); }
+    const on = force ?? !el.classList.contains('on');
+    el.classList.toggle('on', on);
+    return on;
+  }
+  function toggleHelp(force) {
+    let el = $('studio-help');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'studio-help'; el.className = 'studio-help'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'false'); el.setAttribute('aria-label', labels.help || 'Keyboard shortcuts');
+      const rows = [
+        ['→  Space  PgDn', labels.next || 'Next'], ['←  PgUp', labels.prev || 'Previous'], ['Home  End', `1 / ${slides.length}`],
+        ['O', labels.overview || 'Overview'], ['N', labels.notes || 'Notes'], ['P', labels.presenter || 'Presenter view'],
+        ['B', labels.blank || 'Black screen'], ['F', labels.full || 'Fullscreen'], ['R', labels.reset || 'Reset'], ['12 Enter', labels.goto || 'Go to slide'], ['Esc', '×'],
+      ];
+      el.innerHTML = '<div class="studio-help-card"><h2></h2><dl></dl></div>';
+      el.querySelector('h2').textContent = labels.help || 'Keyboard shortcuts';
+      const dl = el.querySelector('dl');
+      for (const [k, v] of rows) { const dt = document.createElement('dt'), dd = document.createElement('dd'); dt.textContent = k; dd.textContent = v; dl.append(dt, dd); }
+      el.onclick = e => { if (e.target === el) toggleHelp(false); };
+      document.body.append(el);
+    }
+    const on = force ?? !el.classList.contains('open');
+    el.classList.toggle('open', on);
+    $('studio-help-btn')?.setAttribute('aria-expanded', String(on));
+    return on;
+  }
+  let toastTimer = 0;
+  function toast(text) {
+    let el = $('studio-toast');
+    if (!el) { el = document.createElement('div'); el.id = 'studio-toast'; el.className = 'studio-toast'; el.setAttribute('role', 'status'); document.body.append(el); }
+    el.textContent = text; el.classList.add('on');
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('on'), 1400);
+  }
+
+  // ------------------------------------------------------------ presenter window
+
+  let presenter = null, presenterStart = 0, presenterPaused = 0;
+  const pad2 = v => String(v).padStart(2, '0');
+  const elapsed = () => { const s = Math.max(0, Math.floor(((presenterPaused || Date.now()) - presenterStart) / 1000)); return `${Math.floor(s / 60)}:${pad2(s % 60)}`; };
+
+  function cloneSlide(i, at) {
+    const src = slides[i];
+    // Clone committed text, not a number caught mid-count.
+    const live = [...counting].map(r => [r, r.node.data]);
+    for (const [r] of live) r.node.data = r.final;
+    const c = src.cloneNode(true);
+    for (const [r, v] of live) r.node.data = v;
+    // IDs stay: the clone lives in the presenter document, and SVG url(#…) references need them.
+    c.inert = true; c.classList.add('is-current'); c.setAttribute('aria-hidden', 'true');
+    if (at !== null) applyStatic(c, at, src);
+    const srcCanvas = src.querySelectorAll('canvas'), dstCanvas = c.querySelectorAll('canvas');
+    dstCanvas.forEach((cv, k) => { try { cv.getContext('2d')?.drawImage(srcCanvas[k], 0, 0); } catch { /* tainted or webgl */ } });
+    c.querySelectorAll('video,audio').forEach(m => { m.removeAttribute('autoplay'); m.muted = true; });
+    return c;
+  }
+  function renderPresenter() {
+    if (!presenter || presenter.closed) return;
+    const d = presenter.document, s = meta.slides[current], last = max(current);
+    const cur = d.getElementById('pv-current'), nxt = d.getElementById('pv-next');
+    if (!cur) return;
+    cur.replaceChildren(cloneSlide(current, null));
+    let nextLabel;
+    if (step < last) { nxt.replaceChildren(cloneSlide(current, step + 1)); nextLabel = `${labels.next || 'Next'} · ${step + 1} / ${last}`; }
+    else if (current < slides.length - 1) { nxt.replaceChildren(cloneSlide(current + 1, 0)); nextLabel = `${labels.next || 'Next'} · ${current + 2} / ${slides.length}`; }
+    else { nxt.replaceChildren(); nextLabel = '—'; }
+    d.getElementById('pv-next-label').textContent = nextLabel;
+    d.getElementById('pv-position').textContent = `${current + 1} / ${slides.length}` + (last ? `  ·  ${step} / ${last}` : '');
+    d.getElementById('pv-title').textContent = s.title;
+    d.getElementById('pv-notes').textContent = s.notes || '';
+    fitPresenter();
+  }
+  function fitPresenter() {
+    if (!presenter || presenter.closed) return;
+    for (const frame of presenter.document.querySelectorAll('.pv-frame')) frame.style.setProperty('--pv-scale', String(frame.clientWidth / meta.width));
+  }
+  function openPresenter() {
+    if (presenter && !presenter.closed) { presenter.focus(); renderPresenter(); return presenter; }
+    const w = window.open('', 'slide-studio-presenter', 'popup,width=1280,height=800');
+    if (!w) { toast('Pop-up blocked'); return null; }
+    presenter = w; presenterStart = Date.now(); presenterPaused = 0;
+    const d = w.document;
+    d.open();
+    d.write(`<!doctype html><html lang="${document.documentElement.lang}" dir="${document.documentElement.dir}"><head><meta charset="utf-8"><title></title></head><body class="pv-body">
+<header class="pv-bar"><strong id="pv-position"></strong><span id="pv-title" class="pv-title"></span><span class="pv-time"><button type="button" id="pv-timer" class="pv-btn"></button><span id="pv-clock"></span></span></header>
+<main class="pv-main"><section class="pv-current-wrap"><div id="pv-current" class="pv-frame"></div></section>
+<aside class="pv-side"><p id="pv-next-label" class="pv-label"></p><div id="pv-next" class="pv-frame pv-next"></div><p class="pv-label" id="pv-notes-label"></p><div id="pv-notes" class="pv-notes" tabindex="0"></div></aside></main>
+<footer class="pv-foot"><button type="button" id="pv-prev" class="pv-btn">←</button><button type="button" id="pv-nextbtn" class="pv-btn">→</button></footer></body></html>`);
+    d.close();
+    d.title = `${labels.presenter || 'Presenter view'} — ${meta.title}`;
+    for (const st of document.querySelectorAll('style')) d.head.append(st.cloneNode(true));
+    d.getElementById('pv-notes-label').textContent = labels.notes || 'Notes';
+    d.getElementById('pv-prev').setAttribute('aria-label', labels.prev || 'Previous');
+    d.getElementById('pv-nextbtn').setAttribute('aria-label', labels.next || 'Next');
+    d.getElementById('pv-prev').onclick = () => prev();
+    d.getElementById('pv-nextbtn').onclick = () => next();
+    d.getElementById('pv-timer').onclick = () => { if (presenterPaused) { presenterStart += Date.now() - presenterPaused; presenterPaused = 0; } else presenterPaused = Date.now(); };
+    d.getElementById('pv-timer').ondblclick = () => { presenterStart = Date.now(); presenterPaused = 0; };
+    d.addEventListener('keydown', e => {
+      if (e.ctrlKey || e.metaKey || e.altKey || e.isComposing) return;
+      if (['ArrowRight', 'PageDown', ' ', 'Enter'].includes(e.key) && !e.target.closest?.('button')) { e.preventDefault(); next(); }
+      else if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); prev(); }
+      else if (e.key === 'Home') { e.preventDefault(); show(0); }
+      else if (e.key === 'End') { e.preventDefault(); show(slides.length - 1, max(slides.length - 1)); }
+      else if (e.key.toLowerCase() === 'b') { e.preventDefault(); toggleBlackout(); }
+    });
+    const tick = () => {
+      if (!presenter || presenter.closed) return;
+      d.getElementById('pv-timer').textContent = elapsed() + (presenterPaused ? ' ‖' : '');
+      d.getElementById('pv-clock').textContent = new Date().toLocaleTimeString(document.documentElement.lang || undefined, { hour: '2-digit', minute: '2-digit' });
+    };
+    tick();
+    const interval = w.setInterval(tick, 1000);
+    w.addEventListener('resize', fitPresenter);
+    w.addEventListener('beforeunload', () => w.clearInterval(interval));
+    renderPresenter();
+    return w;
+  }
+  window.addEventListener('studio:state', renderPresenter);
+  window.addEventListener('pagehide', () => { if (presenter && !presenter.closed) presenter.close(); });
+
+  // ------------------------------------------------------------ fullscreen & idle controls
+
+  let idleTimer = 0;
+  function wake() {
+    document.body.classList.remove('studio-idle');
+    clearTimeout(idleTimer);
+    if (document.body.classList.contains('studio-fullscreen')) idleTimer = setTimeout(() => document.body.classList.add('studio-idle'), 2200);
+  }
+  document.addEventListener('fullscreenchange', () => { document.body.classList.toggle('studio-fullscreen', !!document.fullscreenElement); wake(); scale(); });
+  document.addEventListener('pointermove', wake, { passive: true });
+  async function toggleFullscreen() {
+    try { if (document.fullscreenElement) await document.exitFullscreen(); else await document.documentElement.requestFullscreen(); } catch { toast(labels.full ? `${labels.full}: ✕` : 'Fullscreen unavailable'); }
+  }
+
+  // ------------------------------------------------------------ input
+
+  $('studio-prev').onclick = prev;
+  $('studio-next').onclick = next;
+  $('studio-overview').onclick = toggleOverview;
+  $('studio-reset').onclick = reset;
+  $('studio-jump').onchange = e => show(Number(e.target.value));
+  $('studio-notes-btn').onclick = () => { const on = $('studio-notes').classList.toggle('open'); $('studio-notes-btn').setAttribute('aria-expanded', String(on)); };
+  $('studio-full').onclick = toggleFullscreen;
+  if ($('studio-presenter')) $('studio-presenter').onclick = openPresenter;
+  if ($('studio-help-btn')) $('studio-help-btn').onclick = () => toggleHelp();
+
+  let digits = '', digitTimer = 0;
+  const INTERACTIVE = 'input,textarea,select,video,audio,[contenteditable],[data-interactive],[role="slider"],[role="textbox"],[role="combobox"],[role="grid"]';
+
+  // Navigation buttons are not content widgets. Arrow/Page keys still navigate when
+  // those buttons keep focus after a mouse click; Space/Enter keep native activation.
+  document.addEventListener('keydown', e => {
+    if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey || e.isComposing || e.keyCode === 229) return;
+    const target = e.composedPath().find(x => x instanceof Element) || document.body;
+    if (e.key === 'Escape') {
+      if ($('studio-help')?.classList.contains('open')) { e.preventDefault(); toggleHelp(false); return; }
+      if ($('studio-blackout')?.classList.contains('on')) { e.preventDefault(); toggleBlackout(false); return; }
+      if (overview) { e.preventDefault(); toggleOverview(); return; }
+      if ($('studio-notes').classList.contains('open')) { e.preventDefault(); $('studio-notes').classList.remove('open'); $('studio-notes-btn').setAttribute('aria-expanded', 'false'); return; }
+    }
+    const navigationKey = ['ArrowRight', 'ArrowLeft', 'PageDown', 'PageUp', ' ', 'Enter', 'Home', 'End'].includes(e.key);
+    if (e.repeat && navigationKey) {
+      // Do not steal a slider's held arrow key. Only suppress presentation navigation.
+      if (!target.closest('input,textarea,select,[contenteditable],[data-interactive]')) e.preventDefault();
+      return;
+    }
+    if (overview) return;
+    const onNav = !!target.closest('.studio-controls');
+    if (target.closest(INTERACTIVE)) return;
+    if (target.closest('button,a,summary,[role="button"]') && (!onNav || [' ', 'Enter'].includes(e.key))) return;
+    if (/^[0-9]$/.test(e.key)) {
+      digits += e.key; clearTimeout(digitTimer); digitTimer = setTimeout(() => { digits = ''; }, 1600);
+      toast(`${labels.goto || 'Go to slide'}: ${digits}`);
+      return;
+    }
+    if (e.key === 'Enter' && digits) {
+      e.preventDefault(); const k = Number(digits) - 1; digits = ''; clearTimeout(digitTimer);
+      if (k >= 0 && k < slides.length) show(k, 0, { animate: true });
+      return;
+    }
+    if (['ArrowRight', 'PageDown', ' ', 'Enter'].includes(e.key)) { e.preventDefault(); next(); }
+    else if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); prev(); }
+    else if (e.key === 'Home') { e.preventDefault(); show(0); }
+    else if (e.key === 'End') { e.preventDefault(); show(slides.length - 1, max(slides.length - 1)); }
+    else if (e.key.toLowerCase() === 'o') { e.preventDefault(); toggleOverview(); }
+    else if (e.key.toLowerCase() === 'r') { e.preventDefault(); reset(); }
+    else if (e.key.toLowerCase() === 'n') { e.preventDefault(); $('studio-notes-btn').click(); }
+    else if (e.key.toLowerCase() === 'p') { e.preventDefault(); openPresenter(); }
+    else if (e.key.toLowerCase() === 'b' || e.key === '.') { e.preventDefault(); toggleBlackout(); }
+    else if (e.key.toLowerCase() === 'f') { e.preventDefault(); toggleFullscreen(); }
+    else if (e.key === '?') { e.preventDefault(); toggleHelp(); }
+  });
+
+  // Touch swipe: horizontal flicks navigate; interactive regions keep their gestures.
+  let swipe = null;
+  const stage = document.querySelector('.studio-stage');
+  stage.addEventListener('pointerdown', e => {
+    if (e.pointerType === 'mouse' || overview || e.target.closest(INTERACTIVE + ',button,a')) { swipe = null; return; }
+    swipe = { x: e.clientX, y: e.clientY, t: performance.now() };
+  }, { passive: true });
+  stage.addEventListener('pointerup', e => {
+    if (!swipe) return;
+    const dx = e.clientX - swipe.x, dy = e.clientY - swipe.y, dt = performance.now() - swipe.t;
+    swipe = null;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > 1.5 * Math.abs(dy) && dt < 800) { if ((dx < 0) !== rtl()) next(); else prev(); }
+  }, { passive: true });
+  stage.addEventListener('pointercancel', () => { swipe = null; }, { passive: true });
+
+  document.addEventListener('visibilitychange', () => { if (document.hidden) pauseSlide(current); else show(current, step); });
+  window.addEventListener('resize', scale);
+  mq.addEventListener('change', () => { finish(); for (let i = 0; i < slides.length; i++) pauseSlide(i); show(current, step); });
+  window.addEventListener('beforeprint', () => { restore = { current, step, exporting, widgets: [...widgets].map(([id, w]) => [id, call(w, 'snapshot')]) }; prepareExport(); });
+  window.addEventListener('afterprint', () => {
+    if (!restore) return;
+    exporting = restore.exporting;
+    for (const [id, s] of restore.widgets) call(widgets.get(id), 'restore', s);
+    show(restore.current, restore.step);
+    restore = null;
+  });
+
+  // ------------------------------------------------------------ public API
+
+  const api = {
+    kind: 'craft', version: 4, meta, show, next, prev, finish, reset, setExport, prepareExport, showAllBuilds: prepareExport,
+    overview: toggleOverview, presenter: openPresenter, blackout: toggleBlackout, help: toggleHelp,
+    register(id, widget) {
+      if (widgets.has(id)) throw Error('Duplicate widget ID: ' + id);
+      if (!$(id)) throw Error('Missing widget root: ' + id);
+      widgets.set(id, widget);
+      if (slides[current].contains($(id))) call(widget, exporting ? 'onExport' : 'onEnter', context());
+      return () => { call(widget, 'dispose'); widgets.delete(id); };
+    },
+    getWidgetState: id => call(widgets.get(id), 'snapshot'),
+    getState: () => ({ current, step, maxBuild: max(current), exporting, overview, reducedMotion: mq.matches, warnings: [...warnings], widgets: [...widgets.keys()], presenter: !!(presenter && !presenter.closed) }),
+  };
+  window.slideStudio = window.SlideStudio = api;
+  let id = '';
+  try { id = decodeURIComponent(location.hash.slice(1)); } catch { /* malformed hash */ }
+  const initial = meta.slides.findIndex(s => s.id === id);
+  show(initial < 0 ? 0 : initial);
+  document.body.dataset.studioReady = 'true';
 })();
 </script></body></html>

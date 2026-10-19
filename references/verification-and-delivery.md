@@ -63,8 +63,13 @@ titles, decorative ordinals, one eyebrow + card-row skeleton repeated across the
 English eyebrows in a CJK deck, an identity color reused for unrelated items,
 near-duplicate pages, text set in many hues, colors outside a declared system
 (`--palette`), a high share of small live text, status words ("登壇用ドラフト",
-"draft") on the canvas and tool metadata in speaker notes. See SKILL.md §3 G for the
-repair of each. Warnings are review prompts: fix them or record a one-line reason the
+"draft") on the canvas and tool metadata in speaker notes. On HTML it also reads
+computed styles for decoration: tiled dot/grid backgrounds, glows, blurs and radial
+washes, gradient text, frosted glass, soft shadows on several boxes, letter-spaced
+caps labels, `·`/`|` separator chains, emoji, pill chips, giant faded numerals,
+stacked letters, a colored headline phrase that matches no mark on the page, and ▲
+used for increases in Japanese pages. See SKILL.md
+"Strip the machine-made look" for the repair of each. Warnings are review prompts: fix them or record a one-line reason the
 pattern carries meaning on that page. `--check` exits 2 only for errors (production
 copy, tool metadata in notes). It is a geometry/text heuristic, not a taste score, and
 it does not see pixels inside images. HTML input needs Playwright; `.pptx` needs
@@ -72,15 +77,25 @@ python-pptx; `.scene.json` needs only the standard library.
 
 ### Visual inspection routine
 
-First inspect the contact view for deck rhythm and repeated mistakes. Then inspect
-each final page at readable size. For animated material inspect all meaningful
-states and actual timing on representative transitions. For media confirm playback
-and a changed frame/time, not merely an available control. For 3D confirm rotation
-changes the geometry and test import errors. For translated content inspect glyph
-coverage and shaping in the actual output environment.
+```sh
+python scripts/qa-summary.py project/.studio-review/current/report.json      # findings only
+python scripts/contact-sheet.py project/deck.html --out project/.studio-review/sheet.png --final --label
+python scripts/contact-sheet.py project/deck.html --out project/.studio-review/steps.png --steps
+python scripts/contact-sheet.py project/deck.html --out project/.studio-review/sheet.png --final --frames project/.studio-review/frames
+```
 
-Write a specific defect ledger: slide/state, symptom, cause, change, retest. Avoid
-vague self-ratings like “10/10 premium”. Use a narrow waiver only for intentional
+Keep contact sheets outside the QA output directory (`current/` is owned by
+`qa.py`). First read the whole-deck sheet for rhythm: identical skeletons, pages
+that are mostly empty or all text, a figure drawn too small, accidental dark/light
+alternation. Then open each full-size frame and read every label. For motion,
+read the `--steps` sheet build by build — each intermediate page must be true and
+readable — and watch representative transitions at real speed. For media confirm
+playback and a changed frame/time, not merely a control. For 3D confirm rotation
+changes the geometry. For translated content inspect glyph coverage and shaping
+in the actual output environment.
+
+Write a specific defect ledger: slide/build, symptom, cause, change, retest. Avoid
+vague self-ratings like "10/10 premium". Use a narrow waiver only for intentional
 overlap/bleed, and keep the reason next to the affected element.
 
 ### Environmental limitations

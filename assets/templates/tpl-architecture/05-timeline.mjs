@@ -1,97 +1,85 @@
-// Template: Engineering design review / postmortem · Incident timeline. Synthetic example content; replace data and copy.
+// Template: Incident review · Timeline with time to detect, mitigate and resolve. Synthetic example content; replace data and copy.
+import { wrapText, spreadLabels } from '../../runtime/figure.mjs';
+
 const ID = 'tpl-architecture-timeline';
-const C = { axis: '#3a4c63', grid: '#1f2d40', mute: '#8a9bb0', text2: '#b4c1d1', sync: '#3987e5', warn: '#fab219', crit: '#e66767', good: '#2fb65a', bg: '#0b1119', panel: '#111b28' };
-const DAY = '12 Aug 2026';
-// One source of truth. lane: system (what the service did) | response (what people and tools did)
+// UTC, Tue 6 Oct 2026. mark names the four moments the durations are measured between.
 const events = [
-  { t: '13:58', lane: 'system', kind: 'change', lines: ['pricing-svc v4.18 deployed', '(cache key adds cart_id)'] },
-  { t: '14:05', lane: 'system', kind: 'bad', lines: ['p99 crosses 400 ms SLO', 'customer impact starts'], mark: 'impact' },
-  { t: '15:30', lane: 'system', kind: 'bad', lines: ['peak p99 1,940 ms', 'failed checkouts 2.3%'] },
-  { t: '16:14', lane: 'system', kind: 'change', lines: ['rollback to v4.17', 'complete'] },
-  { t: '16:52', lane: 'system', kind: 'good', lines: ['hit ratio back above 95%', 'p99 under SLO'], mark: 'recovered' },
-  { t: '14:17', lane: 'response', kind: 'detect', lines: ['burn-rate alert pages', 'on-call (1 h window)'], mark: 'alert' },
-  { t: '14:24', lane: 'response', kind: 'act', lines: ['on-call acknowledges'] },
-  { t: '14:41', lane: 'response', kind: 'act', lines: ['SEV-2 declared,', 'incident lead assigned'] },
-  { t: '15:02', lane: 'response', kind: 'act', lines: ['replica scaled up', 'no effect on p99'] },
-  { t: '15:48', lane: 'response', kind: 'act', lines: ['cache-key change', 'identified as cause'], mark: 'cause' },
-  { t: '16:10', lane: 'response', kind: 'act', lines: ['rollback started'], mark: 'mitigate' }
+  { t: '18:00', text: 'Promotion starts; 41,200 price rules invalidated' },
+  { t: '18:02', text: 'p99 passes 1.0 s and 504s begin', mark: 'impact' },
+  { t: '18:10', text: 'Error-rate alert pages the on-call engineer', mark: 'detected' },
+  { t: '18:17', text: 'SEV-2 declared; incident commander assigned' },
+  { t: '18:24', text: 'Reporting jobs paused; p99 falls only to 1.6 s' },
+  { t: '18:31', text: 'Hit ratio found at 22%: the cache is cold' },
+  { t: '18:38', text: 'Script warms the 20,000 most-viewed SKUs' },
+  { t: '18:44', text: 'p99 back under 1.0 s; impact ends', mark: 'mitigated' },
+  { t: '19:32', text: 'Stable for 48 minutes; incident resolved', mark: 'resolved' },
 ];
-const mins = s => { const [h, m] = s.split(':').map(Number); return h * 60 + m; };
-const T0 = mins('13:50'), T1 = mins('17:00');
-const W = 1184, AX = 196, X0 = 110, X1 = W - 16;
-const x = t => X0 + (mins(t) - T0) / (T1 - T0) * (X1 - X0);
-const at = m => events.find(e => e.mark === m).t;
-const dur = (a, b) => { const d = mins(b) - mins(a); return d >= 60 ? `${Math.floor(d / 60)}h ${String(d % 60).padStart(2, '0')}m` : `${d} min`; };
-// label placement: search levels and sides per lane so that blocks never overlap and no stem crosses a block
-const charW = 7.4, blockH = 46;
-const levelsY = { system: [92, 18], response: [AX + 34, AX + 92, AX + 150] }; // index 0 = nearest the axis
-function place(list, nLevels) {
-  const opts = e => { const w = Math.max(60, ...e.lines.map(l => l.length * charW)) + 8, o = [];
-    for (let lv = 0; lv < nLevels; lv++) for (const side of ['r', 'l']) { const bx0 = side === 'r' ? x(e.t) + 8 : x(e.t) - 8 - w; if (bx0 >= 0 && bx0 + w <= X1) o.push({ lv, side, bx0, bx1: bx0 + w }); }
-    return o; };
-  const cand = list.map(opts);
-  const ok = (a, ea, b, eb) => {
-    if (a.lv === b.lv && !(a.bx1 + 12 < b.bx0 || b.bx1 + 12 < a.bx0)) return false;          // same level overlap
-    const sa = x(ea.t), sb = x(eb.t);
-    if (a.lv > b.lv && sa >= b.bx0 - 6 && sa <= b.bx1 + 6) return false;                   // a's stem crosses b's block
-    if (b.lv > a.lv && sb >= a.bx0 - 6 && sb <= a.bx1 + 6) return false;
-    return true;
-  };
-  let best = null, bestCost = Infinity;
-  (function go(i, chosen, cost) {
-    if (cost >= bestCost) return;
-    if (i === list.length) { best = chosen.slice(); bestCost = cost; return; }
-    for (const c of cand[i]) if (chosen.every((p, j) => ok(c, list[i], p, list[j]))) { chosen.push(c); go(i + 1, chosen, cost + c.lv * 2 + (c.side === 'l' ? 1 : 0)); chosen.pop(); }
-  })(0, [], 0);
-  if (!best) throw new Error('Timeline labels do not fit; shorten lines or add a level');
-  list.forEach((e, i) => Object.assign(e, best[i], { anchorEnd: best[i].side === 'l', level: best[i].lv }));
-}
-for (const lane of ['system', 'response']) {
-  const list = events.filter(e => e.lane === lane).sort((a, b) => mins(a.t) - mins(b.t));
-  place(list, levelsY[lane].length);
-  list.forEach(e => { e.by = levelsY[lane][e.level]; });
-}
-const glyph = e => {
-  const cx = x(e.t), cy = AX, c = { change: C.text2, bad: C.warn, good: C.good, detect: C.crit, act: C.sync }[e.kind];
-  if (e.lane === 'system') return `<rect x="${cx - 6}" y="${cy - 6}" width="12" height="12" transform="rotate(45 ${cx} ${cy})" fill="${c}" stroke="${C.bg}" stroke-width="2"/>`;
-  return `<circle cx="${cx}" cy="${cy}" r="6" fill="${c}" stroke="${C.bg}" stroke-width="2"/>`;
-};
-const blocks = events.map(e => {
-  const cx = x(e.t), top = e.by, tx = e.anchorEnd ? e.bx1 : e.bx0, anc = e.anchorEnd ? 'end' : 'start';
-  const stem = e.lane === 'system' ? `<line x1="${cx}" y1="${top + 4}" x2="${cx}" y2="${AX - 8}" stroke="${C.axis}" stroke-width="1"/>` : `<line x1="${cx}" y1="${AX + 8}" x2="${cx}" y2="${top + blockH - 6}" stroke="${C.axis}" stroke-width="1"/>`;
-  const hi = e.kind === 'bad' ? 't-warn' : e.kind === 'good' ? 't-good' : e.kind === 'detect' ? 't-crit' : 't-mono-b';
-  return `${stem}<text x="${tx}" y="${top + 16}" text-anchor="${anc}" class="${hi}">${e.t}</text>` + e.lines.map((l, i) => `<text x="${tx}" y="${top + 34 + i * 17}" text-anchor="${anc}" class="t-lab2">${l}</text>`).join('');
+const axisBreak = ['18:50', '19:26']; // minutes in between are not drawn; the break is marked on the axis
+const domain = ['17:58', '19:36'];
+const durations = [ // measured from the start of customer impact
+  { to: 'detected', label: 'to detect' },
+  { to: 'mitigated', label: 'to mitigate' },
+  { to: 'resolved', label: 'to resolve' },
+];
+const lessons = [
+  { lead: 'The page named the symptom.', text: 'The alert fired on checkout errors; nothing watched the cache hit ratio, so the first 14 minutes went to the gateway and the replica.' },
+  { lead: 'Pausing reporting only halved the pain.', text: 'p99 dropped from 2.0 s to 1.6 s at 18:24 because every request still missed the cache.' },
+  { lead: 'No runbook for a cold cache.', text: 'The warm-up script was written during the incident and ran at 18:38.' },
+];
+
+// ---- scale: true time inside each segment, a fixed 36 px break between them
+const mins = t => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
+const at = mark => events.find(e => e.mark === mark).t;
+const [d0, d1] = domain.map(mins), [b0, b1] = axisBreak.map(mins);
+const TOP = 0, HEIGHT = 444, GAP = 36;
+const PX = (HEIGHT - GAP) / ((b0 - d0) + (d1 - b1));
+const Y = t => { const m = mins(t); return TOP + (m <= b0 ? (m - d0) * PX : (b0 - d0) * PX + GAP + (m - b1) * PX); };
+const span = (a, b) => mins(b) - mins(a);
+const NB = '\u00a0'; // never break a number from its unit
+
+// ---- columns (px inside the 1152 px figure): duration labels | brackets | axis | time + event
+const AX = 236, LABEL_R = 164, TIME_X = AX + 22, TEXT_X = AX + 86, TEXT_W = 448, FS = 18;
+const lines = events.map(e => wrapText(e.text.replace(/(\d) (s|min)\b/g, `$1${NB}$2`), TEXT_W, FS));
+const placed = spreadLabels(events.map((e, i) => ({ id: i, y: Y(e.t), h: lines[i].length * 24 })), { min: TOP + 2, max: TOP + HEIGHT, gap: 6 });
+const RED = 'var(--ar-red)', INK = 'var(--ar-ink)';
+const axis = `<line x1="${AX}" y1="${Y(domain[0])}" x2="${AX}" y2="${Y(axisBreak[0]) + 6}" stroke="${INK}" stroke-width="1.5"/>`
+  + `<line x1="${AX}" y1="${Y(axisBreak[1]) - 6}" x2="${AX}" y2="${Y(domain[1])}" stroke="${INK}" stroke-width="1.5"/>`
+  + [Y(axisBreak[0]) + 6, Y(axisBreak[1]) - 6].map(y => `<path d="M${AX - 9} ${y + 4}L${AX + 9} ${y - 4}" stroke="${INK}" stroke-width="1.5"/>`).join('')
+  + `<text x="${TEXT_X}" y="${(Y(axisBreak[0]) + Y(axisBreak[1])) / 2 + 6}" class="t-axis">${span(...axisBreak)} minutes of monitoring not drawn</text>`
+  + `<line x1="${AX}" y1="${Y(at('impact'))}" x2="${AX}" y2="${Y(at('mitigated'))}" stroke="${RED}" stroke-width="7"/>`;
+const rows = events.map((e, i) => {
+  const y = Y(e.t), ly = placed[i].y - (lines[i].length - 1) * 12, big = !!e.mark;
+  const leader = placed[i].shifted ? `<path d="M${AX + 8} ${y}L${TIME_X - 4} ${placed[i].y}" fill="none" stroke="var(--ar-rule)" stroke-width="1"/>` : '';
+  return `${leader}<circle cx="${AX}" cy="${y}" r="${big ? 5.5 : 4}" fill="${e.mark === 'impact' || e.mark === 'mitigated' ? RED : INK}" stroke="var(--ar-paper)" stroke-width="2"/>`
+    + `<text x="${TIME_X}" y="${ly + 6}" class="t-num" style="font:600 ${FS}px var(--ar-sans);fill:var(--ar-ink)">${e.t}</text>`
+    + `<text x="${TEXT_X}" y="${ly + 6}" style="font:400 ${FS}px var(--ar-sans);fill:var(--ar-ink)">${lines[i].map((l, k) => `<tspan x="${TEXT_X}" dy="${k ? 24 : 0}">${l}</tspan>`).join('')}</text>`;
 }).join('');
-let axis = `<line x1="${X0}" y1="${AX}" x2="${X1}" y2="${AX}" stroke="${C.axis}" stroke-width="1.4"/>`;
-for (let m = T0 + 10; m <= T1; m += 30) { const t = `${Math.floor(m / 60)}:${String(m % 60).padStart(2, '0')}`; axis += `<line x1="${x(t)}" y1="${AX - 4}" x2="${x(t)}" y2="${AX + 4}" stroke="${C.axis}"/><text x="${x(t)}" y="${AX + 22}" text-anchor="middle" class="t-axis">${t}</text>`; }
-const band = `<rect x="${x(at('impact'))}" y="${AX - 2}" width="${x(at('recovered')) - x(at('impact'))}" height="4" fill="${C.warn}" fill-opacity=".7"/>`;
-const impact = `<rect x="${x(at('impact'))}" y="4" width="${x(at('recovered')) - x(at('impact'))}" height="${AX - 8}" fill="${C.warn}" fill-opacity=".045"/><text x="${x(at('impact')) + 6}" y="${AX - 12}" class="t-mono-s">customer impact ${dur(at('impact'), at('recovered'))}</text>`;
-const lanesLab = `<text x="0" y="${AX - 40}" class="t-zone">SYSTEM</text><text x="0" y="${AX + 52}" class="t-zone">RESPONSE</text><text x="0" y="${AX + 5}" class="t-mono-s">UTC →</text>`;
-const H = AX + 150 + blockH + 4;
-const fig = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-labelledby="${ID}-t ${ID}-d">
-<title id="${ID}-t">Incident timeline, ${DAY}, 13:50–17:00 UTC</title>
-<desc id="${ID}-d">${events.sort((a, b) => mins(a.t) - mins(b.t)).map(e => `${e.t} ${e.lines.join(' ')}`).join('; ')}.</desc>
-${impact}${axis}${band}${lanesLab}${blocks}${events.map(glyph).join('')}
+// durations: one bracket per measure, all starting at impact, nested so the shortest sits next to the axis
+const brackets = durations.map((d, k) => {
+  const x = AX - 20 - k * 16, y0 = Y(at('impact')), y1 = Y(at(d.to)), m = span(at('impact'), at(d.to));
+  return `<path d="M${x + 6} ${y0}H${x}V${y1}H${x + 6}" fill="none" stroke="${INK}" stroke-width="1.25"/>`
+    + `<text x="${LABEL_R - k * 16 + 8 * 0}" y="${y1 - 3}" text-anchor="end" style="font:600 22px var(--ar-display);fill:var(--ar-ink)" class="t-num">${m}${NB}min</text>`
+    + `<text x="${LABEL_R - k * 16}" y="${y1 + 18}" text-anchor="end" class="t-axis">${d.label}</text>`;
+}).join('');
+const W = 1152;
+const fig = `<svg viewBox="0 0 ${W} ${HEIGHT}" width="${W}" height="${HEIGHT}" role="img" aria-labelledby="${ID}-t ${ID}-d" style="overflow:visible">
+<title id="${ID}-t">Incident timeline, ${domain[0]}–${domain[1]} UTC, with time to detect, mitigate and resolve</title>
+<desc id="${ID}-d">${events.map(e => `${e.t} ${e.text}`).join('. ')}. ${durations.map(d => `${span(at('impact'), at(d.to))} minutes ${d.label}`).join(', ')}, all measured from ${at('impact')}. The axis is broken between ${axisBreak[0]} and ${axisBreak[1]}.</desc>
+${axis}${brackets}${rows}
 </svg>`;
-const metrics = [
-  { k: 'Time to detect', v: dur(at('impact'), at('alert')), n: `impact ${at('impact')} → alert ${at('alert')}` },
-  { k: 'Time to mitigate', v: dur(at('impact'), at('mitigate')), n: `impact → rollback started ${at('mitigate')}` },
-  { k: 'Time to recover', v: dur(at('impact'), at('recovered')), n: `impact → p99 under SLO ${at('recovered')}` }
-];
+const mitigate = span(at('impact'), at('mitigated')), detect = span(at('impact'), at('detected'));
 
 export default {
   study: true,
   id: ID,
-  title: 'Incident timeline with detection and recovery times',
-  notes: 'Purpose: Reconstruct what the system did and what responders did on one time axis, and derive detection, mitigation and recovery times from the same timestamps.\nModify: Edit events (t, lane, kind, lines, optional mark). Positions, label levels, the impact band and all durations are computed; marks impact, alert, cause, mitigate and recovered must exist.\nInvariant: One time zone, stated once. System events (diamonds) and response events (circles) stay on separate sides of the axis. Durations are computed from the marked events, never typed.\nStatic: Static page.',
+  title: 'Incident timeline with time to detect, mitigate and resolve',
+  notes: 'Purpose: Reconstruct the incident minute by minute and show where the response lost time, with detection, mitigation and resolution times computed from the same timestamps.\nModify: Edit events (t, text, optional mark), axisBreak, domain and lessons. The vertical positions, label spreading, impact bar, brackets, durations and the headline numbers are computed; marks impact, detected, mitigated and resolved must exist.\nInvariant: One time zone, stated once. Time is to scale inside each axis segment and any break is drawn and labelled. Durations are measured from the start of customer impact and never typed by hand. Lessons describe systems and gaps, not people.\nStatic: Static page; no builds.',
   sources: [],
   exportPolicy: 'final',
   className: 'tpl-architecture ar-timeline',
-  content: `<div class="ar-page">
-<div class="ar-bar"><span class="ar-crumb"><b>INC-2317</b><i>/</i>05 · Timeline</span><span>${DAY} · all times UTC</span></div>
-<h1 class="ar-title" data-region="title">Detection took ${dur(at('impact'), at('alert'))}; finding the cause took <em>${dur(at('alert'), at('cause'))}</em></h1>
-<figure class="ar-fig" style="left:48px;top:128px;width:${W}px;height:${H}px" data-region="primary">${fig}</figure>
-<div class="ar-metrics" data-region="support">${metrics.map(m => `<div class="ar-metric"><div class="k">${m.k}</div><div class="v">${m.v}</div><div class="n">${m.n}</div></div>`).join('')}<div class="ar-metric ar-lesson"><div class="k">What slowed us</div><div class="v">Scaling the replica treated the symptom. Cache hit ratio was on a dashboard, not in any alert.</div></div></div>
-<footer class="ar-foot" data-region="source"><span>Illustrative incident · fictional timeline</span><span class="ar-pg">05 / 06</span></footer>
-</div>`
+  content: `<p class="ar-run"><span>Incident review — checkout timeouts, 6 Oct 2026</span><span>5</span></p>
+<h1 class="ar-head" data-region="title">Detected in ${detect} minutes, mitigated in ${mitigate}, because no runbook covered a cold cache</h1>
+<figure class="ar-fig" style="left:64px;top:196px" data-region="primary">${fig}</figure>
+<aside class="ar-rail" data-region="support"><h2>Why mitigation took ${mitigate} minutes</h2>${lessons.map(l => `<p><b>${l.lead}</b> ${l.text.replace(/(\d) (s|min)\b/g, `$1${NB}$2`)}</p>`).join('')}</aside>
+<p class="ar-src" data-region="source"><span>All times UTC, from the alert history and the incident channel. Durations are measured from the start of customer impact at ${at('impact')}.</span></p>`,
 };

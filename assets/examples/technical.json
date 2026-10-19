@@ -7,7 +7,7 @@
   "slides": [
     {
       "layout": "cover",
-      "kicker": "ENGINEERING NOTE",
+      "kicker": "設計メモ",
       "title": "再試行しても、\n二重に処理しない。",
       "body": "冪等性キーを使った設計例",
       "notes": "この作例の数値・状況は架空。実務では検証した情報へ置き換える。"

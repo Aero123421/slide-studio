@@ -55,8 +55,9 @@
     if (!rects.length) continue;
     const entry = {element: ref(e), text: text.slice(0, 90)};
     // Hit testing guards against non-ancestor artwork covering a line or supplying its background.
+    // Hit testing includes fully transparent elements (e.g. an inactive state at opacity 0); skip what is not painted.
     const unexpected = rects.some(r => [.2, .5, .8].some(f => {
-      const top = document.elementFromPoint(r.left + r.width * f, r.top + r.height * .5);
+      const top = document.elementsFromPoint(r.left + r.width * f, r.top + r.height * .5).find(x => shown(x));
       return top && top !== e && !top.contains(e) && !e.contains(top);
     }));
     if (unexpected) warnings.push({kind:'text-occlusion', ...entry, message:'A text line intersects another painted element. Inspect stacking and the actual image.'});

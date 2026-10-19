@@ -1,64 +1,69 @@
-// Template: 戦略提案（コンサル型）· 選択肢比較表（ハーベイボール）. Synthetic example content; replace data and copy.
-// Scores 0–4 per criterion drive the Harvey balls and the total; the recommended column is highlighted by `rec`.
-const P = 'tpl-strategy-options';
+// Template: 戦略提案（経営会議向け）· 3案の比較表. Synthetic example content; replace data and copy.
+// Quantities are computed from the lever effects and stated as numbers; judgments are scored 0–4
+// and drawn as small Harvey balls next to a few words. The recommended column is tinted.
+import { fmt } from '../../runtime/figure.mjs';
+
+const ID = 'tpl-strategy-options';
+const plan = {year: 2029, op2025: 3.6, volume: 2.4, headwind: -4.4, sales2029: 270, target: 6}; // 億円・%（論点ツリーと同じ前提）
+const effect = {'1.1': 3.0, '1.2': 2.2, '2.1': 2.4, '2.2': 1.7, '2.3': 2.6, '2.4': 0.7, '3.1': 2.0, '3.2': 1.2}; // 打ち手別の効果（億円）
 const options = [
-  {k: 'A', name: '全自動倉庫を新設', desc: '自社で60億円を投じ、新拠点に集約'},
-  {k: 'B', name: '3PL大手に運営を委託', desc: '庫内作業と配送を外部に移管'},
-  {k: 'C', name: '段階導入', desc: '3つの打ち手を効果の早い順に実施', rec: true}
+  {key: 'A', name: '価格と販促の見直し', desc: '値付けと販促だけを見直す',
+    levers: ['1.1', '2.1', '3.1', '3.2'], invest: 0.8, payback: {levers: ['1.1', '2.1', '3.1', '3.2']}},
+  {key: 'B', name: '店舗と物流の再設計', desc: '受け取り方と物流まで変える', rec: true,
+    levers: ['1.1', '1.2', '2.1', '2.2', '2.3', '2.4', '3.1'], invest: 14.0, payback: {levers: ['2.2', '2.3']}},
+  {key: 'C', name: '新物流センターの建設', desc: '新センターで全面自動化する',
+    levers: ['1.1', '2.1', '3.1'], extra: -0.6, invest: 62.0, payback: {annual: 6.8}}, // extra: 2029年度は稼働半年で償却が先行／annual: 本格稼働後の年間効果
 ];
-const criteria = [
-  {name: '利益改善の大きさ', note: '完成後の最大値', s: [[4, '+4.8pt（2031年度）'], [2, '+1.9pt、委託料が重い'], [3, '+4.1pt']]},
-  {name: '投資負担の軽さ', note: '初期投資と借入余力', s: [[0, '借入の上限に近い'], [4, 'ほぼ不要'], [3, '自己資金内で賄える']]},
-  {name: '実行リスクの低さ', note: '工期・稼働・品質', s: [[1, '建設遅延の影響が大きい'], [2, '移管中の品質低下'], [3, '段階ごとに見直せる']]},
-  {name: '効果が出る速さ', note: '最初の利益寄与まで', s: [[1, '稼働は2029年以降'], [3, '1年後から'], [3, '半年後から']]},
-  {name: '荷主との関係維持', note: '上位20荷主への影響', s: [[3, '移転時の説明が必要'], [1, '直接の接点を失う'], [4, '現行の窓口を維持']]}
+const judged = [ // score 0–4（多いほど良い）と短い根拠。評価軸は「良い向き」にそろえる
+  {name: '効果が出る早さ', s: [[4, '2027年度から全額'], [3, '2027年度から段階的に'], [1, '本格稼働は2030年度']]},
+  {name: '実行のしやすさ', s: [[4, '今の体制で実施できる'], [2, '店舗と物流で準備が要る'], [1, '建設と移転に3年かかる']]},
+  {name: '顧客の受け止め', s: [[1, '上位顧客が離れるおそれ'], [3, '店舗で受け取れて便利'], [3, '目に見える変化は小さい']]},
+  {name: '2030年度以降の伸びしろ', s: [[1, '2029年度で頭打ち'], [3, '自動化の範囲を広げられる'], [4, '2031年度に20億円規模']]},
 ];
-const quant = [
-  {name: '2029年度 営業利益率', v: ['4.4%', '3.9%', '6.1%']},
-  {name: '必要投資額', v: ['60億円', '3億円', '24億円']},
-  {name: '投資回収期間', v: ['9.5年', '—', '4.2年']}
-];
-const totals = options.map((_, i) => criteria.reduce((s, c) => s + c.s[i][0], 0));
-const max = criteria.length * 4;
+
+// ---- derived
+const r1 = v => Math.round(v * 10) / 10, f1 = v => fmt(v, {digits: 1});
+const sumOf = keys => keys.reduce((s, k) => s + effect[k], 0);
+const rows = options.map(o => {
+  const op = r1(plan.op2025 + plan.volume + plan.headwind + sumOf(o.levers) + (o.extra || 0));
+  const annual = o.payback.annual ?? sumOf(o.payback.levers);
+  const years = o.invest / annual;
+  return {...o, op, margin: r1(op / plan.sales2029 * 100), years};
+});
+const rec = rows.find(o => o.rec);
+const reach = rows.filter(o => o.margin >= plan.target);
+const payText = y => (y < 1 ? '1年未満' : `${f1(y)}年`);
 
 const harvey = (n, id) => {
-  const r = 10, c = 12, a = n / 4 * 2 * Math.PI - Math.PI / 2;
-  const wedge = n === 0 ? '' : n === 4 ? `<circle cx="${c}" cy="${c}" r="${r}" fill="#1c2024"/>`
-    : `<path d="M${c} ${c} L${c} ${c - r} A${r} ${r} 0 ${n > 2 ? 1 : 0} 1 ${(c + r * Math.cos(a)).toFixed(2)} ${(c + r * Math.sin(a)).toFixed(2)}Z" fill="#1c2024"/>`;
-  return `<svg viewBox="0 0 24 24" role="img" aria-labelledby="${id}"><title id="${id}">${n}/4</title><circle cx="${c}" cy="${c}" r="${r}" fill="#fff" stroke="#1c2024" stroke-width="1.5"/>${wedge}</svg>`;
+  const r = 9.5, c = 11, a = n / 4 * 2 * Math.PI - Math.PI / 2;
+  const wedge = n <= 0 ? '' : n >= 4 ? `<circle cx="${c}" cy="${c}" r="${r}" fill="var(--st-ink)"/>`
+    : `<path d="M${c} ${c} L${c} ${c - r} A${r} ${r} 0 ${n > 2 ? 1 : 0} 1 ${(c + r * Math.cos(a)).toFixed(2)} ${(c + r * Math.sin(a)).toFixed(2)} Z" fill="var(--st-ink)"/>`;
+  return `<svg viewBox="0 0 22 22" role="img" aria-labelledby="${id}"><title id="${id}">4段階中${n}</title><circle cx="${c}" cy="${c}" r="${r}" fill="var(--st-paper)" stroke="var(--st-ink)" stroke-width="1.3"/>${wedge}</svg>`;
 };
-const recCls = i => (options[i].rec ? ' class="is-rec"' : '');
-const head = `<tr><th></th>${options.map((o, i) => `<th${recCls(i)}><p class="s-oname"><span class="s-otag">案${o.k}</span>${o.name}${o.rec ? '<span class="s-orec">推奨</span>' : ''}</p><p class="s-odesc">${o.desc}</p></th>`).join('')}</tr>`;
-const qual = criteria.map((c, ci) => `<tr><td class="s-crit">${c.name}<span>${c.note}</span></td>${c.s.map(([n, t], i) => `<td${recCls(i)}><span class="s-hb">${harvey(n, `${P}-h${ci}${i}`)}${t}</span></td>`).join('')}</tr>`).join('');
-const total = `<tr class="s-break"><td class="s-crit">定性評価の合計<span>${max}点満点</span></td>${totals.map((t, i) => `<td class="s-q${options[i].rec ? ' is-rec' : ''}">${t}<small>／${max}</small></td>`).join('')}</tr>`;
-const quan = quant.map((q, qi) => `<tr${qi === 0 ? ' class="s-break"' : ''}><td class="s-crit">${q.name}</td>${q.v.map((v, i) => `<td class="s-q${options[i].rec ? ' is-rec' : ''}">${v.replace(/([\d.]+)(.*)/, '$1<small>$2</small>')}</td>`).join('')}</tr>`).join('');
-const legend = [0, 1, 2, 3, 4].map(n => `<span>${harvey(n, `${P}-lg${n}`)}</span>`).join('');
-
-const track = ['論点', '優先度', '選択肢', '推奨', '実行'].map((t, i) => `<span${i === 2 ? ' class="on"' : ''}>${t}</span>`).join('');
+const cls = o => (o.rec ? ' class="is-rec"' : '');
+const head = `<tr><th scope="col"></th>${rows.map(o => `<th scope="col"${cls(o)}><b>案${o.key}　${o.name}</b><span>${o.desc}</span></th>`).join('')}</tr>`;
+const quant = [
+  [`${plan.year}年度の営業利益率`, o => `<span class="q${o.rec ? ' is-key' : ''}">${f1(o.margin)}<small>%</small></span>`],
+  [`${plan.year}年度の営業利益`, o => `<span class="q">${f1(o.op)}<small>億円</small></span>`],
+  ['必要な投資', o => `<span class="q">${f1(o.invest)}<small>億円</small></span>`],
+  ['投資の回収', o => `<span class="q">${payText(o.years).replace(/年(未満)?$/, m => `<small>${m}</small>`)}</span>`],
+].map(([name, cell]) => `<tr><th scope="row">${name}</th>${rows.map(o => `<td${cls(o)}>${cell(o)}</td>`).join('')}</tr>`).join('');
+const qual = judged.map((j, ji) => `<tr${ji === 0 ? ' class="st-gap"' : ''}><th scope="row">${j.name}</th>${j.s.map(([n, t], i) => `<td${cls(rows[i])}><span class="hb">${harvey(n, `${ID}-h${ji}${i}`)}${t}</span></td>`).join('')}</tr>`).join('');
 
 export default {
   study: true,
-  id: 'tpl-strategy-options',
-  title: '選択肢比較表 — ハーベイボールによる評価',
+  id: ID,
   language: 'ja',
-  notes: 'Purpose: 実現手段の選択肢を同じ評価軸で並べ、推奨案がどの点で優れ、どの点で劣るかを見せる。\nModify: options・criteria（各案の点数0〜4と一言コメント）・quant を差し替える。合計と推奨列の強調は自動。\nInvariant: 評価軸はすべて「●ほど良い」の向きに揃える（例：投資負担の「軽さ」）。定性評価と定量値を分けて示す。推奨案の弱点も隠さない。\nStatic: Already static.',
+  title: 'Options compared: three ways to reach the profit target',
+  notes: 'Purpose: 実現手段の3案を同じ評価軸で並べ、推奨案がどこで優れ、どこで劣るかを隠さずに見せる。\nModify: effect（打ち手別の効果）、options（含む打ち手・投資・回収の計算方法）、judged（4段階の評価と根拠）を差し替える。営業利益・利益率・回収年数は自動で計算される。rec: true の列が網掛けになる。\nInvariant: 評価軸はすべて「●ほど良い」の向きにそろえる。数値で言えるものは数値で書き、評価記号には必ず短い根拠を添える。推奨案の弱点も残す。\nStatic: 静的ページ。',
   sources: [],
   exportPolicy: 'final',
-  className: 'tpl-strategy s-options',
-  content: `<div class="s-wrap">
-  
-  <h1 class="s-title" data-region="title"><em>段階導入（案C）</em>は利益改善で全自動化に及ばないが、<br>投資とリスクの釣り合いが最も良い</h1>
-  <div class="s-track" aria-label="章の位置">${track}</div>
-  <div class="s-rule"></div>
-  <div class="s-opt" data-region="primary">
-    <table>
-      <thead>${head}</thead>
-      <tbody>
-        ${qual}${total}${quan}
-      </tbody>
-    </table>
-  </div>
-  <div class="s-foot"><span data-region="source">例示データ · 利益改善はベースライン2.0%からの差</span><span>北辰コンサルティング<b>4</b></span></div>
-  <div class="s-legend" style="right:260px" aria-label="評価の凡例"><span>劣る</span>${legend}<span>優れる</span></div>
-</div>`
+  className: 'tpl-strategy st-options',
+  content: `<h1 class="st-title" data-region="title">${plan.year}年度に${plan.target}%へ届くのは${reach.length === 1 ? `案${reach[0].key}だけ` : `${reach.length}案`}。投資${fmt(rec.invest)}億円は${payText(rec.years)}で回収できる</h1>
+<table class="st-opt" data-region="primary">
+  <colgroup><col class="c0"><col><col><col></colgroup>
+  <thead>${head}</thead>
+  <tbody>${quant}${qual}</tbody>
+</table>
+<div class="st-foot" data-region="source"><p>注：営業利益＝2025年度実績${f1(plan.op2025)}億円＋売上の伸び${f1(plan.volume)}−運賃・人件費の上昇${f1(-plan.headwind)}＋各案の効果。投資の回収＝投資額÷投資による年間効果<br>評価は4段階（●が最も良い）。案Cの${plan.year}年度は新センターの稼働が半年で、償却費が先行する</p><p>EC事業の収益改善<b>4</b></p></div>`,
 };

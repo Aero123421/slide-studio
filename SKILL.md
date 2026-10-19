@@ -1,211 +1,219 @@
 ---
 name: slide-studio
-description: "Author, revise and QA presentations from source material: claims and copy, whole-slide layout, truthful data diagrams, motion and interaction, self-contained HTML, PDF and PowerPoint export (picture or native editable), and company brand kits/POTX templates. Use when asked to create, rewrite, redesign, fix or review slides, a deck, talk, pitch, lecture or research presentation, in any language. Designs from the content instead of filling a fixed layout."
+description: "Author, redesign and QA presentations as self-contained HTML with PDF and PowerPoint export: claims and copy, whole-slide composition, data-driven charts and diagrams (built-in figure engine), purposeful animation, presenter view, color systems and company brand templates. Use when asked to create, rewrite, redesign, fix or review slides, a deck, talk, pitch, lecture, report or research presentation (スライド, プレゼン, 発表資料, 資料作成), in any language. Designs from the content instead of filling a fixed layout."
 metadata:
-  version: "3.4.0"
+  version: "4.0.0"
 ---
 
-# Slide Studio — meaning, composition, behavior, delivery
+# Slide Studio
 
-You are the author, editor, designer and production engineer. Create the requested
-files, not a plan or a gallery of options. Templates, samples and assets are optional
-materials. A blank canvas is legitimate. More effects or more words are not quality.
+You are the author, editor, designer and production engineer of the deck. Deliver
+the files, not a plan. Library studies and templates are material to adapt; a blank
+canvas is fine. More words, effects or decoration are not quality.
 
-**Priority:** true claims and relationships → useful audience language → readable
-composition → coherent visual expression → behavior → verified delivery. A polished
-false claim is worse than an ordinary accurate one. A geometric QA pass is not a
-content or design approval.
+**Priority order:** true claims → language the audience can use → a composition you
+can read at a glance → coherent visual system → motion and interaction → verified
+delivery. A beautiful false claim is worse than a plain true one.
 
-## 1. Establish the actual job
+## What "done" looks like
 
-Inspect the supplied source and existing work before drawing conclusions. Determine
-audience, question/decision, language, duration, output formats and reading mode:
-`live`, `read`, `reference`, or `hybrid`. Use an explicit user constraint; otherwise
-choose a reversible default. Do not ask the user to pick every visual detail.
-Do not invent a talk duration, task, brand or capability just to frame the deck.
+- Each page answers one question. When a page reports a finding, the headline *is*
+  the finding, specific and scoped ("Valley took 25% of Q3 orders"), not a topic label.
+- Every number traces to data and is computed once; headline, chart and table read
+  the same object. Units, denominators, periods and uncertainty are on the page.
+- The evidence is the largest thing on the page and is drawn at the size it is shown.
+  Text ≥ 18 px for live talks, ≥ 15 px anywhere; nothing overlaps, clips or overflows.
+- One accent per page, and it means "this". Everything else is ink, muted or context grey.
+- Motion explains a change; the final build is the complete page for PDF.
+- You have **looked at every rendered page** (contact sheet + full-size frames) and
+  fixed what you saw. Scripts find defects; they never approve a deck.
 
-For a substantial deck keep a short brief and a claim/evidence outline. Small changes
-do not need a project-management ritual. Keep source facts, inferred interpretations,
-proposals and illustrative data distinct. Do not promote a proposal into a promise.
-Do not personalize public examples from memory or copy private material into the skill.
+## Workflow
 
-## 2. Read a small working set and act on it
+**0 · Set up a project** (never edit the installed skill):
+```sh
+node "$SKILL_DIR/scripts/craft.mjs" init ./deck --language en --colors laboratory
+```
+It copies the figure engine, layout/number helpers, the page grammar (`theme.css`)
+with one color system, a draft `deck.mjs` and `brief.md`. `SKILL_DIR` is this file's folder.
 
-For new/revised decks read [Writing and editing](references/writing-and-editing.md)
-(§1 editorial pass, §4 density). Execute those edits on the actual pages; do not
-restate the advice in audience copy. Then choose relevant guides:
+**1 · Brief.** Read the supplied material first. Fill `brief.md`: audience and what
+they know, the question or decision, reading mode (`live`, `read`, `reference`,
+`hybrid`), language, length, formats, brand. Decide reversible details yourself;
+ask only when a wrong guess would change correctness or touch private material.
 
-| Need | Read |
+**2 · Claim outline.** Write the page titles as a sequence of claims and read them
+in order. Cut pages that repeat; add the missing step. Keep facts, inferences,
+proposals and illustrative data distinct (`observed / reported / inferred /
+proposed / illustrative`). Read [Writing and editing](references/writing-and-editing.md) §1 and §4.
+
+**3 · Evidence.** Put data in arrays at the top of `deck.mjs`; derive every displayed
+number from them. For decision-critical numbers write `evidence.json` and run
+`evidence.py`. Decide what each arrow, line or connector means before drawing it.
+Read [Evidence and diagrams](references/evidence-and-diagrams.md) when numbers or relations matter.
+
+**4 · Prototype two pages** — the hardest evidence page and one contrasting page.
+Build, render, look, fix. Only then multiply the system.
+
+**5 · Build the deck.** Use the figure engine for every chart and relationship
+diagram; use the page grammar for composition; take a library study when one fits.
+
+**6 · Add behavior only where it explains** (builds, transitions, widgets).
+
+**7 · Review loop** (repeat until clean): build → QA → look → fix.
+
+**8 · Deliver** HTML (+ notes-stripped copy), PDF/PPTX if asked, editable source, a
+short verification summary. Details: [Verification and delivery](references/verification-and-delivery.md).
+
+## Figures: compute, don't draw
+
+`figure.mjs` returns finished SVG from data — axes with nice ticks, direct labels,
+highlight-vs-context color, callouts that keep inside the frame, optional builds.
+Full API: [Figures](references/figures.md).
+
+```js
+import { barChart, lineChart, flowDiagram, fmt } from './figure.mjs';
+const top = [...orders].sort((a, b) => b.value - a.value)[0];
+const chart = barChart({ id: 'orders', title: 'Orders by region', desc: `${top.label} leads.`,
+  width: 1152, height: 470, data: orders, sort: 'desc', highlight: top.label, unit: 'Orders, thousands' });
+```
+
+| The page asks… | Use |
 |---|---|
-| Quantities, research results, comparisons, diagrams, graph meaning | [Evidence and diagrams](references/evidence-and-diagrams.md) |
-| Rendered QA, PDF/fonts, exports, release gates | [Verification and delivery](references/verification-and-delivery.md) |
-| Concrete failures / repair operations | [Repair](references/repair.md) |
-| Layout, whitespace, color, type, images | [Visual design](references/visual-design.md) |
-| Animation, controls, media, 3D | [Motion and interaction](references/motion-and-interaction.md) |
-| Authoring APIs, studio scenes, story contract | [Authoring](references/authoring.md) |
-| Native editable PowerPoint | [Authoring](references/authoring.md), [Verification and delivery](references/verification-and-delivery.md) |
-| Existing company slides / reusable private templates | [Brand systems](references/brand.md) |
-| Revising an existing PPTX/PDF deck | `slop_check.py deck.pptx` lists what to fix; read its text/figures with host tools, keep its facts, rebuild; [Brand systems](references/brand.md) for its identity. In-place PPTX editing is not a route here |
-| Rights, source trust, installation, autonomy, capability tiers | [Working agreements](references/working-agreements.md) |
+| Which is biggest / how do items rank? | `barChart` (sorted, highlight), `lollipopChart`, `dotPlot` |
+| What changed between two moments or conditions? | `dumbbellChart`, `slopeChart`, `divergingBarChart` |
+| How did it move over time? | `lineChart` (end labels, bands, refLines), `smallMultiples`, `areaChart` |
+| What adds up to the total? | `waterfallChart` (validated totals), `stackedBarChart`, `waffleChart`, `unitChart` |
+| How is it distributed / how uncertain? | `histogram`, `boxPlot`, `violinPlot`, `stripPlot`, `ecdfChart`, `errorBarChart`, `forestPlot` |
+| Are two things related? | `scatterPlot` (fit + 95% band), `heatmap` |
+| How good is the model? | `confusionMatrix`, `rocCurve`, `prCurve`, `calibrationChart`, `learningCurve`, `residualPlot` |
+| How does the process / system work? | `flowDiagram` (layers, lanes, boundaries, feedback), `sequenceDiagram`, `treeDiagram`, `layerDiagram`, `networkDiagram`, `cycleDiagram` |
+| When does what happen? | `ganttChart`, `timelineChart` (true time spacing) |
+| Where are we on a judgment? | `quadrantChart` (say positions are judgments), `matrixDiagram` |
+| Continuous field / physics | `contourPlot`, `vectorField`, `streamlines` |
 
-Search by the explanation needed, not a color or generic decorative style:
-`node "$SKILL_DIR/scripts/catalog.mjs" search "conditional branch" --limit 4`.
-Inspect an example's source and invariants. Do not read or copy the entire library.
-For a practical page type with finished art direction (pitch, business review, strategy,
-research talk, architecture review, ML report, lecture, editorial, impact report, launch,
-project status, keynote; English and Japanese), `catalog.mjs list --kind templates`.
-A template pack is a coherent reference to adapt: replace its synthetic data, copy and
-fictional names, recompute its charts, and keep only what fits. Do not submit it as-is.
+Draw at display size (`width`/`height` = the region), give every figure `title` and
+`desc`, and pass `highlight` for the one thing the headline names. For anything
+the catalogue lacks, compose with the engine's scales and primitives — never
+hand-place data coordinates.
 
-## 3. Author in a bounded loop
+## Page grammar and color
 
-**A. Write the literal thought.** Answer the audience's current question in ordinary
-language, with its condition and evidence. Polish only after it makes sense. Topic
-labels, technical terms and poetic language can all be appropriate; forced slogans,
-fake contrasts and performative sincerity are not a substitute for a thought.
-Read the titles in sequence and cut redundant pages. Remove duplicated interpretation,
-not data, units, uncertainty or necessary comparison fields.
+`theme.css` (from `assets/runtime/study-frame.css`) gives a page vocabulary on the
+1280×720 canvas: `st-head` (claim, 36–40 px), `st-dek` (one condition line),
+`st-fig` (evidence region 1152×~470), `st-rail` + `st-kpi`/`st-text` (a 312 px
+commentary rail; layouts `st--rail`, `st--left`), `st-num` (one big number),
+`st-source` (provenance), `st--full` (full bleed). Use it, extend it, or replace it;
+choose the composition from the content — finding, picture, mechanism, comparison
+or table — not from habit.
 
-**B. Establish the truth of the visual.** For important numbers, compute once and
-use the same data object for title, table, chart and controls. Declare the subtraction
-order, units, denominator, missingness and rounding. Use `quant.mjs` and `evidence.py`
-where relevant. Verify important source facts independently; those tools do not fact-
-check arbitrary prose. For diagrams, decide whether edges mean sequence, alternatives,
-comparison, association or physical transfer. A schematic still needs true endpoints.
-When summarizing a paper/table, retain the exact source version, row/column headers
-and measurement protocol. Similar numbers from different columns are not one baseline.
-Verify the depicted mechanism against a source figure, not only its caption.
+Color comes from one role-based system: a brand's tokens or one of 37 systems in
+`assets/color-systems/` (`gallery/color-systems.html`). Put `cs-<id>` on the slide;
+figures read the same `--ss-*` tokens. Text is ink and muted ink; the accent marks
+the one thing; categorical colors live on data marks only. See
+[Visual design](references/visual-design.md) for type, space, images and repair.
 
-**C. Design the whole canvas.** Choose the actual primary: finding, picture, mechanism,
-comparison or table. Allocate space from measured content, not inherited card slots.
-A small top-heavy cluster above a blank lower half often needs a larger evidence area,
-not fewer facts or more decoration. Choose type and available fonts before fitting text.
-Keep related explanation near its evidence. Dense reference pages can remain dense.
-Take color from one role-based system: the brand's, or one of `assets/color-systems/`
-(`node "$SKILL_DIR/scripts/color-systems.mjs" validate` lists their checks;
-`gallery/color-systems.html` shows them). Text stays ink and muted ink; the accent
-marks the one thing a page is about; categorical colors live on data marks only.
+## Motion and presentation
 
-**D. Prototype and repair.** Make the hardest explanatory page and one contrasting
-page. Render them before multiplying a flawed design. Inspect full-size text, figure
-meaning, optical mass, crop, key labels and the final animation extent. Temporarily
-remove an eyebrow, subtitle, badge, border or slogan: if no useful meaning, hierarchy
-or identity is lost, omit it. This is a deletion test, not a universal style ban.
+Builds: `data-step="n"` + `data-motion` (`reveal lift rise slide settle zoom blur
+grow-x grow-y wipe wipe-up draw count focus`), `data-delay`, `data-stagger` on a
+parent, `data-easing` (`standard emphasized decelerate accelerate smooth linear`).
+Transformations: `data-states` maps build → CSS (same element moves; compute both
+geometries from data). Slide transitions: `transition: 'fade'|'rise'|'push'|'zoom'`
+on the deck or a slide. The player gives presenters a **presenter window (P)**
+with notes, timer and next-build preview, black screen (B), overview (O),
+number + Enter to jump, swipe, fullscreen (F) and a shortcut sheet (?).
+Rules and widget lifecycle: [Motion and interaction](references/motion-and-interaction.md).
 
-**E. Extend the system.** Build the rest with coherent type/color/image treatment and
-purposeful variation. Repeated composition is useful for comparison; random variation
-is not originality. Invent new geometry or use subject-specific media when the library
-is a poor fit. Do not submit study captions, sample data or a barely relabeled gallery.
+Motion must explain what changes, keep identity, never loop, respect reduced
+motion, and end on a complete page. An accurate still beats an unrelated animation.
 
-**F. Add behavior only when it helps.** Define input → state → visible result → reset →
-static meaning. Use one state path for mouse and keys. Preserve input/slider/IME keys.
-Test focused navigation controls, reverse/rapid input, revisit, reduced motion and
-export. An accurate useful still is better than an unrelated animation.
-Check the meaning of every discrete choice, and boundary/changeover values for ranges.
-"The output changed" does not establish that the new equation, label or diagram is true.
+## Library
 
-**G. Strip the machine-made look before calling it done.** These patterns make a deck
-read as generated. The default is to remove each one; keep it only when you can say
-in one line what it tells the reader on that page.
+```sh
+node "$SKILL_DIR/scripts/catalog.mjs" search "paired change" --limit 4     # Japanese queries work too
+node "$SKILL_DIR/scripts/catalog.mjs" take dumbbell ./deck/study-dumbbell   # source + engine + its color system
+node "$SKILL_DIR/scripts/catalog.mjs" take tpl-strategy ./deck               # a whole template pack as one draft deck
+```
+104 diagram studies, 64 motion studies, 24 interactions, 36 compositions and 72
+template pages (12 packs: pitch, QBR, strategy, research (ja), architecture, ML
+report, lecture, editorial, impact report, launch, project status, keynote), all
+data-driven. Browse `gallery/index.html`. Replace data, names and copy; never ship
+a study as-is. Search by the explanation you need, not by a look.
+
+## Review loop
+
+```sh
+node "$SKILL_DIR/scripts/craft.mjs" build ./deck/deck.mjs --out ./deck/deck.html --force
+python "$SKILL_DIR/scripts/qa.py" ./deck/deck.html --out ./deck/.studio-review/current --states all
+python "$SKILL_DIR/scripts/qa-summary.py" ./deck/.studio-review/current/report.json
+python "$SKILL_DIR/scripts/contact-sheet.py" ./deck/deck.html --out ./deck/.studio-review/sheet.png --final --label
+python "$SKILL_DIR/scripts/contact-sheet.py" ./deck/deck.html --out ./deck/.studio-review/steps.png --steps   # motion
+python "$SKILL_DIR/scripts/slop_check.py" ./deck/deck.html
+```
+Open the sheet and the full-size frames (`--frames DIR`) and critique them like an
+art director: what do I see first, is the evidence big enough, does any page look
+like every other page, is anything crowded, empty, misaligned or illegible? Fix the
+cause (restructure, resize, rewrite), rebuild, look again. Exercise real
+click/key paths on motion decks with `qa-navigation.py`. If you cannot view images,
+say that visual review is pending — measurements do not replace looking.
+
+## Strip the machine-made look
+
+Default: remove each of these unless you can say in one line what it tells the reader.
 
 | Pattern | Do instead |
 |---|---|
-| The same skeleton on every page: small caps eyebrow, title, a row of 3–4 equal cards, footer | Give each page the form its evidence needs: chart, table, diagram, photo or one sentence |
-| Colored stripe on a card edge, a bar under the title, a tick before the eyebrow | Nothing. Group with space or a tint; state emphasis in the words or the data mark |
-| Big `01 02 03` in front of items that are not a sequence | Let the headings carry the order |
-| English eyebrows (`HOW TO CHOOSE`) in a Japanese or other non-English deck | Remove, or write a label in the deck's language that adds information |
-| An entity's identity color (a model, a product) reused on unrelated items | Identity colors belong to that entity only; everything else neutral or one accent |
-| The same entity list restated on the cover, a profile page and a summary page | Say it once where it is evidenced; later pages add a new question or decision |
-| Attribute cards (price cards, spec cards) standing in for a table or chart | A table for attributes, a chart on one shared scale for quantities |
-| Half the canvas empty below small text | Enlarge the evidence; cut duplicated words instead of shrinking type |
-| "Draft", "for the talk", tool or export notes on the canvas or in speaker notes | File name, runbook or nothing |
+| Same skeleton every page: eyebrow, title, row of 3–4 equal cards, footer | Give each page the form its evidence needs: chart, table, diagram, photo, one sentence |
+| Colored stripe on a card edge, bar under the title, tick before the eyebrow | Nothing; group with space; emphasize in the words or the data mark |
+| Big `01 02 03` on items that are not a sequence | Let the headings carry order |
+| English eyebrows (`KEY INSIGHT`) in a non-English deck | Remove, or a label in the deck's language that adds information |
+| An entity's identity color reused on unrelated items | Identity colors for that entity only |
+| The same list restated on cover, profile and summary | Say it once where it is evidenced |
+| Attribute cards standing in for a table or chart | A table for attributes; a chart on one scale for quantities |
+| Half the canvas empty below small text | Enlarge the evidence; cut duplicate words, don't shrink type |
+| "Draft", "for the talk", tool or export notes on the canvas | Notes, runbook, or nothing |
+| Dot/blueprint grids, glows, radial washes, blurred blobs, frosted glass, soft shadows under every box | Flat paper; emphasis by position, size, weight and the one accent |
+| Phone and browser mockups, toasts, avatars, "NEW" pills, icon rows, emoji, sparkles, hand-drawn underlines | The real thing (an honest UI fragment at legible size, a measured drawing) or words |
+| A grid of KPI tiles with ▲▼ pills and gradient sparklines | One KPI table; signed deltas (+1.2 / −1.2). In Japanese business documents ▲ means *negative* |
+| Letter-spaced caps labels, breadcrumbs, `·` chains, "02 / 06", stacked letters, giant faded numerals | One quiet running line, or nothing |
+| Two-tone headline, a colored phrase, an italic serif word dropped in, a slogan | A plain, specific claim; color a phrase only when it names the same-colored mark |
 
-`scripts/slop_check.py` locates these in a built HTML, a `.scene.json` or any `.pptx`
-(including decks made elsewhere). Each warning needs a fix or that one-line reason.
+`slop_check.py` finds these in HTML (computed styles included), `.scene.json` or
+any `.pptx`. Each warning needs a fix or a one-line reason. The checker cannot see
+taste: the [visual design](references/visual-design.md) guide explains what to do
+instead.
 
-## 4. Build and inspect
+## Delivery
 
-Resolve `SKILL_DIR` from this file's location. Work in the user's project, never by
-editing the installed skill. Match the loop to the host's capability tier
-(see [Working agreements](references/working-agreements.md)): when browser QA
-or installs are unavailable, skip those steps and report them as unrun.
-Use `python3` where `python` is absent. The default original-HTML route requires no layout ID:
+- **HTML**: self-contained; `build --strip-notes` for the audience copy (notes in
+  HTML are not secret). Bind QA to the delivered file: `verify-review.py deck.html --report …`.
+- **PDF**: `font_audit.py` → reviewed `fonts.json` → `export.py deck.html deck.pdf
+  --font-contract fonts.json --require-font-contract`; then look at the PDF.
+- **PowerPoint**: `export.py deck.html deck.pptx` makes pictures. Native editable
+  slides need the structured route (`studio.mjs` + `export-pptx.mjs --mode editable`).
+  Never silently flatten a requested editable deck.
+- **Company templates**: capture → proof → approve → POTX. See [Brand systems](references/brand.md).
+- PDF/PPTX are static: motion, video and widgets do not survive. Plan the static story.
 
-```sh
-node "$SKILL_DIR/scripts/craft.mjs" init ./presentation --language en
-# Author deck.mjs. Set readingMode; replace the draft and actual source/data.
-# While deck.mjs still has draft:true, preview by adding --allow-draft to build.
-# Rebuilding to an existing --out file needs --force.
-node "$SKILL_DIR/scripts/craft.mjs" build ./presentation/deck.mjs --out ./presentation/deck.html
-# For important numeric claims, independently check declared input/expected values:
-python "$SKILL_DIR/scripts/evidence.py" ./presentation/evidence.json
-# Use this for a substantial sourced story, not as a truth certificate:
-python "$SKILL_DIR/scripts/editorial.py" ./presentation/story.json
-python "$SKILL_DIR/scripts/qa.py" ./presentation/deck.html --out ./presentation/.studio-review/current --states all --check
-# Deck-level review for machine-made patterns (also accepts .scene.json or .pptx):
-python "$SKILL_DIR/scripts/slop_check.py" ./presentation/deck.html
-# On motion decks, exercise real click/key paths:
-python "$SKILL_DIR/scripts/qa-navigation.py" ./presentation/deck.html --out ./presentation/navigation.json
-# After the LAST build, including a separate stripped audience build:
-python "$SKILL_DIR/scripts/verify-review.py" ./presentation/deck.html --report ./presentation/.studio-review/current/report.json
-```
+Report what you verified and what you could not (unrun tiers, unviewed images,
+untested widget choices). Never claim aesthetic certification or that the tooling
+guarantees quality.
 
-Review the actual images and hints, not only `passed:true`. `deliveryApproved` is
-false because an automated geometric/export check cannot grant editorial approval.
-Check numbers, prose, diagram meaning, reading-mode density, optical hierarchy and
-the delivered format. Fix diagnosed defects; do not hide them with broad waivers.
-`--states all` covers slide builds, not every custom widget choice. Read the
-[verification and delivery guide](references/verification-and-delivery.md) for checks and limits.
-If screenshots cannot be viewed, retain the review output and explicitly leave visual
-review pending; DOM measurements are not a replacement for seeing the slides.
+## References
 
-For requested PDF, verify actual print fonts against a reviewed project contract:
+| Need | Read |
+|---|---|
+| Copy, headlines, density, channels (audience vs notes) | [Writing and editing](references/writing-and-editing.md) |
+| Numbers, sources, relationship semantics, research figures | [Evidence and diagrams](references/evidence-and-diagrams.md) |
+| Chart and diagram API, theming, standalone SVG | [Figures](references/figures.md) |
+| Composition, space, type, color, images | [Visual design](references/visual-design.md) |
+| Builds, transitions, presenter view, widgets, media, 3D | [Motion and interaction](references/motion-and-interaction.md) |
+| Deck module format, structured JSON route, assets, runtime API | [Authoring](references/authoring.md) |
+| QA, PDF fonts, export routes, release gates | [Verification and delivery](references/verification-and-delivery.md) |
+| Concrete failures and how to repair them | [Repair](references/repair.md) |
+| Existing company slides, POTX templates | [Brand systems](references/brand.md) |
+| Installation, capability tiers, privacy, rights | [Working agreements](references/working-agreements.md) |
 
-```sh
-python "$SKILL_DIR/scripts/font_audit.py" ./presentation/deck.html > ./presentation/font-observations.json
-# Review actual faces and create fonts.json; do not blindly approve fallbacks.
-python "$SKILL_DIR/scripts/export.py" ./presentation/deck.html ./presentation/deck.pdf \
-  --font-contract ./presentation/fonts.json --require-font-contract > ./presentation/export-check.json
-```
-
-The export waits after print-state activation, inspects rendered fonts, checks PDF
-page count/text coverage and replaces output atomically only on success. Then render
-and inspect the PDF itself. No font binaries ship here; HTML system-font portability
-still needs checking in the target environment. Source script contamination is not
-fixed by changing a font.
-
-`export.py deck.html deck.pptx` creates **pictures**, not native editable text/shapes.
-For native PowerPoint use `studio.mjs` and `export-pptx.mjs --mode editable` with an
-authored scene (`layout:"freeform", chrome:false` is allowed). PDF/PPTX are static;
-HTML motion, playback and controls do not survive. Do not silently flatten a requested
-editable deck. Install optional dependencies only in an approved local environment.
-
-## 5. Keep audience content and private identity separate
-
-On the canvas show the selected condition and result, not "switch during the talk"
-or "the PDF keeps this view". Timing belongs in notes/runbook. Build and browser
-checks reject a small set of high-confidence leaks; also read script-created/export
-text. `build --strip-notes` produces an audience copy without speaker notes; retain
-necessary source/scope on the page. HTML notes are not protected secrets.
-
-For company templates keep `brand.json`, logos and observations in a private project.
-Distinguish adaptive identity (new compositions under approved rules) from fixed native
-POTX layouts. Capture yields a draft, not approval. Test contrasting proof pages, long
-labels and actual export fonts. Do not reproduce arbitrary reference defects or claim
-a complete master import that the tool does not implement.
-
-## 6. Clean handoff, honest evidence
-
-Default QA retains one JSON report and one review HTML plus an ownership manifest;
-frames stay in memory. Reuse the review directory. Use `--keep failures --max-failures 6`
-only when loose defect images help. `--review-states` puts all states in the same HTML.
-`clean.py` plans/removes only unchanged tool-owned files with explicit `--apply`.
-Never recursively delete a user's source/output folders or include caches in a ZIP.
-
-Deliver the requested files, editable source, provenance and a compact observed-test
-summary. Block success for wrong facts, unreadable essentials, false graph relations,
-dead controls, unverified required exports, or unexplained `slop_check.py` findings. Report unrun tests as unrun. Do not
-claim aesthetic certification, complete language/security compliance, or that all AI
-models now create equally good slides. Finish the package, not just a status update.
-Bind the QA report to the exact delivered HTML and loaded local assets. A later build
-invalidates its earlier review; a notes-stripped copy is a separate file to check.
+Keep private material out of the skill: brand kits, logos and user data live in the
+user's project. Generic examples use synthetic data and fictional names.

@@ -26,7 +26,7 @@ jobs:
       - name: Gallery freshness
         run: |
           npm run build:galleries
-          git diff --exit-code -- gallery/
+          git diff --exit-code -- gallery/ assets/svg/ assets/svg/study.css assets/motion/study.css assets/interactions/study.css assets/compositions/study.css assets/color-systems/color-systems.css
       - name: Audit and manifest freshness
         run: |
           python scripts/audit.py . --manifest

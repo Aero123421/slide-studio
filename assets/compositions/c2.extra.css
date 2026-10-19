@@ -1,0 +1,36 @@
+/* Composition studies, batch C2 — page CSS the study grammar (study-frame.css) does not cover.
+   Every selector is scoped under one study class (.cmp-*). Colors are --ss-* tokens from the
+   slide's color system; the only literal colors live in the indigo study's dye swatches (data).
+   Grid: 1280×720, 64 px side margins, 12 columns of 74 px with 24 px gutters
+   (column k starts at 64 + 98·(k−1)). Type scale: display 72–120 · headline 36–52 ·
+   lead 24–28 · body 20–22 · label 16–18 · note 15. */
+
+/* ── Cinematic chapter: one photograph, a dark field, a long pause ─────────────── */
+.cmp-cinematic .cc-run { position: absolute; left: 64px; top: 52px; font: 400 16px/1.3 var(--ss-font-sans); color: var(--ss-muted); }
+.cmp-cinematic .cc-photo { position: absolute; left: 848px; top: 92px; width: 368px; height: 524px; object-fit: cover; object-position: 50% 50%; display: block; }
+.cmp-cinematic .cc-caption { position: absolute; left: 848px; top: 632px; width: 368px; font: 400 15px/1.4 var(--ss-font-sans); color: var(--ss-ink); }
+.cmp-cinematic .cc-block { position: absolute; left: 64px; bottom: 104px; width: 662px; }
+.cmp-cinematic .cc-label { font: 400 20px/1.3 var(--ss-font-sans); color: var(--ss-muted); font-variant-numeric: lining-nums; }
+.cmp-cinematic .cc-title { margin: 14px 0 36px -6px; font: 400 152px/.92 var(--ss-font-display); letter-spacing: -.03em; color: var(--ss-ink); }
+.cmp-cinematic .cc-lead { max-width: 560px; font: 400 24px/1.45 var(--ss-font-sans); color: var(--ss-muted); text-wrap: pretty; }
+.cmp-cinematic .cc-lead b { font-weight: 600; color: var(--ss-accent); }
+
+/* ── Quiet statement: one decision, set to be read slowly ──────────────────────── */
+.cmp-quiet .qs-statement { position: absolute; left: 64px; top: 152px; width: 1060px; font: 500 56px/1.16 var(--ss-font-display); letter-spacing: -.02em; color: var(--ss-ink); }
+.cmp-quiet .qs-rule { position: absolute; left: 64px; top: 520px; width: 368px; height: 1px; background: var(--ss-rule); border: 0; margin: 0; }
+.cmp-quiet .qs-support { position: absolute; left: 64px; top: 544px; width: 860px; font: 400 22px/1.45 var(--ss-font-sans); color: var(--ss-ink); font-variant-numeric: tabular-nums lining-nums; }
+.cmp-quiet .qs-attrib { position: absolute; left: 64px; bottom: 48px; font: 400 18px/1.3 var(--ss-font-sans); color: var(--ss-muted); }
+
+/* ── Atmospheric color: a chapter set in the color it describes (indigo) ────────── */
+.st.cmp-indigo { background: var(--ss-accent); color: var(--ss-paper); }
+.cmp-indigo .ai-chapter { position: absolute; left: 64px; top: 52px; font: 500 18px/1.5 var(--ss-font-sans); color: var(--ss-seq-2); letter-spacing: .04em; }
+.st.cmp-indigo .ai-head { position: absolute; left: 64px; top: 104px; width: 760px; font: 700 50px/1.38 var(--ss-font-display); letter-spacing: .02em; color: var(--ss-paper); }
+.st.cmp-indigo .ai-lead { position: absolute; left: 64px; top: 262px; width: 680px; font: 400 21px/1.75 var(--ss-font-sans); color: var(--ss-paper); word-break: keep-all; overflow-wrap: anywhere; }
+.cmp-indigo .ai-note { position: absolute; right: 64px; top: 52px; font: 400 15px/1.5 var(--ss-font-sans); color: var(--ss-seq-2); text-align: right; }
+.cmp-indigo .ai-axis { position: absolute; left: 0; top: 432px; width: 1280px; height: 40px; }
+.cmp-indigo .ai-axis-title { position: absolute; left: 64px; top: 0; font: 500 16px/1.4 var(--ss-font-sans); color: var(--ss-seq-2); }
+.cmp-indigo .ai-tick { position: absolute; top: 0; padding-left: 7px; border-left: 1px solid var(--ss-seq-2); height: 40px; font: 500 16px/1.4 var(--ss-font-sans); color: var(--ss-paper); font-variant-numeric: tabular-nums; }
+.cmp-indigo .ai-band { position: absolute; top: 472px; bottom: 0; }
+.cmp-indigo .ai-name { position: absolute; top: 22px; right: 12px; writing-mode: vertical-rl; font: 700 24px/1 var(--ss-font-display); letter-spacing: .06em; }
+.cmp-indigo .ai-kana { position: absolute; top: 24px; right: 44px; writing-mode: vertical-rl; font: 400 16px/1 var(--ss-font-sans); letter-spacing: .04em; }
+.cmp-indigo .ai-here { position: absolute; left: 14px; bottom: 26px; width: 120px; font: 500 16px/1.5 var(--ss-font-sans); }

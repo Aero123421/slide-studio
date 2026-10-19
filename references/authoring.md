@@ -1,6 +1,8 @@
 # Authoring guide
 
-Start with the story contract, then author with either structured authoring (`studio.mjs`) or the creative authoring API (`craft.mjs`).
+Start with the story contract. Author with the default HTML route (`craft.mjs`, below);
+use the structured JSON route (`studio.mjs`) when the deliverable must be a native,
+editable PowerPoint.
 
 ---
 
@@ -53,6 +55,124 @@ Reorder or omit parts when the audience already knows them. A title-only divider
 be useful rhythm, but a content-empty “Our journey” page does not earn its place.
 Keep a backup appendix for optional detail rather than hiding essential evidence
 behind an interaction that the final PDF cannot expose.
+
+---
+
+## The default route: authored decks (`craft.mjs`)
+
+### Project setup
+
+```sh
+node "$SKILL_DIR/scripts/craft.mjs" init ./deck --language ja --colors wa-ai
+```
+
+`init` writes a self-contained project: `deck.mjs` (a draft with a computed chart),
+`theme.css` (page grammar + one color system), `figure.mjs` and its `fig-*.mjs`
+modules, `studio-kit.mjs`, `layout.mjs`, `quant.mjs`, `semantic-graph.mjs`,
+`brief.md` and `assets/`. The project never imports from the installed skill, so
+it survives skill updates and can be zipped and shared. `--colors` takes any id in
+`assets/color-systems/` (default `laboratory`, `wa-ai` for Japanese).
+
+### The deck module
+
+`craft.mjs` imports trusted local `.mjs` — it executes JavaScript; never build a
+downloaded module you have not read.
+
+```js
+import fs from 'node:fs/promises';
+import { h } from './studio-kit.mjs';
+import { lineChart, fmt } from './figure.mjs';
+
+const css = await fs.readFile(new URL('./theme.css', import.meta.url), 'utf8');
+const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+const active = [22, 25, 27, 31, 35, 38];                       // thousands, from source X
+const growth = fmt((active.at(-1) / active[0] - 1) * 100, { digits: 0 });
+
+export default {
+  title: 'Activation review', language: 'en', readingMode: 'live', transition: 'fade', draft: false,
+  css,
+  slides: [{
+    id: 'active-users', title: `Active users grew ${growth}% in six months`, className: 'st cs-laboratory',
+    content: `<h1 class="st-head">Active users grew <em>${growth}%</em> in six months</h1>
+      <figure class="st-fig" data-region="primary">${lineChart({ id: 'au', title: 'Active users, thousands',
+        width: 1152, height: 470, x: months, series: [{ name: 'Active users', values: active }], build: { start: 1 } })}</figure>
+      <p class="st-source" data-region="source"><span>Source X, monthly actives</span></p>`,
+    notes: 'Say what changed in April.', sources: [{ file: 'data/actives.csv' }], exportPolicy: 'final',
+  }],
+  script: '', // optional trusted script, runs after the player initializes
+};
+```
+
+Deck fields: `title`, `language` (BCP 47), `direction`, `width`/`height` (default
+1280×720), `readingMode` (`live|read|reference|hybrid`), `transition`
+(`none|fade|rise|push|zoom`), `labels` (override player chrome strings), `brand`,
+`draft`, `sample`, `css`, `script`, `slides`. Slide fields: `id` (stable, unique),
+`title` (accessible name — not automatically visible), `content` (HTML/SVG; no
+`<script>`), `className`, `language`, `direction`, `transition`, `notes`,
+`sources`, `exportPolicy`, `copyWaivers`, `widgets`.
+
+`draft:true` blocks a final build; preview with `--allow-draft` and clear it only
+after review. `sample:true` records teaching status; it adds no label — put
+"illustrative data" lines where they matter. Escape external text with `h()`;
+`states()`/`statesAttr()` encode state maps for attributes. Scope CSS by slide id
+or class.
+
+### Assets
+
+`{{asset:assets/photo.jpg}}` in content or CSS embeds a local file relative to the
+deck module (PNG, JPEG, WebP, SVG, MP4, WebM, WAV, MP3, VTT; ≤ 16 MiB each). Nothing
+is downloaded and no fonts are embedded. `svg(file, prefix)` loads a passive local
+SVG and namespaces its IDs. Inline SVG keeps geometry editable and animatable; an
+SVG in `<img>` is isolated but opaque to builds.
+
+### Library studies and templates
+
+```sh
+node "$SKILL_DIR/scripts/catalog.mjs" search "rank change over time" --limit 5
+node "$SKILL_DIR/scripts/catalog.mjs" show slope-comparison
+node "$SKILL_DIR/scripts/catalog.mjs" take slope-comparison ./deck/slope
+```
+
+Every catalog source is a data-driven slide module. `take` copies the module (data
+and code, not a snapshot), the runtime files it imports, its CSS with only the
+color system it uses, its media, a draft `deck.mjs` and `PROVENANCE.md`; it never
+overwrites an existing directory. Diagram studies also carry a standalone `.svg`
+with literal colors. Edit the data, headline and labels; remove `study: true`
+once the page is yours. Template packs (`assets/templates/<pack>/`) are complete
+art-directed page sets: data arrays at the top drive the geometry; `pack.css` is
+scoped to the pack class. `take tpl-<pack> DIR` copies the whole pack (all pages,
+`pack.css`, the engine) as one draft deck. Replace fictional names and synthetic numbers, keep the
+"illustrative data" line until real sources replace it, and never submit a pack
+unchanged. Several studies can live in one deck if their IDs and CSS scopes don't
+collide — namespace repeated instances.
+
+### Runtime API (browser)
+
+`SlideStudio.show(index, step, {animate})`, `next()`, `prev()`, `reset()`,
+`finish()`, `overview()`, `presenter()`, `blackout()`, `help()`, `setExport(bool)`,
+`prepareExport()`, `getState()`, `getWidgetState(id)` and `register(id, hooks)`.
+`studio:state` events carry slide, index, step, active, exporting and
+reducedMotion. `data-static="show"` elements appear only in export,
+`data-static="hide"` only live — give exports a meaningful fallback, not a blank.
+
+### Helpers
+
+- `figure.mjs` — charts, diagrams, fields, scales, text measurement, callouts
+  ([Figures](figures.md)).
+- `layout.mjs` — `allocate` (weighted regions), `dagLayers`, `labelRail`,
+  `routeOrthogonal`: explicit fit checks that throw instead of shrinking
+  (`examples/constraint-layout/deck.mjs` shows a full derivation).
+- `studio-kit.mjs` — `h`, `states`, `grid`, `position`, `port`, `connector`,
+  `scaleLinear`, `contrast`, `checkBounds`, `svg`.
+- `quant.mjs` and `semantic-graph.mjs` — units-checked arithmetic and relation
+  validation ([Evidence](evidence-and-diagrams.md)).
+
+`data-region="title|primary|support|source"` and `data-space-intent` are invisible
+review metadata. `copyWaivers` allow an exact, justified quotation of production
+language ([copy channels](writing-and-editing.md)). An approved `brand` object is
+validated and exposed as `--brand-*` variables. `build --strip-notes` writes the
+audience copy; `build` refuses to overwrite without `--force`. Run `validate`,
+`editorial.py` and `qa.py`, then look at the slides.
 
 ---
 
@@ -161,112 +281,3 @@ The freeform layout keeps the standard header/footer unless the slide sets `chro
 5. Retain sources, notes, theme tokens, JSON, and exported files together.
 
 Supported does not mean unlimited: right-to-left shaping, native chart workbooks, embedded fonts, inherited PPTX masters, and arbitrary CSS-to-editable-PPTX conversion are outside this small engine. Use an appropriate native/library workflow when the user needs those capabilities.
-
----
-
-## Authoring API and project layout
-
-The creative `craft.mjs` API (the default original-HTML route), distinct from the
-structured `studio.mjs` workflow above.
-
-### The default authored module
-
-`craft.mjs` imports trusted local `.mjs`; this executes JavaScript. It is not a
-sandbox for downloaded modules. Author source in the project, not the installed skill.
-
-```js
-import {h, states} from './studio-kit.mjs';
-export default {
-  title: 'A specific explanatory title', language: 'en',
-  width: 1280, height: 720, direction: 'ltr', draft: false,
-  css: '.slide{background:#fff;color:#182b36} .result{padding:64px}',
-  slides: [{
-    id: 'result', title: 'Accessible title', className: 'result',
-    content: `<h1>${h('The content-specific claim')}</h1>
-      <p data-step="1">The qualification that belongs to it.</p>`,
-    notes: 'Presenter notes and scope.', sources: [], exportPolicy: 'final'
-  }],
-  script: '' // Optional trusted script executed after the player initializes.
-};
-```
-
-The accessible `title` is not automatically a visible heading. Author the page's
-actual content. No mandatory header, footer, watermark, grid or layout ID is imposed.
-The starter has `draft:true`; preview with `--allow-draft`. Replace it before marking
-the deck finished. `sample:true` records teaching status but does not insert a label:
-put visible synthetic/evidence labels where they matter.
-
-`content` is authored HTML/SVG. Script tags inside it are rejected; put code in
-`deck.script`. Escape external text with `h()`. `states()` encodes state JSON for
-HTML attributes. Styles are authored CSS; scope local exceptions by slide ID/class.
-
-### Assets
-
-`{{asset:assets/photo.jpg}}` in content or CSS embeds a local file relative to the
-deck module's directory. PNG/JPEG/WebP/SVG/MP4/WebM/WAV/MP3/VTT are supported. Each
-asset is bounded to 16 MiB. Large media should use an intentional local asset bundle.
-The tool does not download files or embed fonts. `svg(file,prefix)` loads inspected
-passive local SVG and namespaces IDs. Inline SVG exposes editable geometry; an SVG
-in an `<img>` is easier to isolate but cannot be animated by selecting its internals.
-
-### Studies and adaptation
-
-Template packs (`assets/templates/<pack>/`, catalog kind `templates`) are complete page
-sets with their own art direction. Each slide module is self-contained: data arrays at
-the top drive the SVG geometry, so edit the data and let labels and marks update together.
-`pack.css` is scoped to the pack class. Replace fictional names and synthetic numbers,
-and keep each page's visible "illustrative data" line until real sources replace it.
-
-`catalog.mjs search`, `show` and `take` help retrieve a small number of relevant
-examples. `take` writes a new directory with editable `.mjs`, CSS and required local
-media; it never overwrites an existing directory. It also writes provenance notes.
-The resulting `deck.mjs` is a draft: preview it with `build --allow-draft`. Built-in widgets depend on the
-installed runtime at build time, not on a network at viewing time.
-
-Every catalog source exports a slide object. It may be imported into an authored
-deck, but content, CSS and IDs must be coordinated. Copy and namespace repeated
-instances. Do not include duplicate slide or SVG IDs. Better results often come
-from changing the source substantially rather than combining entire finished slides.
-
-### Runtime
-
-`SlideStudio.show(index,step,{animate})`, `next()`, `prev()`, `reset()`, `finish()`,
-`overview()`, `setExport(bool)`, `prepareExport()`, `getState()`, `getWidgetState(id)`
-and `register(id,hooks)` are available in the browser. `register` returns an unregister
-function. The `studio:state` event includes slide, index, step, active, exporting and
-reducedMotion. It is for lifecycle-aware components, not a replacement for source data.
-
-`data-static="show"` is hidden during presentation and visible during export.
-`data-static="hide"` does the reverse. Provide a real meaningful fallback, not a
-blank rectangle. Custom media/Canvas must implement onExport and onLeave behavior.
-The default API does not magically convert WebGL into vector PDF.
-
-### Geometry helpers
-
-`grid` computes rectangles; `position` emits CSS bounds; `port` and `connector`
-calculate orthogonal endpoints; `scaleLinear` maps finite data; `contrast` computes
-opaque color contrast; `checkBounds` flags invalid rectangles. They are useful
-primitives, not an automatic layout optimizer or a visual quality scorer.
-
-`craft.mjs build` refuses to overwrite an existing `--out`; pass `--force` when
-rebuilding the same file intentionally. Run `craft.mjs validate` for schema and script parsing, `editorial.py` for story
-checks, and `qa.py` for browser measurements. Inspect actual output after all three.
-
-### Layout helpers, review metadata, brand and notes
-
-`craft.mjs init` also copies `layout.mjs`. Its `allocate`, `dagLayers`, `labelRail`
-and `routeOrthogonal` helpers calculate geometry with explicit fit checks. They
-never select a story or certify a pleasing composition. For a complete derivation
-see `examples/constraint-layout/deck.mjs`; region dimensions and node relationships
-come from data, not a selected template.
-
-`data-region="title|primary|support|source"` and `data-space-intent` are invisible
-review metadata. They must not become visible captions. Custom slides may use
-`copyWaivers` for exact, necessary quoted production language; see
-[copy channels](writing-and-editing.md). `study:true` belongs to teaching examples only.
-
-A deck may include an approved `brand` object; the build validates it and supplies
-`--brand-*` CSS variables. A draft identity requires an explicit draft preview.
-Custom CSS can override identity, so token validation does not replace visual review.
-Use `craft.mjs build ... --strip-notes` for distributable HTML without speaker notes.
-

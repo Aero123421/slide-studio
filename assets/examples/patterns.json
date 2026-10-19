@@ -7,7 +7,7 @@
   "slides": [
     {
       "layout": "cover",
-      "kicker": "OPERATIONS / DECISION BRIEF",
+      "kicker": "運用チームからの提案",
       "title": "確認作業を減らし、\n判断に時間を使う。",
       "body": "月次レポート作成の改善案",
       "byline": "運用チーム / 2026年9月",
@@ -431,7 +431,7 @@
     },
     {
       "layout": "closing",
-      "kicker": "DECISION",
+      "kicker": "決めていただきたいこと",
       "title": "4週間の試行に、\n着手してよいか。",
       "body": "対象は1チーム。担当は運用チーム。\n月末に継続・修正・中止を判断する。",
       "notes": "この作例の数値・状況は架空。実務では検証した情報へ置き換える。"

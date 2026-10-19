@@ -1,88 +1,90 @@
-// Template: 四半期業績レビュー（QBR）· 商談ファネルとボトルネック. Synthetic example content; replace data and copy.
-// Stage counts for this and the previous quarter. Bar widths ∝ count; conversion rates, the bottleneck and its impact are derived.
-const P = 'tpl-qbr-funnel';
-const stages = [
-  {name: 'リード', now: 4820, prev: 4080},
-  {name: 'MQL', now: 1510, prev: 1300},
-  {name: '商談化', now: 620, prev: 624},
-  {name: '提案', now: 310, prev: 300},
-  {name: '受注', now: 96, prev: 98}
+// Template: 四半期業績レビュー（QBR）· 商談ファネル. Synthetic example content; replace data and copy.
+// Stage counts for this and last quarter. Bar lengths share one scale; conversion rates, the step that fell
+// most, and the counterfactual in the rail are all computed from `stages` and `newArr`.
+import { svgRoot, el, g, textLines, linear, fmt, measureText } from '../../runtime/figure.mjs';
+
+const ID = 'tpl-qbr-funnel';
+const periods = { now: '7–9月', prev: '4–6月' };
+const stages = [                         // 件数
+  { label: 'リード', rate: null, now: 4820, prev: 4080 },
+  { label: '商談', rate: '商談化率', now: 964, prev: 1061 },
+  { label: '提案', rate: '提案率', now: 405, prev: 435 },
+  { label: '受注', rate: '受注率', now: 117, prev: 124 },
 ];
-const newArr = 4.1;                                   // 億円, this quarter (matches KPI page)
-const conv = stages.slice(1).map((s, i) => ({from: stages[i].name, to: s.name, now: s.now / stages[i].now, prev: s.prev / stages[i].prev}));
-conv.forEach(c => { c.d = (c.now - c.prev) * 100; });
-const worst = conv.reduce((a, b) => (b.d < a.d ? b : a));
-const wi = conv.indexOf(worst);
-// Impact if the worst step had kept last quarter's rate; downstream rates held at this quarter's.
-const extraDeals = stages[wi].now * (worst.prev - worst.now);
-const downstream = stages.at(-1).now / stages[wi + 1].now;
-const extraWins = extraDeals * downstream;
-const acv = newArr * 1e4 / stages.at(-1).now;         // 万円 per win
-const extraArr = extraWins * acv / 1e4;               // 億円
+const newArr = { now: 380, plan: 450 };  // 新規ARR, 百万円 (same as page 2)
+const cause = { staffShort: 3, daysPrev: 2.1, daysNow: 4.6 };  // インサイドセールスの欠員（人）と初回接触までの平均日数
+const source = '出所：営業本部 SFA（2026年10月5日抽出）';
+const running = '2026年度 第2四半期 業績レビュー';
+const page = 4;
 
-const W = 704, H = 440, rowH = 88, bh = 44, top = 16, fx = 250, fmax = 330;
-const bar = v => v / stages[0].now * fmax;
-const yRow = i => top + i * rowH;
-const pct = v => `${(v * 100).toFixed(1)}%`;
-const rows = stages.map((s, i) => {
-  const w = Math.max(bar(s.now), 1.5), y0 = yRow(i);
-  const next = stages[i + 1];
-  const trap = next ? `<path d="M${fx - bar(s.now) / 2} ${y0 + bh} L${fx + bar(s.now) / 2} ${y0 + bh} L${fx + bar(next.now) / 2} ${yRow(i + 1)} L${fx - bar(next.now) / 2} ${yRow(i + 1)}Z" fill="${i === wi ? '#fbe0da' : '#e7edf7'}"/>` : '';
-  return `${trap}<rect x="${(fx - w / 2).toFixed(1)}" y="${y0}" width="${w.toFixed(1)}" height="${bh}" rx="3" fill="${i === stages.length - 1 ? '#2c64f0' : '#0d1b2e'}"/>
-    <text x="0" y="${y0 + 29}" class="q-sv-lab" style="font-size:17px;fill:#0f1c2d">${s.name}</text>
-    <text x="${fx + fmax / 2 + 92}" y="${y0 + 30}" text-anchor="end" style="font:700 22px var(--q-num);fill:#0f1c2d">${s.now.toLocaleString('ja-JP')}</text>
-    <text x="${fx + fmax / 2 + 92}" y="${y0 + 52}" text-anchor="end" class="q-sv-axis" style="font-size:15px">前期 ${s.prev.toLocaleString('ja-JP')}</text>`;
-}).join('');
-const cx0 = 552, cw = 148;
-const convs = conv.map((c, i) => {
-  const yc = yRow(i) + bh + (rowH - bh) / 2, bad = i === wi;
-  const col = bad ? '#ad311c' : c.d >= 0 ? '#0a7663' : '#3d4b62';
-  return `${bad ? `<rect x="${cx0 - 12}" y="${yc - 28}" width="${W - cx0 + 12}" height="56" rx="8" fill="#fbe0da"/>` : ''}
-    <text x="${cx0}" y="${yc - 6}" style="font:700 17px var(--q-num);fill:${col}">↓ ${pct(c.now)}</text>
-    <text x="${W - 4}" y="${yc - 6}" text-anchor="end" style="font:600 15px var(--q-num);fill:${col}">${c.d >= 0 ? '+' : '−'}${Math.abs(c.d).toFixed(1)}pt</text>
-    <rect x="${cx0}" y="${yc + 6}" width="${cw}" height="7" rx="3.5" fill="#e4e9f0"/>
-    <rect x="${cx0}" y="${yc + 6}" width="${(c.now * cw).toFixed(1)}" height="7" rx="3.5" fill="${bad ? '#e2553d' : '#2c64f0'}"/>
-    <line x1="${(cx0 + c.prev * cw).toFixed(1)}" x2="${(cx0 + c.prev * cw).toFixed(1)}" y1="${yc + 1}" y2="${yc + 18}" stroke="#0d1b2e" stroke-width="2"/>`;
-}).join('');
+// ---- derived
+const steps = stages.slice(1).map((s, i) => ({ ...s, from: stages[i], cNow: s.now / stages[i].now, cPrev: s.prev / stages[i].prev }));
+steps.forEach(st => { st.d = (st.cNow - st.cPrev) * 100; });
+const worst = steps.reduce((a, b) => (b.d < a.d ? b : a));
+const wi = steps.indexOf(worst);
+// Counterfactual: the worst step at last quarter's rate, every other step at this quarter's rate.
+let count = stages[0].now;
+steps.forEach((st, i) => { count *= i === wi ? st.cPrev : st.cNow; });
+const acv = newArr.now / stages.at(-1).now;          // 百万円 per deal
+const extraDeals = Math.round(count - stages.at(-1).now);
+const altArr = Math.round(count * acv);
+const pct1 = v => fmt(v * 100, { digits: 1 });
+const growth = v => fmt(v, { digits: 0, sign: true });
+const leadGrowth = (stages[0].now / stages[0].prev - 1) * 100;
+const winChange = stages.at(-1).now - stages.at(-1).prev;
 
-const dialMini = `<svg viewBox="0 0 40 40" role="img" aria-labelledby="${P}-dial"><title id="${P}-dial">四半期ダイヤル：第2四半期（7〜9月）</title>${[1, 2, 3, 4].map(k => {
-  const a0 = -Math.PI / 2 + (k - 1) * Math.PI / 2 + 0.08, a1 = a0 + Math.PI / 2 - 0.16, p = (r, a) => `${(20 + r * Math.cos(a)).toFixed(2)} ${(20 + r * Math.sin(a)).toFixed(2)}`;
-  const d = `M${p(19, a0)} A19 19 0 0 1 ${p(19, a1)} L${p(11, a1)} A11 11 0 0 0 ${p(11, a0)}Z`;
-  return k === 1 ? `<path d="${d}" fill="#3b5480"/>` : k === 2 ? `<path d="${d}" fill="#2c64f0"/>` : `<path d="${d}" fill="none" stroke="#3b5480" stroke-width="1.2"/>`;
-}).join('')}</svg>`;
+// ---- figure: 8 columns × 432 px. Stage rows carry bars; the rows between them carry the conversion step.
+const W = 760, H = 432, labelW = 88, barX = 96, barMax = 440, barH = 30, rowGap = 112, y0 = 22;
+const sx = linear([0, Math.max(...stages.flatMap(s => [s.now, s.prev]))], [0, barMax]);
+const rowY = i => y0 + i * rowGap;
+const ja0 = v => fmt(v, { locale: 'ja', digits: 0 });
+const stageRows = stages.map((s, i) => {
+  const yy = rowY(i), wNow = Math.max(2, sx(s.now)), xPrev = barX + sx(s.prev), end = Math.max(barX + wNow, xPrev);
+  const valueW = measureText(ja0(s.now), 22, { weight: 700 });
+  return g({},
+    textLines([s.label], { x: 0, y: yy + barH / 2, size: 20, valign: 'middle', weight: 700, fill: 'var(--ink)' }),
+    el('rect', { x: barX, y: yy, width: wNow, height: barH, fill: 'var(--ink)' }),
+    el('line', { x1: xPrev, x2: xPrev, y1: yy - 6, y2: yy + barH + 6, stroke: 'var(--context)', 'stroke-width': 2 }),
+    textLines([ja0(s.now)], { x: end + 14, y: yy + barH / 2, size: 22, valign: 'middle', weight: 700, fill: 'var(--ink)' }),
+    textLines([`前期 ${ja0(s.prev)}`], { x: end + 14 + valueW + 14, y: yy + barH / 2, size: 16, valign: 'middle', fill: 'var(--muted)' }));
+}).join('');
+const stepRows = steps.map((st, i) => {
+  const yy = rowY(i) + barH + (rowGap - barH) / 2, hot = i === wi, c = hot ? 'var(--navy)' : 'var(--muted)';
+  const t1 = `${st.rate} ${pct1(st.cNow)}%`, t1w = measureText(t1, 20, { weight: hot ? 700 : 400 });
+  const t2 = `前期 ${pct1(st.cPrev)}%`, t2w = measureText(t2, 16);
+  return g({},
+    el('path', { d: `M${barX + 6} ${rowY(i) + barH + 8}V${rowY(i + 1) - 8}M${barX + 1} ${rowY(i + 1) - 14}L${barX + 6} ${rowY(i + 1) - 8}L${barX + 11} ${rowY(i + 1) - 14}`, fill: 'none', stroke: hot ? 'var(--navy)' : 'var(--context)', 'stroke-width': hot ? 2 : 1.5, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }),
+    textLines([t1], { x: barX + 24, y: yy, size: 20, valign: 'middle', weight: hot ? 700 : null, fill: hot ? 'var(--navy)' : 'var(--ink)' }),
+    textLines([t2], { x: barX + 24 + t1w + 14, y: yy, size: 16, valign: 'middle', fill: 'var(--muted)' }),
+    textLines([`${fmt(st.d, { digits: 1, sign: true })}pt`], { x: barX + 24 + t1w + 14 + t2w + 14, y: yy, size: hot ? 20 : 16, valign: 'middle', weight: hot ? 700 : null, fill: c }));
+}).join('');
+const figure = svgRoot({
+  id: `${ID}-fig`, width: W, height: H,
+  title: `商談ファネルの件数と段階間の転換率（${periods.now}と${periods.prev}）`,
+  desc: `${stages.map(s => `${s.label}${ja0(s.now)}件（前期${ja0(s.prev)}件）`).join('、')}。${steps.map(st => `${st.rate}${pct1(st.cNow)}%（前期${pct1(st.cPrev)}%）`).join('、')}。最も下がったのは${worst.rate}。`,
+}, stageRows, stepRows,
+textLines([`棒：${periods.now}　縦線：${periods.prev}`], { x: W, y: H - 4, size: 15, anchor: 'end', fill: 'var(--muted)' }));
 
 export default {
   study: true,
-  id: 'tpl-qbr-funnel',
-  title: '商談ファネルとボトルネック',
+  id: ID,
   language: 'ja',
-  notes: 'Purpose: 獲得ファネルの各段階の件数と転換率を前期と比べ、最も悪化した段階とその影響額を示す。\nModify: stages に今期・前期の件数を入れる。転換率、ボトルネック（前期差が最も悪い段階）、影響額は自動計算。\nInvariant: 棒の幅は件数に比例（受注が細いのは実際に少ないため）。影響額は「その段階だけ前期の転換率だった場合」の仮定で、下流の転換率は今期値を使う。\nStatic: Already static.',
+  title: 'Sales funnel: where conversion fell',
+  notes: `Purpose: リードから受注までの各段階を前期と比べ、どの段階で取りこぼしたかを1か所に絞って示す。右欄で「その段階が前期並みならどうだったか」を金額にする。\nModify: stages（段階名・転換率の呼び名・今期と前期の件数）と newArr（今期実績と計画、2ページと同じ値）を書き換える。最も悪化した段階、その強調、右欄の受注件数と新規ARRの試算、見出しの数値は自動。cause と右欄の要因の文は実際の調査結果に合わせる。\nInvariant: 棒の長さは件数に比例し、全段階で同じ目盛り（受注の棒が短いのは実際に少ないから）。強調は1段階だけ。試算は「その段階だけ前期の転換率、他は今期の転換率、平均受注額は今期」という前提を右欄に書く。\nStatic: Already static.`,
   sources: [],
   exportPolicy: 'final',
   className: 'tpl-qbr q-funnel',
-  content: `<div class="q-wrap">
-  <div class="q-rail">${dialMini}<p class="q-sec">営業ファネル</p><p class="q-pg"><b>04</b>/ 06</p></div>
-  <div class="q-top"><span>FY2026 Q2 業績レビュー ・ ハルニレ・クラウド</span><span class="q-chip"><i></i>前期（4–6月）比</span></div>
-  <h1 class="q-title" data-region="title">リードは前期比+${((stages[0].now / stages[0].prev - 1) * 100).toFixed(0)}%でも、<em class="q-neg">${worst.from}から${worst.to}への転換</em>で取りこぼしている</h1>
-  <p class="q-sub" data-region="support">${worst.from}→${worst.to}の転換率は ${pct(worst.prev)} → ${pct(worst.now)}。他の段階は前期並みを保った。</p>
-  <div class="q-card q-fn" data-region="primary">
-    <svg viewBox="0 0 ${W} ${H}" role="img" aria-labelledby="${P}-t ${P}-d">
-      <title id="${P}-t">今期の商談ファネル（件数）と段階間の転換率</title>
-      <desc id="${P}-d">${stages.map(s => `${s.name} ${s.now}件`).join('、')}。転換率は ${conv.map(c => `${c.from}→${c.to} ${pct(c.now)}（前期 ${pct(c.prev)}）`).join('、')}。</desc>
-      ${rows}${convs}
-    </svg>
+  content: `<h1 class="q-head" data-region="title">リードは前期より<span class="nw">${growth(leadGrowth).replace('+', '')}%</span>増えたが、<span class="nw">${worst.rate}が${pct1(worst.cPrev)}%から${pct1(worst.cNow)}%に下がり、</span>受注は<span class="nw">${-winChange}件</span>減った</h1>
+<figure class="g" style="--c:1;--s:8;top:200px;margin:0" data-region="primary">${figure}</figure>
+<div class="q-rail g" style="--c:9;--s:4;top:200px" data-region="support">
+  <div>
+    <p class="q-label">${worst.rate}が前期並みだった場合の新規ARR</p>
+    <p class="q-fig">${ja0(altArr)}<span class="unit">百万円</span></p>
+    <p class="q-body">受注は<span class="nw">${extraDeals}件</span>多く、計画の<span class="nw">${newArr.plan}百万円</span>を上回っていた計算になる。</p>
   </div>
-  <aside class="q-fx" data-region="support">
-    <p class="q-lab">ボトルネック</p>
-    <h3>${worst.from}→${worst.to}の転換率が<br>前期の水準を保っていれば</h3>
-    <div class="q-rate"><strong>+${extraArr.toFixed(2)}</strong><span>億円の新規ARR<br>（今期実績 ${newArr}億円）</span></div>
-    <ol>
-      <li>${worst.to}の増加<b>+${Math.round(extraDeals)}件</b></li>
-      <li>受注の増加（×${pct(downstream)}）<b>+${Math.round(extraWins)}件</b></li>
-      <li>平均受注額<b>${Math.round(acv)}万円</b></li>
-      <li>新規ARRへの影響<b>+${extraArr.toFixed(2)}億円</b></li>
-    </ol>
-  </aside>
-  <p class="q-source" data-region="source">例示データ · 右列の縦線は前期の転換率、棒の幅は件数に比例</p>
-</div>`
+  <div>
+    <p class="q-body">インサイドセールスの欠員${cause.staffShort}名で、初回接触までの日数が平均<span class="nw">${cause.daysPrev}日</span>から<span class="nw">${cause.daysNow}日</span>に延びた。</p>
+  </div>
+</div>
+<p class="q-foot" data-region="source"><span>${source}　試算は他の転換率と平均受注額を今期の値に固定</span><span class="num">${running}　${page}</span></p>`,
 };

@@ -1,6 +1,51 @@
 # Changelog
 
-## Unreleased
+## 4.0.0 — 2026-10-19
+
+A rebuild of the craft layer: the agent now draws evidence with an engine, composes on
+a page grammar with role-based color, moves only to explain, and reviews against a
+stricter definition of the machine-made look. Every library page was remade as a
+finished example with computed headlines.
+
+- **Figure engine** (`assets/runtime/figure.mjs` + `fig-core/stats/charts/stats-charts/diagrams/patterns.mjs`):
+  45 chart and diagram types from data; nice scales, measured labels, CJK phrase
+  wrapping with kinsoku, callouts kept inside the frame, validated waterfall totals,
+  layered flow layout with collision checks, statistics (OLS band, KDE, ECDF, ROC/PR/AUC,
+  calibration), seeded textures and contour/vector fields. Themes through `--ss-*`
+  CSS tokens or literal color-system JSON; standalone SVG export. Derived label sizes
+  never drop below 15 px. `references/figures.md` documents the API.
+- **Player 4** (`assets/runtime/player.js`, rewritten readably): presets `draw`, `count`,
+  `grow-x`, `grow-y`, `blur`, `zoom`, `rise`, `wipe-up`; `data-delay`, `data-stagger`,
+  `data-easing`; `data-states` transformations committed synchronously with a removable
+  animation layer; deck/slide transitions (`fade`, `rise`, `push`, `zoom`); presenter
+  window with next build, notes and timer; black screen, shortcut sheet, number jump,
+  swipe, idle-hiding fullscreen controls. 12 UI languages.
+- **Page grammar** (`assets/runtime/study-frame.css`, `st-*`) and **color systems as CSS**
+  (`cs-<id>` classes generated into `assets/color-systems/color-systems.css`).
+- **Libraries rebuilt** as finished pages with specific fictional content: 104 diagram
+  studies (each also a standalone SVG), 64 motion studies, 24 interactions, 36
+  compositions, 12 template packs (72 pages, redesigned from scratch with their own art
+  direction), and the worked example decks (research narrative, from-scratch derivation,
+  constraint layout, ten languages, image handling, repair lab, period comparison,
+  transfer talk, brand proof).
+- **Machine-made look**: `slop_check.py` reads computed styles in HTML decks — tiled
+  dot/grid backgrounds, glows and blurs, gradient text, frosted glass, shadowed cards,
+  letter-spaced caps labels, separator chains, emoji, chips, giant faded numerals,
+  stacked letters, a colored headline phrase that matches no mark, ▲ used for
+  increases in Japanese. SKILL.md and `references/visual-design.md` ("Identity without
+  ornament") say what to do instead.
+- **Tooling**: `craft.mjs init` copies the engine, theme and a computed starter deck;
+  `catalog.mjs take` copies a study with its dependencies, trimmed CSS, media and SVG
+  twin; `preview.mjs` (with `--css`); `contact-sheet.py` (craft and structured decks,
+  `--steps`, `--frames`); `build-studies.mjs` (CSS bundles incl. compositions,
+  standalone SVGs, `--css-only`); `build-thumbs.py`; a searchable visual gallery index.
+- Structured route: localized kickers in the bundled Japanese examples, 15 px chrome,
+  a sample label in the deck language, no faded section numeral.
+- Tests: figure-engine suite (every chart renders a finite, accessible SVG with unique
+  ids), HTML style-signal test for `slop_check.py`.
+
+### Also in 4.0 (prepared after 3.4)
+
 
 - 37 role-based color systems (`assets/color-systems/`, `gallery/color-systems.html`)
   for business, public sector, research, engineering, education and expressive/cultural

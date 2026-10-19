@@ -1,74 +1,89 @@
-/* tpl-editorial — high-contrast magazine: ink/ivory, one vermilion accent, serif display, fine-line engraving. All rules scoped. */
-.tpl-editorial{--ed-ink:#15120F;--ed-paper:#F3EDE2;--ed-paper-2:#EAE2D3;--ed-dark:#17110D;--ed-cream:#F1E6D2;--ed-crema:#D4A064;--ed-red:#B3361C;--ed-red-lt:#E36A4C;--ed-muted:#5B5249;--ed-muted-lt:#B9AD9C;--ed-rule:#CFC4B2;
-  --ed-serif:"Georgia","Liberation Serif","Times New Roman",serif;
-  --ed-sans:"Inter","Helvetica Neue","Segoe UI","Liberation Sans",Arial,sans-serif}
-.tpl-editorial .ed{position:absolute;inset:0;background:var(--ed-paper);color:var(--ed-ink);font-family:var(--ed-serif);overflow:hidden}
-.tpl-editorial .ed.is-dark{background:var(--ed-dark);color:var(--ed-cream)}
-.tpl-editorial .ed-abs{position:absolute}
-.tpl-editorial .ed-art{position:absolute;pointer-events:none}
-.tpl-editorial .ed-art svg,.tpl-editorial .ed-fig svg{display:block;width:100%;height:100%}
-.tpl-editorial .ed-fig{position:absolute}
-/* masthead + folio */
-.tpl-editorial .ed-mast{position:absolute;left:64px;right:64px;top:34px;display:flex;justify-content:space-between;align-items:baseline;padding-bottom:10px;border-bottom:1px solid currentColor;font:600 15px/1.2 var(--ed-sans);letter-spacing:.22em;text-transform:uppercase}
-.tpl-editorial .ed-mast b{font:700 italic 22px/1 var(--ed-serif);letter-spacing:.02em;text-transform:none}
-.tpl-editorial .ed-folio{position:absolute;left:64px;right:64px;bottom:26px;display:flex;justify-content:space-between;font:500 15px/1.3 var(--ed-sans);letter-spacing:.14em;text-transform:uppercase;color:var(--ed-muted)}
-.tpl-editorial .is-dark .ed-folio{color:var(--ed-muted-lt)}
-.tpl-editorial .ed-kicker{font:700 15px/1.3 var(--ed-sans);letter-spacing:.24em;text-transform:uppercase;color:var(--ed-red)}
-.tpl-editorial .is-dark .ed-kicker{color:var(--ed-red-lt)}
-.tpl-editorial .ed-src{position:absolute;font:400 15px/1.4 var(--ed-sans);color:var(--ed-muted)}
-/* 01 opener */
-.tpl-editorial .ed-the{display:block;margin:0 0 6px 10px;font:italic 400 60px/1 var(--ed-serif);letter-spacing:0;color:var(--ed-red-lt)}
-.tpl-editorial .ed-title{position:absolute;left:58px;top:112px;width:720px;font:400 208px/.9 var(--ed-serif);letter-spacing:-.035em;color:var(--ed-cream)}
-.tpl-editorial .ed-title i{display:block;font-style:italic;letter-spacing:-.03em}
-.tpl-editorial .ed-foot1{position:absolute;left:66px;bottom:28px;width:620px}
-.tpl-editorial .ed-dek{width:540px;font:400 21px/1.5 var(--ed-serif);color:var(--ed-cream)}
-.tpl-editorial .ed-by{margin-top:16px;font:600 15px/1.3 var(--ed-sans);letter-spacing:.16em;text-transform:uppercase;color:var(--ed-muted-lt)}
-/* 02 image spread */
-.tpl-editorial .ed-photo{position:absolute;left:64px;top:84px;width:648px;height:432px;overflow:hidden;background:#2A1A12}
-.tpl-editorial .ed-photo img{display:block;width:100%;height:100%;object-fit:cover;filter:saturate(.92) contrast(1.04)}
-.tpl-editorial .ed-cap{position:absolute;left:64px;top:532px;width:648px;font:italic 400 19px/1.5 var(--ed-serif);color:var(--ed-ink)}
-.tpl-editorial .ed-cap b{font:700 15px/1 var(--ed-sans);font-style:normal;letter-spacing:.18em;text-transform:uppercase;color:var(--ed-red);margin-right:10px}
-.tpl-editorial .ed-credit{position:absolute;left:64px;top:572px;font:400 15px/1.4 var(--ed-sans);color:var(--ed-muted)}
-.tpl-editorial .ed-vrule{position:absolute;top:84px;width:1px;height:560px;background:var(--ed-rule)}
-.tpl-editorial .ed-col{position:absolute;left:776px;top:84px;width:440px}
-.tpl-editorial .ed-col h1{margin:14px 0 22px;font:400 50px/1.08 var(--ed-serif);letter-spacing:-.015em}
-.tpl-editorial .ed-col h1 i{color:var(--ed-red)}
-.tpl-editorial .ed-body{font:400 20px/1.65 var(--ed-serif);color:var(--ed-ink);text-align:left;hyphens:auto}
-.tpl-editorial .ed-body::first-letter{float:left;font:400 92px/.8 var(--ed-serif);margin:8px 10px 0 -2px;color:var(--ed-red)}
-/* 03 pull quote */
-.tpl-editorial .ed.is-quote{background:var(--ed-paper-2)}
-.tpl-editorial .ed-side{position:absolute;left:64px;top:190px;width:276px}
-.tpl-editorial .ed-side p:not(.ed-kicker){margin-top:14px;font:400 18px/1.6 var(--ed-serif);color:var(--ed-muted)}
-.tpl-editorial .ed-qwrap{position:absolute;left:420px;top:232px;width:796px}
-.tpl-editorial .ed-quote{margin:0;font:italic 400 62px/1.14 var(--ed-serif);letter-spacing:-.012em;color:var(--ed-ink)}
-.tpl-editorial .ed-quote em{font-style:normal;color:var(--ed-red)}
-.tpl-editorial .ed-attr{margin-top:44px;padding-top:16px;border-top:2px solid var(--ed-ink);font:600 15px/1.4 var(--ed-sans);letter-spacing:.16em;text-transform:uppercase;color:var(--ed-muted)}
-/* 04 timeline */
-.tpl-editorial .ed-h{position:absolute;left:64px;top:84px;width:1152px;font:400 46px/1.1 var(--ed-serif);letter-spacing:-.015em}
-.tpl-editorial .ed-h i{color:var(--ed-red)}
-.tpl-editorial .ed-lede{position:absolute;left:64px;top:146px;width:860px;font:400 20px/1.5 var(--ed-serif);color:var(--ed-muted)}
-.tpl-editorial .ed-svg-name{font:700 15px var(--ed-sans);letter-spacing:.12em;text-transform:uppercase;fill:var(--ed-ink)}
-.tpl-editorial .ed-svg-val{font:italic 400 20px var(--ed-serif);fill:var(--ed-ink)}
-.tpl-editorial .ed-svg-axis{font:500 15px var(--ed-sans);fill:var(--ed-muted)}
-.tpl-editorial .ed-svg-note{font:italic 400 18px var(--ed-serif);fill:var(--ed-red)}
-/* 05 numbers spread */
-.tpl-editorial .ed-left{position:absolute;left:0;top:0;width:640px;height:720px;background:var(--ed-dark);color:var(--ed-cream)}
-.tpl-editorial .ed-gutter{position:absolute;left:600px;top:0;width:80px;height:720px;background:linear-gradient(90deg,rgba(0,0,0,0) 0,rgba(0,0,0,.28) 48%,rgba(0,0,0,.10) 52%,rgba(0,0,0,0) 100%);pointer-events:none}
-.tpl-editorial .ed-big{font:400 330px/.8 var(--ed-serif);letter-spacing:-.05em}
-.tpl-editorial .ed-mid{font:400 150px/.85 var(--ed-serif);letter-spacing:-.04em}
-.tpl-editorial .ed-unit{font:italic 400 44px/1 var(--ed-serif);letter-spacing:0;margin-left:10px}
-.tpl-editorial .ed-mid .ed-unit{font-size:40px}
-.tpl-editorial .ed-numcap{font:400 20px/1.45 var(--ed-serif)}
-.tpl-editorial .ed-left .ed-numcap{color:var(--ed-cream)}
-.tpl-editorial .ed-derived{position:absolute;left:720px;top:560px;width:496px;display:flex;gap:40px;border-top:1px solid var(--ed-ink);padding-top:14px}
-.tpl-editorial .ed-derived div{font:italic 400 34px/1.1 var(--ed-serif)}
-.tpl-editorial .ed-derived small{display:block;margin-top:6px;font:600 15px/1.3 var(--ed-sans);font-style:normal;letter-spacing:.14em;text-transform:uppercase;color:var(--ed-muted)}
-/* 06 closing */
-.tpl-editorial .ed-closewrap{position:absolute;left:640px;top:180px;width:576px}
-.tpl-editorial .ed-close{font:italic 400 96px/1 var(--ed-serif);letter-spacing:-.03em}
-.tpl-editorial .ed-close em{font-style:normal;color:var(--ed-red)}
-.tpl-editorial .ed-next{margin:44px 0 0 4px;width:520px;font:400 21px/1.55 var(--ed-serif)}
-.tpl-editorial .ed-next b{display:block;margin-bottom:8px;font:700 15px/1.3 var(--ed-sans);letter-spacing:.2em;text-transform:uppercase;color:var(--ed-red)}
-.tpl-editorial .ed-end{display:inline-block;width:14px;height:14px;background:var(--ed-red);margin-left:10px;vertical-align:baseline}
-.tpl-editorial .ed-colophon{position:absolute;left:644px;bottom:44px;width:572px;padding-top:12px;border-top:1px solid var(--ed-rule);font:400 15px/1.5 var(--ed-sans);color:var(--ed-muted)}
-.tpl-editorial .ed-cont{margin-top:26px;padding-top:10px;border-top:1px solid var(--ed-rule);font:italic 400 17px/1.4 var(--ed-serif);color:var(--ed-muted)}
+/* Quire — a literary-magazine feature set as slides ("Twenty-eight seconds").
+   Grid: 1280×720, margins 88, 12 columns of 70 px, 24 px gutters (column k starts at
+   88 + 94(k−1); n columns span 94n − 24). Text column = 6 columns (540 px). Top margin 72;
+   folio line ends at 680.
+   Type scale (px): Display 112 · Quote 52/64 · Headline 40/48 · Lead 26/38 · Body 21/32 ·
+   Caption 16/22 · Note 15/20. Serif for display and text, a small sans for captions only.
+   Color: paper, ink, one grey, rust for small marks (drop cap, end mark, quote marks, the pour);
+   espresso for the one dark page. */
+.tpl-editorial{
+  --ed-paper:#F5F1EA;--ed-ink:#1B1815;--ed-grey:#6A635A;--ed-rule:#D3CABD;--ed-tint:#DED5C8;--ed-rust:#A0461F;
+  --ed-dark:#1E1A17;--ed-dark-ink:#EFE8DD;--ed-dark-grey:#A99F92;--ed-dark-rust:#D9895F;
+  --ed-serif:"Charter","Bitstream Charter","Iowan Old Style",Georgia,serif;
+  --ed-sans:"Inter","Helvetica Neue",Arial,sans-serif;
+  /* figure-engine tokens */
+  --ss-paper:var(--ed-paper);--ss-surface:var(--ed-tint);--ss-ink:var(--ed-ink);--ss-muted:var(--ed-grey);
+  --ss-rule:var(--ed-rule);--ss-grid:#E6DFD4;--ss-accent:var(--ed-rust);--ss-on-accent:#FFFFFF;
+  --ss-positive:#3F6B4E;--ss-negative:var(--ed-rust);--ss-highlight:var(--ed-rust);--ss-context:#BDB3A5;
+  --ss-font-sans:var(--ed-sans);--ss-font-serif:var(--ed-serif);
+  --ss-font-mono:"SFMono-Regular",Menlo,Consolas,"DejaVu Sans Mono",monospace;
+  --ss-cat-1:#A0461F;--ss-cat-2:#1B1815;--ss-cat-3:#7A7166;--ss-cat-4:#BDB3A5;--ss-cat-5:#5E3A24;--ss-cat-6:#DED5C8;
+  --ss-seq-1:#F2E6DC;--ss-seq-2:#E5CBB6;--ss-seq-3:#D3A688;--ss-seq-4:#BE7C59;--ss-seq-5:#A0461F;--ss-seq-6:#7A3417;--ss-seq-7:#52230F;
+  --ss-div-1:#A0461F;--ss-div-2:#C98A68;--ss-div-3:#E8CDBB;--ss-div-4:#F1ECE4;--ss-div-5:#CFC7BB;--ss-div-6:#91887C;--ss-div-7:#4E4840;
+  background:var(--ed-paper);color:var(--ed-ink);font:400 21px/32px var(--ed-serif);
+  font-kerning:normal;-webkit-font-smoothing:antialiased;
+}
+.tpl-editorial svg{display:block;overflow:visible}
+
+/* ---- furniture: one folio line; none on the opener ---- */
+.tpl-editorial .ed-folio{position:absolute;left:88px;right:88px;bottom:40px;display:flex;justify-content:space-between;
+  font:400 15px/20px var(--ed-sans);color:var(--ed-grey);font-variant-numeric:tabular-nums}
+
+/* ---- type roles ---- */
+.tpl-editorial .ed-head{font:400 40px/48px var(--ed-serif);letter-spacing:-.01em;text-wrap:balance}
+.tpl-editorial .ed-lead{font:400 26px/38px var(--ed-serif);text-wrap:pretty}
+.tpl-editorial .ed-body{font:400 21px/32px var(--ed-serif);hanging-punctuation:first;text-wrap:pretty}
+.tpl-editorial .ed-cap{font:400 16px/22px var(--ed-sans);color:var(--ed-grey);text-wrap:pretty}
+.tpl-editorial .ed-note{font:400 15px/20px var(--ed-sans);color:var(--ed-grey)}
+.tpl-editorial .ed-dept{font:400 16px/22px var(--ed-sans);color:var(--ed-grey)}
+
+/* ---- 01 opener: title in a sink, dek and byline under it ---- */
+.tpl-editorial .ed-title{position:absolute;left:82px;top:236px;width:1104px;font:400 112px/112px var(--ed-serif);letter-spacing:-.022em}
+.tpl-editorial .ed-dek{position:absolute;left:558px;top:488px;width:540px}
+.tpl-editorial .ed-byline{position:absolute;left:558px;top:600px;font:600 16px/22px var(--ed-sans)}
+.tpl-editorial .ed-byline span{font-weight:400;color:var(--ed-grey)}
+
+/* ---- 02 spread: photograph anchored to the top-right corner, essay column with a drop cap ---- */
+.tpl-editorial .ed-photo{position:absolute;left:652px;top:0;width:628px;height:419px;margin:0}
+.tpl-editorial .ed-photo img{display:block;width:628px;height:419px;object-fit:cover}
+.tpl-editorial .ed-photo figcaption{position:absolute;left:0;top:443px;width:446px}
+.tpl-editorial .ed-column{position:absolute;left:88px;top:72px;width:540px}
+.tpl-editorial .ed-column p+p{text-indent:1.4em}
+.tpl-editorial .ed-drop::first-letter{float:left;font:400 107px/88px var(--ed-serif);color:var(--ed-rust);margin:7px 10px 0 -3px}
+@supports (initial-letter:3) or (-webkit-initial-letter:3){
+  .tpl-editorial .ed-drop::first-letter{float:none;font:inherit;margin:0 .1em 0 0;-webkit-initial-letter:3;initial-letter:3;color:var(--ed-rust)}
+}
+
+/* ---- 03 quote: the dark page ---- */
+.tpl-editorial.ed-dark{background:var(--ed-dark);color:var(--ed-dark-ink)}
+.tpl-editorial.ed-dark .ed-folio{color:var(--ed-dark-grey)}
+.tpl-editorial .ed-quote{position:absolute;left:182px;top:208px;width:916px;font:400 52px/64px var(--ed-serif);
+  letter-spacing:-.01em;text-indent:-.42em;text-wrap:balance}
+.tpl-editorial .ed-quote .q{color:var(--ed-dark-rust)}
+.tpl-editorial .ed-quote-src{position:absolute;left:182px;top:472px;font:400 16px/22px var(--ed-sans);color:var(--ed-dark-grey)}
+
+/* ---- 04 timeline ---- */
+.tpl-editorial .ed-tl-head{position:absolute;left:88px;top:72px;width:916px}
+.tpl-editorial .ed-tl-fig{position:absolute;left:88px;top:212px;width:1104px;height:330px;margin:0}
+.tpl-editorial .ed-tl-note{position:absolute;left:276px;top:560px;width:728px}
+.tpl-editorial .ed-tl-note .ed-note{margin-top:8px}
+
+/* ---- 05 numbers: the recipe as a typographic table ---- */
+.tpl-editorial .ed-num-head{position:absolute;left:88px;top:72px;width:446px}
+.tpl-editorial .ed-num-intro{position:absolute;left:88px;top:296px;width:446px}
+.tpl-editorial .ed-recipe{position:absolute;left:652px;top:72px;width:540px;border-collapse:collapse}
+.tpl-editorial .ed-recipe td{vertical-align:top;padding:14px 0 15px;border-bottom:1px solid var(--ed-rule)}
+.tpl-editorial .ed-recipe tr:first-child td{padding-top:0}
+.tpl-editorial .ed-recipe td.n{width:196px;padding-right:24px;text-align:right;white-space:nowrap;
+  font:400 56px/60px var(--ed-serif);letter-spacing:-.02em;font-variant-numeric:lining-nums tabular-nums}
+.tpl-editorial .ed-recipe td.n small{font-size:26px;letter-spacing:0;margin-left:.12em}
+.tpl-editorial .ed-recipe td b{display:block;font:600 16px/22px var(--ed-sans);margin-bottom:2px}
+.tpl-editorial .ed-recipe td p{font:400 18px/26px var(--ed-serif);color:var(--ed-ink)}
+
+/* ---- 06 closing: last paragraph, end mark, author note, credits ---- */
+.tpl-editorial .ed-close{position:absolute;left:88px;top:120px;width:728px}
+.tpl-editorial .ed-end{display:inline-block;width:.42em;height:.42em;margin-left:.3em;background:var(--ed-rust);vertical-align:.02em}
+.tpl-editorial .ed-author{position:absolute;left:88px;top:420px;width:540px;font-style:italic;color:var(--ed-grey)}
+.tpl-editorial .ed-credits{position:absolute;left:88px;right:88px;top:532px;border-top:1px solid var(--ed-rule);padding-top:14px;
+  display:grid;grid-template-columns:352px 352px 352px;column-gap:24px}
+.tpl-editorial .ed-credits b{display:block;font-weight:600;color:var(--ed-ink)}

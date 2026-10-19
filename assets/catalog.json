@@ -8466,7 +8466,7 @@
       "title": "Give the evidence the larger region",
       "purpose": "Give the evidence the larger region",
       "source": "assets/compositions/composition-evidence-primary.mjs",
-      "css": "assets/compositions/advanced.css",
+      "css": "assets/compositions/study.css",
       "gallery": "gallery/compositions.html#composition-evidence-primary",
       "tags": [
         "compositions",
@@ -8485,7 +8485,7 @@
       "title": "Keep number, unit and scope together",
       "purpose": "Keep number, unit and scope together",
       "source": "assets/compositions/composition-number-and-unit.mjs",
-      "css": "assets/compositions/advanced.css",
+      "css": "assets/compositions/study.css",
       "gallery": "gallery/compositions.html#composition-number-and-unit",
       "tags": [
         "compositions",
@@ -8504,7 +8504,7 @@
       "title": "Align three small views without adding cards",
       "purpose": "Align three small views without adding cards",
       "source": "assets/compositions/composition-three-aligned-views.mjs",
-      "css": "assets/compositions/advanced.css",
+      "css": "assets/compositions/study.css",
       "gallery": "gallery/compositions.html#composition-three-aligned-views",
       "tags": [
         "compositions",
@@ -8524,7 +8524,7 @@
       "title": "Put the qualification where it applies",
       "purpose": "Put the qualification where it applies",
       "source": "assets/compositions/composition-exception-rail.mjs",
-      "css": "assets/compositions/advanced.css",
+      "css": "assets/compositions/study.css",
       "gallery": "gallery/compositions.html#composition-exception-rail",
       "tags": [
         "compositions",
@@ -8543,7 +8543,7 @@
       "title": "Write the question in natural Japanese",
       "purpose": "Write the question in natural Japanese",
       "source": "assets/compositions/composition-natural-japanese.mjs",
-      "css": "assets/compositions/advanced.css",
+      "css": "assets/compositions/study.css",
       "gallery": "gallery/compositions.html#composition-natural-japanese",
       "tags": [
         "compositions",
@@ -8562,7 +8562,7 @@
       "title": "Let structure and scope share the page",
       "purpose": "Let structure and scope share the page",
       "source": "assets/compositions/composition-mechanism-scope.mjs",
-      "css": "assets/compositions/advanced.css",
+      "css": "assets/compositions/study.css",
       "gallery": "gallery/compositions.html#composition-mechanism-scope",
       "tags": [
         "compositions",
@@ -8582,7 +8582,7 @@
       "title": "Build a continuous explanatory path",
       "purpose": "Build a continuous explanatory path",
       "source": "assets/compositions/composition-continuous-handoff.mjs",
-      "css": "assets/compositions/advanced.css",
+      "css": "assets/compositions/study.css",
       "gallery": "gallery/compositions.html#composition-continuous-handoff",
       "tags": [
         "compositions",
@@ -8600,7 +8600,7 @@
       "title": "Balance typography against a vertical motif",
       "purpose": "Balance typography against a vertical motif",
       "source": "assets/compositions/composition-portrait-mass.mjs",
-      "css": "assets/compositions/advanced.css",
+      "css": "assets/compositions/study.css",
       "gallery": "gallery/compositions.html#composition-portrait-mass",
       "tags": [
         "compositions",
@@ -8619,7 +8619,7 @@
       "title": "Give a wide comparison enough width",
       "purpose": "Give a wide comparison enough width",
       "source": "assets/compositions/composition-wide-information.mjs",
-      "css": "assets/compositions/advanced.css",
+      "css": "assets/compositions/study.css",
       "gallery": "gallery/compositions.html#composition-wide-information",
       "tags": [
         "compositions",
@@ -8638,7 +8638,7 @@
       "title": "Create a quiet page with an actual claim",
       "purpose": "Create a quiet page with an actual claim",
       "source": "assets/compositions/composition-quiet-result.mjs",
-      "css": "assets/compositions/advanced.css",
+      "css": "assets/compositions/study.css",
       "gallery": "gallery/compositions.html#composition-quiet-result",
       "tags": [
         "compositions",
@@ -8659,7 +8659,7 @@
       "title": "Use an asymmetric text-and-evidence relation",
       "purpose": "Use an asymmetric text-and-evidence relation",
       "source": "assets/compositions/composition-split-claim.mjs",
-      "css": "assets/compositions/advanced.css",
+      "css": "assets/compositions/study.css",
       "gallery": "gallery/compositions.html#composition-split-claim",
       "tags": [
         "compositions",
@@ -8677,7 +8677,7 @@
       "title": "Close with the test the evidence earns",
       "purpose": "Close with the test the evidence earns",
       "source": "assets/compositions/composition-closing-experiment.mjs",
-      "css": "assets/compositions/advanced.css",
+      "css": "assets/compositions/study.css",
       "gallery": "gallery/compositions.html#composition-closing-experiment",
       "tags": [
         "compositions",

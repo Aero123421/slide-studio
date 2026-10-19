@@ -11,3 +11,12 @@ test('craft build refuses to overwrite without --force and explains how',async()
  const build=extra=>run(['scripts/craft.mjs','build',path.join(project,'deck.mjs'),'--out',path.join(project,'deck.html'),'--allow-draft',...extra]);
  assert.equal(build([]).status,0);const again=build([]);assert.equal(again.status,1);assert.match(again.stderr,/already exists; pass --force/);assert.equal(build(['--force']).status,0);}finally{await fs.rm(dir,{recursive:true,force:true})}});
 test('native PPTX export keeps tool metadata out of speaker notes',async()=>{const src=await fs.readFile(path.join(ROOT,'scripts/export-pptx.mjs'),'utf8');const note=src.match(/const note=s=>[^\n]*/)[0];assert.doesNotMatch(note,/\[Export\]|motion flattened/)});
+test('catalog take copies a study or a whole template pack that builds on its own',async()=>{const dir=await fs.mkdtemp(path.join(os.tmpdir(),'ss-take-'));try{
+ const one=path.join(dir,'one');assert.equal(run(['scripts/catalog.mjs','take','forest-plot',one]).status,0);
+ for(const f of ['deck.mjs','PROVENANCE.md','assets/runtime/figure.mjs','assets/svg/forest-plot.mjs','assets/svg/study.css'])await fs.access(path.join(one,f));
+ assert.equal(run(['scripts/craft.mjs','build',path.join(one,'deck.mjs'),'--out',path.join(one,'deck.html'),'--allow-draft']).status,0);
+ const pack=path.join(dir,'pack');const r=run(['scripts/catalog.mjs','take','tpl-qbr',pack]);assert.equal(r.status,0,r.stderr);
+ assert.equal(JSON.parse(r.stdout).pages.length,6);await fs.access(path.join(pack,'assets/templates/tpl-qbr/pack.css'));
+ const b=run(['scripts/craft.mjs','build',path.join(pack,'deck.mjs'),'--out',path.join(pack,'deck.html'),'--allow-draft']);assert.equal(b.status,0,b.stderr);
+ const html=await fs.readFile(path.join(pack,'deck.html'),'utf8');assert.equal((html.match(/<section[^>]*class="[^"]*\bslide\b/g)||[]).length,6);
+}finally{await fs.rm(dir,{recursive:true,force:true})}});

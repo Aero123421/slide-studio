@@ -1,75 +1,81 @@
-// Template: 四半期業績レビュー（QBR）· KPIタイル（スパークライン付き）. Synthetic example content; replace data and copy.
-// Each KPI is one object: 8 quarters of history, the plan for this quarter and whether higher is better.
-const P = 'tpl-qbr-kpi-tiles';
-const quarters = ['24/Q3', '24/Q4', '25/Q1', '25/Q2', '25/Q3', '25/Q4', '26/Q1', '26/Q2'];
+// Template: 四半期業績レビュー（QBR）· 主要指標の一覧表. Synthetic example content; replace data and copy.
+// One ruled table: 実績・計画・計画比・前年同期比 and an 8-quarter line per KPI. Every ratio, the miss flag
+// and the headline are computed from `kpis`; nothing is typed twice.
+import { svgRoot, el, linear, pathFromPoints, fmt } from '../../runtime/figure.mjs';
+
+const ID = 'tpl-qbr-kpi-tiles';
+const quarters = ['2024年10–12月', '2025年1–3月', '2025年4–6月', '2025年7–9月', '2025年10–12月', '2026年1–3月', '2026年4–6月', '2026年7–9月'];
+// kind: 'amount' (百万円; ratios are growth rates in %) or 'rate' (%; ratios are differences in pt).
+// better: 'up' or 'down' (月次解約率 is better when lower). series = the 8 quarters above, this quarter last.
 const kpis = [
-  {name: '売上高', unit: '億円', dp: 1, s: [11.9, 12.6, 13.8, 14.8, 15.6, 16.4, 17.3, 18.4], plan: 18.0, better: 'up', kind: 'ratio'},
-  {name: '営業利益率', unit: '%', dp: 1, s: [7.2, 8.1, 9.4, 10.9, 11.3, 11.9, 12.2, 12.8], plan: 12.5, better: 'up', kind: 'pt'},
-  {name: 'ARR', unit: '億円', dp: 1, s: [48.2, 51.0, 54.3, 57.9, 61.6, 64.8, 67.9, 71.2], plan: 70.5, better: 'up', kind: 'ratio'},
-  {name: '新規ARR', unit: '億円', dp: 1, s: [3.2, 3.5, 3.9, 4.2, 4.6, 4.8, 4.3, 4.1], plan: 4.5, better: 'up', kind: 'ratio'},
-  {name: '月次解約率', unit: '%', dp: 2, s: [0.92, 0.88, 0.84, 0.80, 0.74, 0.70, 0.66, 0.62], plan: 0.65, better: 'down', kind: 'pt'},
-  {name: '売上継続率（NRR）', unit: '%', dp: 0, s: [104, 105, 107, 108, 109, 110, 111, 112], plan: 111, better: 'up', kind: 'pt'}
+  { name: '売上高', kind: 'amount', better: 'up', plan: 2030, series: [1191, 1299, 1411, 1534, 1665, 1803, 1941, 2078] },
+  { name: '営業利益', kind: 'amount', better: 'up', plan: 210, series: [88, 104, 121, 150, 162, 178, 196, 238] },
+  { name: 'ARR（期末）', kind: 'amount', better: 'up', plan: 8560, series: [4980, 5410, 5880, 6390, 6930, 7490, 8040, 8580] },
+  { name: '新規ARR', kind: 'amount', better: 'up', plan: 450, series: [300, 330, 362, 400, 418, 432, 402, 380] },
+  { name: '売上継続率（NRR）', kind: 'rate', digits: 1, better: 'up', plan: 111.0, series: [106.0, 107.0, 108.0, 109.0, 110.0, 110.0, 111.0, 112.0] },
+  { name: '月次解約率', kind: 'rate', digits: 2, better: 'down', plan: 0.65, series: [0.92, 0.88, 0.84, 0.80, 0.74, 0.70, 0.66, 0.62] },
 ];
+const source = '出所：経営企画部（2026年10月8日時点の速報値）';
+const running = '2026年度 第2四半期 業績レビュー';
+const page = 2;
 
-const tileW = (1100 - 2 * 20) / 3, sw = Math.round(tileW - 44), sh = 62;
-const fmt = (v, dp) => v.toFixed(dp);
-const delta = (k, ref) => {                      // returns {text, good}
-  const cur = k.s.at(-1);
-  const d = k.kind === 'ratio' ? (cur / ref - 1) * 100 : cur - ref;
-  const good = k.better === 'up' ? d >= 0 : d <= 0;
-  const sign = d > 0 ? '+' : d < 0 ? '−' : '±';
-  const text = k.kind === 'ratio' ? `${sign}${Math.abs(d).toFixed(1)}%` : `${sign}${Math.abs(d).toFixed(k.dp === 2 ? 2 : 1)}pt`;
-  return {text, good, arrow: d > 0 ? '▲' : d < 0 ? '▼' : '―'};
-};
-const spark = (k, i) => {
-  const min = Math.min(...k.s, k.plan), max = Math.max(...k.s, k.plan), pad = (max - min) * 0.14;
-  const x = j => 6 + j * (sw - 12) / (k.s.length - 1), y = v => sh - 8 - (v - min + pad) / (max - min + 2 * pad) * (sh - 16);
-  const line = k.s.map((v, j) => `${j ? 'L' : 'M'}${x(j).toFixed(1)} ${y(v).toFixed(1)}`).join('');
-  const good = delta(k, k.plan).good;
-  const c = good ? '#2c64f0' : '#e2553d';
-  const id = `${P}-g${i}`;
-  return `<svg viewBox="0 0 ${sw} ${sh}" style="width:${sw}px" role="img" aria-labelledby="${id}-t"><title id="${id}-t">${k.name}の8四半期推移（${quarters[0]}〜${quarters.at(-1)}）: ${k.s.map(v => fmt(v, k.dp)).join('、')}。今期計画 ${fmt(k.plan, k.dp)}</title>
-    <defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c}" stop-opacity=".22"/><stop offset="1" stop-color="${c}" stop-opacity="0"/></linearGradient></defs>
-    <path d="${line}L${x(k.s.length - 1).toFixed(1)} ${sh}L${x(0)} ${sh}Z" fill="url(#${id})"/>
-    <line x1="${x(k.s.length - 2).toFixed(1)}" x2="${(sw - 2).toFixed(1)}" y1="${y(k.plan).toFixed(1)}" y2="${y(k.plan).toFixed(1)}" stroke="#0d1b2e" stroke-width="1.4" stroke-dasharray="3 3"/>
-    <path d="${line}" fill="none" stroke="${c}" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>
-    ${k.s.map((v, j) => j < k.s.length - 1 ? `<circle cx="${x(j).toFixed(1)}" cy="${y(v).toFixed(1)}" r="2" fill="${c}" opacity=".55"/>` : '').join('')}
-    <circle cx="${x(k.s.length - 1).toFixed(1)}" cy="${y(k.s.at(-1)).toFixed(1)}" r="5" fill="#fff" stroke="${c}" stroke-width="2.6"/>
-  </svg>`;
-};
-const tiles = kpis.map((k, i) => {
-  const vsPlan = delta(k, k.plan), vsYear = delta(k, k.s.at(-5));
-  const badge = (lab, d) => `<span class="q-badge ${d.good ? 'pos' : 'neg'}"><span>${lab}</span>${d.arrow} ${d.text}</span>`;
-  return `<div class="q-card q-tile${vsPlan.good ? '' : ' is-alert'}">
-    <div class="q-tl">${k.name}<span>計画 ${fmt(k.plan, k.dp)}${k.unit}</span></div>
-    <p class="q-v">${fmt(k.s.at(-1), k.dp)}<small>${k.unit}</small></p>
-    <div class="q-d">${badge('計画比', vsPlan)}${badge('前年比', vsYear)}</div>
-    ${spark(k, i)}
-  </div>`;
-}).join('');
-const miss = kpis.filter(k => !delta(k, k.plan).good).map(k => k.name);
+// ---- derived
+const rows = kpis.map(k => {
+  const actual = k.series.at(-1), yearAgo = k.series.at(-5);
+  const change = ref => (k.kind === 'amount' ? (actual / ref - 1) * 100 : actual - ref);
+  const vsPlan = change(k.plan), vsYear = change(yearAgo);
+  const met = k.better === 'up' ? actual >= k.plan : actual <= k.plan;
+  return { ...k, actual, vsPlan, vsYear, met };
+});
+const misses = rows.filter(r => !r.met);
+const ja = (v, digits) => fmt(v, { locale: 'ja', digits });
+const value = (r, v) => (r.kind === 'amount' ? ja(v, 0) : `${ja(v, r.digits)}<span class="unit">%</span>`);
+const delta = (r, v) => (r.kind === 'amount' ? fmt(v, { digits: 1, sign: true, suffix: '%' }) : fmt(v, { digits: r.digits, sign: true, suffix: 'pt' }));
 
-const dialMini = `<svg viewBox="0 0 40 40" role="img" aria-labelledby="${P}-dial"><title id="${P}-dial">四半期ダイヤル：第2四半期（7〜9月）</title>${[1, 2, 3, 4].map(k => {
-  const a0 = -Math.PI / 2 + (k - 1) * Math.PI / 2 + 0.08, a1 = a0 + Math.PI / 2 - 0.16, p = (r, a) => `${(20 + r * Math.cos(a)).toFixed(2)} ${(20 + r * Math.sin(a)).toFixed(2)}`;
-  const d = `M${p(19, a0)} A19 19 0 0 1 ${p(19, a1)} L${p(11, a1)} A11 11 0 0 0 ${p(11, a0)}Z`;
-  return k === 1 ? `<path d="${d}" fill="#3b5480"/>` : k === 2 ? `<path d="${d}" fill="#2c64f0"/>` : `<path d="${d}" fill="none" stroke="#3b5480" stroke-width="1.2"/>`;
-}).join('')}</svg>`;
+const trend = (r, i) => {
+  const W = 270, H = 40, y = linear([Math.min(...r.series), Math.max(...r.series)], [H - 6, 6]);
+  const x = linear([0, r.series.length - 1], [4, W - 6]);
+  const pts = r.series.map((v, j) => [x(j), y(v)]);
+  return svgRoot({
+    id: `${ID}-trend-${i}`, width: W, height: H,
+    title: `${r.name}の8四半期の推移`,
+    desc: `${quarters[0]}から${quarters.at(-1)}まで：${r.series.map(v => (r.kind === 'amount' ? ja(v, 0) : ja(v, r.digits) + '%')).join('、')}`,
+  },
+  el('path', { d: pathFromPoints(pts), fill: 'none', stroke: 'var(--muted)', 'stroke-width': 1.5, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }),
+  el('circle', { cx: pts.at(-1)[0], cy: pts.at(-1)[1], r: 3.5, fill: r.met ? 'var(--navy)' : 'var(--miss)' }));
+};
+
+const body = rows.map((r, i) => `<tr>
+    <td class="q-name">${r.name}</td>
+    <td class="r q-actual">${value(r, r.actual)}</td>
+    <td class="r q-val">${value(r, r.plan)}</td>
+    <td class="r q-val${r.met ? '' : ' miss'}">${delta(r, r.vsPlan)}</td>
+    <td class="q-flag">${r.met ? '' : '未達'}</td>
+    <td class="r q-val">${delta(r, r.vsYear)}</td>
+    <td>${trend(r, i)}</td>
+  </tr>`).join('');
+
+const miss = misses[0];
+const headline = misses.length === 1
+  ? `主要${rows.length}指標のうち${rows.length - 1}指標が計画を達成。<span class="nw">${miss.name}のみ</span>計画比<span class="nw">${delta(miss, miss.vsPlan)}</span>で未達となった`
+  : `主要${rows.length}指標のうち${rows.length - misses.length}指標が計画を達成し、${misses.map(m => m.name).join('・')}が未達`;
 
 export default {
   study: true,
-  id: 'tpl-qbr-kpi-tiles',
-  title: 'KPIタイル — 8四半期の推移と計画比',
+  id: ID,
   language: 'ja',
-  notes: 'Purpose: 主要KPI 6つの今期値・計画比・前年比・推移を一覧し、未達の指標を一目で示す。\nModify: kpis 配列に8四半期の値・今期計画・良い方向（better）を入れる。バッジの符号と色、赤枠は自動で決まる。\nInvariant: 解約率のように「下がるのが良い」指標は better:\'down\' で色を反転。前年比は4四半期前との比較。スパークラインは形を見るもので、値はタイルの数字で読む。\nStatic: Already static.',
+  title: 'Key metrics against plan and last year, one table',
+  notes: `Purpose: 主要指標の実績を計画・前年同期と並べ、どれが計画に届かなかったかを1つの表で示す。カードを並べず、上から順に読める表にする。\nModify: kpis に指標を足し引きする（6〜8行まで）。各行は8四半期の実績（今期が最後）、今期計画、kind（金額＝増減率％、比率＝差pt）、better（低いほど良い指標は down）を持つ。計画比・前年同期比・未達の判定・見出し・推移線は自動。quarters と source、running も更新する。\nInvariant: 赤は未達の行の計画比だけに使い、必ず「未達」と書く。▲や▼は使わない（日本の帳票では▲はマイナスを表す）。前年同期比は4四半期前との比較。推移線は形を見るためのもので、縦軸は行ごとに異なると注記する。\nStatic: Already static.`,
   sources: [],
   exportPolicy: 'final',
   className: 'tpl-qbr q-kpi',
-  content: `<div class="q-wrap">
-  <div class="q-rail">${dialMini}<p class="q-sec">KPI概況</p><p class="q-pg"><b>02</b>/ 06</p></div>
-  <div class="q-top"><span>FY2026 Q2 業績レビュー ・ ハルニレ・クラウド</span><span class="q-chip"><i></i>7–9月 実績</span></div>
-  <h1 class="q-title" data-region="title">売上と利益率は計画を上回る一方、<em class="q-neg">新規ARRは2四半期続けて未達</em></h1>
-  <p class="q-sub" data-region="support">未達は${miss.join('・')}のみ。失速の主因は商談化率の低下で、既存顧客の拡大が売上を支えている。</p>
-  <div class="q-tiles" data-region="primary">${tiles}</div>
-  <p class="q-source" data-region="source">例示データ · 点線＝今期計画、推移は ${quarters[0]}〜${quarters.at(-1)} の8四半期</p>
-</div>`
+  content: `<h1 class="q-head" data-region="title">${headline}</h1>
+<p class="q-note q-unit-note g" style="--c:9;--s:4;top:182px" data-region="support">（単位：百万円）</p>
+<table class="q-table g" style="--c:1;--s:12;top:214px" data-region="primary">
+  <colgroup><col style="width:270px"><col style="width:196px"><col style="width:98px"><col style="width:98px"><col style="width:98px"><col style="width:98px"><col style="width:294px"></colgroup>
+  <thead><tr><th>指標</th><th class="r">実績</th><th class="r">計画</th><th class="r">計画比</th><th></th><th class="r">前年同期比</th><th class="r">8四半期の推移</th></tr></thead>
+  <tbody>${body}</tbody>
+</table>
+<p class="q-note g" style="--c:1;--s:12;top:590px" data-region="support">注：計画比・前年同期比は、金額は増減率、比率は差（pt）。月次解約率は四半期の平均で、低いほど良い。推移は${quarters[0]}期から${quarters.at(-1)}期まで、縦軸は指標ごとに異なる。●は今期。</p>
+<p class="q-foot" data-region="source"><span>${source}</span><span class="num">${running}　${page}</span></p>`,
 };

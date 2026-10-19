@@ -70,4 +70,25 @@ class SlopCheck(unittest.TestCase):
             subprocess.run(['node',str(ROOT/'scripts/studio.mjs'),'build',str(ROOT/f'assets/examples/{name}.json'),'--out',str(out)],check=True,capture_output=True)
             r=review(load_scene(self.dir/f'{name}.scene.json'),'scene')
             self.assertEqual(r['errors'],0,name)
+    def test_html_style_signals_of_the_machine_made_look(self):
+        try:
+            import playwright  # noqa: F401
+            from slop_check import load_html
+        except Exception:self.skipTest('Playwright is not installed')
+        decorated=('<section class="slide" id="decorated" style="position:relative;width:1280px;height:720px;background:#f4f1ea radial-gradient(circle at 1px 1px,#bbb 1px,transparent 1.2px) 0 0/24px 24px">'
+            '<h1 style="font-size:40px;color:#111">売上は計画を上回る一方、<em style="color:#d9442b;font-style:normal">新規ARRは未達</em></h1>'
+            '<p style="font:600 13px Inter;letter-spacing:.14em;text-transform:uppercase">quarterly review</p><p style="font:600 13px Inter;letter-spacing:.14em;text-transform:uppercase">kpi summary</p>'
+            + ''.join(f'<span style="display:inline-block;height:28px;line-height:28px;padding:0 12px;border-radius:14px;background:#e3f2ea">{t}</span>' for t in ['計画比 ▲ +2.2%','前年比','NEW'])
+            + '<p style="font-size:20px">✨ 今期のハイライト</p></section>')
+        anchored=('<section class="slide" id="anchored" style="position:relative;width:1280px;height:720px;background:#ffffff">'
+            '<h1 style="font-size:40px;color:#111">ARR grew fastest in <em style="color:#2457c5;font-style:normal">the enterprise tier</em></h1>'
+            '<svg width="600" height="200"><rect x="0" y="20" width="420" height="40" fill="#2457c5"/><rect x="0" y="80" width="300" height="40" fill="#9aa1ab"/></svg></section>')
+        page=self.dir/'styled.html';page.write_text('<!doctype html><meta charset="utf-8"><body style="margin:0">'+decorated+anchored+'</body>',encoding='utf-8')
+        try:slides=load_html(page)
+        except Exception as e:self.skipTest(f'Chromium unavailable: {e}')
+        r=review(slides,'html');sig=signals(r)
+        for name in ['ornamental-pattern','spaced-caps-labels','chips','emoji','headline-accent-unanchored','ja-triangle-for-increase']:
+            self.assertIn(name,sig,name)
+        unanchored=[f['slide'] for f in r['findings'] if f['signal']=='headline-accent-unanchored']
+        self.assertEqual(unanchored,['decorated'],'a colored phrase that names a same-colored mark is not flagged')
 if __name__=='__main__':unittest.main()

@@ -165,7 +165,9 @@ an unavailable tier; skip its steps and report them as unrun.
 Everything build- and browser-related stays unrun.
 
 **Tier 1 — Node 20+ and/or Python 3.10+ standard library, no installs.**
-`catalog.mjs`, `craft.mjs` (init/build), `studio.mjs` (list/init/validate/build),
+`catalog.mjs`, `craft.mjs` (init/build), `preview.mjs`, `build-studies.mjs`,
+`color-systems.mjs`, the figure engine (`assets/runtime/figure.mjs`),
+`studio.mjs` (list/init/validate/build),
 `lint.mjs`, `svg-edit.py`, `editorial.py`, `evidence.py`, `audit.py`,
 `slop_check.py` (on `.scene.json`),
 `brand-capture.py`, `inspect-brand.py`, plus `clean.py`/`verify-review.py` on existing
@@ -174,8 +176,9 @@ review output. The CSS preflight (`css-check.mjs`) runs inside build and QA.
 opens directly. This tier builds and statically checks a deck.
 
 **Tier 2 — `pip install -r requirements.txt` plus Playwright Chromium.**
-`qa.py`, `qa-navigation.py`, `font_audit.py`, `export.py` (PDF and screenshot
-PPTX), `brand-template.py` (.potx), `slop_check.py` on HTML or `.pptx`. This tier renders, reviews, and exports.
+`qa.py` (+ `qa-summary.py`), `contact-sheet.py`, `qa-navigation.py`, `font_audit.py`,
+`export.py` (PDF and screenshot PPTX), `brand-template.py` (.potx), `slop_check.py` on
+HTML or `.pptx`. This tier renders, reviews, and exports.
 
 **Tier 3 — `npm install` (pptxgenjs).** `export-pptx.mjs` native editable route.
 `export-pdf-office.mjs` additionally needs LibreOffice `soffice`.
@@ -184,9 +187,10 @@ PPTX), `brand-template.py` (.potx), `slop_check.py` on HTML or `.pptx`. This tie
 
 ```sh
 node scripts/catalog.mjs search "comparison"
-node scripts/catalog.mjs take motion-focal-reveal ./smoke-study
+node scripts/catalog.mjs take dumbbell ./smoke-study
 node scripts/craft.mjs build ./smoke-study/deck.mjs --out ./smoke-study/deck.html --allow-draft
 python scripts/qa.py ./smoke-study/deck.html --out ./smoke-study/.studio-review/current --check
+python scripts/contact-sheet.py ./smoke-study/deck.html --out ./smoke-study/sheet.png --final
 ```
 
 Use an actual catalog ID returned by search if a particular example ID changes.

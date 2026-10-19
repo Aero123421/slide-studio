@@ -1,17 +1,86 @@
-// Original editable study. Read notes for purpose, modifications, and invariants.
-// Asset placeholders are embedded by scripts/craft-core.mjs. Change content and geometry freely.
+// Diagram study · Waveform — instantaneous voltage over time at a stated sample rate, with the RMS
+// envelope drawn as what it is: a quantity derived from the same samples, not a new measurement.
+// Samples, the half-cycle RMS, the sag depth and duration are all computed from `supply` and `sag`.
+import { svgRoot, el, g, textLines, linear, pathFromPoints, theme as makeTheme, fmt } from '../runtime/figure.mjs';
+
+const supply = { f: 50, vrms: 230, fs: 3200, ms: 300, thd5: 0.03 };   // Hz, V, samples/s, record length (ms), 5th-harmonic share
+const sag = { start: 72, end: 158, residual: 0.63, recoveryMs: 14 };   // ms; residual = share of nominal during the sag
+const threshold = 0.9;   // a dip starts when the RMS falls below 90% of nominal (IEC 61000-4-30 style)
+
+// Samples: sinusoid + 5th harmonic, scaled by a sag envelope with an exponential recovery.
+const n = Math.round((supply.fs * supply.ms) / 1000), dt = 1000 / supply.fs, vpk = supply.vrms * Math.SQRT2;
+const env = tms => (tms < sag.start ? 1 : tms < sag.end ? sag.residual : 1 - (1 - sag.residual) * Math.exp(-(tms - sag.end) / sag.recoveryMs));
+const samples = Array.from({ length: n }, (_, i) => {
+  const tms = i * dt, ph = 2 * Math.PI * supply.f * (tms / 1000);
+  return { t: tms, v: env(tms) * vpk * (Math.sin(ph) + supply.thd5 * Math.sin(5 * ph + 0.4)) };
+});
+// Half-cycle-refreshed RMS over one cycle: each value uses the previous 64 samples.
+const perCycle = supply.fs / supply.f, half = perCycle / 2;
+const rms = [];
+for (let end = perCycle; end <= n; end += half) {
+  const win = samples.slice(end - perCycle, end);
+  rms.push({ t: end * dt, v: Math.sqrt(win.reduce((s, p) => s + p.v ** 2, 0) / win.length) });
+}
+const below = rms.filter(r => r.v < threshold * supply.vrms);
+const dip = { min: Math.min(...rms.map(r => r.v)), from: below[0].t - (1000 / supply.f) / 2, to: below.at(-1).t };
+dip.duration = dip.to - dip.from;
+const pctMin = Math.round((dip.min / supply.vrms) * 100);
+
+export function figure(theme = 'css') {
+  const t = makeTheme(theme), W = 1152, H = 470, id = 'waveform-fig';
+  const box = { x: 58, y: 0, w: 800, h: 412 };
+  // y range runs above the peaks so the labels get their own band and never sit on the trace
+  const x = linear([0, supply.ms], [box.x, box.x + box.w]), y = linear([-380, 640], [box.y + box.h, box.y]), band = y(470);
+  const thrY = y(threshold * supply.vrms);
+  // Inset: the same samples, one cycle inside the sag, drawn as dots so the time base is visible.
+  const ins = { x: 922, y: 64, w: 230, h: 250 }, t0 = sag.start + 22, t1 = t0 + 1000 / supply.f;
+  const ix = linear([t0, t1], [ins.x + 10, ins.x + ins.w - 10]), iy = linear([-260, 260], [ins.y + ins.h - 10, ins.y + 10]);
+  const inSamples = samples.filter(p => p.t >= t0 && p.t <= t1);
+  return svgRoot({ id, width: W, height: H, theme: t,
+    title: 'Supply voltage waveform during a motor start, with the derived RMS',
+    desc: `Instantaneous voltage sampled at ${fmt(supply.fs)} samples per second (${perCycle} per ${supply.f} Hz cycle) over ${supply.ms} ms. The one-cycle RMS, refreshed every half cycle, falls to ${fmt(dip.min, { digits: 0 })} V (${pctMin}% of ${supply.vrms} V) and stays below the ${Math.round(threshold * 100)}% threshold for ${fmt(dip.duration, { digits: 0 })} ms. The RMS line is computed from the same samples.` },
+  el('defs', {}, el('clipPath', { id: `${id}-clip` }, el('rect', { x: box.x, y: box.y, width: box.w, height: box.h }))),
+  // grid and axes
+  [-300, -200, -100, 0, 100, 200, 300].map(v => g({},
+    el('line', { x1: box.x, x2: box.x + box.w, y1: y(v), y2: y(v), stroke: v === 0 ? t.c('rule') : t.c('grid'), 'stroke-width': v === 0 ? 1.4 : 1 }),
+    textLines([fmt(v, { sign: v > 0 })], { x: box.x - 10, y: y(v), size: 15, anchor: 'end', valign: 'middle', fill: t.c('muted') }))),
+  textLines(['V'], { x: box.x - 10, y: y(400), size: 15, anchor: 'end', valign: 'middle', fill: t.c('muted') }),
+  [0, 50, 100, 150, 200, 250, 300].map(v => textLines([String(v)], { x: x(v), y: box.y + box.h + 8, size: 15, anchor: v === 0 ? 'start' : v === supply.ms ? 'end' : 'middle', valign: 'top', fill: t.c('muted') })),
+  textLines([`Time (ms), sampled ${fmt(supply.fs)} times per second, ${perCycle} per cycle`], { x: box.x + box.w, y: H - 2, size: 15, anchor: 'end', valign: 'bottom', fill: t.c('muted') }),
+  // the dip interval, then the raw samples, then the derived RMS
+  el('rect', { x: x(dip.from), y: box.y, width: x(dip.to) - x(dip.from), height: box.h, fill: t.c('surface') }),
+  textLines([`${fmt(dip.duration, { digits: 0 })} ms below ${Math.round(threshold * 100)}%`], { x: (x(dip.from) + x(dip.to)) / 2, y: box.y + box.h - 12, size: 15, anchor: 'middle', valign: 'bottom', weight: 700, fill: t.c('ink') }),
+  el('path', { d: pathFromPoints(samples.map(p => [x(p.t), y(p.v)])), fill: 'none', stroke: t.c('ink'), 'stroke-width': 1.3, 'stroke-linejoin': 'round', 'clip-path': `url(#${id}-clip)` }),
+  el('line', { x1: box.x, x2: box.x + box.w, y1: thrY, y2: thrY, stroke: t.c('muted'), 'stroke-width': 1.2, 'stroke-dasharray': '6 5' }),
+  el('path', { d: pathFromPoints(rms.map(r => [x(r.t), y(r.v)]), { curve: 'step' }), fill: 'none', stroke: t.c('accent'), 'stroke-width': 3, 'stroke-linejoin': 'round' }),
+  // label band: each label drops a leader to the line it names
+  [[rms[1].t + 4, y(rms[1].v), ['RMS, derived', '1-cycle window, every ½ cycle'], t.c('accent'), 'start'],
+    [dip.to - 20, y(rms.find(r => r.t >= dip.to - 20).v), [`${fmt(dip.min, { digits: 0 })} V`, `${pctMin}% of nominal`], t.c('accent'), 'middle'],
+    [282, thrY, ['Dip threshold', `${Math.round(threshold * 100)}% of ${supply.vrms} V`], t.c('muted'), 'end']].map(([tm, ly, lines, c, anchor]) => g({},
+    el('line', { x1: x(tm), x2: x(tm), y1: band + 10, y2: ly - 4, stroke: c, 'stroke-width': 1.2 }),
+    el('circle', { cx: x(tm), cy: ly, r: 3.5, fill: c }),
+    textLines([lines[0]], { x: x(tm) + (anchor === 'start' ? -4 : anchor === 'end' ? 4 : 0), y: band - 20, size: 16, anchor, valign: 'bottom', fill: c, weight: 700 }),
+    textLines([lines[1]], { x: x(tm) + (anchor === 'start' ? -4 : anchor === 'end' ? 4 : 0), y: band, size: 15, anchor, valign: 'bottom', fill: c }))),
+  // inset with its link back to the main trace
+  el('rect', { x: x(t0), y: y(260), width: x(t1) - x(t0), height: y(-260) - y(260), fill: 'none', stroke: t.c('muted'), 'stroke-width': 1.2, 'stroke-dasharray': '3 3' }),
+  el('path', { d: `M${x(t1)} ${y(260)}L${ins.x} ${ins.y}M${x(t1)} ${y(-260)}L${ins.x} ${ins.y + ins.h}`, fill: 'none', stroke: t.c('muted'), 'stroke-width': 1, 'stroke-dasharray': '3 3' }),
+  el('rect', { x: ins.x, y: ins.y, width: ins.w, height: ins.h, rx: 6, fill: t.c('surface'), stroke: t.c('rule') }),
+  el('line', { x1: ins.x, x2: ins.x + ins.w, y1: iy(0), y2: iy(0), stroke: t.c('rule') }),
+  el('path', { d: pathFromPoints(inSamples.map(p => [ix(p.t), iy(p.v)])), fill: 'none', stroke: t.c('muted'), 'stroke-width': 1 }),
+  inSamples.map(p => el('circle', { cx: ix(p.t), cy: iy(p.v), r: 2.4, fill: t.c('ink') })),
+  textLines([`One cycle = ${perCycle} samples,`, `${fmt(dt, { digits: 4 })} ms apart`], { x: ins.x, y: ins.y + ins.h + 12, size: 15, valign: 'top', fill: t.c('muted'), lineHeight: 1.3 }),
+  textLines(['Detail: the samples'], { x: ins.x, y: ins.y - 10, size: 16, valign: 'bottom', weight: 700, fill: t.c('ink') }));
+}
+
 export default {
   study: true,
-  "id": "waveform",
-  "title": "Time waveform",
-  "notes": "Purpose: Show amplitude over time\nModify: Rewrite labels, recompute geometry from source data, adapt framing and orientation.\nInvariant: State sample rate/time base; smoothing is not a new measurement.\nStatic: Already static; preserve semantic labels and readable strokes.",
-  "sources": [
-    {
-      "type": "original-example",
-      "file": "assets/svg/waveform.svg"
-    }
-  ],
-  "exportPolicy": "final",
-  "className": "",
-  "content": "<h1 class=\"g-title\">Time waveform</h1><p class=\"g-purpose\">Show amplitude over time</p><div class=\"g-demo\"><svg aria-labelledby=\"g-waveform-waveform-title g-waveform-waveform-desc\" role=\"img\" viewbox=\"0 0 800 440\" xmlns=\"http://www.w3.org/2000/svg\"><title id=\"g-waveform-waveform-title\">Time waveform</title><desc id=\"g-waveform-waveform-desc\">Show amplitude over time. Original schematic. Values are illustrative, not measured.</desc><g data-part=\"drawing\"><line stroke=\"#17252d\" stroke-width=\"2\" x1=\"90\" x2=\"720\" y1=\"350\" y2=\"350\"></line><line stroke=\"#17252d\" stroke-width=\"2\" x1=\"90\" x2=\"90\" y1=\"70\" y2=\"350\"></line><line stroke=\"#dce6e8\" stroke-width=\"2\" x1=\"90\" x2=\"710\" y1=\"210\" y2=\"210\"></line><polyline fill=\"none\" points=\"100.0,210.0 104.0,222.2 108.0,234.0 112.0,245.3 116.0,255.6 120.0,264.8 124.0,272.8 128.0,279.2 132.0,284.1 136.0,287.3 140.0,288.7 144.0,288.4 148.0,286.3 152.0,282.5 156.0,277.1 160.0,270.2 164.0,262.1 168.0,252.8 172.0,242.7 176.0,231.9 180.0,220.7 184.0,209.4 188.0,198.1 192.0,187.2 196.0,176.9 200.0,167.4 204.0,159.0 208.0,151.7 212.0,145.8 216.0,141.4 220.0,138.6 224.0,137.4 228.0,137.8 232.0,139.8 236.0,143.4 240.0,148.4 244.0,154.8 248.0,162.4 252.0,171.0 256.0,180.4 260.0,190.4 264.0,200.7 268.0,211.2 272.0,221.5 276.0,231.6 280.0,241.0 284.0,249.7 288.0,257.5 292.0,264.1 296.0,269.5 300.0,273.5 304.0,276.0 308.0,277.0 312.0,276.6 316.0,274.6 320.0,271.2 324.0,266.5 328.0,260.5 332.0,253.5 336.0,245.5 340.0,236.8 344.0,227.6 348.0,218.0 352.0,208.4 356.0,198.8 360.0,189.6 364.0,180.9 368.0,172.9 372.0,165.8 376.0,159.8 380.0,154.9 384.0,151.3 388.0,149.0 392.0,148.1 396.0,148.6 400.0,150.5 404.0,153.7 408.0,158.2 412.0,163.7 416.0,170.3 420.0,177.7 424.0,185.7 428.0,194.3 432.0,203.1 436.0,212.0 440.0,220.8 444.0,229.3 448.0,237.3 452.0,244.6 456.0,251.1 460.0,256.6 464.0,261.1 468.0,264.3 472.0,266.3 476.0,267.1 480.0,266.5 484.0,264.7 488.0,261.7 492.0,257.6 496.0,252.4 500.0,246.3 504.0,239.4 508.0,232.0 512.0,224.1 516.0,215.9 520.0,207.7 524.0,199.6 528.0,191.8 532.0,184.4 536.0,177.7 540.0,171.8 544.0,166.7 548.0,162.7 552.0,159.7 556.0,158.0 560.0,157.3 564.0,157.9 568.0,159.6 572.0,162.5 576.0,166.4 580.0,171.2 584.0,176.8 588.0,183.2 592.0,190.1 596.0,197.4 600.0,205.0 604.0,212.5 608.0,220.0 612.0,227.2 616.0,234.0 620.0,240.1 624.0,245.6 628.0,250.2 632.0,253.8 636.0,256.5 640.0,258.1 644.0,258.6 648.0,258.0 652.0,256.4 656.0,253.7 660.0,250.0 664.0,245.5 668.0,240.3 672.0,234.4 676.0,228.0 680.0,221.2 684.0,214.3 688.0,207.3 692.0,200.4 696.0,193.8\" stroke=\"#28617b\" stroke-width=\"3\"></polyline><text fill=\"#17252d\" font-family=\"Arial, sans-serif\" font-size=\"20\" text-anchor=\"end\" x=\"700\" y=\"392\">Time</text></g></svg>\n</div><div class=\"g-footer\">Original instructional study · schematic / synthetic content <code>assets/svg/waveform.svg</code></div>"
+  id: 'waveform',
+  title: 'Waveform: amplitude over time with a stated time base',
+  className: 'st cs-terminal-dark',
+  notes: 'Purpose: Show how a signal’s amplitude changes over time, with the sampling stated and any envelope marked as derived.\nModify: Edit `supply`, `sag` and `threshold`; samples, the half-cycle RMS, the dip interval and the headline numbers recompute. With logged data, replace `samples` and keep the RMS computation.\nInvariant: The time axis states its unit and the sample rate; the raw trace is drawn from samples, never smoothed; the RMS line is labelled as derived from the same samples; the threshold and its basis are on the page.\nStatic: Already static. For a talk, show the raw trace, then the RMS, then the dip interval.',
+  sources: [{ type: 'original-example', file: 'assets/svg/waveform.mjs' }],
+  exportPolicy: 'final',
+  content: `<h1 class="st-head">A motor start pulled the supply down to <em>${pctMin}% of nominal</em> for ${fmt(dip.duration, { digits: 0 })} ms <span class="st-quiet">— a sag, not an interruption</span></h1>
+<figure class="st-fig" data-region="primary">${figure()}</figure>
+<p class="st-source" data-region="source"><span>Illustrative data · single-phase ${supply.vrms} V, ${supply.f} Hz feeder at a pumping station</span><span>Time waveform with derived RMS</span></p>`,
 };

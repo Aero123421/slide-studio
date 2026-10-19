@@ -1,88 +1,96 @@
-// Template: Engineering design review / postmortem · Request sequence diagram. Synthetic example content; replace data and copy.
+// Template: Incident review · Time-scaled request sequence. Synthetic example content; replace data and copy.
+import { linear } from '../../runtime/figure.mjs';
+
 const ID = 'tpl-architecture-sequence';
-const C = { panel: '#111b28', stroke: '#2f4259', text: '#e8eef6', text2: '#b4c1d1', mute: '#8a9bb0', sync: '#3987e5', warn: '#fab219', life: '#2a3a50' };
-const lanes = ['client', 'api-gateway', 'checkout-svc', 'pricing-svc', 'price-cache', 'catalog replica', 'orders-db'];
-const X = lanes.map((_, i) => 84 + i * 168);
-const L = Object.fromEntries(lanes.map((n, i) => [n, X[i]]));
-// Messages in time order. type: call | return. hot = only happens on a cache miss. note = right-side duration tag.
-const msgs = [
-  { from: 'client', to: 'api-gateway', text: 'POST /checkout', type: 'call' },
-  { from: 'api-gateway', to: 'checkout-svc', text: 'createOrder(cart)', type: 'call' },
-  { from: 'checkout-svc', to: 'pricing-svc', text: 'quote(cart)', type: 'call' },
-  { from: 'pricing-svc', to: 'price-cache', text: 'GET price:{sku}:{cart_id}', type: 'call', key: true },
-  { frame: 'hit', guard: '[hit]  97% of lookups before v4.18 · 41% during' },
-  { from: 'price-cache', to: 'pricing-svc', text: 'rules · ~2 ms', type: 'return' },
-  { frame: 'miss', guard: '[miss]  59% of lookups during the incident' },
-  { from: 'price-cache', to: 'pricing-svc', text: 'nil', type: 'return', hot: true },
-  { from: 'pricing-svc', to: 'catalog replica', text: 'SELECT rules …  0.2–1.8 s', type: 'call', hot: true, slow: true },
-  { from: 'catalog replica', to: 'pricing-svc', text: 'rows', type: 'return', hot: true },
-  { from: 'pricing-svc', to: 'price-cache', text: 'SET key · TTL 10 min', type: 'call', hot: true },
-  { frame: 'end' },
-  { from: 'pricing-svc', to: 'checkout-svc', text: 'quote', type: 'return' },
-  { from: 'checkout-svc', to: 'orders-db', text: 'INSERT order', type: 'call' },
-  { from: 'orders-db', to: 'checkout-svc', text: 'ok', type: 'return' },
-  { from: 'checkout-svc', to: 'api-gateway', text: '201 Created', type: 'return' },
-  { from: 'api-gateway', to: 'client', text: '201 · or 504 after 2.0 s', type: 'return', timeout: true }
+const trace = { id: '4f1c9a2e', at: '18:14:07 UTC', timeout: 2000, paymentNeeds: 270, hitTotal: 210 }; // ms
+// Participants top to bottom, in call order. plain = a person, not a service identifier.
+const lanes = [
+  { id: 'shopper', name: 'Shopper', plain: true },
+  { id: 'gateway', name: 'api-gateway' },
+  { id: 'checkout', name: 'checkout-svc' },
+  { id: 'pricing', name: 'pricing-svc' },
+  { id: 'cache', name: 'price-cache', degraded: true },
+  { id: 'replica', name: 'catalog-replica-2', degraded: true },
 ];
-const TOP = 64, STEP = 24;
-let y = TOP, out = '', frameTop = 0, frameSep = 0;
-const activ = {}; // lane -> [y0, y1] pairs for activation bars
-const act = (lane, y0, y1) => (activ[lane] = activ[lane] || []).push([y0, y1]);
-const fx0 = L['pricing-svc'] - 70, fx1 = L['catalog replica'] + 76;
-for (const m of msgs) {
-  if (m.frame === 'hit') { frameTop = y - 10; out += `<text x="${fx0 + 50}" y="${y + 7}" class="t-mono-s">${m.guard}</text>`; y += 38; continue; }
-  if (m.frame === 'miss') { frameSep = y - 8; out += `<line x1="${fx0}" y1="${frameSep}" x2="${fx1}" y2="${frameSep}" stroke="${C.mute}" stroke-dasharray="5 4"/><text x="${fx0 + 12}" y="${y + 10}" class="t-warn">${m.guard}</text>`; y += 42; continue; }
-  if (m.frame === 'end') {
-    out = `<rect x="${fx0}" y="${frameTop}" width="${fx1 - fx0}" height="${y - frameTop - 6}" rx="4" fill="rgba(250,178,25,.04)" stroke="${C.mute}" stroke-width="1"/>`
-      + `<path d="M${fx0},${frameTop} h38 v14 l-8,8 h-30 z" fill="${C.stroke}"/><text x="${fx0 + 8}" y="${frameTop + 16}" class="t-mono-b">alt</text>` + out;
-    y += 12; continue;
-  }
-  const x1 = L[m.from], x2 = L[m.to], dir = Math.sign(x2 - x1), pad = 6;
-  const col = m.hot ? C.warn : m.type === 'call' ? C.sync : C.mute;
-  const sx = x1 + dir * pad, ex = x2 - dir * (pad + 1);
-  out += `<line x1="${sx}" y1="${y}" x2="${ex}" y2="${y}" stroke="${col}" stroke-width="${m.slow ? 2.4 : 1.6}"${m.type === 'return' ? ' stroke-dasharray="5 4"' : ''} marker-end="url(#${ID}-${m.type === 'call' ? 'c' : 'r'}${m.hot ? 'h' : ''})"/>`;
-  const lx = (x1 + x2) / 2;
-  let label = m.text;
-  if (m.key) label = label.replace('{cart_id}', `<tspan style="fill:${C.warn}">{cart_id}</tspan>`);
-  out += `<text x="${lx}" y="${y - 7}" text-anchor="middle" class="${m.slow ? 't-warn' : m.timeout ? 't-mono' : 't-mono'}">${label}</text>`;
-  if (m.type === 'call') act(m.to, y, null);
-  if (m.type === 'return') { const a = (activ[m.from] || []).find(p => p[1] === null); if (a) a[1] = y; }
-  m.y = y; y += STEP;
-}
-// close any open activations on the callee lanes (e.g. the SET call has no explicit return)
-for (const k in activ) activ[k].forEach(p => { if (p[1] === null) p[1] = p[0] + 12; });
-const H = y + 6;
-const heads = lanes.map((n, i) => {
-  const hot = ['pricing-svc', 'price-cache', 'catalog replica'].includes(n);
-  return `<rect x="${X[i] - 74}" y="0" width="148" height="38" rx="6" fill="${C.panel}" stroke="${hot ? C.warn : C.stroke}" stroke-width="${hot ? 1.6 : 1.2}"/><text x="${X[i]}" y="24" text-anchor="middle" class="t-node">${n}</text>`
-    + `<line x1="${X[i]}" y1="38" x2="${X[i]}" y2="${H}" stroke="${C.life}" stroke-width="1.4" stroke-dasharray="2 4"/>`;
+// Spans from the trace, ms after the shopper sent the request. The gateway cancels everything at the timeout.
+const spans = [
+  { lane: 'gateway', start: 0, end: 2000 },
+  { lane: 'checkout', start: 3, end: 1846 }, // then the payment step starts and is cancelled at the timeout
+  { lane: 'pricing', start: 21, end: 1846 },
+  { lane: 'cache', start: 24, end: 26 },
+  { lane: 'replica', start: 27, end: 1839, label: 'SELECT price rules' },
+];
+// Messages at their real times. ret = a response travelling back up the call chain.
+const messages = [
+  { from: 'shopper', to: 'gateway', t: 0 },
+  { from: 'gateway', to: 'checkout', t: 3 },
+  { from: 'checkout', to: 'pricing', t: 21 },
+  { from: 'pricing', to: 'cache', t: 24 },
+  { from: 'pricing', to: 'replica', t: 27 },
+  { from: 'replica', to: 'pricing', t: 1839, ret: true },
+  { from: 'pricing', to: 'checkout', t: 1846, ret: true },
+  { from: 'gateway', to: 'shopper', t: 2000, ret: true, label: '504 Gateway Timeout' },
+];
+
+// ---- derived numbers (headline, notes and labels use these)
+const span = id => spans.find(s => s.lane === id);
+const replicaMs = span('replica').end - span('replica').start;
+const quoteAt = span('pricing').end;
+const leftMs = trace.timeout - quoteAt;
+const NB = '\u00a0'; // never break a number from its unit
+const sec = ms => `${(ms / 1000).toFixed(2).replace(/0$/, '')}${NB}s`;
+const ms = v => `${v.toLocaleString('en-US')}${NB}ms`;
+
+// ---- geometry
+const W = 1152, LABEL_W = 214, TOP = 64, ROW = 60, BAR = 16;
+const X = linear([0, 2250], [LABEL_W, W - 8]);
+const rowY = Object.fromEntries(lanes.map((l, i) => [l.id, TOP + i * ROW]));
+const bottom = TOP + (lanes.length - 1) * ROW + 30, AXIS = bottom + 10, H = AXIS + 34;
+const RED = 'var(--ar-red)', INK = 'var(--ar-ink)', GREY = 'var(--ar-line)';
+const grid = [0, 500, 1000, 1500, 2000].map(t => `<line x1="${X(t)}" y1="${TOP - 26}" x2="${X(t)}" y2="${bottom}" stroke="var(--ar-grid)"/>`
+  + `<text x="${X(t)}" y="${AXIS + 22}" text-anchor="middle" class="t-axis t-num">${t ? `${(t / 1000).toFixed(1)} s` : '0'}</text>`).join('')
+  + [250, 750, 1250, 1750].map(t => `<line x1="${X(t)}" y1="${AXIS}" x2="${X(t)}" y2="${AXIS + 5}" stroke="var(--ar-rule)"/>`).join('')
+  + `<line x1="${LABEL_W}" y1="${AXIS}" x2="${W - 8}" y2="${AXIS}" stroke="var(--ar-rule)"/>`;
+const names = lanes.map(l => `<text x="0" y="${rowY[l.id] + 6}" class="${l.plain ? 't-strong' : 't-name'}"${l.plain ? ' style="font-size:17px"' : ''}>${l.name}</text>`
+  + (l.id === 'shopper' ? `<line x1="${X(0)}" y1="${rowY.shopper}" x2="${X(trace.timeout)}" y2="${rowY.shopper}" stroke="var(--ar-rule)" stroke-width="1.5"/>` : '')).join('');
+const bars = spans.map(s => {
+  const deg = lanes.find(l => l.id === s.lane).degraded, x0 = X(s.start), w = Math.max(3, X(s.end) - x0), y = rowY[s.lane] - BAR / 2;
+  return `<rect x="${x0}" y="${y}" width="${w}" height="${BAR}" fill="${deg ? RED : 'var(--ar-seq-bar,#d9dce0)'}"/>`;
 }).join('');
-const bars = Object.entries(activ).map(([lane, ps]) => ps.map(([a, b]) => `<rect x="${L[lane] - 5}" y="${a - 3}" width="10" height="${Math.max(10, b - a + 6)}" rx="2" fill="#1d2d42" stroke="${C.stroke}"/>`).join('')).join('');
-// annotation for the cache-key change, anchored to the GET message row
-const keyMsg = msgs.find(m => m.key);
-const note = `<g><path d="M${L['orders-db'] - 78},${keyMsg.y - 34} h148 l8,8 v58 h-156 z" fill="#1a2433" stroke="${C.warn}" stroke-width="1.2"/>
-<text x="${L['orders-db'] - 68}" y="${keyMsg.y - 13}" class="t-lab2">v4.18 added cart_id to</text><text x="${L['orders-db'] - 68}" y="${keyMsg.y + 5}" class="t-lab2">the key, so each cart</text><text x="${L['orders-db'] - 68}" y="${keyMsg.y + 23}" class="t-lab2">became a new entry.</text></g>`;
-const mk = (id, c, open) => `<marker id="${ID}-${id}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">${open ? `<path d="M1,1 L9,5 L1,9" fill="none" stroke="${c}" stroke-width="1.6"/>` : `<path d="M0,1 L9,5 L0,9 z" fill="${c}"/>`}</marker>`;
-const fig = `<svg viewBox="0 0 1184 ${H + 4}" role="img" aria-labelledby="${ID}-t ${ID}-d">
-<title id="${ID}-t">Checkout request sequence with the cache hit and miss alternatives</title>
-<desc id="${ID}-d">The client calls api-gateway, which calls checkout-svc, which asks pricing-svc for a quote. pricing-svc looks up price-cache with a key that includes cart_id. In the hit branch the cache returns rules in about 2 ms. In the miss branch, 59% of lookups during the incident, pricing-svc queries the catalog-db read replica for 0.2 to 1.8 seconds and writes the result back to the cache. checkout-svc then inserts the order into orders-db and returns 201, or the gateway returns 504 after its 2.0 second timeout.</desc>
-<defs>${mk('c', C.sync)}${mk('ch', C.warn)}${mk('r', C.mute, true)}${mk('rh', C.warn, true)}</defs>
-${heads}${bars}${out}${note}
+// The payment step checkout started with the quote: an outline as long as it needs, cut by the timeout line.
+const need = `<rect x="${X(quoteAt) + 0.75}" y="${rowY.checkout - BAR / 2 + 0.75}" width="${X(quoteAt + trace.paymentNeeds) - X(quoteAt) - 1.5}" height="${BAR - 1.5}" fill="var(--ar-paper)" stroke="${INK}" stroke-width="1.5"/>`;
+const arrows = messages.map(m => {
+  const y0 = rowY[m.from], y1 = rowY[m.to], dir = Math.sign(y1 - y0), x = X(m.t);
+  const end = y1 - dir * (m.to === 'shopper' ? 4 : BAR / 2 + 1);
+  return `<line x1="${x}" y1="${y0 + dir * (m.from === 'shopper' ? 0 : BAR / 2)}" x2="${x}" y2="${end}" stroke="${m.ret ? GREY : INK}" stroke-width="1.4" marker-end="url(#${ID}-${m.ret ? 'open' : 'fill'})"/>`;
+}).join('');
+const tx = X(trace.timeout);
+const notes = `<line x1="${tx}" y1="${TOP - 34}" x2="${tx}" y2="${bottom}" stroke="${INK}" stroke-width="2"/>
+<text x="${tx + 10}" y="${TOP - 22}" class="t-strong">Gateway timeout</text><text x="${tx + 10}" y="${TOP - 2}" class="t-strong t-num">${sec(trace.timeout)}</text>
+<text x="${X(0) + 12}" y="${rowY.shopper - 10}" class="t-note"><tspan class="t-name" style="font-size:16px">POST /checkout</tspan></text>
+<text x="${tx - 10}" y="${rowY.shopper - 10}" text-anchor="end" class="t-note">${messages.at(-1).label}</text>
+<text x="${X(26) + 10}" y="${rowY.cache + 6}" class="t-note t-red">miss after ${ms(span('cache').end - span('cache').start)}</text>
+<text x="${(X(span('replica').start) + X(span('replica').end)) / 2}" y="${rowY.replica - 18}" text-anchor="middle" class="t-strong t-red t-num">${span('replica').label}: ${ms(replicaMs)}</text>
+<text x="${tx - 10}" y="${rowY.checkout - 16}" text-anchor="end" class="t-note t-num">Payment step needs about ${ms(trace.paymentNeeds)}; <tspan class="t-strong">${ms(leftMs)} were left</tspan></text>`;
+const marks = `<marker id="${ID}-fill" viewBox="0 0 10 10" refX="9.5" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0 0.8L10 5L0 9.2Z" fill="${INK}"/></marker>`
+  + `<marker id="${ID}-open" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto"><path d="M1 1L9 5L1 9" fill="none" stroke="${GREY}" stroke-width="1.6"/></marker>`;
+const fig = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-labelledby="${ID}-t ${ID}-d">
+<title id="${ID}-t">One failed checkout request on a true time axis, 0 to 2.25 seconds</title>
+<desc id="${ID}-d">Trace ${trace.id} at ${trace.at}. The shopper's POST /checkout reaches api-gateway, checkout-svc and pricing-svc within ${ms(span('pricing').start)}. price-cache answers with a miss after ${ms(span('cache').end - span('cache').start)}, so pricing-svc queries catalog-replica-2, which takes ${ms(replicaMs)}. The quote reaches checkout-svc at ${ms(quoteAt)}, leaving ${ms(leftMs)} before the ${sec(trace.timeout)} gateway timeout; the payment step needs about ${ms(trace.paymentNeeds)}, so the gateway returns 504 at ${sec(trace.timeout)}.</desc>
+<defs>${marks}</defs>
+${grid}${names}${bars}${need}${arrows}${notes}
 </svg>`;
 
 export default {
   study: true,
   id: ID,
-  title: 'Request sequence: cache hit versus miss',
-  notes: 'Purpose: Show the order of calls for one request and exactly where the failing branch adds time, so the fix can be placed on the right hop.\nModify: Edit lanes and msgs (from, to, text, type). Frames are declared inline with {frame:"hit"|"miss"|"end"}; y positions and activation bars are computed from message order.\nInvariant: Solid arrows are calls in call direction, dashed arrows are returns. An alt frame holds mutually exclusive branches; give each branch its guard and frequency. The vertical axis is order, not time; durations are written on the messages.\nStatic: Static page.',
+  title: 'Time-scaled sequence of one failed checkout',
+  notes: 'Purpose: Show, on a true time axis, how much of the gateway\'s budget the fallback query consumed, so the fix is placed on the hop that spends the time.\nModify: Replace trace, lanes, spans and messages with one representative trace (times in ms from the first request). Bar lengths, arrows, the remaining-time bracket and the headline numbers are computed; keep the axis domain a little past the timeout.\nInvariant: Time runs left to right on one linear scale and is never broken; the timeout line spans every lane; red marks only the degraded components; say it is one request, and state how a healthy request compares.\nStatic: Static page; no builds.',
   sources: [],
   exportPolicy: 'final',
   className: 'tpl-architecture ar-sequence',
-  content: `<div class="ar-page">
-<div class="ar-bar"><span class="ar-crumb"><b>INC-2317</b><i>/</i>03 · Request sequence</span><span>POST /checkout · during incident</span></div>
-<h1 class="ar-title" data-region="title">A miss adds up to <em>1.8 s</em> of replica time inside a 2.0 s gateway timeout</h1>
-<figure class="ar-fig" style="left:48px;top:128px;width:1184px;height:482px" data-region="primary">${fig}</figure>
-<div class="ar-legend" style="left:48px;top:626px" data-region="support"><span><svg width="46" height="14" viewBox="0 0 46 14" aria-hidden="true"><line x1="2" y1="7" x2="38" y2="7" stroke="${C.sync}" stroke-width="2"/><path d="M36,2 L44,7 L36,12 z" fill="${C.sync}"/></svg>Call</span><span><svg width="46" height="14" viewBox="0 0 46 14" aria-hidden="true"><line x1="2" y1="7" x2="40" y2="7" stroke="${C.mute}" stroke-width="2" stroke-dasharray="5 4"/><path d="M37,2 L44,7 L37,12" fill="none" stroke="${C.mute}" stroke-width="1.6"/></svg>Return</span><span><svg width="46" height="14" viewBox="0 0 46 14" aria-hidden="true"><line x1="2" y1="7" x2="38" y2="7" stroke="${C.warn}" stroke-width="2"/><path d="M36,2 L44,7 L36,12 z" fill="${C.warn}"/></svg>Only on a cache miss</span><span>Vertical order is sequence, not to time scale</span></div>
-<footer class="ar-foot" data-region="source"><span>Illustrative data · durations are typical values in the incident window</span><span class="ar-pg">03 / 06</span></footer>
-</div>`
+  content: `<p class="ar-run"><span>Incident review — checkout timeouts, 6 Oct 2026</span><span>3</span></p>
+<h1 class="ar-head" data-region="title">A single replica query took ${sec(replicaMs)} of the gateway’s ${sec(trace.timeout)} budget</h1>
+<figure class="ar-fig" style="left:64px;top:178px" data-region="primary">${fig}</figure>
+<p class="ar-src" data-region="source"><span>Trace <span class="ar-id">${trace.id}</span>, ${trace.at}, one of the failed checkouts. With a cache hit the same request finishes in ${ms(trace.hitTotal)}.</span></p>`,
 };

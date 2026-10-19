@@ -55,7 +55,7 @@ const maxLog = 4; // 10^4
 const hx = i => X(i / BINS);
 let hist = `<text x="${O.x - 10}" y="${HB.y + 10}" text-anchor="end" class="v-axis">10⁴</text><text x="${O.x - 10}" y="${HB.y + HB.h}" text-anchor="end" class="v-axis">1</text>`;
 hist += `<line x1="${O.x}" y1="${HB.y + HB.h}" x2="${O.x + S}" y2="${HB.y + HB.h}" stroke="${C.axis}"/>`;
-hist += cal.bins.map(b => { const h = Math.log10(b.n) / maxLog * HB.h; return `<rect x="${hx(b.i) + 3}" y="${HB.y + HB.h - h}" width="${S / BINS - 6}" height="${h}" rx="2" fill="${C.cal}" fill-opacity=".85"/><text x="${hx(b.i) + S / BINS / 2}" y="${HB.y + HB.h - h - 5}" text-anchor="middle" class="v-axis" style="font-size:12px">${b.n}</text>`; }).join('');
+hist += cal.bins.map(b => { const h = Math.log10(b.n) / maxLog * HB.h; return `<rect x="${hx(b.i) + 3}" y="${HB.y + HB.h - h}" width="${S / BINS - 6}" height="${h}" rx="2" fill="${C.cal}" fill-opacity=".85"/><text x="${hx(b.i) + S / BINS / 2}" y="${HB.y + HB.h - h - 5}" text-anchor="middle" class="v-axis" style="font-size:15px">${b.n}</text>`; }).join('');
 hist += `<text x="${O.x + S + 10}" y="${HB.y + HB.h - 4}" class="v-axis">windows per bin</text><text x="${O.x + S + 10}" y="${HB.y + HB.h + 14}" class="v-axis">(log scale)</text>`;
 const H = HB.y + HB.h + 26;
 const fig = `<svg viewBox="0 0 620 ${H}" role="img" aria-labelledby="${ID}-t ${ID}-d">
@@ -89,7 +89,7 @@ export default {
   <div class="ml-metric"><span>Expected calibration error</span><b>${(cal.ece * 100).toFixed(1)} pts</b><small>raw scores ${(raw.ece * 100).toFixed(1)} pts · bin-weighted |pred − obs|</small></div>
   <div class="ml-metric"><span>Brier score</span><b>${cal.brier.toFixed(3)}</b><small>raw scores ${raw.brier.toFixed(3)} · lower is better</small></div>
   <div class="ml-note" style="position:static;margin-top:16px"><h3>Why it matters</h3>The alert threshold <code>t = ${THRESHOLD}</code> and the weekly alert budget assume calibrated risks. Raw scores of ${(rb.i / BINS).toFixed(1)}–${((rb.i + 1) / BINS).toFixed(1)} came true only ${pctS(rb.obs)}% of the time, so uncalibrated alerts would look more certain than they are.</div>
-  <table class="ml-bins"><thead><tr><th>Calibrated bin</th><th>n</th><th>mean pred.</th><th>observed [95% CI]</th></tr></thead><tbody>${cal.bins.filter(b => b.i >= 1 && b.i <= 5).map(b => `<tr${b.i === tb.i ? ' class="ml-on"' : ''}><td>${(b.i / BINS).toFixed(1)}–${((b.i + 1) / BINS).toFixed(1)}</td><td>${b.n}</td><td>${b.pred.toFixed(2)}</td><td>${b.obs.toFixed(2)} [${b.ci[0].toFixed(2)}, ${b.ci[1].toFixed(2)}]</td></tr>`).join('')}</tbody></table>
+  <table class="ml-bins"><thead><tr><th>Calibrated bin</th><th>n</th><th>mean pred.</th><th>observed [95% CI]</th></tr></thead><tbody>${cal.bins.filter(b => Math.abs(b.i - tb.i) <= 1).map(b => `<tr${b.i === tb.i ? ' class="ml-on"' : ''}><td>${(b.i / BINS).toFixed(1)}–${((b.i + 1) / BINS).toFixed(1)}</td><td>${b.n}</td><td>${b.pred.toFixed(2)}</td><td>${b.obs.toFixed(2)} [${b.ci[0].toFixed(2)}, ${b.ci[1].toFixed(2)}]</td></tr>`).join('')}</tbody></table>
 </div>
 <footer class="ml-foot" data-region="source"><span>Illustrative data · synthetic predictions</span><span>10 equal-width bins · calibrator fit on Sep 2025 validation</span></footer>
 </div>`

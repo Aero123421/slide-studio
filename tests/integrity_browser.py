@@ -15,9 +15,9 @@ def run():
     def test(name,fn):
         try:fn();rows.append({'name':name,'passed':True})
         except Exception as e:rows.append({'name':name,'passed':False,'error':str(e)[:1200]})
-    def build(content,css=''):
+    def build(content,css='',script=None):
         deck={'title':'Rendered integrity study','css':'.slide{background:#fff;color:#14232e;padding:64px;font:28px Arial}h1{font-size:48px}'+css,
-              'slides':[{'id':'study','title':'Rendered integrity study','content':content}]}
+              'slides':[{'id':'study','title':'Rendered integrity study','content':content}],**({'script':script} if script else {})}
         js="import {renderCraft} from './scripts/craft-core.mjs';process.stdout.write(await renderCraft("+json.dumps(deck)+"));"
         return subprocess.check_output(['node','--input-type=module','-e',js],cwd=ROOT,text=True)
     integrity=(ROOT/'assets/runtime/rendered-integrity.js').read_text()
@@ -104,6 +104,17 @@ def run():
             text=PdfReader(str(pdf_out)).pages[0].extract_text()
             expect('18:00' in text and '1,234' in text and not any(0xE000<=ord(c)<=0xF8FF for c in text),repr(text))
         test('PDF export keeps figures and punctuation searchable when a font maps alternates to private use',searchable_pdf)
+        # A widget redraws for print (its onExport runs on beforeprint), after the fallback has been applied:
+        # the redrawn figures must be searchable too. The redraw keeps the same text, as a widget's does.
+        redraw="const draw=()=>{document.getElementById('axis').innerHTML=\"<text x='10' y='50' font-size='28' style='font-family:Inter;font-variant-numeric:tabular-nums'>0.1 0.2 0.3 at 18:00</text>\"};draw();addEventListener('beforeprint',draw);"
+        source.write_text(build("<h1>Axis drawn by a widget</h1><svg id='axis' width='900' height='80'></svg>",script=redraw));redraw_pdf=folder/'redraw.pdf'
+        redrawn=subprocess.run([sys.executable,str(ROOT/'scripts/export.py'),str(source),str(redraw_pdf),'--force'],capture_output=True,text=True)
+        def searchable_redraw():
+            expect(redrawn.returncode==0,redrawn.stdout[-600:]+redrawn.stderr[-600:])
+            from pypdf import PdfReader
+            text=PdfReader(str(redraw_pdf)).pages[0].extract_text()
+            expect('0.1 0.2 0.3' in text and '18:00' in text and not any(0xE000<=ord(c)<=0xF8FF for c in text),repr(text))
+        test('PDF text stays searchable when a widget redraws its figure while the page prints',searchable_redraw)
         # CJK fonts that share one glyph between a radical and its ideograph make Chromium write ⽉/⻑
         # into the text layer; the export rewrites those entries so 月 and 長 can be searched.
         source.write_text(build('<h1 lang="ja">月次報告の作り方を見直す</h1><p lang="ja" style="font-family:\'Noto Sans CJK JP\',IPAPGothic,sans-serif">店長の時間を店に戻す。西宮店、長期、方針、見込み。</p>'))

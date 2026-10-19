@@ -11,11 +11,19 @@ from font_audit import load_contract,settle_fonts,audit_fonts,print_text,pdf_pos
 # punctuation between figures, tabular figures, character variants. Chromium then writes those
 # code points into the PDF text layer, so "18:00" cannot be searched or copied. When the strict
 # postflight finds that, the PDF is rendered once more with those substitutions turned off;
-# layout features (Japanese palt, kerning, ligatures) are kept.
+# layout features (Japanese palt, kerning, ligatures) are kept. A widget can redraw while the
+# page prints (its onExport runs on beforeprint), so the numeric and contextual settings go in
+# an !important sheet that also reaches new elements, and an observer rewrites the feature
+# list of anything added later.
 PDF_SAFE_TEXT=r'''()=>{let n=0;const keep=/^["'](palt|halt|vpal|vhal|kern|vkrn|liga|clig|locl|ccmp)["']/;
- for(const el of document.querySelectorAll('*')){const s=getComputedStyle(el),f=s.fontFeatureSettings;
-  if(f&&f!=='normal'){const k=f.split(',').map(x=>x.trim()).filter(x=>keep.test(x));el.style.setProperty('font-feature-settings',k.length?k.join(', '):'normal','important')}
-  el.style.setProperty('font-variant-ligatures','no-contextual','important');el.style.setProperty('font-variant-numeric','normal','important');n++}
+ const fix=el=>{const f=getComputedStyle(el).fontFeatureSettings;n++;
+  if(f&&f!=='normal'){const k=f.split(',').map(x=>x.trim()).filter(x=>keep.test(x));el.style.setProperty('font-feature-settings',k.length?k.join(', '):'normal','important')}};
+ const sheet=document.createElement('style');sheet.dataset.studioPdfText='';
+ sheet.textContent='*,*::before,*::after{font-variant-numeric:normal!important;font-variant-ligatures:no-contextual!important}';
+ document.head.append(sheet);
+ for(const el of document.querySelectorAll('*'))fix(el);
+ new MutationObserver(list=>{for(const m of list)for(const a of m.addedNodes)if(a.nodeType===1){fix(a);a.querySelectorAll('*').forEach(fix)}})
+  .observe(document.documentElement,{childList:true,subtree:true});
  return n}'''
 
 # CJK Radicals Supplement → the unified ideograph drawn with the same glyph (Unicode

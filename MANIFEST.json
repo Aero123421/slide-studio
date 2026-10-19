@@ -17,8 +17,8 @@
     },
     {
       "path": "CHANGELOG.md",
-      "bytes": 14509,
-      "sha256": "865555ec2e715ec9221c18756b030d54a200dd03d32dd549a82a7859357f8cc2"
+      "bytes": 14585,
+      "sha256": "76e6c6df61e218a2b9ea1b5149fefac0c22a44acfa5d94e83e1a3f2e75ddcc37"
     },
     {
       "path": "CONTRIBUTING.md",
@@ -4542,8 +4542,8 @@
     },
     {
       "path": "scripts/export.py",
-      "bytes": 10112,
-      "sha256": "613cac48ad8f3a51c1a8d7db0436661c0ee808dc6a8c2c40202de0f313f7fb86"
+      "bytes": 10685,
+      "sha256": "2d86451c5c3835490e02a42bc4e405f5faf56be8abe8c131b62c2fd7e4451830"
     },
     {
       "path": "scripts/font_audit.py",
@@ -4687,8 +4687,8 @@
     },
     {
       "path": "tests/integrity_browser.py",
-      "bytes": 15344,
-      "sha256": "bc4aebd03cd6ac3771889dc0b3d911c4debfea1349d4216522e1c7a05ba06378"
+      "bytes": 16630,
+      "sha256": "3d362fdeee604a383bacb6c2af36cd2884a609cd43d38fcc337730dbf05858b2"
     },
     {
       "path": "tests/navigation.py",

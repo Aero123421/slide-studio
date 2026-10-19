@@ -67,7 +67,8 @@ finished example with computed headlines.
 - **PDF text layer**: exports stay searchable when a font gives alternate glyphs private-use
   code points (Inter's figure punctuation and tabular digits: the page is printed again
   with those substitutions off) or when a CJK font shares a glyph between a radical and its
-  ideograph (the text layer is rewritten from ⽉/⻑ to 月/長).
+  ideograph (the text layer is rewritten from ⽉/⻑ to 月/長). The fallback also reaches
+  figures a widget redraws while the page prints.
 - **Interactions with real subjects**: the 24 studies are pages from fictional decks (a
   sepsis alert threshold, a dosing curve, a tide gauge during a typhoon, a bus network
   with a closed bridge, a parcel-rate matrix, a measured model ablation…), six in

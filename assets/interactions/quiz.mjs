@@ -59,11 +59,11 @@ Static: 書き出しでは解説と内訳の図、去年の回答の割合を表
       explanation: `気づいてからブレーキが効くまでの${reaction.toFixed(1)}秒で${m1(thinking)} m（空走距離）、効いてから止まるまでに${m1(braking)} m（制動距離）。`,
       figure: figure(),
     },
-    controls: { choice: { label: '答えを選ぶ' } },
+    controls: { choice: { label: '答えを選ぶ', summary: false } },
     text: {
       check: '答え合わせ', reset: '元に戻す', prompt: '回答はこの端末の外に送られない。',
       none: 'まず答えを一つ選ぶ。', correctPrefix: '正解。', wrongPrefix: '不正解。',
-      answerMark: '正解', yourMark: 'あなたの答え', share: `去年 {v}%`,
+      answerMark: '正解', yourMark: 'あなたの答え', share: `去年 {v}%`, statusExport: '正解は{answer}。{feedback}',
     },
   }],
 };

@@ -14,7 +14,7 @@ const stops = [   // positions in km on a local grid (x east, y south); label si
   { id: 'ferry', name: 'Ferry Lane', x: 5.5, y: 4.7, label: 'right' },
   { id: 'heath', name: 'Heathfield', x: 7.0, y: 3.6, label: 'right' },
   { id: 'brook', name: 'Brook Green', x: 6.3, y: 1.1, label: 'right' },
-  { id: 'weir', name: 'Weir Road', x: 5.2, y: 0.4, label: 'right' },
+  { id: 'weir', name: 'Weir Road', x: 5.2, y: 0.5, label: 'above' },
 ];
 const links = [   // bus minutes between neighbouring stops
   ['hospital', 'market', 4], ['hospital', 'library', 5], ['hospital', 'station', 6], ['market', 'quay', 4], ['station', 'quay', 5],
@@ -69,7 +69,7 @@ Static: The export shows the closure without the shuttle (${cut.length} stops cu
         { from: shuttle[0], to: shuttle[1], minutes: shuttle[2], toggle: 'shuttle', label: 'Weir Road shuttle', closedLabel: 'shuttle not running', labelDy: -14 }],
       toggles: [{ key: 'bridge', label: 'Mill Street bridge open', on: 'Open', off: 'Closed' }, { key: 'shuttle', label: 'Shuttle over Weir Road bridge', on: 'Running', off: 'Not running' }],
       areas: [{ points: river, tone: 'water', label: 'River Calder', labelAt: [4.28, 5.0] }],
-      pad: { l: 40, r: 120, t: 46, b: 66 },
+      pad: { l: 40, r: 120, t: 56, b: 66 },
     },
     text: {
       minutes: '{m} min', unreachable: 'cut off',

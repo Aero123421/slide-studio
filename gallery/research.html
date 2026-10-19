@@ -2105,7 +2105,9 @@ KINDS.quiz = w => {
       // The explanation shows after checking, and always in a static export.
       if (done) explain.removeAttribute('data-static'); else explain.dataset.static = 'show';
       let status;
-      if (!s.checked) status = t.prompt || (own ? '' : 'Local practice only. No scores leave this page.');
+      const answer = q.options.find(o => o.id === q.answer);
+      if (!s.checked && exporting && own) status = w.fill(t.statusExport || 'Answer: {answer}. {feedback}', { answer: answer?.label ?? '', feedback: answer?.feedback ?? '' });
+      else if (!s.checked) status = t.prompt || (own ? '' : 'Local practice only. No scores leave this page.');
       else if (!chosen) status = t.none || 'Choose an answer first.';
       else if (right) status = own ? join(t.correctPrefix || 'Correct:', chosen.feedback) : correctText;
       else status = own ? join(t.wrongPrefix || 'Not quite:', chosen.feedback) : (t.wrong || 'Try again: visual polish cannot substitute for uncertainty.');

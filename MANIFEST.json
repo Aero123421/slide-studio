@@ -593,7 +593,7 @@
     {
       "path": "assets/interactions/graph.mjs",
       "bytes": 5811,
-      "sha256": "b20dca82bf2ffa93884bcb60ab9b0482dba50713029b1174bb8455ebc3484d83"
+      "sha256": "d6de39071808b43cf472d5cf81fb9f0f3faf255d65bbfda1a97a912559ccc1b5"
     },
     {
       "path": "assets/interactions/histogram.mjs",
@@ -632,8 +632,8 @@
     },
     {
       "path": "assets/interactions/quiz.mjs",
-      "bytes": 5816,
-      "sha256": "55862d6c8fd880fc1c25d8e74da2abc5da36505fefced8084c01c5c9a190da5a"
+      "bytes": 5880,
+      "sha256": "a9831cf32c33f595ed3c7f74a78d54315be73f8d35eecc75ba308312c6c3b841"
     },
     {
       "path": "assets/interactions/scrubber.mjs",
@@ -1152,8 +1152,8 @@
     },
     {
       "path": "assets/runtime/widgets.js",
-      "bytes": 123005,
-      "sha256": "c964ec33df82e7a752185a3dd045487bfdb9edd8644727c594ad714c1ebc7d58"
+      "bytes": 123247,
+      "sha256": "c31267058452244cb785021ee44e1603489b0d32fc0ee83531025757948e97ad"
     },
     {
       "path": "assets/story.schema.json",
@@ -2762,8 +2762,8 @@
     },
     {
       "path": "gallery/interactions.html",
-      "bytes": 710485,
-      "sha256": "af5aeb79685006684af80ac87d058c0430f97b3087aaad5a27d3eae6b13a2e29"
+      "bytes": 710791,
+      "sha256": "79ed9a522cc02643596c65e6ec4ee0e77c7c148de965d7871e3e1b60a7f748de"
     },
     {
       "path": "gallery/languages.html",
@@ -2787,8 +2787,8 @@
     },
     {
       "path": "gallery/research.html",
-      "bytes": 279066,
-      "sha256": "227de0f09adc3dc6a5976c9e9b5632a9999115a248ee3afa6d17a2425480bb9c"
+      "bytes": 279308,
+      "sha256": "e3f843d40b1298fe3edcf22df3655891ec54008ccdfe192647508512a1402e9a"
     },
     {
       "path": "gallery/templates.html",

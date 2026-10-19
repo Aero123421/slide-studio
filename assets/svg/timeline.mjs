@@ -1,7 +1,7 @@
 // Diagram study · Timeline — events at their true times, with the intervals between them named.
 // Spacing encodes elapsed minutes. Flags are packed into levels so no stem crosses a label;
 // phase lengths, the rail numbers and the headline are computed from `events`.
-import { theme as makeTheme, svgRoot, el, g, textLines, wrapText, measureText, linear, fmt } from '../runtime/figure.mjs';
+import { theme as makeTheme, svgRoot, el, textLines, wrapText, measureText, linear } from '../runtime/figure.mjs';
 
 const events = [ // minutes after 02:00, night of 14 March (illustrative)
   { at: 14, key: 'impact', title: 'Deploy 4.18 lands', body: 'checkout errors climb' },

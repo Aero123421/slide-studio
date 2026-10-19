@@ -63,7 +63,7 @@ const figure = svgRoot({
   title: `商談ファネルの件数と段階間の転換率（${periods.now}と${periods.prev}）`,
   desc: `${stages.map(s => `${s.label}${ja0(s.now)}件（前期${ja0(s.prev)}件）`).join('、')}。${steps.map(st => `${st.rate}${pct1(st.cNow)}%（前期${pct1(st.cPrev)}%）`).join('、')}。最も下がったのは${worst.rate}。`,
 }, stageRows, stepRows,
-textLines([`棒：${periods.now}　縦線：${periods.prev}`], { x: W, y: H - 4, size: 15, anchor: 'end', fill: 'var(--muted)' }));
+textLines([`棒は${periods.now}、縦線は${periods.prev}の件数`], { x: W, y: H - 4, size: 15, anchor: 'end', fill: 'var(--muted)' }));
 
 export default {
   study: true,
@@ -86,5 +86,5 @@ export default {
     <p class="q-body">インサイドセールスの欠員${cause.staffShort}名で、初回接触までの日数が平均<span class="nw">${cause.daysPrev}日</span>から<span class="nw">${cause.daysNow}日</span>に延びた。</p>
   </div>
 </div>
-<p class="q-foot" data-region="source"><span>${source}　試算は他の転換率と平均受注額を今期の値に固定</span><span class="num">${running}　${page}</span></p>`,
+<p class="q-foot" data-region="source"><span>${source}　注：試算では${worst.rate}以外の転換率と平均受注額を今期の値とした</span><span class="num">${running}　${page}</span></p>`,
 };

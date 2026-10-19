@@ -80,7 +80,7 @@ export default {
   notes: 'Purpose: Relate an enlarged detail to the exact region it comes from, with scale on both, so the audience can trust what the close-up shows.\nModify: Replace `cells` with your segmented positions (µm), and move `roiY`/`roiSize`; both panels, the link lines, the scale bars and the counts recompute. With a real micrograph, crop the same image at native pixels for the detail.\nInvariant: The box marks exactly the enlarged region; corners are linked; each panel has its own scale bar in real units; the enlargement factor is stated; image evidence is never retouched, only cropped and scaled.\nStatic: Already static. For a talk, show the field, then the box, then the detail.',
   sources: [{ type: 'original-example', file: 'assets/svg/microscopy-callout.mjs' }],
   exportPolicy: 'final',
-  content: `<h1 class="st-head">At the wound edge <em>${roiDividing} of ${inRoi.length} cells are dividing</em>, ${fmt(ratio, { digits: 0 })} times the rate in the intact monolayer</h1>
+  content: `<h1 class="st-head">At the wound edge <em>${roiDividing}&nbsp;of&nbsp;${inRoi.length}&nbsp;cells</em> are dividing, ${fmt(ratio, { digits: 0 })} times the rate in the intact monolayer</h1>
 <figure class="st-fig" data-region="primary">${figure()}</figure>
 <p class="st-source" data-region="source"><span>Illustrative simulation · nuclei positions drawn from point data, not a micrograph; intact = more than 300 µm from the edge</span><span>Detail callout with scale bars</span></p>`,
 };

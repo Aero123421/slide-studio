@@ -1,132 +1,99 @@
-// Template: プロジェクト定例・進捗報告 · マイルストーンのタイムライン（今日の位置）. Synthetic example content; replace data and copy.
-// 日付はすべて phases 配列と today から計算します。基準線（薄い帯）と見込み（濃い帯）、遅れ（斜線）は同じ日付軸に載ります。
-const P = 'tpl-project-status-milestones';
-const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-const meta = { project: 'MINATO', name: '受発注システム刷新', meeting: '第14回 定例', date: '2026年9月23日（水）' };
+// Template: プロジェクト月次状況報告 · マイルストーン（基準計画と見込み）. Synthetic example content; replace data and copy.
+// One date axis for the whole project: thin line = baseline (基準計画), thick bar = actual / forecast,
+// vertical line = 基準日. Slips, the remaining buffer and the headline are computed from `phases`.
+import { svgRoot, el, g, textLines, linear, measureText } from '../../runtime/figure.mjs';
 
-const D = s => Date.UTC(+s.slice(0, 4), +s.slice(5, 7) - 1, +s.slice(8, 10));
-const DAY = 86400000;
-const md = t => { const d = new Date(t); return `${d.getUTCMonth() + 1}/${d.getUTCDate()}`; };
-const WD = ['日', '月', '火', '水', '木', '金', '土'];
-const mdw = t => { const d = new Date(t); return `${d.getUTCMonth() + 1}月${d.getUTCDate()}日（${WD[d.getUTCDay()]}）`; };
-// Business days from a to b (positive when b is later), weekends excluded.
-const bizDiff = (a, b) => { let n = 0, s = Math.sign(b - a); for (let t = a; t !== b; t += s * DAY) { const w = new Date(t + s * DAY).getUTCDay(); if (w !== 0 && w !== 6) n += s; } return n; };
-
-const range = { from: D('2026-06-01'), to: D('2027-02-28') };
-const today = D('2026-09-23');
-// status: done | active | planned. base = 基準計画, fc = 実績または見込み. ms = 終了時のマイルストーン名.
+const ID = 'tpl-project-status-milestones';
+const project = { name: '基幹システム移行プロジェクト', meeting: '第7回ステアリングコミッティ', date: '2026-10-21' };
+const asOf = '2026-10-16';                       // 基準日 = end of sprint 5
+const span = ['2026-04-01', '2027-06-01'];       // axis range
+const STATUS = { ok: '順調', warn: '注意', late: '遅延' };
+// plan = 基準計画（2026年6月承認）, fc = 実績または見込み. state: done | active | next. status only for active phases.
 const phases = [
-  { name: '基本設計', owner: '業務・開発', base: ['2026-06-01', '2026-07-31'], fc: ['2026-06-01', '2026-07-31'], status: 'done', ms: '基本設計の承認' },
-  { name: '詳細設計・開発', owner: '開発・委託先', base: ['2026-08-03', '2026-10-02'], fc: ['2026-08-03', '2026-10-09'], status: 'active', ms: '開発完了' },
-  { name: '結合テスト', owner: 'QA・開発', base: ['2026-09-29', '2026-11-06'], fc: ['2026-10-06', '2026-11-10'], status: 'planned', ms: '結合テスト完了' },
-  { name: '総合テスト', owner: 'QA・業務', base: ['2026-11-09', '2026-12-11'], fc: ['2026-11-11', '2026-12-15'], status: 'planned', ms: '総合テスト完了', buffer: ['2026-12-14', '2026-12-18'] },
-  { name: '移行リハーサル', owner: 'インフラ・業務', base: ['2026-12-21', '2026-12-25'], fc: ['2026-12-21', '2026-12-25'], status: 'planned', ms: 'リハーサル完了' },
-  { name: '本番稼働・安定化', owner: '全体', base: ['2027-01-12', '2027-02-26'], fc: ['2027-01-12', '2027-02-26'], status: 'planned', ms: '本番稼働', msAtStart: true }
+  { name: '要件定義', plan: ['2026-04-01', '2026-06-12'], fc: ['2026-04-01', '2026-06-12'], state: 'done' },
+  { name: '基本設計', plan: ['2026-06-15', '2026-08-07'], fc: ['2026-06-15', '2026-08-07'], state: 'done' },
+  { name: '開発', plan: ['2026-08-10', '2026-11-27'], fc: ['2026-08-10', '2026-12-11'], state: 'active', status: 'warn' },
+  { name: 'データ移行', plan: ['2026-09-01', '2027-01-29'], fc: ['2026-09-01', '2027-01-29'], state: 'active', status: 'ok' },
+  { name: '結合テスト', plan: ['2026-11-30', '2027-01-22'], fc: ['2026-12-14', '2027-02-05'], state: 'next' },
+  { name: '総合・受入テスト', plan: ['2027-01-25', '2027-03-12'], fc: ['2027-02-08', '2027-03-26'], state: 'next' },
+  { name: '移行リハーサル', plan: ['2027-03-15', '2027-04-09'], fc: ['2027-03-29', '2027-04-23'], state: 'next' },
 ];
+const buffer = { plan: ['2027-04-12', '2027-04-30'], fc: ['2027-04-26', '2027-04-30'] };   // 予備期間
+const cutover = { from: '2027-05-01', to: '2027-05-05', goLive: '2027-05-06' };          // 連休中に切り替え
+const page = 2;
 
-const W = 1168, X0 = 232, X1 = 1160, sx = t => X0 + (t - range.from) / (range.to - range.from) * (X1 - X0);
-const axisH = 44, rowH = 48;
-const rows = phases.map((p, i) => {
-  const y = axisH + i * rowH, cy = y + rowH / 2;
-  const [b0, b1] = p.base.map(D), [f0, f1] = p.fc.map(D);
-  const late = bizDiff(b1, f1);
-  const fill = p.status === 'done' ? '#1d3a5f' : p.status === 'active' ? '#0c7478' : '#ffffff';
-  const stroke = p.status === 'planned' ? '#0c7478' : 'none';
-  // Active phase: progress fill up to today.
-  const prog = p.status === 'active' ? `<rect x="${sx(f0)}" y="${cy - 3}" width="${sx(today) - sx(f0)}" height="14" fill="#0c7478"/>` : '';
-  const barFill = p.status === 'active' ? '#bfe0e0' : fill;
-  const lateBar = f1 > b1 ? `<rect x="${sx(b1)}" y="${cy - 3}" width="${sx(f1) - sx(b1)}" height="14" fill="url(#${P}-late)" stroke="#c48a00" stroke-width="1"/>` : '';
-  const buf = p.buffer ? (() => {
-    const [u0, u1] = p.buffer.map(D), used = Math.max(0, bizDiff(D(p.base[1]), f1)), size = bizDiff(u0 - DAY, u1);
-    return `<rect x="${sx(u0 - DAY * 0.5)}" y="${cy - 5}" width="${sx(u1 + DAY * 0.5) - sx(u0 - DAY * 0.5)}" height="18" rx="3" fill="none" stroke="#8a96a8" stroke-dasharray="3 3"/>
-      <text x="${sx(u1 + DAY * 0.5) + 6}" y="${cy + 9}" font-size="15" fill="#465264">予備日 残り${size - used}日</text>`;
-  })() : '';
-  const msT = p.msAtStart ? f0 : f1, msBase = p.msAtStart ? b0 : b1;
-  // Baseline date: small hollow diamond on the thin baseline bar. Forecast/actual: solid diamond on the main bar.
-  const baseDiamond = x => `<path d="M${x} ${cy - 13}l6 6.5-6 6.5-6-6.5z" fill="#fff" stroke="#6b778a" stroke-width="1.5"/>`;
-  const fcDiamond = x => `<path d="M${x} ${cy - 5}l9 9-9 9-9-9z" fill="${p.status === 'done' ? '#1b2433' : '#0c7478'}" stroke="#fff" stroke-width="1.5"/>`;
-  const msLabel = p.status === 'done' ? `${md(msT)} 完了` : late > 0 ? `${md(msT)}（+${late}営業日）` : `${md(msT)}（予定どおり）`;
-  const labelRight = sx(msT) + 14 + msLabel.length * 14 < W;
-  const lab = p.msAtStart
-    ? `<text x="${sx(msT) - 14}" y="${cy - 14}" font-size="15" font-weight="700" fill="#1b2433" text-anchor="end">${esc(p.ms)} ${msLabel}</text>`
-    : `<text x="${labelRight ? sx(msT) + 14 : sx(msT) - 14}" y="${cy - 14}" font-size="15" font-weight="700" fill="${late > 0 ? '#8a5a00' : '#1b2433'}" text-anchor="${labelRight ? 'start' : 'end'}">${msLabel}</text>`;
-  return `<g>
-    <line x1="0" x2="${X1}" y1="${y + rowH}" y2="${y + rowH}" stroke="#e8ecf1"/>
-    <text x="0" y="${cy - 1}" font-size="17" font-weight="700" fill="#1b2433">${esc(p.name)}</text>
-    <text x="0" y="${cy + 18}" font-size="15" fill="#5f6b7c">${esc(p.owner)}</text>
-    <rect x="${sx(b0)}" y="${cy - 9}" width="${sx(b1) - sx(b0)}" height="5" rx="2" fill="#c7cfda"/>
-    <rect x="${sx(f0)}" y="${cy - 3}" width="${Math.max(3, Math.min(sx(f1), sx(b1)) - sx(f0))}" height="14" fill="${barFill}" stroke="${stroke}" stroke-width="1.4"/>
-    ${prog}${lateBar}${buf}
-    ${msT !== msBase ? baseDiamond(sx(msBase)) : ''}${fcDiamond(sx(msT))}${lab}
-  </g>`;
-}).join('');
+// ---- derived
+const DAY = 86400000, WD = '日月火水木金土';
+const t = iso => Date.parse(`${iso}T00:00:00Z`);
+const md = ms => { const d = new Date(ms); return `${d.getUTCMonth() + 1}月${d.getUTCDate()}日`; };
+const ymd = ms => `${new Date(ms).getUTCFullYear()}年${md(ms)}`;
+const weeks = (a, b) => Math.round((t(b) - t(a)) / (7 * DAY));
+phases.forEach(p => { p.slip = weeks(p.plan[1], p.fc[1]); });
+const dev = phases.find(p => p.state === 'active' && p.slip > 0) || phases.find(p => p.slip > 0);
+const workWeeks = ([a, b]) => Math.round((t(b) - t(a) + 3 * DAY) / (7 * DAY));   // Monday → Friday spans
+const bufferPlan = workWeeks(buffer.plan), bufferLeft = workWeeks(buffer.fc);
 
+// ---- figure: 12 columns × 404 px. Label column = 3 columns; timeline = columns 4–12.
+const W = 1152, H = 404, x0 = 294, headH = 52, rowH = 38;
+const x = linear([t(span[0]), t(span[1])], [x0, W]);
+const rows = [...phases.map(p => ({ ...p, kind: 'phase' })), { name: '予備期間', kind: 'buffer' }, { name: '本番移行', kind: 'cutover' }];
+const ry = i => headH + i * rowH;
 const months = [];
-for (let y = 2026, m = 5; ; m++) { if (m > 11) { m = 0; y++; } const t = Date.UTC(y, m, 1); if (t > range.to) break; months.push({ t, y, m }); }
-const chartH = axisH + phases.length * rowH;
-const axis = months.map(({ t, y, m }, i) => {
-  const next = i + 1 < months.length ? months[i + 1].t : range.to + DAY;
-  return `<line x1="${sx(t)}" x2="${sx(t)}" y1="${axisH - 14}" y2="${chartH}" stroke="#dde3ea"/>
-  <text x="${(sx(t) + sx(next)) / 2}" y="${axisH - 22}" font-size="15" fill="#465264" text-anchor="middle">${m === 0 ? `${y}年 ` : ''}${m + 1}月</text>`;
+for (let d = new Date(t(span[0])); d.getTime() < t(span[1]); d.setUTCMonth(d.getUTCMonth() + 1)) months.push(new Date(d.getTime()));
+const axis = months.map((m, i) => {
+  const a = x(m.getTime()), b = i + 1 < months.length ? x(months[i + 1].getTime()) : W, jan = m.getUTCMonth() === 0;
+  return g({},
+    el('line', { x1: a, x2: a, y1: jan || i === 0 ? 4 : headH - 26, y2: ry(rows.length), stroke: jan ? 'var(--rule)' : 'var(--grid)', 'stroke-width': 1 }),
+    jan || i === 0 ? textLines([`${m.getUTCFullYear()}年`], { x: a + 6, y: 4, size: 15, valign: 'top', fill: 'var(--muted)' }) : '',
+    textLines([`${m.getUTCMonth() + 1}月`], { x: (a + b) / 2, y: headH - 12, size: 16, anchor: 'middle', fill: 'var(--muted)' }));
 }).join('');
-const golive = D(phases[phases.length - 1].fc[0]);
-const todayMark = `<rect x="${sx(today)}" y="${axisH - 14}" width="${sx(golive) - sx(today)}" height="${chartH - axisH + 14}" fill="#0c7478" opacity=".035"/>
-  <line x1="${sx(today)}" x2="${sx(today)}" y1="${axisH - 16}" y2="${chartH + 6}" stroke="#b8372a" stroke-width="2"/>
-  <rect x="${sx(today) - 44}" y="${chartH + 6}" width="88" height="26" rx="13" fill="#b8372a"/>
-  <text x="${sx(today)}" y="${chartH + 24}" font-size="15" font-weight="700" fill="#fff" text-anchor="middle">今日 ${md(today)}</text>`;
-
-const svg = `<svg viewBox="0 0 ${W} ${chartH + 34}" width="${W}" height="${chartH + 34}" role="img" aria-labelledby="${P}-t ${P}-d" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic','Meiryo','IPAGothic',sans-serif">
-<title id="${P}-t">フェーズ別の基準計画と見込み、マイルストーン、今日の位置</title>
-<desc id="${P}-d">${phases.map(p => `${p.name}：基準 ${md(D(p.base[0]))}〜${md(D(p.base[1]))}、見込み ${md(D(p.fc[0]))}〜${md(D(p.fc[1]))}`).join('。')}。今日は${md(today)}。例示データ。</desc>
-<defs><pattern id="${P}-late" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" fill="#fff2d2"/><line x1="0" y1="0" x2="0" y2="6" stroke="#e0a100" stroke-width="2"/></pattern></defs>
-${todayMark}${axis}${rows}
-</svg>`;
-
-const nextMs = phases.map(p => ({ name: p.ms, t: D(p.msAtStart ? p.fc[0] : p.fc[1]) })).filter(m => m.t > today).sort((a, b) => a.t - b.t)[0];
-const days = t => Math.round((t - today) / DAY);
-const bufPhase = phases.find(p => p.buffer), used = bizDiff(D(bufPhase.base[1]), D(bufPhase.fc[1])), bufSize = bizDiff(D(bufPhase.buffer[0]) - DAY, D(bufPhase.buffer[1]));
-const devLate = bizDiff(D(phases[1].base[1]), D(phases[1].fc[1]));
-const gauge = Array.from({ length: bufSize }, (_, i) => `<rect x="${i * 30}" y="0" width="24" height="16" rx="3" fill="${i < used ? 'url(#' + P + '-late)' : '#e0f1f1'}" stroke="${i < used ? '#c48a00' : '#0c7478'}" stroke-width="1.2"/>`).join('');
-
-const key = `<div class="ps-abs" style="left:56px;bottom:18px;display:flex;gap:22px;align-items:center;font:400 15px/1 var(--ps-jp);color:var(--ps-ink-2)">
-  <span style="display:inline-flex;align-items:center;gap:8px"><i style="display:inline-block;width:28px;height:5px;border-radius:2px;background:#c7cfda"></i>基準計画</span>
-  <span style="display:inline-flex;align-items:center;gap:8px"><i style="display:inline-block;width:28px;height:12px;background:#1d3a5f"></i>完了</span>
-  <span style="display:inline-flex;align-items:center;gap:8px"><i style="display:inline-block;width:28px;height:12px;background:linear-gradient(90deg,#0c7478 55%,#bfe0e0 55%)"></i>進行中（今日まで）</span>
-  <span style="display:inline-flex;align-items:center;gap:8px"><i style="display:inline-block;width:28px;height:12px;border:1.4px solid #0c7478"></i>見込み</span>
-  <span style="display:inline-flex;align-items:center;gap:8px"><i style="display:inline-block;width:28px;height:12px;background:repeating-linear-gradient(45deg,#fff2d2 0 3px,#e0a100 3px 5px);border:1px solid #c48a00"></i>基準からの遅れ</span>
-  <span style="display:inline-flex;align-items:center;gap:8px"><svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="M8 1l7 7-7 7-7-7z" fill="#fff" stroke="#6b778a" stroke-width="1.8"/></svg>基準日</span>
-  <span style="display:inline-flex;align-items:center;gap:8px"><svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M8 1l7 7-7 7-7-7z" fill="#0c7478"/></svg>見込み日</span>
-  <span style="margin-left:auto;color:var(--ps-ink-3)">例示データ</span></div>`;
-
-const logo = `<svg viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="6" fill="#1d3a5f"/><path d="M4 14c2.7-2.6 5.3-2.6 8 0s5.3 2.6 8 0" fill="none" stroke="#5ec4c4" stroke-width="2" stroke-linecap="round"/><path d="M4 9c2.7-2.6 5.3-2.6 8 0s5.3 2.6 8 0" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>`;
-const bar = () => `<header class="ps-bar">${logo}<p>${meta.project}<span>${meta.name}プロジェクト</span></p><p class="ps-meta"><b>${meta.meeting}</b>${meta.date}</p></header>`;
+const bar = (from, to, y, h, attrs) => el('rect', { x: x(t(from)), y, width: Math.max(3, x(t(to) + DAY) - x(t(from))), height: h, ...attrs });
+const label = (p, y) => {
+  const status = p.status ? `<tspan fill="var(--${p.status === 'ok' ? 'ok' : p.status === 'warn' ? 'warn' : 'late'})">●</tspan> ${STATUS[p.status]}` : p.state === 'done' ? '完了' : '';
+  return textLines([p.name], { x: 0, y, size: 18, valign: 'middle', fill: 'var(--ink)', weight: p.status ? 700 : null })
+    + (status ? `<text x="${x0 - 24}" y="${(y + 16 * 0.36).toFixed(1)}" font-size="16" text-anchor="end" style="fill:var(--${p.status ? 'ink' : 'muted'})">${status}</text>` : '');
+};
+const body = rows.map((r, i) => {
+  const y = ry(i), cy = y + rowH / 2, parts = [label(r, cy)];
+  if (r.kind === 'phase') {
+    parts.push(bar(r.plan[0], r.plan[1], cy - 9, 3, { fill: 'var(--context)' }));
+    parts.push(bar(r.fc[0], r.fc[1], cy - 3, 12, { fill: r.state === 'done' ? 'var(--muted)' : 'var(--teal)' }));
+    if (r.slip > 0) parts.push(textLines([`+${r.slip}週`], { x: x(t(r.fc[1]) + DAY) + 8, y: cy + 3, size: 16, valign: 'middle', weight: 700, fill: 'var(--ink)' }));
+  } else if (r.kind === 'buffer') {
+    parts.push(bar(buffer.plan[0], buffer.plan[1], cy - 9, 3, { fill: 'var(--context)' }));
+    parts.push(bar(buffer.fc[0], buffer.fc[1], cy - 3, 12, { fill: 'var(--paper)', stroke: 'var(--teal)', 'stroke-width': 1.5 }));
+    const lab = `残り${bufferLeft}週間（当初${bufferPlan}週間）`;
+    parts.push(textLines([lab], { x: x(t(buffer.fc[0])) - 10, y: cy + 3, size: 16, anchor: 'end', valign: 'middle', fill: 'var(--ink)' }));
+  } else {
+    const gx = x(t(cutover.goLive) + DAY / 2);
+    parts.push(bar(cutover.from, cutover.to, cy - 3, 12, { fill: 'var(--teal)' }));
+    parts.push(el('path', { d: `M${gx} ${cy - 7}l8 9-8 9-8-9z`, fill: 'var(--ink)' }));
+    const lab = `本番稼働 ${md(t(cutover.goLive))}`;
+    parts.push(textLines([lab], { x: x(t(cutover.from)) - 10, y: cy + 3, size: 16, anchor: 'end', valign: 'middle', weight: 700, fill: 'var(--ink)' }));
+  }
+  return g({}, el('line', { x1: 0, x2: W, y1: y + rowH, y2: y + rowH, stroke: 'var(--grid)' }), ...parts);
+}).join('');
+const tx = x(t(asOf) + DAY / 2), bottom = ry(rows.length);
+const today = g({},
+  el('line', { x1: tx, x2: tx, y1: headH, y2: bottom + 6, stroke: 'var(--ink)', 'stroke-width': 1.5 }),
+  textLines([`基準日 ${md(t(asOf))}`], { x: tx, y: bottom + 12, size: 16, anchor: 'middle', valign: 'top', weight: 700, fill: 'var(--ink)' }));
+const figure = svgRoot({
+  id: `${ID}-fig`, width: W, height: H,
+  title: 'フェーズ別の基準計画と実績・見込み（2026年4月〜2027年5月）',
+  desc: `${phases.map(p => `${p.name}：基準${md(t(p.plan[0]))}〜${md(t(p.plan[1]))}、見込み${md(t(p.fc[0]))}〜${md(t(p.fc[1]))}`).join('。')}。予備期間は${bufferPlan}週間から${bufferLeft}週間に減る。本番稼働は${ymd(t(cutover.goLive))}で変わらない。`,
+}, el('line', { x1: 0, x2: W, y1: headH, y2: headH, stroke: 'var(--ink)', 'stroke-width': 1.5 }), axis, body, today);
 
 export default {
   study: true,
-  id: 'tpl-project-status-milestones',
-  title: 'マイルストーン：基準計画と見込み、今日の位置',
+  id: ID,
   language: 'ja',
-  notes: 'Purpose: 基準計画に対してどこがどれだけずれ、最終期限に影響するかを1本の日付軸で示す。\nModify: phases の base／fc（YYYY-MM-DD）、status、buffer と today を書き換える。棒・菱形・遅れ・予備日・下段の数値は日付から計算される。\nInvariant: 基準計画は消さずに残す。遅れは営業日で数え、予備日の残数と矛盾させない。今日の線は報告基準日に合わせる。\nStatic: ビルドなし。',
+  title: 'Milestones: baseline against forecast, with the status date',
+  notes: `Purpose: 基準計画に対してどの工程がどれだけずれ、予備期間と本番稼働日にどう響くかを1本の日付軸で示す。\nModify: phases の plan（基準計画）と fc（実績・見込み）、state、進行中の工程の status、buffer、cutover、asOf を書き換える（YYYY-MM-DD）。ずれの週数、予備期間の残り、見出しは自動。期間が変わったら span も直す。\nInvariant: 基準計画の線は消さずに残す。見込みは基準日時点の実績から計算した日付にする（3ページのバーンダウンと同じ日付）。状況の色は言葉と一緒にだけ使う。本番稼働日を最後の行で必ず示す。\nStatic: Already static.`,
   sources: [],
   exportPolicy: 'final',
-  className: 'tpl-project-status ps-milestones',
-  content: `<div class="ps-page">${bar()}
-<div class="ps-abs" style="left:56px;top:66px;right:56px">
-  <p class="ps-sec">02　マイルストーン</p>
-  <h1 class="ps-title" data-region="title">開発の遅れ${devLate}営業日は、並行テストと予備日${used}日で吸収します</h1>
-</div>
-<div class="ps-fig" data-region="primary" style="left:56px;top:150px;width:${W}px">${svg}</div>
-<div class="ps-abs" data-region="support" style="left:56px;right:56px;top:540px;display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:40px">
-  <div style="border-top:1.5px solid var(--ps-ink);padding-top:12px"><p style="font:400 15px/1.3 var(--ps-jp);color:var(--ps-ink-3)">次のマイルストーン</p>
-    <p style="margin-top:8px;font:700 22px/1.3 var(--ps-jp)">${esc(nextMs.name)}　${mdw(nextMs.t)}</p>
-    <p style="margin-top:4px;font:400 16px/1.4 var(--ps-jp);color:var(--ps-ink-2)">あと<b class="ps-num" style="font-size:20px;color:var(--ps-ink)"> ${days(nextMs.t)} </b>日・基準日から${devLate}営業日遅れ</p></div>
-  <div style="border-top:1.5px solid var(--ps-ink);padding-top:12px"><p style="font:400 15px/1.3 var(--ps-jp);color:var(--ps-ink-3)">総合テスト後の予備日</p>
-    <svg viewBox="0 0 ${bufSize * 30} 16" width="${bufSize * 30}" height="16" style="margin-top:12px" role="img" aria-labelledby="${P}-g"><title id="${P}-g">予備日${bufSize}日のうち${used}日を使用</title><defs><pattern id="${P}-late2" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" fill="#fff2d2"/><line x1="0" y1="0" x2="0" y2="6" stroke="#e0a100" stroke-width="2"/></pattern></defs>${gauge.replaceAll(P + '-late', P + '-late2')}</svg>
-    <p style="margin-top:10px;font:400 16px/1.4 var(--ps-jp);color:var(--ps-ink-2)">${bufSize}日のうち${used}日を使用、<b style="color:var(--ps-ink)">残り${bufSize - used}日</b></p></div>
-  <div style="border-top:1.5px solid var(--ps-ink);padding-top:12px"><p style="font:400 15px/1.3 var(--ps-jp);color:var(--ps-ink-3)">本番稼働まで</p>
-    <p style="margin-top:8px;font:700 22px/1.3 var(--ps-jp)">${mdw(golive)}</p>
-    <p style="margin-top:4px;font:400 16px/1.4 var(--ps-jp);color:var(--ps-ink-2)">あと<b class="ps-num" style="font-size:20px;color:var(--ps-ink)"> ${days(golive)} </b>日・基準日から変更なし</p></div>
-</div>
-${key}
-</div>`
+  className: 'tpl-project-status p-milestones',
+  content: `<p class="p-run" data-region="support"><span>${project.name}　${project.meeting}</span><span class="num">${ymd(t(project.date))}　${page}</span></p>
+<h1 class="p-head" data-region="title">${dev.name}の完了が<span class="nw">${dev.slip}週間</span>遅れ、後続の工程も同じだけずれる。予備期間で吸収し、<span class="nw">本番稼働日は変えない</span></h1>
+<figure class="g" style="--c:1;--s:12;top:214px;margin:0" data-region="primary">${figure}</figure>
+<p class="p-note" data-region="source">細い線は基準計画（2026年6月承認）、太い線は実績と見込み。見込みは${ymd(t(asOf))}時点の開発速度による（3ページ）。</p>`,
 };

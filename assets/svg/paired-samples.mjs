@@ -47,12 +47,12 @@ export function figure(theme = 'css') {
     textLines([head], { x, y: 4, size: 19, anchor: 'middle', valign: 'top', weight: 700, fill: t.c('ink') }),
     textLines(['字/分'], { x: x + side * lead, y: 46, size: 15, anchor: side < 0 ? 'end' : 'start', valign: 'middle', fill: t.c('muted') }),
     textLines(['児童'], { x: x + side * (lead + 48), y: 46, size: 15, anchor: side < 0 ? 'end' : 'start', valign: 'middle', fill: t.c('muted') }),
-    el('line', { x1: x, x2: x, y1: top - 6, y2: bottom + 4, stroke: t.c('rule'), 'stroke-width': 1.5 }))),
+    el('line', { fill: 'none', x1: x, x2: x, y1: top - 6, y2: bottom + 4, stroke: t.c('rule'), 'stroke-width': 1.5 }))),
   // one line per child: identity is kept, never a rank match
   order.map(({ p }) => {
     const slow = isSlow(p);
     return g({},
-      el('line', { x1: xa, y1: y(p.jul), x2: xb, y2: y(p.sep), stroke: slow ? t.c('accent') : t.c('context'), 'stroke-width': slow ? 3 : 1.8, 'stroke-linecap': 'round' }),
+      el('line', { fill: 'none', x1: xa, y1: y(p.jul), x2: xb, y2: y(p.sep), stroke: slow ? t.c('accent') : t.c('context'), 'stroke-width': slow ? 3 : 1.8, 'stroke-linecap': 'round' }),
       el('circle', { cx: xa, cy: y(p.jul), r: slow ? 5 : 3.8, fill: slow ? t.c('accent') : t.c('muted') }),
       el('circle', { cx: xb, cy: y(p.sep), r: slow ? 5 : 3.8, fill: slow ? t.c('accent') : t.c('muted') }));
   }),

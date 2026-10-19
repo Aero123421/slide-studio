@@ -30,14 +30,14 @@ export const DEFAULT_THEME = Object.freeze({
   cat: ['#2457c5', '#d9822b', '#7a58a6', '#3d8c58', '#c2465b', '#5c6b7b', '#b39223', '#2f8f9b'],
   seq: ['#e9effb', '#bdcff2', '#86a6e4', '#4a76d1', '#2550a8', '#183670', '#0e2246'],
   div: ['#a8361f', '#d9775f', '#f1c4b6', '#f4f2ef', '#bccdf0', '#6e93dd', '#2457c5'],
-  fontSans: FONT.sans, fontSerif: FONT.serif, fontMono: FONT.mono,
+  fontSans: FONT.sans, fontSerif: FONT.serif, fontMono: FONT.mono, fontDisplay: FONT.sans,
 });
 
 const VAR = {
   paper: '--ss-paper', surface: '--ss-surface', ink: '--ss-ink', muted: '--ss-muted', rule: '--ss-rule',
   grid: '--ss-grid', accent: '--ss-accent', onAccent: '--ss-on-accent', positive: '--ss-positive',
   negative: '--ss-negative', highlight: '--ss-highlight', context: '--ss-context',
-  fontSans: '--ss-font-sans', fontSerif: '--ss-font-serif', fontMono: '--ss-font-mono',
+  fontSans: '--ss-font-sans', fontSerif: '--ss-font-serif', fontMono: '--ss-font-mono', fontDisplay: '--ss-font-display',
 };
 
 /**
@@ -71,9 +71,15 @@ export function theme(input = 'css') {
     /** Diverging ramp from a -1..1 position (0 = neutral middle). */
     divAt(t) { const n = base.div.length; return ramp(base.div, Math.round(((clamp(t, -1, 1) + 1) / 2) * (n - 1)), 'div'); },
     font(kind = 'sans') {
-      const key = { sans: 'fontSans', serif: 'fontSerif', mono: 'fontMono' }[kind];
+      const key = { sans: 'fontSans', serif: 'fontSerif', mono: 'fontMono', display: 'fontDisplay' }[kind];
       if (!key) throw Error(`Unknown font kind "${kind}"`);
       return wrap(VAR[key], base[key]);
+    },
+    /** k (0..1) of color A over color B; A and B are roles ('accent') or literal colors. */
+    mix(a, b, k) {
+      const lit = v => (v in VAR ? base[v] : v), css = v => (v in VAR ? this.c(v) : v);
+      if (literal) return mixHex(lit(b), lit(a), clamp01(k));
+      return `color-mix(in srgb, ${css(a)} ${Math.round(clamp01(k) * 100)}%, ${css(b)})`;
     },
     /** Literal hex for a role, for contrast math (works in both modes). */
     hex(role) { return base[role]; },
@@ -94,6 +100,7 @@ export function fromColorSystem(cs) {
     seq: ramp(d.sequential, 7), div: ramp(d.diverging, 7),
     fontSans: type.body ? `${type.body}${type.ja ? ',' + type.ja : ''}` : undefined,
     fontSerif: type.display && /serif/i.test(type.display) && !/sans-serif/i.test(type.display) ? type.display : undefined,
+    fontDisplay: type.display ? `${type.display}${type.ja && !type.display.includes(type.ja) ? ',' + type.ja : ''}` : undefined,
   };
   for (const k of Object.keys(out)) if (out[k] === undefined) delete out[k];
   return out;

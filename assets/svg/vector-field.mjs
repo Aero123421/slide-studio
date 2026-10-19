@@ -50,14 +50,14 @@ export function figure(theme = 'css') {
   textLines(['Land'], { x: sx(40), y: map.y - 7, size: 16, weight: 700, fill: t.c('muted'), anchor: 'end', valign: 'bottom' }),
   textLines(['Sea-breeze front, u = 0'], { x: sx(fTop[0]), y: map.y - 7, size: 16, anchor: 'middle', valign: 'bottom', weight: 700, fill: t.c('accent') }),
   // transect line on the map
-  el('line', { x1: sx(0), x2: sx(40), y1: sy(transectY), y2: sy(transectY), stroke: t.c('muted'), 'stroke-width': 1.2, 'stroke-dasharray': '2 4' }),
+  el('line', { fill: 'none', x1: sx(0), x2: sx(40), y1: sy(transectY), y2: sy(transectY), stroke: t.c('muted'), 'stroke-width': 1.2, 'stroke-dasharray': '2 4' }),
   textLines([`y = ${transectY} km`], { x: map.x + map.w + 6, y: sy(transectY), size: 15, valign: 'middle', fill: t.c('muted') }),
   // scale bar and coordinate convention under the map
   el('path', { d: `M${sx(0)} ${map.y + map.h + 14}h${5 * k}`, stroke: t.c('ink'), 'stroke-width': 2.5 }),
   textLines(['5 km'], { x: sx(0) + 5 * k + 8, y: map.y + map.h + 14, size: 15, valign: 'middle', fill: t.c('ink'), weight: 600 }),
   textLines(['x east, y north; arrows point where the air goes'], { x: map.x + map.w, y: map.y + map.h + 14, size: 15, anchor: 'end', valign: 'middle', fill: t.c('muted') }),
   // key: north, reference arrow, grid spacing
-  el('line', { x1: kx + 8, x2: kx + 8, y1: ky + 36, y2: ky - 6, stroke: t.c('ink'), 'stroke-width': 2, 'marker-end': `url(#${id}-n)` }),
+  el('line', { fill: 'none', x1: kx + 8, x2: kx + 8, y1: ky + 36, y2: ky - 6, stroke: t.c('ink'), 'stroke-width': 2, 'marker-end': `url(#${id}-n)` }),
   textLines(['N'], { x: kx + 8, y: ky + 52, size: 16, anchor: 'middle', valign: 'middle', weight: 700, fill: t.c('ink') }),
   el('path', { d: `M${kx + 52} ${ky + 16}h${keyLen}M${kx + 52 + keyLen - 6} ${ky + 12}l6 4l-6 4`, fill: 'none', stroke: t.c('ink'), 'stroke-width': 1.8, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }),
   textLines(['5 m/s'], { x: kx + 60 + keyLen, y: ky + 16, size: 16, valign: 'middle', weight: 700, fill: t.c('ink') }),
@@ -65,13 +65,13 @@ export function figure(theme = 'css') {
   // transect profile: the numbers in the headline
   textLines([`Onshore wind u along y = ${transectY} km`], { x: pp.x, y: pp.y - 34, size: 15, valign: 'bottom', weight: 700, fill: t.c('ink') }),
   textLines(['m/s, east positive'], { x: pp.x, y: pp.y - 14, size: 15, valign: 'bottom', fill: t.c('muted') }),
-  [-4, 0, 4, 8].map(v => g({}, el('line', { x1: pp.x, x2: pp.x + pp.w, y1: py(v), y2: py(v), stroke: v === 0 ? t.c('ink') : t.c('grid'), 'stroke-width': v === 0 ? 1.2 : 1 }),
+  [-4, 0, 4, 8].map(v => g({}, el('line', { fill: 'none', x1: pp.x, x2: pp.x + pp.w, y1: py(v), y2: py(v), stroke: v === 0 ? t.c('ink') : t.c('grid'), 'stroke-width': v === 0 ? 1.2 : 1 }),
     textLines([fmt(v, { sign: v > 0 })], { x: pp.x - 6, y: py(v), size: 15, anchor: 'end', valign: 'middle', fill: t.c('muted') }))),
   el('path', { d: pathFromPoints(profile.map(p => [px(p.x), py(p.u)])), fill: 'none', stroke: t.c('ink'), 'stroke-width': 2 }),
   el('circle', { cx: px(peak.x), cy: py(peak.u), r: 4.5, fill: t.c('ink') }),
   textLines([`${fmt(peak.u, { digits: 1 })} m/s`], { x: px(peak.x) + 8, y: py(peak.u) - 4, size: 15, valign: 'bottom', weight: 700, fill: t.c('ink') }),
   el('circle', { cx: px(front.x), cy: py(0), r: 5, fill: t.c('accent') }),
-  textLines([`front, ${fmt(inland, { digits: 0 })} km inland`], { x: px(front.x) - 8, y: py(0) + 9, size: 15, anchor: 'end', valign: 'top', weight: 700, fill: t.c('accent') }),
+  textLines([`front ${fmt(inland, { digits: 0 })} km inland`], { x: px(front.x) + 8, y: py(0) - 8, size: 15, valign: 'bottom', weight: 700, fill: t.c('accent') }),
   [0, 20, 40].map(v => textLines([`${v}${v === 40 ? ' km' : ''}`], { x: px(v), y: pp.y + pp.h + 30, size: 15, anchor: v === 0 ? 'start' : v === 40 ? 'end' : 'middle', valign: 'top', fill: t.c('muted') })));
 }
 
@@ -83,7 +83,7 @@ export default {
   notes: 'Purpose: Show local direction and relative magnitude across an area, and where the flow converges.\nModify: Replace `wind` (any function of x, y returning [u, v]) and `coast`; arrows, the u = 0 front, the transect and the headline numbers recompute, and the 5 m/s key is scaled to the same maximum speed as the arrows.\nInvariant: One arrow per grid cell at a stated spacing; arrow length is proportional to speed with a reference arrow; the coordinate convention (x east, y north) and the direction convention (toward, not from) are on the page; the map keeps equal km scale on both axes.\nStatic: Already static. For motion, draw the arrows, then trace the front.',
   sources: [{ type: 'original-example', file: 'assets/svg/vector-field.mjs' }],
   exportPolicy: 'final',
-  content: `<h1 class="st-head">The afternoon sea breeze peaks at ${fmt(peak.u, { digits: 1 })} m/s and stalls at a <em>front ${fmt(inland, { digits: 0 })} km inland</em>, where it meets the easterly</h1>
+  content: `<h1 class="st-head">The afternoon sea breeze peaks at ${fmt(peak.u, { digits: 1 })} m/s and stalls at a <em>front&nbsp;${fmt(inland, { digits: 0 })}&nbsp;km&nbsp;inland</em>, where it meets the easterly</h1>
 <figure class="st-fig" data-region="primary">${figure()}</figure>
 <p class="st-source" data-region="source"><span>Illustrative model · onshore breeze against a 2.4 m/s easterly, 15:00 local time</span><span>Vector field with computed front</span></p>`,
 };

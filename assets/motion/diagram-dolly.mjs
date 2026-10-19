@@ -33,7 +33,7 @@ export function figure(theme = 'css') {
   const label = s => s === key ? null : textLines([s], { x: box[s].x + box[s].w / 2, y: cy, size: 18, anchor: 'middle', valign: 'middle', fill: t.c('ink'), weight: 600 });
   return svgRoot({ id: 'motion-diagram-dolly-fig', width: W, height: H, theme: t,
     title: 'Order flow of an online shop, then a close view of the components inside Payments',
-    desc: `Six stages from storefront to delivery. Inside Payments, every payment passes Tokenise, ${single.map(c => c.label).join(', ')}, one of two acquirers, and the Ledger; ${single.map(c => c.label).join(', ')} runs as a single instance.` },
+    desc: `${stages.length} stages from ${stages[0].toLowerCase()} to ${stages.at(-1).toLowerCase()}. Inside ${key}, every payment passes ${inside.filter(c => c.share === 1).map(c => c.label).join(', ')}; ${single.map(c => c.label).join(', ')} runs as a single instance.` },
   el('defs', {}, arrowMarker('motion-diagram-dolly-arr', t.c('muted'), { size: 9 }), el('clipPath', { id: 'motion-diagram-dolly-frame' }, el('rect', { x: 0, y: 0, width: W, height: H }))),
   g({ 'clip-path': 'url(#motion-diagram-dolly-frame)' },
     g({ 'data-states': { 0: { transform: 'matrix(1,0,0,1,0,0)' }, 1: { transform: `matrix(${n(k)},0,0,${n(k)},${n(tx)},${n(ty)})` } }, 'data-duration': 1200, 'data-easing': 'smooth', style: 'transform-box:view-box;transform-origin:0 0' },
@@ -50,6 +50,12 @@ export function figure(theme = 'css') {
   // Close-view labels at reading size, placed where each component lands after the dolly.
   g({ 'data-step': 1, 'data-motion': 'reveal', 'data-delay': 1000, 'data-duration': 400 },
     inside.map(c => { const [lx, ly] = cam([part[c.id].x + cw / 2, part[c.id].y + ch]); return textLines([c.label], { x: lx, y: ly + 8, size: 17, anchor: 'middle', valign: 'top', fill: t.c('ink'), weight: single.includes(c) ? 700 : 500 }); })),
+  // Orientation in the close view: the neighbouring stages, named where their boxes are cut by the frame.
+  g({ 'data-step': 1, 'data-motion': 'reveal', 'data-delay': 1000, 'data-duration': 400 },
+    [stages[stages.indexOf(key) - 1], stages[stages.indexOf(key) + 1]].map((s, j) => {
+      const [x0, yy] = cam([box[s].x, cy]), [x1] = cam([box[s].x + box[s].w, cy]);
+      return textLines([s], { x: j ? Math.min(x1, W) - 18 : Math.max(x0, 0) + 18, y: yy, size: 17, anchor: j ? 'end' : 'start', valign: 'middle', fill: t.c('muted'), weight: 600 });
+    })),
   // Build 2 — what the close view shows: volumes and instances per component.
   g({ 'data-step': 2, 'data-motion': 'reveal', 'data-stagger': 80 },
     inside.map(c => { const [lx, ly] = cam([part[c.id].x + cw / 2, part[c.id].y + ch]); const on = single.includes(c);

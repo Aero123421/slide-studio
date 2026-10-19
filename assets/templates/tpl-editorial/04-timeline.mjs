@@ -1,64 +1,98 @@
-// Template: Editorial / visual essay · Illustrated timeline on a log time scale. Synthetic example content; replace data and copy.
+// Template: Quire visual essay · Timeline. Synthetic example content; replace data and copy.
+// Two rows, each a linear time scale of the same width. Row 1 is the whole journey from tree
+// to cup; row 2 is its last minute, magnified. The pour is a rust sliver too thin to draw in
+// row 1 and nearly half of row 2. Every position, the magnification and the headline ratio
+// are computed from `journey` and `lastMinute`.
+import { theme, el, g, svgRoot, textLines, measureText, fmt } from '../../runtime/figure.mjs';
+
 const ID = 'tpl-editorial-timeline';
-const MIN = 60, HOUR = 3600, DAY = 86400;
-// Typical, illustrative durations in seconds. Order = sequence of the process.
-const stages = [
-  {key: 'ferment', name: 'Ferment', sec: 36 * HOUR, label: '36 hours'},
-  {key: 'dry', name: 'Dry', sec: 21 * DAY, label: '21 days'},
-  {key: 'ship', name: 'Ship & store', sec: 120 * DAY, label: '4 months'},
-  {key: 'roast', name: 'Roast', sec: 12 * MIN, label: '12 minutes'},
-  {key: 'rest', name: 'Rest', sec: 7 * DAY, label: '7 days'},
-  {key: 'pull', name: 'Pull', sec: 28, label: '28 seconds', note: 'the only step you see'}
+const journey = [                                     // days; a washed lot from Huila, Colombia
+  { name: 'Picking and washing', short: 'Picking', days: 3 },
+  { name: 'Drying', days: 21 },
+  { name: 'Resting in parchment', short: 'Resting', days: 40 },
+  { name: 'Milling and shipping', days: 70 },
+  { name: 'Waiting at the roaster', days: 73 },
+  { name: 'Roasting and resting', days: 10 },
 ];
-const totalDays = stages.reduce((a, s) => a + s.sec, 0) / DAY;
-const months = totalDays / 30.44;
-const pull = stages.find(s => s.key === 'pull');
-const grid = [['10 sec', 10], ['1 min', MIN], ['1 hour', HOUR], ['1 day', DAY], ['1 week', 7 * DAY], ['1 month', 30.44 * DAY], ['1 year', 365.25 * DAY]];
+const lastMinute = [                                  // seconds; the minute before the cup is served
+  { name: 'Grinding', s: 10 },
+  { name: 'Dosing and tamping', s: 15 },
+  { name: 'The pour', s: 28, pour: true },
+  { name: 'Served', s: 7 },
+];
+const DAY = 86400;
+const totalDays = journey.reduce((s, j) => s + j.days, 0);
+const minute = lastMinute.reduce((s, m) => s + m.s, 0);
+const pour = lastMinute.find(m => m.pour).s;
+const perSecond = totalDays / pour;                   // days of waiting per second of pouring
+const words = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'];
+const ratio = perSecond % 1 >= 0.5 ? `almost ${words[Math.ceil(perSecond)]}` : `more than ${words[Math.floor(perSecond)]}`;
+const months = Math.round(totalDays / 30.44);
 
-// Geometry: log10 scale shared by every stage.
-const W = 1152, X0 = 150, X1 = 1140, colW = (X1 - X0) / stages.length, top = 146, bot = 430;
-const lmin = Math.log10(10), lmax = Math.log10(365.25 * DAY);
-const y = s => bot - (Math.log10(s) - lmin) / (lmax - lmin) * (bot - top);
-const cx = i => X0 + (i + .5) * colW;
-const f = n => n.toFixed(1);
+// ---- geometry: figure is 1104 × 300, drawn at slide size; bars span columns 3–12 ----
+const t = theme('css');
+const W = 1104, X0 = 188, BW = W - X0, BH = 56, GAP = 2;
+const R1 = 56, R2 = 212;                              // top of row 1 and row 2 bars
+const s1 = BW / (totalDays * DAY), s2 = BW / minute; // px per second in each row
+const magnify = Math.round(s2 / s1 / 1000) * 1000;
+const pourPx1 = pour * s1;                            // width of the pour drawn at row-1 scale
+const fits = (w, lines) => Math.max(...lines.map((l, i) => measureText(l, 16, { weight: i ? 400 : 600 }))) + 20 <= w;
 
-const ink = 'fill="none" stroke="#15120F" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"';
-const draw = {
-  ferment: `<rect x="28" y="22" width="44" height="54" rx="8" fill="#EAE2D3" stroke="#15120F" stroke-width="1.6"/><path d="M28 36 H72 M28 62 H72" ${ink}/><ellipse cx="44" cy="50" rx="5" ry="3.4" fill="#B3361C"/><ellipse cx="58" cy="47" rx="5" ry="3.4" fill="#B3361C"/><ellipse cx="51" cy="55" rx="5" ry="3.4" fill="#B3361C"/><circle cx="46" cy="12" r="3" ${ink}/><circle cx="56" cy="6" r="2" ${ink}/><circle cx="60" cy="15" r="2.4" ${ink}/>`,
-  dry: `<circle cx="80" cy="14" r="8" ${ink}/><path d="M80 0 V3 M80 25 V28 M66 14 H69 M91 14 H94 M70 4 l2 2 M88 22 l2 2 M90 4 l-2 2" ${ink}/><path d="M8 50 L92 50 L84 60 L16 60 Z" fill="#EAE2D3" stroke="#15120F" stroke-width="1.6" stroke-linejoin="round"/><path d="M22 60 V78 M78 60 V78 M50 60 V78" ${ink}/>${Array.from({length: 9}, (_, i) => `<ellipse cx="${18 + i * 8}" cy="${46 - (i % 2) * 2}" rx="3.4" ry="2.4" fill="#8C4F25"/>`).join('')}`,
-  ship: `<path d="M24 30 C 22 20, 34 14, 50 16 C 66 14, 78 20, 76 30 L 80 72 C 80 78, 20 78, 20 72 Z" fill="#E7D3AE" stroke="#15120F" stroke-width="1.6"/><path d="M36 18 C 40 10, 60 10, 64 18" ${ink}/><path d="M34 42 H66 M34 52 H66 M34 62 H58" fill="none" stroke="#15120F" stroke-width="1.2" stroke-dasharray="3 3"/><path d="M4 78 H96" ${ink}/>`,
-  roast: `<rect x="18" y="30" width="56" height="34" rx="17" fill="#EAE2D3" stroke="#15120F" stroke-width="1.6"/><circle cx="46" cy="47" r="9" ${ink}/><path d="M46 38 V56 M37 47 H55" fill="none" stroke="#15120F" stroke-width="1"/><path d="M62 30 V8 H72 V30" ${ink}/><path d="M74 47 H88 V58" ${ink}/><path d="M36 74 C 32 68, 40 66, 38 60 C 44 64, 46 70, 42 74 Z M54 74 C 50 69, 57 67, 55 62 C 60 66, 61 71, 58 74 Z" fill="#B3361C"/><path d="M14 76 H92" ${ink}/>`,
-  rest: `<path d="M30 16 H70 L74 76 H26 Z" fill="#EAE2D3" stroke="#15120F" stroke-width="1.6" stroke-linejoin="round"/><path d="M30 16 L34 26 H66 L70 16" ${ink}/><circle cx="50" cy="44" r="7" ${ink}/><circle cx="50" cy="44" r="2.4" fill="#15120F"/><path d="M34 60 H66" fill="none" stroke="#15120F" stroke-width="1" opacity=".5"/>`,
-  pull: `<path d="M10 22 H44" fill="none" stroke="#15120F" stroke-width="6" stroke-linecap="round"/><path d="M44 16 H80 V28 C 80 32, 76 34, 72 34 H52 C 48 34, 44 32, 44 28 Z" fill="#EAE2D3" stroke="#15120F" stroke-width="1.6"/><path d="M60 34 V40 M66 34 V40" ${ink}/><path d="M61 42 V58 M65 42 V58" fill="none" stroke="#B3361C" stroke-width="2" stroke-linecap="round"/><path d="M48 58 H78 L74 76 H52 Z" fill="#fff" stroke="#15120F" stroke-width="1.6" stroke-linejoin="round"/><path d="M78 62 C 88 62, 88 72, 76 72" ${ink}/>`
-};
-
-const svg = `<svg viewBox="0 0 ${W} 440" role="img" aria-labelledby="${ID}-t ${ID}-d">
-  <title id="${ID}-t">Six stages from fruit to cup on a logarithmic time scale</title>
-  <desc id="${ID}-d">${stages.map(s => `${s.name}: ${s.label}`).join('; ')}. Total about ${months.toFixed(1)} months. Illustrative typical durations.</desc>
-  ${grid.map(([t, s]) => `<path d="M${X0 - 20} ${f(y(s))} H${X1}" stroke="#15120F" stroke-opacity="${s === 10 ? .5 : .14}" stroke-width="1"/><text class="ed-svg-axis" x="${X0 - 30}" y="${f(y(s) + 5)}" text-anchor="end">${t}</text>`).join('')}
-  ${stages.map((s, i) => `<path d="M${f(cx(i))} ${top - 10} V${bot}" stroke="#15120F" stroke-opacity=".22" stroke-width="1" stroke-dasharray="1 4"/>`).join('')}
-  ${stages.map((s, i) => `<g transform="translate(${f(cx(i) - 50)} 0)">${draw[s.key]}</g>`).join('')}
-  ${stages.map((s, i) => `<text class="ed-svg-name" x="${f(cx(i))}" y="112" text-anchor="middle">${s.name}</text>`).join('')}
-  ${stages.slice(1).map((s, i) => `<path d="M${f(X0 + (i + 1) * colW - 5)} 102 l6 5 l-6 5" fill="none" stroke="#B3361C" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>`).join('')}
-  ${stages.map((s, i) => { const x = cx(i), yy = y(s.sec), hot = s === pull, right = x + 120 < W;
-    return `<circle cx="${f(x)}" cy="${f(yy)}" r="${hot ? 10 : 7}" fill="${hot ? '#B3361C' : '#15120F'}"/>
-    <text class="ed-svg-val" x="${f(right ? x + 16 : x - 16)}" y="${f(yy + 6)}" text-anchor="${right ? 'start' : 'end'}">${s.label}</text>
-    ${s.note ? `<text class="ed-svg-note" x="${f(right ? x + 16 : x - 16)}" y="${f(yy - 22)}" text-anchor="${right ? 'start' : 'end'}">${s.note}</text>` : ''}`; }).join('')}
-</svg>`;
+function row(items, y, scale, seconds) {
+  let acc = 0;
+  return items.map(it => {
+    const x0 = X0 + acc * scale, w = seconds(it) * scale; acc += seconds(it);
+    const dur = it.days != null ? `${it.days} days` : `${it.s} s`;
+    const label = fits(w, [it.name, dur]) ? it.name : it.short && fits(w, [it.short, dur]) ? it.short : null;
+    const rect = el('rect', { x: x0 + GAP / 2, y, width: Math.max(1, w - GAP), height: BH, fill: it.pour ? t.c('accent') : 'var(--ed-tint)' });
+    const ink = it.pour ? '#FFFFFF' : t.c('ink');
+    const inside = label ? textLines([label], { x: x0 + 10, y: y + 23, size: 16, weight: 600, fill: ink })
+      + textLines([dur], { x: x0 + 10, y: y + 44, size: 16, fill: it.pour ? '#FFFFFF' : 'var(--ed-grey-on-tint)' }) : '';
+    return { rect, inside, x0, w, it, dur, outside: !label };
+  });
+}
+const r1 = row(journey, R1, s1 * DAY, j => j.days);
+const r2 = row(lastMinute, R2, s2, m => m.s);
+// Stages too narrow for an inside label get one above the bar, from whichever end is nearer.
+const outside = r1.filter(r => r.outside).map(r => {
+  const atEnd = r.x0 + r.w > X0 + BW / 2, x = atEnd ? X0 + BW : r.x0;
+  return el('line', { x1: r.x0 + r.w / 2, x2: r.x0 + r.w / 2, y1: R1 - 14, y2: R1, stroke: t.c('ink'), 'stroke-width': 1 })
+    + textLines([`${r.it.name}, ${r.dur}`], { x, y: R1 - 22, size: 16, anchor: atEnd ? 'end' : 'start', fill: t.c('ink') });
+});
+const end1 = X0 + BW;
+const figure = svgRoot({
+  id: `${ID}-fig`, width: W, height: 300, theme: t,
+  title: `From tree to cup in ${totalDays} days, and the last minute magnified`,
+  desc: `${journey.map(j => `${j.name} ${j.days} days`).join(', ')}. The last minute, magnified ${fmt(magnify)} times: ${lastMinute.map(m => `${m.name.toLowerCase()} ${m.s} seconds`).join(', ')}. At the scale of the first row the pour would be ${fmt(pourPx1, { digits: 4 })} px wide.`,
+},
+  // the magnifier: the last minute of row 1 opens out into the whole of row 2
+  el('path', { d: `M${end1} ${R1 + BH + 4}L${X0} ${R2 - 6}H${end1}Z`, fill: 'var(--ed-tint)', 'fill-opacity': 0.45 }),
+  el('path', { d: `M${end1} ${R1 + BH + 4}L${X0} ${R2 - 6}M${end1} ${R1 + BH + 4}V${R2 - 6}`, fill: 'none', stroke: t.c('muted'), 'stroke-width': 1 }),
+  g({}, r1.map(r => r.rect)), g({}, r1.map(r => r.inside)), outside.join(''),
+  // where the pour sits in row 1: a marker, not a mark of its width (that is the point of the note)
+  el('line', { x1: end1 - 1, x2: end1 - 1, y1: R1 - 10, y2: R1 + BH + 4, stroke: t.c('accent'), 'stroke-width': 3 }),
+  g({}, r2.map(r => r.rect)), g({}, r2.map(r => r.inside)),
+  textLines(['Tree to cup'], { x: 0, y: R1 + 23, size: 16, fill: t.c('ink'), weight: 600 }),
+  textLines([`${totalDays} days`], { x: 0, y: R1 + 44, size: 16, fill: t.c('muted') }),
+  textLines(['The last minute'], { x: 0, y: R2 + 23, size: 16, fill: t.c('ink'), weight: 600 }),
+  textLines([`magnified ${fmt(magnify)}×`], { x: 0, y: R2 + 44, size: 16, fill: t.c('muted') }),
+  textLines(['0 s'], { x: X0, y: R2 + BH + 24, size: 15, fill: t.c('muted') }),
+  textLines([`${minute} s`], { x: end1, y: R2 + BH + 24, size: 15, anchor: 'end', fill: t.c('muted') }),
+);
 
 export default {
   study: true,
   id: ID,
-  title: 'Illustrated timeline: fruit to cup',
-  notes: 'Purpose: Show a sequence of stages and how long each takes, when durations differ by orders of magnitude.\nModify: Edit stages (name, duration in seconds, label) and the drawings. The vertical positions, grid and total in the lede are computed from the same array.\nInvariant: Left-to-right is the order of the process; height is duration on a log scale that is named in the lede and labelled on the axis. Durations are typical illustrative values, stated in the source line.\nStatic: Static page.',
+  title: 'Proportional timeline: months of waiting, seconds of pouring',
+  notes: `Purpose: Make a contrast of scale felt: ${months} months of waiting against a ${pour}-second pour, without a log scale that hides it.\nModify: Edit \`journey\` (days per stage, in order) and \`lastMinute\` (seconds, one item marked pour). Stage widths, inside/outside labels, the magnification factor, the headline ratio and the closing note recompute.\nInvariant: Both rows are linear and the same width; row 2 is exactly the last minute of row 1; only the pour is rust; durations are labelled on the marks; the source says the values are typical, not measured.\nStatic: Already static.`,
   sources: [],
   exportPolicy: 'final',
-  className: 'tpl-editorial ed-p-timeline',
-  content: `<div class="ed">
-  <div class="ed-mast" data-region="support"><b>Margin</b><span>II — Before the water</span></div>
-  <h1 class="ed-h" data-region="title">Months of waiting, then <i>${pull.label}</i></h1>
-  <p class="ed-lede">Six stages from fruit to cup, about ${Math.round(months)} months in all. The scale is logarithmic: each step up multiplies time.</p>
-  <div class="ed-fig" style="left:64px;top:224px;width:1152px;height:440px" data-region="primary">${svg}</div>
-  <div class="ed-folio"><span data-region="source">Illustrative typical durations · they vary by farm, process and roaster</span><span>17</span></div>
-</div>`
+  className: 'tpl-editorial ed-timeline',
+  content: `<h1 class="ed-tl-head ed-head" data-region="title">The coffee waited ${ratio} days for every second of the pour</h1>
+<figure class="ed-tl-fig" data-region="primary">${figure}</figure>
+<div class="ed-tl-note" data-region="support">
+  <p class="ed-body">Drawn to the scale of the top line, the ${pour}-second pour would be ${fmt(pourPx1, { digits: 4 })} pixels wide.</p>
+  <p class="ed-note">Typical durations for a washed coffee from Huila, Colombia, roasted in northern Europe; they vary by farm, process and roaster.</p>
+</div>
+<p class="ed-folio" data-region="source"><span>Quire, Winter 2026</span><span>41</span></p>`,
 };

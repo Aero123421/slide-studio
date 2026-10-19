@@ -34,3 +34,59 @@
 .cmp-indigo .ai-name { position: absolute; top: 22px; right: 12px; writing-mode: vertical-rl; font: 700 24px/1 var(--ss-font-display); letter-spacing: .06em; }
 .cmp-indigo .ai-kana { position: absolute; top: 24px; right: 44px; writing-mode: vertical-rl; font: 400 16px/1 var(--ss-font-sans); letter-spacing: .04em; }
 .cmp-indigo .ai-here { position: absolute; left: 14px; bottom: 26px; width: 120px; font: 500 16px/1.5 var(--ss-font-sans); }
+
+/* ── Technical dark: code and an instrument trace on one dark page ─────────────── */
+.cmp-techdark .td-fig { top: 158px; bottom: auto; height: 236px; }
+.cmp-techdark .td-code { position: absolute; left: 64px; top: 418px; width: 662px; box-sizing: border-box; margin: 0; padding: 12px 18px 14px; background: var(--ss-surface); font: 400 16px/1.5 var(--ss-font-mono); color: var(--ss-ink); white-space: pre; overflow: hidden; }
+.cmp-techdark .td-file { display: block; margin-bottom: 4px; color: var(--ss-muted); }
+.cmp-techdark .td-line { display: block; }
+.cmp-techdark .td-n { display: inline-block; width: 3ch; color: var(--ss-muted); }
+.cmp-techdark .td-m { display: inline-block; width: 2ch; text-align: center; }
+.cmp-techdark .td-cause { color: var(--ss-accent); }
+.cmp-techdark .td-cause .td-n { color: var(--ss-accent); }
+.cmp-techdark .td-fix { color: var(--ss-positive); }
+.cmp-techdark .td-log { position: absolute; left: 750px; top: 428px; width: 466px; }
+.cmp-techdark .td-log-title { margin-bottom: 8px; font: 600 16px/1.4 var(--ss-font-sans); color: var(--ss-muted); }
+.cmp-techdark .td-log p + p { display: grid; grid-template-columns: 10ch 1fr; padding: 9px 0; border-top: 1px solid var(--ss-rule); font: 400 16px/1.45 var(--ss-font-mono); color: var(--ss-ink); }
+.cmp-techdark .td-log p + p span { color: var(--ss-muted); }
+
+/* ── Monochrome data: weight, dash and position instead of hue ─────────────────── */
+.cmp-mono .mono-rail { justify-content: flex-start; gap: 30px; padding-top: 14px; }
+.cmp-mono .mono-table { width: 100%; border-collapse: collapse; font: 400 18px/1.3 var(--ss-font-sans); font-variant-numeric: tabular-nums lining-nums; color: var(--ss-ink); }
+.cmp-mono .mono-table caption { padding-bottom: 10px; text-align: left; font-weight: 700; }
+.cmp-mono .mono-table th, .cmp-mono .mono-table td { padding: 8px 0 8px 12px; border-bottom: 1px solid var(--ss-rule); text-align: right; font-weight: 400; }
+.cmp-mono .mono-table th[scope="row"], .cmp-mono .mono-table thead th:first-child { padding-left: 0; text-align: left; }
+.cmp-mono .mono-table thead th { font-size: 16px; color: var(--ss-muted); border-bottom: 1px solid var(--ss-ink); }
+.cmp-mono .mono-table .mono-focus th, .cmp-mono .mono-table .mono-focus td { font-weight: 700; }
+.cmp-mono .mono-table tfoot th, .cmp-mono .mono-table tfoot td { border-top: 1px solid var(--ss-ink); border-bottom: 0; }
+
+/* ── Bold geometry: nested squares whose areas are the numbers ─────────────────── */
+.cmp-bold .bg-squares { position: absolute; left: 0; bottom: 0; width: 600px; height: 600px; }
+.cmp-bold .bg-sq { position: absolute; left: 0; bottom: 0; }
+.cmp-bold .bg-label { position: absolute; width: 520px; font: 400 18px/1.35 var(--ss-font-sans); }
+.cmp-bold .bg-label b { display: block; margin-bottom: 2px; font: 400 32px/1.1 var(--ss-font-display); letter-spacing: -.01em; font-variant-numeric: lining-nums tabular-nums; }
+.cmp-bold .bg-run { position: absolute; left: 750px; top: 52px; font: 400 16px/1.3 var(--ss-font-sans); color: var(--ss-muted); }
+.cmp-bold .bg-head { position: absolute; left: 750px; top: 112px; width: 466px; font: 400 76px/1.02 var(--ss-font-display); letter-spacing: -.02em; color: var(--ss-ink); text-wrap: balance; }
+.cmp-bold .bg-lead { position: absolute; left: 750px; top: 316px; width: 440px; font: 400 24px/1.45 var(--ss-font-sans); color: var(--ss-ink); text-wrap: pretty; }
+.cmp-bold .bg-facts { position: absolute; left: 750px; top: 452px; font: 400 18px/1.4 var(--ss-font-sans); color: var(--ss-muted); }
+.cmp-bold .bg-source { position: absolute; left: 750px; bottom: 22px; width: 466px; font: 400 15px/1.4 var(--ss-font-sans); color: var(--ss-muted); }
+
+/* ── Methods figure: sequence in columns, true time underneath ─────────────────── */
+.cmp-methods .st-fig { top: 150px; bottom: 54px; }
+
+/* ── Equation page: notation large, terms beside it, one plot ──────────────────── */
+.cmp-equation math { font-family: "STIX Two Math", "Cambria Math", "Latin Modern Math", var(--ss-font-display); color: var(--ss-ink); }
+.cmp-equation math mi:not([mathvariant]) { text-transform: none; font-style: italic; }  /* italic letters from the text face, not math-alphanumeric fallbacks */
+.cmp-equation .eq-formula { position: absolute; left: 64px; top: 168px; width: 662px; }
+.cmp-equation .eq-main { display: block; math-style: normal; font-size: 64px; line-height: 1; }
+.cmp-equation .eq-hot { color: var(--ss-accent); }
+.cmp-equation .eq-words { margin-top: 18px; max-width: 640px; font: 400 22px/1.45 var(--ss-font-sans); color: var(--ss-muted); }
+.cmp-equation .eq-terms { position: absolute; left: 64px; top: 392px; width: 662px; margin: 0; }
+.cmp-equation .eq-terms div { display: grid; grid-template-columns: 76px 1fr 92px; align-items: baseline; padding: 8px 0 7px; border-top: 1px solid var(--ss-rule); }
+.cmp-equation .eq-terms dt { font-size: 28px; line-height: 1.1; }
+.cmp-equation .eq-terms dd { margin: 0; font: 400 20px/1.35 var(--ss-font-sans); color: var(--ss-ink); }
+.cmp-equation .eq-terms .eq-unit { text-align: right; font-variant-numeric: tabular-nums lining-nums; color: var(--ss-muted); }
+.cmp-equation .eq-terms .eq-hot dd { color: var(--ss-accent); }
+.cmp-equation .eq-example { position: absolute; left: 64px; top: 636px; font: 400 22px/1.3 var(--ss-font-sans); color: var(--ss-ink); font-variant-numeric: tabular-nums lining-nums; }
+.cmp-equation .eq-fig { position: absolute; left: 750px; top: 168px; width: 466px; height: 452px; margin: 0; }
+.cmp-equation .eq-fig > svg { width: 100%; height: 100%; display: block; overflow: visible; }

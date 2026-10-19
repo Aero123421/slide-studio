@@ -31,11 +31,11 @@ const key = c => formula(c).map(([k, v]) => k + v).join('');
 const iso = mols.filter((m, i) => mols.some((o, j) => j !== i && key(o.count) === key(m.count)));   // same formula, different graph
 
 // Chemical text: digits become subscripts (a run of digits shares one baseline shift).
-const chemRuns = text => {
+const chemRuns = (text, shift = 5) => {
   const out = []; let sub = false;
   for (const ch of text) {
     const digit = /\d/.test(ch);
-    out.push(el('tspan', digit ? { 'font-size': 13, dy: sub ? null : 4 } : { dy: sub ? -4 : null }, ch));
+    out.push(el('tspan', digit ? { 'font-size': 15, dy: sub ? null : shift } : { dy: sub ? -shift : null }, ch));
     sub = digit;
   }
   return out;
@@ -61,32 +61,32 @@ export function figure(theme = 'css') {
     for (const [a, b, order] of m.bonds) {
       const [x1, y1] = P(a), [x2, y2] = P(b), methyl = b.startsWith('Me');
       const stroke = methyl ? t.c('accent') : t.c('ink');
-      parts.push(el('line', { x1, y1, x2, y2, stroke, 'stroke-width': methyl ? 2.6 : 2, 'stroke-linecap': 'round' }));
+      parts.push(el('line', { fill: 'none', x1, y1, x2, y2, stroke, 'stroke-width': methyl ? 2.6 : 2, 'stroke-linecap': 'round' }));
       if (order === 2) {
         const dx = x2 - x1, dy = y2 - y1, l = Math.hypot(dx, dy), nx = -dy / l, ny = dx / l;
         if (b.startsWith('O')) {   // exocyclic C=O: second line beside the first
-          parts.push(el('line', { x1: x1 + nx * 5, y1: y1 + ny * 5, x2: x2 + nx * 5, y2: y2 + ny * 5, stroke, 'stroke-width': 2, 'stroke-linecap': 'round' }));
+          parts.push(el('line', { fill: 'none', x1: x1 + nx * 5, y1: y1 + ny * 5, x2: x2 + nx * 5, y2: y2 + ny * 5, stroke, 'stroke-width': 2, 'stroke-linecap': 'round' }));
         } else {                   // ring double bond: inner line, shortened, toward the ring centre
           const ring = ring5.includes(a) && ring5.includes(b) && !(a === 'C4' && b === 'C5') ? cp : [0, 0];
           const [cx, cy] = [ox + ring[0] * L, oy - ring[1] * L], mx = (x1 + x2) / 2, my = (y1 + y2) / 2, s = (cx - mx) * nx + (cy - my) * ny > 0 ? 1 : -1;
-          parts.push(el('line', { x1: x1 + dx * 0.16 + s * nx * 6, y1: y1 + dy * 0.16 + s * ny * 6, x2: x2 - dx * 0.16 + s * nx * 6, y2: y2 - dy * 0.16 + s * ny * 6, stroke, 'stroke-width': 2, 'stroke-linecap': 'round' }));
+          parts.push(el('line', { fill: 'none', x1: x1 + dx * 0.16 + s * nx * 6, y1: y1 + dy * 0.16 + s * ny * 6, x2: x2 - dx * 0.16 + s * nx * 6, y2: y2 - dy * 0.16 + s * ny * 6, stroke, 'stroke-width': 2, 'stroke-linecap': 'round' }));
         }
       }
     }
     // Atom labels: heteroatoms and methyls, each on a paper knockout so bond ends stop at the letters.
     // `bonded` is the index of the character that sits on the atom position (C of H3C, N of HN, …).
     const label = (a, text, color, bonded = 0) => {
-      const [x, y] = P(a), widths = [...text].map(ch => measureText(ch, /\d/.test(ch) ? 13 : 18, { weight: 600 }));
+      const [x, y] = P(a), widths = [...text].map(ch => measureText(ch, /\d/.test(ch) ? 15 : 20, { weight: 600 }));
       const w = widths.reduce((s1, v) => s1 + v, 0), before = widths.slice(0, bonded).reduce((s1, v) => s1 + v, 0);
       const x0 = x - before - widths[bonded] / 2;
-      labels.push(el('rect', { x: x0 - 2, y: y - 11, width: w + 4, height: 22, fill: t.c('paper') }),
-        el('text', { x: x0, y: y + 6.5, 'font-size': 18, 'font-weight': 600, fill: color }, chemRuns(text)));
+      labels.push(el('rect', { x: x0 - 2, y: y - 12, width: w + 4, height: 24, fill: t.c('paper') }),
+        el('text', { x: x0, y: y + 7, 'font-size': 20, 'font-weight': 600, fill: color }, chemRuns(text)));
     };
     for (const a of m.atoms) {
       if (a.startsWith('Me')) { const left = pos[a][0] < pos[`N${a.slice(2)}`][0] - 0.1; label(a, left ? 'H3C' : 'CH3', t.c('accent'), left ? 2 : 0); continue; }
       if (a[0] === 'C') continue;
       if (a[0] === 'N' && m.hyd[a]) {   // N–H: hydrogen written on the side away from the ring
-        if (a === 'N3') { label(a, 'N', t.c('ink')); labels.push(textLines(['H'], { x: P(a)[0], y: P(a)[1] + 24, size: 18, anchor: 'middle', valign: 'middle', weight: 600, fill: t.c('ink') })); }
+        if (a === 'N3') { label(a, 'N', t.c('ink')); labels.push(textLines(['H'], { x: P(a)[0], y: P(a)[1] + 25, size: 20, anchor: 'middle', valign: 'middle', weight: 600, fill: t.c('ink') })); }
         else if (pos[a][0] < 0.2) label(a, 'HN', t.c('ink'), 1); else label(a, 'NH', t.c('ink'), 0);
         continue;
       }
@@ -95,7 +95,7 @@ export function figure(theme = 'css') {
     // locants for the three methylation sites
     const loc = ['N1', 'N3', 'N7'].map(a => { const c = centre(a), [x, y] = P(a), v = [ox + c[0] * L - x, oy - c[1] * L - y], l = Math.hypot(...v); return textLines([a.slice(1)], { x: x + (v[0] / l) * 19, y: y + (v[1] / l) * 19, size: 15, anchor: 'middle', valign: 'middle', fill: t.c('muted') }); });
     const f = formula(m.count), tx = i * cell + cell / 2;
-    const fText = el('text', { x: tx, y: 340, 'font-size': 17, 'text-anchor': 'middle', fill: t.c('ink') }, chemRuns(f.map(([k, v]) => k + (v > 1 ? v : '')).join('')));
+    const fText = el('text', { x: tx, y: 340, 'font-size': 19, 'text-anchor': 'middle', fill: t.c('ink') }, chemRuns(f.map(([k, v]) => k + (v > 1 ? v : '')).join(''), 4));
     return g({ 'data-molecule': m.name }, parts, labels, loc,
       textLines([m.name], { x: tx, y: 302, size: 19, anchor: 'middle', valign: 'middle', weight: 700, fill: t.c('ink') }),
       fText,

@@ -1,7 +1,7 @@
 // Diagram study · Nested boundaries — membership by position: inside a boundary means in scope.
 // Zones nest (network ⊃ audit scope ⊃ token vault). Each system names its zone and, if it moved,
 // the zone it came from; boxes, ghosts, crossing arrows, counts and the headline are computed.
-import { theme as makeTheme, svgRoot, el, g, textLines, measureNode, drawNode, arrowMarker, roundRectPath } from '../runtime/figure.mjs';
+import { theme as makeTheme, svgRoot, el, textLines, measureNode, drawNode, arrowMarker, roundRectPath } from '../runtime/figure.mjs';
 
 const zones = [ // outer to inner; each zone lies inside the previous one
   { id: 'corp', label: '社内ネットワーク' },

@@ -1,6 +1,6 @@
 // Motion study · Reveal the focal subject — one school's line first, then the 23 schools
 // it is compared with, then the ranks that make the claim. Builds: 1 context, 2 ranks.
-// Every value on the page (ranks, median, headline) is computed from `schools`.
+// Every value on the page (ranks, median, headline) is computed from `subject` and `others`.
 import { svgRoot, el, g, linear, axis, textLines, pathFromPoints, spreadLabels, niceDomain, theme as makeTheme, fmt } from '../runtime/figure.mjs';
 
 const years = [2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025];
@@ -48,7 +48,7 @@ export function figure(theme = 'css') {
   // Build 1 — the context arrives behind the subject, quietly, top of the pack first.
   g({ 'data-step': 1, 'data-motion': 'reveal', 'data-stagger': 24, 'data-duration': 420 },
     byLast.map(s => el('path', { d: pathFromPoints(pts(s)), fill: 'none', stroke: t.c('context'), 'stroke-width': 1.8, 'stroke-linejoin': 'round' }))),
-  textLines([`${others.length} other schools in the district`], { x: x(2019) + 6, y: y(Math.max(...others.map(s => s.values[1]))) - 16, size: 16, fill: t.c('muted'), weight: 600, halo: t.c('paper'), attrs: { 'data-step': 1, 'data-motion': 'reveal', 'data-delay': 500 } }),
+  textLines([`${others.length} other schools in the district`], { x: x(years[1]) + 6, y: y(Math.max(...others.map(s => s.values[1]))) - 16, size: 16, fill: t.c('muted'), weight: 600, halo: t.c('paper'), attrs: { 'data-step': 1, 'data-motion': 'reveal', 'data-delay': 500 } }),
   // Build 2 — the district median and the two ranks that carry the claim.
   g({ 'data-step': 2, 'data-motion': 'draw', 'data-duration': 800 },
     el('path', { d: pathFromPoints(median.map((v, i) => [x(years[i]), y(v)])), fill: 'none', stroke: t.c('ink'), 'stroke-width': 1.6, 'stroke-dasharray': '6 5' })),

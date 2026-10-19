@@ -11,7 +11,7 @@ const drivers = [                       // 計画との差（営業利益への�
   { label: 'クラウド\n基盤費', value: -14, note: 'ストレージ単価の改定' },
   { label: '人件費', value: 41, focus: true },
   { label: '広告\n宣伝費', value: -26, note: '展示会2件の追加出展' },
-  { label: 'その他の\n経費', value: -21, note: '採用費と業務委託費' },
+  { label: 'その他の\n販管費', value: -21, note: '業務委託費の増加' },
 ];
 const hiring = { planned: 32, joined: 19 };   // 期初からの採用計画と入社数（全社）, 人
 const source = '出所：経理部 月次決算（2026年7–9月）';
@@ -76,7 +76,7 @@ export default {
     <p class="q-body">採用は計画${hiring.planned}名に対し入社${hiring.joined}名。未充足の${hiring.planned - hiring.joined}名分、${flat(focus.label)}が計画を下回った。</p>
   </div>
   <div>
-    <p class="q-body">経費の計画超過は合計<span class="nw">${-overrunTotal}百万円</span>。最大は${flat(biggest.label)}の<span class="nw">${-biggest.value}百万円</span>（${biggest.note}）。</p>
+    <p class="q-body">費用の計画超過は合計<span class="nw">${-overrunTotal}百万円</span>。最大は${flat(biggest.label)}の<span class="nw">${-biggest.value}百万円</span>（${biggest.note}）。</p>
   </div>
 </div>
 <p class="q-foot" data-region="source"><span>${source}</span><span class="num">${running}　${page}</span></p>`,

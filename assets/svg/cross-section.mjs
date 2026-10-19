@@ -27,15 +27,25 @@ export function figure(theme = 'css') {
   const x0 = 304, s = 2.2, X = mm => x0 + mm * s, x1 = X(thick);
   const top = 92, bot = 268;                          // section slice, broken top and bottom
   const edges = layers.reduce((a, l) => [...a, a.at(-1) + l.d], [0]);
+  // Hatching identifies the material (drawing convention), drawn per layer and clipped to it.
+  const diagonals = (xa, w, step, dir, sw) => Array.from({ length: Math.ceil((w + 2 * (bot - top)) / step) }, (_, n) => {
+    const k = -(bot - top) + n * step;
+    return el('line', { fill: 'none', x1: xa + k, y1: dir > 0 ? bot : top, x2: xa + k + (bot - top), y2: dir > 0 ? top : bot, stroke: t.c('muted'), 'stroke-width': sw });
+  });
+  const hatches = {
+    concrete: (xa, w) => [...diagonals(xa, w, 12, 1, 1),   // 45° lines, plus rebar 44 px in from each face
+      ...[44, w - 44].flatMap(dx => [top + 40, top + 120].map(y => el('circle', { cx: xa + dx, cy: y, r: 6, fill: t.c('ink') })))],
+    insulation: (xa, w) => [el('path', {                     // the zigzag that marks insulation
+      d: pathFromPoints(Array.from({ length: Math.ceil((bot - top) / 22) + 2 }, (_, k) => [k % 2 ? xa + w - 6 : xa + 6, top + k * 22])),
+      fill: 'none', stroke: t.c('muted'), 'stroke-width': 1.4, 'stroke-linejoin': 'round' })],
+    dots: (xa, w) => { const r = rng(5); return Array.from({ length: Math.round((w * (bot - top)) / 55) }, () => el('circle', { cx: xa + 2 + r() * (w - 4), cy: top + r() * (bot - top), r: 1.1, fill: t.c('muted') })); },
+    cross: (xa, w) => [...diagonals(xa, w, 7, 1, 0.8), ...diagonals(xa, w, 7, -1, 0.8)],
+  };
   const hatch = (l, i) => {
-    const xa = X(edges[i]), xb = X(edges[i + 1]), w = xb - xa, clip = `${id}-c${i}`, out = [];
-    if (l.hatch === 'concrete') { for (let k = -bot; k < w + bot; k += 12) out.push(el('line', { x1: xa + k, y1: bot, x2: xa + k + (bot - top), y2: top, stroke: t.c('muted'), 'stroke-width': 1 })); [44, w - 44].forEach(dx => [top + 40, top + 120].forEach(y => out.push(el('circle', { cx: xa + dx, cy: y, r: 6, fill: t.c('ink') })))); }
-    if (l.hatch === 'insulation') { const pts = []; for (let y = top, k = 0; y <= bot + 30; y += 22, k++) pts.push([k % 2 ? xb - 6 : xa + 6, y]); out.push(el('path', { d: pathFromPoints(pts), fill: 'none', stroke: t.c('muted'), 'stroke-width': 1.4, 'stroke-linejoin': 'round' })); }
-    if (l.hatch === 'dots') { const r = rng(5); for (let n = 0; n < (w * (bot - top)) / 55; n++) out.push(el('circle', { cx: xa + 2 + r() * (w - 4), cy: top + r() * (bot - top), r: 1.1, fill: t.c('muted') })); }
-    if (l.hatch === 'cross') for (let k = -bot; k < w + bot; k += 7) out.push(el('line', { x1: xa + k, y1: bot, x2: xa + k + (bot - top), y2: top, stroke: t.c('muted'), 'stroke-width': 0.8 }), el('line', { x1: xa + k, y1: top, x2: xa + k + (bot - top), y2: bot, stroke: t.c('muted'), 'stroke-width': 0.8 }));
+    const xa = X(edges[i]), w = X(edges[i + 1]) - xa, clip = `${id}-c${i}`;
     return g({}, el('clipPath', { id: clip }, el('rect', { x: xa, y: top, width: w, height: bot - top })),
       el('rect', { x: xa, y: top, width: w, height: bot - top, fill: l.hatch === 'concrete' ? t.c('surface') : t.c('paper') }),
-      g({ 'clip-path': `url(#${clip})` }, out),
+      g({ 'clip-path': `url(#${clip})` }, hatches[l.hatch](xa, w)),
       el('rect', { x: xa, y: top, width: w, height: bot - top, fill: 'none', stroke: t.c('ink'), 'stroke-width': 1.5 }));
   };
   // break lines: the slice continues above and below
@@ -52,8 +62,8 @@ export function figure(theme = 'css') {
   });
   // dimension chain under the section
   const dimY = bot + 24;
-  const dims = g({}, el('line', { x1: x0, x2: x1, y1: dimY, y2: dimY, stroke: t.c('ink'), 'stroke-width': 1 }),
-    edges.map(e => el('line', { x1: X(e) - 4, x2: X(e) + 4, y1: dimY + 4, y2: dimY - 4, stroke: t.c('ink'), 'stroke-width': 1.4 })),
+  const dims = g({}, el('line', { fill: 'none', x1: x0, x2: x1, y1: dimY, y2: dimY, stroke: t.c('ink'), 'stroke-width': 1 }),
+    edges.map(e => el('line', { fill: 'none', x1: X(e) - 4, x2: X(e) + 4, y1: dimY + 4, y2: dimY - 4, stroke: t.c('ink'), 'stroke-width': 1.4 })),
     layers.map((l, i) => (X(edges[i + 1]) - X(edges[i]) > 40 ? textLines([fmt(l.d)], { x: (X(edges[i]) + X(edges[i + 1])) / 2, y: dimY - 4, size: 15, anchor: 'middle', valign: 'bottom', fill: t.c('ink') }) : '')),
     textLines([`計 ${fmt(thick)} mm`], { x: x1 + 10, y: dimY, size: 15, valign: 'middle', fill: t.c('ink'), weight: 600 }));
   // temperature profile on the same x scale
@@ -61,9 +71,9 @@ export function figure(theme = 'css') {
   const pts = [[x0 - 56, air.outside], [x0, temps[0]], ...edges.slice(1).map((e, i) => [X(e), temps[i + 1]]), [x1 + 56, air.inside]];
   const insSeg = [[X(edges[ins]), temps[ins]], [X(edges[ins + 1]), temps[ins + 1]]];
   const profile = g({},
-    [air.outside, 10, air.inside].map(v => g({}, el('line', { x1: x0 - 56, x2: x1 + 56, y1: ty(v), y2: ty(v), stroke: t.c('grid') }),
+    [air.outside, 10, air.inside].map(v => g({}, el('line', { fill: 'none', x1: x0 - 56, x2: x1 + 56, y1: ty(v), y2: ty(v), stroke: t.c('grid') }),
       textLines([`${fmt(v)} °C`], { x: x0 - 66, y: ty(v), size: 15, anchor: 'end', valign: 'middle', fill: t.c('muted') }))),
-    edges.map(e => el('line', { x1: X(e), x2: X(e), y1: ty(air.inside) - 6, y2: ty(air.outside), stroke: t.c('rule'), 'stroke-dasharray': '3 3' })),
+    edges.map(e => el('line', { fill: 'none', x1: X(e), x2: X(e), y1: ty(air.inside) - 6, y2: ty(air.outside), stroke: t.c('rule'), 'stroke-dasharray': '3 3' })),
     el('path', { d: pathFromPoints(pts.map(([x, v]) => [x, ty(v)])), fill: 'none', stroke: t.c('ink'), 'stroke-width': 2.2, 'stroke-linejoin': 'round' }),
     el('path', { d: pathFromPoints(insSeg.map(([x, v]) => [x, ty(v)])), fill: 'none', stroke: t.c('accent'), 'stroke-width': 4, 'stroke-linecap': 'round' }),
     textLines([`温度差の${fmt(share * 100, { digits: 0 })}%`], { x: (insSeg[0][0] + insSeg[1][0]) / 2 + 22, y: ty((temps[ins] + temps[ins + 1]) / 2) + 14, size: 17, valign: 'middle', weight: 700, fill: t.c('accent') }),
@@ -75,7 +85,7 @@ export function figure(theme = 'css') {
     textLines(['キープラン'], { x: 0, y: 4, size: 15, valign: 'top', weight: 700, fill: t.c('ink') }),
     textLines(['断面A–Aの位置'], { x: 0, y: 26, size: 15, valign: 'top', fill: t.c('muted') }),
     el('rect', { x: kp.x, y: kp.y, width: kp.w, height: kp.h, fill: t.c('paper'), stroke: t.c('ink'), 'stroke-width': 4 }),
-    el('line', { x1: ax, x2: bx, y1: cutY, y2: cutY, stroke: t.c('ink'), 'stroke-width': 1.6, 'stroke-dasharray': '10 3 2 3' }),
+    el('line', { fill: 'none', x1: ax, x2: bx, y1: cutY, y2: cutY, stroke: t.c('ink'), 'stroke-width': 1.6, 'stroke-dasharray': '10 3 2 3' }),
     [ax, bx].map((x, k) => g({},
       el('path', { d: `M${x} ${cutY}v-16`, stroke: t.c('ink'), 'stroke-width': 1.6, 'marker-end': `url(#${id}-view)` }),
       textLines(['A'], { x: x + (k ? 8 : -8), y: cutY - 16, size: 16, anchor: k ? 'start' : 'end', valign: 'middle', weight: 700, fill: t.c('ink') }))),

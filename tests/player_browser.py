@@ -21,7 +21,8 @@ const deck={title:'Player fixture',transition:'rise',css:'.slide{padding:40px}',
 {id:'one',title:'One',notes:'Speaker note one',content:`<h1>Counting</h1><p id="num" data-step="1" data-motion="count" data-duration="900">1,234.5 units</p><ul id="list" data-step="2" data-motion="lift" data-stagger="120"><li>a</li><li>b</li><li>c</li></ul>`},
 {id:'two',title:'Two',transition:'push',content:bars},
 {id:'three',title:'Three',content:line},
-{id:'four',title:'Four',content:'<h1>Four</h1>'}]};
+{id:'four',title:'Four',content:'<h1>Four</h1>'},
+{id:'five',title:'Five',content:`<p id="until" data-until="0">Only before the first build</p><div id="mover" data-states='{"0":{"opacity":"0.2"},"1":{"opacity":"1"}}' data-delay="500" data-duration="300">Moves after a delay</div>`}]};
 console.log(await renderCraft(deck));'''
 
 
@@ -121,6 +122,19 @@ def main():
                     expect(page.evaluate('document.getAnimations().length') == 0, 'no animations under reduced motion')
                     expect(page.inner_text('#num') == '1,234.5 units', 'final state shown immediately')
                 check('reduced motion commits states without animating', reduced)
+
+                def until_and_delay():
+                    page.emulate_media(reduced_motion='no-preference')
+                    page.evaluate('SlideStudio.show(4,0)')
+                    expect(page.evaluate('SlideStudio.getState().maxBuild') == 1, 'data-until alone creates the build that hides it')
+                    expect(page.evaluate("getComputedStyle(document.getElementById('until')).visibility") == 'visible', 'visible at build 0')
+                    page.keyboard.press('ArrowRight'); page.wait_for_timeout(120)
+                    expect(page.evaluate("getComputedStyle(document.getElementById('until')).visibility") == 'hidden', 'hidden after build 0')
+                    mid = float(page.evaluate("getComputedStyle(document.getElementById('mover')).opacity"))
+                    expect(abs(mid - 0.2) < 0.05, f'data-delay holds the old state during the delay (opacity {mid})')
+                    page.evaluate('SlideStudio.finish()')
+                    expect(float(page.evaluate("getComputedStyle(document.getElementById('mover')).opacity")) == 1, 'ends in the new state')
+                check('data-until on its own, and data-delay on data-states', until_and_delay)
 
                 check('no page errors or player warnings', lambda: (expect(not errors, str(errors[:3])), expect(not state()['warnings'], str(state()['warnings']))))
             finally:

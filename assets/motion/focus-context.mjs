@@ -1,7 +1,7 @@
 // Motion study · Focus without deleting context — a veil dims every cell outside the focus
 // block, but the cells stay visible and the axes stay at full strength, so the audience
 // keeps its bearings. Builds: 1 dim the context and outline the focus, 2 the numbers inside.
-import { svgRoot, el, g, band, textLines, theme as makeTheme, n } from '../runtime/figure.mjs';
+import { svgRoot, el, g, band, textLines, theme as makeTheme } from '../runtime/figure.mjs';
 
 // On-call pages by weekday and hour of day, Q3 (illustrative production service).
 const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -31,6 +31,7 @@ export function figure(theme = 'css') {
   return svgRoot({ id: 'motion-focus-context-fig', width: W, height: H, theme: t,
     title: 'On-call pages by weekday and hour of day, third quarter',
     desc: `${total} pages. ${focusPages} of them (${share}%) arrived ${focus.days[0]}–${focus.days.at(-1)} ${focus.from}:00–${focus.to}:00, ${focusHours} of the week's 168 hours (${hourShare}%).` },
+  // Mask luminance (white shows the veil, black cuts the hole): literal by definition, not a colour.
   el('defs', {}, el('mask', { id: 'motion-focus-context-hole', maskUnits: 'userSpaceOnUse', x: grid.x - 2, y: grid.y - 2, width: grid.w + 4, height: grid.h + 4 },
     el('rect', { x: grid.x - 2, y: grid.y - 2, width: grid.w + 4, height: grid.h + 4, fill: '#fff' }),
     el('rect', { x: F.x - 1, y: F.y - 1, width: F.w + 2, height: F.h + 2, fill: '#000' }))),
@@ -56,7 +57,7 @@ export default {
   notes: `Purpose: Point at one block of a dense chart by dimming everything else, while the dimmed cells and the full-strength axes keep the audience oriented.\nModify: Replace \`pages\` (7 × 24) and \`focus\`; the veil's hole, the outline, the counts and the shares (${share}% of pages in ${hourShare}% of hours) recompute.\nInvariant: The veil halves the contrast of the context but never hides a cell; axis labels are never dimmed; the focus block is cut out of the veil, so it keeps its true colors.\nStatic: The final build shows the dimmed week, the outlined focus block with its counts, and the share beside it.`,
   sources: [{ type: 'original-example', file: 'assets/motion/focus-context.mjs' }],
   exportPolicy: 'final',
-  content: `<h1 class="st-head">${share}% of on-call pages arrive in ${hourShare}% of the week: the Tue–Thu afternoon <em>deploy window</em></h1>
+  content: `<h1 class="st-head">${share}% of on-call pages arrive in ${hourShare}% of the week: the ${focus.days[0]}–${focus.days.at(-1)} afternoon <em>${focus.label.toLowerCase()}</em></h1>
 <figure class="st-fig" data-region="primary">${figure()}</figure>
 <p class="st-source" data-region="source"><span>Illustrative data · ${total} pages from one production service, July–September</span><span>Motion · dim the context, keep the axes (2 builds)</span></p>`,
 };

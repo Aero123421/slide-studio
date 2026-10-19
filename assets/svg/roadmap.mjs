@@ -2,7 +2,7 @@
 // Stages are spaced evenly because the axis is order, not time. Each stage states what its
 // timing rests on (done, estimate, unknown, or a duration after an earlier stage). The gate,
 // the undated stages and the headline are computed from `stages`.
-import { theme as makeTheme, svgRoot, el, g, textLines, wrapText, fmt } from '../runtime/figure.mjs';
+import { theme as makeTheme, svgRoot, el, textLines, wrapText } from '../runtime/figure.mjs';
 
 const stages = [ // status: done | active | gate | next; \n marks a preferred line break (illustrative plan)
   { label: '構想・需要調査', status: 'done', when: '2023年度', basis: '完了' },

@@ -25,7 +25,7 @@ const span = ['', 'one', 'two', 'three', 'four', 'five'][Math.round(outbreaks.le
 const scopes = [
   { from: peak, to: peak, title: `${peakName}: ${outbreaks[peak]} outbreaks`, detail: `the most in any month since ${MONTHS[first.month]} ${first.year}` },
   { from: thisWinter.from, to: thisWinter.to, title: `Winter ${thisWinter.label}: ${thisWinter.total} outbreaks`, detail: 'November to March' },
-  { from: winters[0].from, to: thisWinter.to, title: `This winter: ${fmt(vsLast, { sign: true })}% on last winter`, detail: `three winters: ${winters.map(w => w.total).join(', ')}` },
+  { from: winters[0].from, to: thisWinter.to, title: `This winter: ${fmt(vsLast, { sign: true })}% on last winter`, detail: `${winters.length} winters, each November to March` },
 ];
 
 export function figure(theme = 'css') {

@@ -36,12 +36,12 @@ export function figure(theme = 'css') {
   g({ 'data-states': { 0: { opacity: 1 }, 1: { opacity: 0 } }, 'data-duration': 300 },
     groups.map((gr, k) => el('line', { x1: legend.x - 30, x2: legend.x - 8, y1: legend.y + k * legend.row, y2: legend.y + k * legend.row, stroke: t.cat(gr.cat), 'stroke-width': 4 }))),
   // Leaders from each line end to its rail slot, drawn once the label has arrived.
-  g({ 'data-step': 1, 'data-motion': 'draw', 'data-delay': 750, 'data-duration': 400 },
+  g({ 'data-step': 1, 'data-motion': 'draw', 'data-delay': 1000, 'data-duration': 400 },
     groups.map((gr, k) => el('path', { d: pathFromPoints([[xEnd + 8, y(gr.index.at(-1))], [railX - 22, placed[k].y], [railX - 8, placed[k].y]]), fill: 'none', stroke: t.cat(gr.cat), 'stroke-width': 1.4 }))),
   groups.map((gr, k) => el('circle', { cx: xEnd, cy: y(gr.index.at(-1)), r: 4.5, fill: t.cat(gr.cat), stroke: t.c('paper'), 'stroke-width': 1.5 })),
   // The labels: drawn at their rail slots; at build 0 they are translated back into the legend.
   groups.map((gr, k) => g({ 'data-states': { 0: { transform: `matrix(1,0,0,1,${n(legend.x - railX)},${n(legend.y + k * legend.row - placed[k].y)})` }, 1: { transform: 'matrix(1,0,0,1,0,0)' } },
-    'data-duration': 800, 'data-easing': 'smooth', style: 'transform-box:view-box;transform-origin:0 0' },
+    'data-duration': 800, 'data-delay': k * 70, 'data-easing': 'smooth', style: 'transform-box:view-box;transform-origin:0 0' }, // top label first
     textLines([gr.name], { x: railX, y: placed[k].y, size: 18, valign: 'middle', fill: t.cat(gr.cat), weight: 700, halo: t.c('paper') }),
     textLines([fmt(gr.index.at(-1), { digits: 1 })], { x: railX + measureText(gr.name, 18, { weight: 700 }) + 12, y: placed[k].y, size: 18, valign: 'middle', fill: t.c('ink'), attrs: { 'data-step': 2, 'data-motion': 'reveal', 'data-delay': 100 + k * 70 } }))),
   // Build 2 — the spike that makes the shared ending remarkable.
@@ -58,7 +58,7 @@ export default {
   notes: `Purpose: Give labels room without changing what they name: the legend labels travel to a rail beside the line ends, spaced so none collide, and leaders tie each to its line.\nModify: Replace \`groups\` (one index series each); rail slots come from spreadLabels on the end values, so they adapt when ends bunch or spread. Keep at most four or five series in categorical colors.\nInvariant: Lines, scales and colors never change; each label keeps its color and moves as one element (translate only) from its legend slot to its rail slot; leaders appear after the labels arrive.\nStatic: The final build shows direct labels on the rail with end values, and the peak annotated (the legend swatches are gone).`,
   sources: [{ type: 'original-example', file: 'assets/motion/motion-annotation-rail.mjs' }],
   exportPolicy: 'final',
-  content: `<h1 class="st-head"><em>${spiker.name}</em> spiked ${peak - 100}% by mid-2022, yet all four food groups ended 2025 within ${Math.ceil(spread)} points</h1>
+  content: `<h1 class="st-head"><em>${spiker.name}</em> spiked ${peak - 100}% by ${quarters[peakAt]}, yet all ${['', 'one', 'two', 'three', 'four', 'five'][groups.length]} food groups ended ${quarters.at(-1).slice(0, 4)} within ${Math.ceil(spread)} points</h1>
 <figure class="st-fig" data-region="primary">${figure()}</figure>
 <p class="st-source" data-region="source"><span>Illustrative data · consumer price index by food group, quarterly</span><span>Motion · legend labels move onto a rail (2 builds)</span></p>`,
 };

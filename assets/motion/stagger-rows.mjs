@@ -41,14 +41,14 @@ export function figure(theme = 'css') {
       textLines([r.product], { x: nameW + 14, y: cy, size: 16, valign: 'middle', fill: t.c('muted'), attrs: enter }),
       el('path', { d: barPath(x(0), y(r.label), x(r.minutes) - x(0), y.bw, 3, 'right'), fill: r.pilot ? t.c('accent') : t.c('context'), style: 'transform-origin:0% 50%',
         ...(r.pilot ? {} : { 'data-step': 1, 'data-motion': 'grow-x', 'data-delay': k * 110, 'data-duration': 560, 'data-easing': 'decelerate' }) }),
-      textLines([r.pilot ? `${r.minutes} min` : `${r.minutes}`], { x: x(r.minutes) + 8, y: cy, size: 17, valign: 'middle', weight: r.pilot ? 700 : 600, fill: r.pilot ? t.c('accent') : t.c('ink'),
+      textLines([r.pilot ? `${r.minutes} minutes` : `${r.minutes}`], { x: x(r.minutes) + 8, y: cy, size: 17, valign: 'middle', weight: r.pilot ? 700 : 600, fill: r.pilot ? t.c('accent') : t.c('ink'),
         attrs: { 'font-variant-numeric': 'tabular-nums', ...(r.pilot ? {} : { 'data-step': 1, 'data-motion': 'reveal', 'data-delay': k * 110 + 380 }) } }));
   }),
   // build 2: the reference the rows are read against, and the like-for-like comparison
   g({ 'data-step': 2, 'data-motion': 'reveal', 'data-duration': 500 },
     // the median line breaks wherever a row's value label would sit on it
     rows.map((r, i) => {
-      const lab = r.pilot ? `${r.minutes} min` : `${r.minutes}`, lx = x(r.minutes) + 8, lw = measureText(lab, 17, { weight: 700 });
+      const lab = r.pilot ? `${r.minutes} minutes` : `${r.minutes}`, lx = x(r.minutes) + 8, lw = measureText(lab, 17, { weight: 700 });
       const hit = x(plant) >= lx - 3 && x(plant) <= lx + lw + 3;
       const y0 = i ? y(r.label) - (y.step - y.bw) / 2 : m.t - 4, y1 = i < rows.length - 1 ? y(r.label) + y.bw + (y.step - y.bw) / 2 : H - m.b;
       return hit ? '' : el('line', { x1: x(plant), x2: x(plant), y1: y0, y2: y1, stroke: t.c('ink'), 'stroke-width': 1.6, 'stroke-dasharray': '5 4' });

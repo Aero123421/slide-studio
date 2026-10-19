@@ -5,13 +5,13 @@ const ID = 'tpl-editorial-spread';
 const photo = {
   src: '{{asset:assets/media/study-01.jpg}}', w: 600, h: 400,          // native pixels
   alt: 'An espresso in a red-brown cup and saucer with a metal spoon, on a worn wooden table',
-  caption: 'An espresso in a red cup and saucer on a café table: the last half-minute of a long journey.',
+  caption: 'An espresso in a red cup and saucer on a café table.',
   credit: 'Photograph: public domain (CC0).',
 };
 const shown = 628;                                                        // px wide on the slide
 const essay = [
   'The shot takes twenty-eight seconds. Eighteen grams of ground coffee go into the basket, water just under boiling is forced through at nine bars, and thirty-six grams of something dark and glossy run into the cup. The barista watches the stream turn from brown to blond and stops it by the scale as much as by eye.',
-  'It is the shortest part of the coffee’s life and the only part most of us ever see. Everything before it happened out of sight, and slowly.',
+  'It is the shortest part of the coffee’s life and the only part most of us see. The beans in this cup were picked on a hillside in Huila, in southern Colombia, by someone who left every cherry that was not yet red. They were washed, dried for three weeks on raised beds, rested, milled and sent north by sea. When they reached a roaster they had been travelling for more than four months, and they waited ten weeks more before anyone heated them.',
 ];
 
 export default {

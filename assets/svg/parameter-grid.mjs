@@ -48,8 +48,8 @@ export function figure(theme = 'css') {
     const pts = run.val.map((v, e) => [x(e), v == null ? null : y(Math.min(v, yDom[1]))]);
     const parts = [
       el('rect', { x: px, y: py + head - 4, width: pw, height: ph - head + 4, fill: isBest ? t.c('surface') : 'none' }),
-      [0.4, 0.6, 0.8, 1.0].map(v => el('line', { x1: px, x2: px + pw, y1: y(v), y2: y(v), stroke: t.c('grid'), 'stroke-width': 1 })),
-      el('line', { x1: px, x2: px + pw, y1: py + ph, y2: py + ph, stroke: t.c('rule'), 'stroke-width': 1.2 }),
+      [0.4, 0.6, 0.8, 1.0].map(v => el('line', { fill: 'none', x1: px, x2: px + pw, y1: y(v), y2: y(v), stroke: t.c('grid'), 'stroke-width': 1 })),
+      el('line', { fill: 'none', x1: px, x2: px + pw, y1: py + ph, y2: py + ph, stroke: t.c('rule'), 'stroke-width': 1.2 }),
       segments(pts).map(seg => el('path', { d: pathFromPoints(seg), fill: 'none', stroke: color, 'stroke-width': isBest ? 3 : 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' })),
     ];
     if (div) {

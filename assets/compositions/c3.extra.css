@@ -32,3 +32,24 @@
 .st.cmp-exception-rail { --ss-font-sans: "Inter", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic UI", "Yu Gothic", Meiryo, "IPAGothic", sans-serif; --ss-font-display: var(--ss-font-sans); }
 .st.cmp-exception-rail .st-head em { white-space: nowrap; }
 .st.cmp-exception-rail .st-dek { max-width: 1040px; }
+
+/* composition-natural-japanese (ja): question (cols 1–6) and answer (cols 7–12) on one top line, evidence below */
+.st.cmp-natural-ja { --ss-font-sans: "Inter", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic UI", "Yu Gothic", Meiryo, "IPAGothic", sans-serif; --ss-font-display: var(--ss-font-sans); }
+.st.cmp-natural-ja .cmp-nj-q { position: absolute; left: 64px; top: 46px; width: 564px; font: 700 40px/1.42 var(--ss-font-display); color: var(--ss-ink); }
+.st.cmp-natural-ja .cmp-nj-q span, .st.cmp-natural-ja .cmp-nj-nb { white-space: nowrap; }
+.st.cmp-natural-ja .cmp-nj-a { position: absolute; left: 652px; top: 46px; width: 564px; font: 400 22px/1.7 var(--ss-font-sans); color: var(--ss-ink); word-break: auto-phrase; }
+.st.cmp-natural-ja .cmp-nj-a b { display: block; margin-bottom: 4px; font: 700 40px/1.42 var(--ss-font-display); }
+.st.cmp-natural-ja .cmp-nj-fig { position: absolute; left: 64px; top: 224px; width: 1152px; height: 436px; margin: 0; }
+.st.cmp-natural-ja .cmp-nj-fig > svg { display: block; width: 100%; height: 100%; overflow: visible; }
+
+/* composition-mechanism-scope: timing diagram (cols 1–8) and test envelope (cols 9–12) share one top line */
+.st.cmp-mechanism-scope { --ss-font-sans: "Inter", "Helvetica Neue", "Segoe UI", Arial, sans-serif; --ss-font-display: "Inter Display", "Inter", "Helvetica Neue", "Segoe UI", Arial, sans-serif; --ss-font-mono: "JetBrains Mono", "SF Mono", "SFMono-Regular", Menlo, Consolas, "DejaVu Sans Mono", monospace; }
+
+/* composition-continuous-handoff: one band across cols 1–10, the end product at its end (cols 11–12) */
+.st.cmp-handoff { --ss-font-sans: "Inter", "Helvetica Neue", "Segoe UI", Arial, sans-serif; --ss-font-display: "Inter Display", "Inter", "Helvetica Neue", "Segoe UI", Arial, sans-serif; }
+.st.cmp-handoff .cmp-ho-fig { position: absolute; left: 64px; top: 176px; width: 960px; height: 460px; margin: 0; }
+.st.cmp-handoff .cmp-ho-fig > svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.st.cmp-handoff .cmp-ho-cup { position: absolute; left: 1040px; top: 222px; width: 176px; margin: 0; }
+.st.cmp-handoff .cmp-ho-cup img { display: block; width: 176px; height: 176px; object-fit: cover; }
+.st.cmp-handoff .cmp-ho-cup figcaption { margin-top: 12px; display: grid; gap: 2px; font: 400 16px/1.35 var(--ss-font-sans); color: var(--ss-muted); }
+.st.cmp-handoff .cmp-ho-cup figcaption b { font: 650 22px/1.2 var(--ss-font-display); color: var(--ss-ink); font-variant-numeric: tabular-nums; }

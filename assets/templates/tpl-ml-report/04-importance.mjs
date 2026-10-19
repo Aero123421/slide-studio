@@ -1,61 +1,67 @@
-// Template: ML model evaluation report · Feature importance with uncertainty. Synthetic example content; replace data and copy.
+// Template: Model evaluation report · Permutation importance with intervals. Synthetic example content; replace data and copy.
+import { rng, forestPlot } from '../../runtime/figure.mjs';
+
 const ID = 'tpl-ml-report-importance';
-// One source of truth: permutation importance on the test split, metric = drop in average precision (Failing vs rest),
-// 30 repeats; lo/hi = 2.5th and 97.5th percentiles of the 30 repeats.
-const REPEATS = 30, BASE_AP = 0.771;
-const features = [
-  { f: 'vibration_rms_24h', group: 'vibration', m: 0.182, lo: 0.161, hi: 0.205 },
-  { f: 'bearing_temp_delta', group: 'thermal', m: 0.121, lo: 0.104, hi: 0.139 },
-  { f: 'motor_current_thd', group: 'electrical', m: 0.064, lo: 0.051, hi: 0.078 },
-  { f: 'discharge_pressure_cv', group: 'hydraulic', m: 0.047, lo: 0.035, hi: 0.060 },
-  { f: 'hours_since_service', group: 'maintenance', m: 0.029, lo: 0.018, hi: 0.041 },
-  { f: 'start_stop_count_7d', group: 'operation', m: 0.012, lo: 0.004, hi: 0.021 },
-  { f: 'ambient_temp', group: 'context', m: 0.003, lo: -0.004, hi: 0.010 },
-  { f: 'site_id', group: 'context', m: -0.001, lo: -0.006, hi: 0.004 }
-].sort((a, b) => b.m - a.m);
-const X = { min: -0.02, max: 0.22 }, W = 760, L = 214, R = 548, TOP = 40, ROW = 46;
-const sx = v => L + (v - X.min) / (X.max - X.min) * (R - L);
-const f3 = v => (v < 0 ? '−' : '') + Math.abs(v).toFixed(3);
-const zeroish = d => d.lo <= 0 && d.hi >= 0;
-let g = '';
-for (let v = 0; v <= 0.2 + 1e-9; v += 0.05) g += `<line x1="${sx(v)}" y1="${TOP - 8}" x2="${sx(v)}" y2="${TOP + features.length * ROW}" stroke="${v === 0 ? '#0f172a' : '#edf1f5'}" stroke-width="${v === 0 ? 1.4 : 1}"/><text x="${sx(v)}" y="${TOP + features.length * ROW + 22}" text-anchor="middle" class="v-axis">${v.toFixed(2)}</text>`;
-const rowsSvg = features.map((d, i) => {
-  const y = TOP + i * ROW + ROW / 2, z = zeroish(d), col = z ? '#94a3b8' : '#104281';
-  return `${i % 2 ? '' : `<rect x="0" y="${y - ROW / 2}" width="${W}" height="${ROW}" fill="#f7f9fb"/>`}
-<text x="0" y="${y + 5}" class="v-num">${d.f}</text>
-<line x1="${sx(d.lo)}" y1="${y}" x2="${sx(d.hi)}" y2="${y}" stroke="${col}" stroke-width="3" stroke-linecap="round"/>
-<circle cx="${sx(d.m)}" cy="${y}" r="6.5" fill="${z ? '#fff' : col}" stroke="${col}" stroke-width="2"/>
-<text x="${R + 22}" y="${y + 5}" class="${z ? 'v-lab2' : 'v-num-b'}">${f3(d.m)}</text><text x="${R + 80}" y="${y + 5}" class="v-axis">[${f3(d.lo)}, ${f3(d.hi)}]</text>`;
-}).join('');
-const H = TOP + features.length * ROW + 50;
-const fig = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-labelledby="${ID}-t ${ID}-d">
-<title id="${ID}-t">Permutation importance with 95% intervals</title>
-<desc id="${ID}-d">Drop in average precision for Failing when each feature is permuted, ${REPEATS} repeats on the test split. ${features.map(d => `${d.f} ${d.m.toFixed(3)} (interval ${d.lo.toFixed(3)} to ${d.hi.toFixed(3)})`).join('; ')}. Intervals for ${features.filter(zeroish).map(d => d.f).join(' and ')} include zero.</desc>
-<text x="0" y="16" class="v-axis">FEATURE</text><text x="${sx(0)}" y="16" text-anchor="middle" class="v-axis">0 = no effect</text><text x="${R + 22}" y="16" class="v-axis">MEAN  [2.5%, 97.5%]</text>
-${g}${rowsSvg}
-<text x="${(L + R) / 2}" y="${H - 2}" text-anchor="middle" class="v-axt">Drop in average precision when the feature is shuffled</text>
-</svg>`;
-const top2 = features[0].m + features[1].m, total = features.filter(d => d.m > 0).reduce((a, d) => a + d.m, 0);
-const nulls = features.filter(zeroish);
+// ---- Shared test set: identical on pages 02–06 (modules cannot import each other). ----
+// Replace with your scored test set, one row per pump-week: y = 1 if the pump failed within 7 days,
+// p = calibrated failure probability, raw = model score before calibration, vib = weekly peak vibration velocity, mm/s.
+const TEST = { pumps: 1144, weeks: 26, failures: 331, threshold: 0.06, ruleMmS: 4.5, capacity: 40, seed: 7 };
+const rows = (() => {
+  const R = rng(TEST.seed), N = TEST.pumps * TEST.weeks, pi = TEST.failures / N, mu = 2.55, s1 = 1.15;
+  const gauss = () => { let u = 0; while (!u) u = R(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * R()); };
+  const dens = (x, m, s) => Math.exp(-0.5 * ((x - m) / s) ** 2) / s;
+  return Array.from({ length: N }, (_, i) => {
+    const y = i < TEST.failures ? 1 : 0, z = y ? mu + s1 * gauss() : gauss();
+    const a = pi * dens(z, mu, s1), p = a / (a + (1 - pi) * dens(z, 0, 1));
+    return { y, p, raw: 1 / (1 + Math.exp(-(2 + 0.8 * Math.log(p / (1 - p))))), vib: Math.max(0.5, 2.76 + 0.9 * (0.55 * z + 0.835 * gauss())) };
+  });
+})();
+// ---- end of shared block ----
+
+const REPEATS = 30; // shuffles per input on the test set
+// Mean drop in average precision when one input is shuffled; low/high = 2.5th and 97.5th percentile of the repeats.
+const inputs = [
+  { label: 'Motor current, 7-day trend', short: 'motor current', estimate: 0.142, low: 0.118, high: 0.167 },
+  { label: 'Vibration velocity, weekly peak', short: 'vibration', estimate: 0.108, low: 0.087, high: 0.131 },
+  { label: 'Bearing temperature above ambient', short: 'bearing temperature', estimate: 0.061, low: 0.044, high: 0.079 },
+  { label: 'Starts per hour', short: 'starts per hour', estimate: 0.037, low: 0.022, high: 0.053 },
+  { label: 'Run hours since overhaul', short: 'run hours', estimate: 0.024, low: 0.011, high: 0.038 },
+  { label: 'Wet-well level variability', short: 'wet-well level', estimate: 0.011, low: 0.002, high: 0.021 },
+  { label: 'Rainfall, previous 7 days', short: 'rainfall', estimate: 0.004, low: -0.005, high: 0.013 },
+  { label: 'Pump age', short: 'pump age', estimate: 0.001, low: -0.006, high: 0.008 },
+  { label: 'Station', short: 'station', estimate: -0.002, low: -0.009, high: 0.005 },
+];
+
+// ---- derived
+const order = rows.map(r => [r.p, r.y]).sort((a, b) => b[0] - a[0]);
+let tp = 0, fp = 0, sumPrec = 0;
+for (const [, y] of order) { if (y) { tp++; sumPrec += tp / (tp + fp); } else fp++; }
+const AP = sumPrec / tp; // average precision of the model on the test set (page 03)
+const ranked = [...inputs].sort((a, b) => b.estimate - a.estimate);
+const nothing = ranked.filter(r => r.low <= 0 && r.high >= 0);
+const list = a => (a.length > 1 ? `${a.slice(0, -1).join(', ')} and ${a.at(-1)}` : a[0]);
+const cap = s => s[0].toUpperCase() + s.slice(1);
+const [first, second] = ranked;
+
+const fig = forestPlot({
+  id: `${ID}-fig`, width: 1152, height: 404,
+  title: `Permutation importance of ${inputs.length} inputs on the test set`,
+  desc: `Drop in average precision (from ${AP.toFixed(2)}) when each input is shuffled, mean of ${REPEATS} repeats with 2.5–97.5 percentile intervals. ${ranked.map(r => `${r.label} ${r.estimate.toFixed(3)} [${r.low.toFixed(3)}, ${r.high.toFixed(3)}]`).join('; ')}. Intervals for ${list(nothing.map(r => r.short))} include zero.`,
+  rows: ranked, reference: 0, hollowIfCrossing: true, highlight: r => r.low > 0, domain: [-0.02, 0.18],
+  format: { digits: 3 }, labelTitle: 'Input, shuffled', columnTitle: 'Drop in AP  [95% interval]',
+  xLabel: 'Drop in average precision when the input is shuffled',
+});
 
 export default {
   study: true,
   id: ID,
-  title: 'Feature importance with uncertainty',
-  notes: 'Purpose: Show which inputs the model relies on for the decision that matters, with the spread across repeats, so small or null effects are not over-read.\nModify: Replace features with your permutation-importance results (mean and interval per feature), and REPEATS / BASE_AP. Order, interval styling and the null count are computed.\nInvariant: Name the metric, the split, the number of repeats and the interval definition. Keep the zero line. Intervals that include zero are drawn hollow and grey. Importance describes the model, not causes in the pumps.\nStatic: Static page.',
+  title: 'Permutation importance with intervals',
+  notes: 'Purpose: Show which inputs the model actually relies on, with their uncertainty, so a reviewer can check that the signal is physical (current, vibration, heat) and not an artefact (station, age).\nModify: Replace inputs with your permutation results (mean and percentile interval per input, plain-language labels, a short name for the headline) and REPEATS; keep the shared block identical to pages 02, 03, 05 and 06. Order, highlighting, hollow markers, the base AP and the headline are computed.\nInvariant: Name the metric, the split, the number of repeats and the interval; keep the zero line; inputs whose interval includes zero are hollow and grey, never ranked as if they mattered.\nStatic: Static page; no builds.',
   sources: [],
   exportPolicy: 'final',
   className: 'tpl-ml-report ml-importance',
-  content: `<div class="ml-page">
-<div class="ml-top"><span class="ml-badge"><b>PumpGuard v2.3</b>evaluation report</span><span class="ml-sec"><em>04</em>What the model uses</span></div>
-<h1 class="ml-title" data-region="title">Vibration and bearing heat carry the signal; ${nulls.length === 2 ? 'two' : nulls.length} features add nothing</h1>
-<figure class="ml-fig" style="left:56px;top:130px;width:${W}px;height:${H}px" data-region="primary">${fig}</figure>
-<div class="ml-side" style="left:864px;top:150px;width:360px" data-region="support">
-  <div class="ml-metric"><span>Baseline average precision</span><b>${BASE_AP.toFixed(3)}</b><small>Failing vs rest, test split, no shuffling</small></div>
-  <div class="ml-metric"><span>Intervals that include zero</span><b>${nulls.length}</b><small>${nulls.map(d => d.f).join(', ')}</small></div>
-  <div class="ml-metric"><span>Top two features</span><b>${Math.round(100 * top2 / total)}%</b><small>of the summed positive drops</small></div>
-  <div class="ml-note" style="position:static;margin-top:16px"><h3>Read with care</h3><ul><li>Interval = 2.5th–97.5th percentile over ${REPEATS} shuffles.</li><li>vibration_rms_24h and bearing_temp_delta are correlated (r = 0.62), so they share credit.</li><li>High importance means the model uses a feature, not that it causes failure.</li></ul></div>
-</div>
-<footer class="ml-foot" data-region="source"><span>Illustrative data · synthetic importances</span><span>permutation importance · test split Oct–Nov 2025</span></footer>
-</div>`
+  content: `<p class="ml-run"><span>PF-7 v3 pump-failure model — evaluation report</span><span>4</span></p>
+<h1 class="ml-head" data-region="title">${cap(first.short)} and ${second.short} carry most of the signal; ${list(nothing.map(r => r.short))} add nothing</h1>
+<figure class="ml-fig" style="left:64px;top:196px" data-region="primary">${fig}</figure>
+<p class="ml-cap" style="left:64px;top:620px;width:858px"><b>Figure 4.</b> How far average precision (${AP.toFixed(2)} on the test set) falls when one input is shuffled across pump-weeks; mean of ${REPEATS} shuffles with a 95% interval. Hollow grey marks include zero.</p>`,
 };

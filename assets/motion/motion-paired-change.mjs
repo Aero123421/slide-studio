@@ -65,7 +65,7 @@ export default {
   notes: 'Purpose: Change two related values together on one shared baseline and unit, so their difference is read as a distance that is re-measured at every step.\nModify: Replace `years` and the two `areas` (one value per year); column scales, counted labels, ghost ticks, the gap bracket and the rail recompute.\nInvariant: Both columns rescale from the same zero with transforms computed from the data; labels count from the previous value; earlier values stay as labelled ticks; the gap is always urban minus rural on the same axis.\nStatic: The final build shows the latest values, both earlier ticks per column and the gap history in the rail.',
   sources: [{ type: 'original-example', file: 'assets/motion/motion-paired-change.mjs' }],
   exportPolicy: 'final',
-  content: `<h1 class="st-head"><em>Rural</em> gigabit coverage rose from ${rural.values[0]}% to ${rural.values.at(-1)}%; the gap to towns, ${gaps[widest]} points in ${years[widest]}, is now ${gaps.at(-1)}</h1>
+  content: `<h1 class="st-head"><em>Rural</em> gigabit coverage rose from ${rural.values[0]}% to ${rural.values.at(-1)}%; the gap to urban areas, ${gaps[widest]} points in ${years[widest]}, is now ${gaps.at(-1)}</h1>
 <figure class="st-fig" data-region="primary">${figure()}</figure>
 <div class="st-rail" data-region="support">
   ${years.map((yr, k) => `${k ? '<hr class="st-rule" data-step="' + k + '" data-motion="reveal">' : ''}<div class="st-kpi"${k ? ` data-step="${k}" data-motion="reveal" data-delay="700"` : ''}><b${k === years.length - 1 ? ' class="st-accent"' : ''}>${gaps[k]} pts</b><span>Gap in ${yr}: urban ${urban.values[k]}%, rural ${rural.values[k]}%${k ? ` (${fmt(gaps[k] - gaps[k - 1], { sign: true })})` : ''}.</span></div>`).join('\n  ')}

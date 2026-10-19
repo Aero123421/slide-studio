@@ -28,6 +28,7 @@ export function figure(theme = 'css') {
   return svgRoot({ id: 'motion-crop-reveal-fig', width: W, height: H, theme: t,
     title: 'エスプレッソのメニュー写真と、最初の視線が向いた領域',
     desc: `${people}人中${focus.first}人（${pct(focus)}%）の最初の視線がクレマに向いた。` + areas.filter(a => !a.focus).map(a => `${a.name}${a.first}人`).join('、') + '。' },
+  // Mask luminance (white = visible): literal by definition, not a colour.
   el('defs', {}, el('mask', { id: 'motion-crop-reveal-crop', maskUnits: 'userSpaceOnUse', x: P.x, y: P.y, width: P.w, height: P.h },
     // The crop: a unit square scaled to the detail at build 0 and to the whole photo at build 1.
     el('rect', { x: 0, y: 0, width: 1, height: 1, fill: '#fff', 'data-states': { 0: { transform: unit(F) }, 1: { transform: unit(P) } }, 'data-duration': 1000, 'data-easing': 'smooth', style: 'transform-box:view-box;transform-origin:0 0' }))),

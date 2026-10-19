@@ -2,7 +2,8 @@
    Grid: 1280×720, margins 64, 12 columns of 74 px, 24 px gutters (column k starts at
    64 + 98(k−1); n columns span 98n − 24). Running head 40–58, headline from 92,
    evidence 236–632, source line ends at 680.
-   Type scale (px): Display 208 (cover wordmark only) · Headline 40/48 · Lead 26/36 · Body 20/30 · Label 17/24 · Note 15/20.
+   Type scale (px): Display 208 (cover wordmark only) · Headline 40/48 · Lead 26/36 · Body 20/30 · Label 17/24 ·
+   Note 15/20. Figures in Inter Display reuse the Headline (40) and Lead (26) steps.
    Color: paper, ink, one grey for text, context grey for data, one vermilion accent for "this". */
 .tpl-pitch{
   --pp-paper:#F4F1EA;--pp-ink:#171614;--pp-grey:#5F5B54;--pp-context:#B4AEA3;--pp-rule:#CFC8BB;--pp-grid:#E3DED4;
@@ -23,7 +24,6 @@
   font-kerning:normal;-webkit-font-smoothing:antialiased;
 }
 .tpl-pitch svg{display:block;overflow:visible}
-.tpl-pitch .pp-abs{position:absolute}
 
 /* ---- furniture ---- */
 .tpl-pitch .pp-run{position:absolute;left:64px;right:64px;top:40px;display:flex;justify-content:space-between;
@@ -35,13 +35,9 @@
   letter-spacing:-.01em;text-wrap:balance;font-variant-numeric:lining-nums}
 .tpl-pitch .pp-lead{font:400 26px/36px var(--pp-serif);text-wrap:pretty}
 .tpl-pitch .pp-body{font:400 20px/30px var(--pp-serif);text-wrap:pretty}
-.tpl-pitch .pp-label{font:400 17px/24px var(--pp-sans)}
 .tpl-pitch .pp-ex{position:absolute;left:64px;top:236px;font:400 17px/24px var(--pp-sans);color:var(--pp-grey)}
 .tpl-pitch .pp-ex b{font-weight:600;color:var(--pp-ink);margin-right:.45em}
 .tpl-pitch .pp-num{font:600 40px/44px var(--pp-figure);letter-spacing:-.02em;font-variant-numeric:tabular-nums lining-nums}
-.tpl-pitch .pp-accent{color:var(--pp-accent-ink)}
-.tpl-pitch .pp-grey{color:var(--pp-grey)}
-.tpl-pitch .tab{font-variant-numeric:tabular-nums lining-nums}
 
 /* ---- 01 cover: sentence top right, wordmark standing on the rule ---- */
 .tpl-pitch .pp-cover-line{position:absolute;left:652px;top:92px;width:564px}

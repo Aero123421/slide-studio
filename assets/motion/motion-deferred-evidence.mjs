@@ -11,6 +11,7 @@ const teams = [ // 1人1か月あたりの病欠日数：試行前（2024年4〜
   { group: 'comparison', before: 1.01, during: 0.93 }, { group: 'comparison', before: 0.88, during: 0.81 }, { group: 'comparison', before: 0.85, during: 0.86 },
   { group: 'comparison', before: 0.93, during: 0.84 }, { group: 'comparison', before: 0.82, during: 0.78 },
 ];
+const periods = { before: '2024年4〜9月', during: '2025年4〜9月' }; // 試行前と試行中の比較期間
 const groups = [{ key: 'pilot', label: '週休3日の試行チーム' }, { key: 'comparison', label: '比較チーム（通常勤務）' }].map(gr => {
   const list = teams.filter(tm => tm.group === gr.key);
   const b = mean(list.map(tm => tm.before)), d = mean(list.map(tm => tm.during));
@@ -57,7 +58,7 @@ export default {
   content: `<h1 class="st-head" style="word-break:auto-phrase">週休3日制を試した${pilot.list.length}チームで、病欠は本当に減ったのか？</h1>
 <figure class="st-fig" data-region="primary">${figure()}</figure>
 <div class="st-rail" data-region="support" style="word-break:auto-phrase">
-  <p class="st-text st-muted">試行した${pilot.list.length}チームと、業務の近い${comp.list.length}チームの病欠日数を、試行前（2024年4〜9月）と試行中（2025年4〜9月）で比べた。</p>
+  <p class="st-text st-muted">試行した${pilot.list.length}チームと、業務の近い${comp.list.length}チームの病欠日数を、試行前（${periods.before}）と試行中（${periods.during}）で比べた。</p>
   <hr class="st-rule" data-step="2" data-motion="reveal">
   <div class="st-kpi" data-step="2" data-motion="reveal" data-delay="200"><b class="st-accent">${fmt(pilot.change, { sign: true })}%</b><span>試行チームの病欠日数。比較チームは${fmt(comp.change, { sign: true })}%。</span></div>
   <div class="st-kpi" data-step="2" data-motion="reveal" data-delay="500"><b>${pilot.fewer}<small style="font-size:.42em;font-weight:600;margin-left:.1em">/ ${pilot.list.length}チーム</small></b><span>試行チームのうち、病欠が減ったチーム。</span></div>

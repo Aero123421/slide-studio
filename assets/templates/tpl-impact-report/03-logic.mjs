@@ -1,48 +1,55 @@
-// Template: 年次インパクトレポート · 事業の流れ（インプット→活動→アウトプット→アウトカム）. Synthetic example content; replace data and copy.
+// Template: 年次活動報告（寄付者・自治体向け）· ロジックモデル. Synthetic example content; replace data and copy.
+// 投入 → 活動 → アウトプット → アウトカム, each with measured indicators. One hairline carries the
+// direction of the flow; outcome figures take the accent. Shared figures match the other pages.
 const ID = 'tpl-impact-report-logic';
-// Figures are the same as on the other pages (budget total = expenditure total on the budget page).
-const K = {spend: 4860, volunteers: 186, sites: 17, sessions: 612, kids: 1284, visits: 18420, retention: 78, survey: 812};
-const fmt = n => n.toLocaleString('ja-JP');
-const cols = [
-  {icon: 'input', h: 'インプット', sub: '投じた資源', items: [
-    {v: fmt(K.spend), u: '万円', t: '年間の事業支出'}, {v: fmt(K.volunteers), u: '人', t: 'ボランティア（年3回以上）'}, {v: fmt(K.sites), u: 'か所', t: '公民館・集会所などの拠点'}]},
-  {icon: 'act', h: '活動', sub: '行ったこと', items: [
-    {v: fmt(K.sessions), u: '回', t: '放課後の学習会'}, {v: '24', u: '回', t: '保護者向けの相談会'}, {v: '4', u: '回', t: 'ボランティア研修'}]},
-  {icon: 'output', h: 'アウトプット', sub: '直接の結果', items: [
-    {v: fmt(K.kids), u: '人', t: '参加した子ども（実人数）'}, {v: fmt(K.visits), u: '人回', t: '延べ参加'}, {v: '312', u: '件', t: '保護者からの相談'}]},
-  {icon: 'outcome', h: 'アウトカム', sub: '子どもに起きた変化', out: true, items: [
-    {v: fmt(K.retention), u: '%', t: '3月まで通い続けた子ども'}, {v: '64', u: '%', t: '「勉強が前より好きになった」'}, {v: '71', u: '%', t: '「困ったときに相談できる大人がいる」'}]}
-];
-const impact = 'どの家庭に生まれても、放課後に学び続けられる地域';
-
-const ic = {
-  input: `<circle cx="27" cy="27" r="27" fill="#DDEAE4"/><rect x="13" y="24" width="28" height="18" rx="3" fill="#2E6E72"/><path d="M19 24 v-5 a8 8 0 0 1 16 0 v5" stroke="#2E6E72" stroke-width="3" fill="none"/><circle cx="27" cy="33" r="3" fill="#DDEAE4"/>`,
-  act: `<circle cx="27" cy="27" r="27" fill="#DDEAE4"/><rect x="12" y="16" width="30" height="20" rx="2" fill="#2E6E72"/><path d="M17 23 h12 M17 29 h18" stroke="#DDEAE4" stroke-width="2.2" stroke-linecap="round"/><path d="M20 36 l-4 8 M34 36 l4 8" stroke="#2E6E72" stroke-width="2.6" stroke-linecap="round"/>`,
-  output: `<circle cx="27" cy="27" r="27" fill="#DDEAE4"/><circle cx="20" cy="22" r="5" fill="#2E6E72"/><path d="M11 40 c0-8 4-12 9-12 s9 4 9 12z" fill="#2E6E72"/><circle cx="35" cy="24" r="4.4" fill="#8DB3A5"/><path d="M27 40 c0-7 4-10 8-10 s8 3 8 10z" fill="#8DB3A5"/>`,
-  outcome: `<circle cx="27" cy="27" r="27" fill="#2A5A64"/><path d="M14 38 l9 -9 l6 5 l11 -13" stroke="#F2C7A8" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M34 20 h7 v7" stroke="#F2C7A8" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`
+const K = {                           // 他のページと同じ値
+  spend: 6300, staff: {full: 6, part: 14}, volunteers: 138, rooms: 12, perWeek: 3, weeks: 45,
+  kids: 486, visits: 34992, talks: 410,
+  stay: {april: 402, march: 338}, homework: {july: 61, feb: 78, n: 412}, exam: {grade9: 38, enrolled: 38},
 };
-const chev = `<svg viewBox="0 0 40 56" aria-hidden="true"><path d="M10 8 L28 28 L10 48" stroke="#8DB3A5" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-const colW = (1152 - 3 * 40) / 4;
+const n = v => v.toLocaleString('ja-JP');
+const sessions = K.rooms * K.perWeek * K.weeks;                       // 1,620
+const kept = Math.round(K.stay.march / K.stay.april * 100);           // 84
+const stages = [                      // 各段階3項目まで。pre・v・u = 数の前の語・数・単位、t = 何の数か（1行）、how = 測り方・内訳（1行）
+  {h: '投入', sub: '使った資源', items: [
+    {v: n(K.spend), u: '万円', t: '年間の事業費', how: '2025年度決算'},
+    {v: K.staff.full + K.staff.part, u: '人', t: '学習支援スタッフ', how: `常勤${K.staff.full}人・非常勤${K.staff.part}人`},
+    {v: K.volunteers, u: '人', t: 'ボランティア', how: '大学生と地域の大人'}]},
+  {h: '活動', sub: '行ったこと', items: [
+    {pre: '週', v: K.perWeek, u: '回', t: `${K.rooms}教室での学習会`, how: '1回2時間、宿題と復習'},
+    {v: K.talks, u: '件', t: '保護者との面談', how: '入会時と学期ごと'},
+    {pre: '月', v: 1, u: '回', t: '学校・市との連絡会', how: '気になる子のケース会議'}]},
+  {h: 'アウトプット', sub: '直接の結果', items: [
+    {v: n(sessions), u: '回', t: '開いた学習会', how: '出席記録'},
+    {v: n(K.kids), u: '人', t: '参加した子ども', how: '実人数、出席記録'},
+    {v: n(K.visits), u: '人', t: '延べ参加', how: '出席記録'}]},
+  {h: 'アウトカム', sub: '子どもの変化', out: true, items: [
+    {v: kept, u: '%', t: '3月まで通い続けた', how: `4月の在籍${K.stay.april}人のうち`},
+    {v: K.homework.feb, u: '%', t: '宿題を最後までやり切る', how: `7月は${K.homework.july}%（子ども${K.homework.n}人の回答）`},
+    {v: K.exam.enrolled, u: '人', t: '高校に進んだ中学3年生', how: `${K.exam.enrolled === K.exam.grade9 ? '受験した全員' : `${K.exam.grade9}人のうち`}。進路調査（3月）`}]},
+];
+const goal = '家庭の事情にかかわらず、子どもが学び続けられる地域';
+const cols = [64, 358, 652, 946];                                      // 12列グリッドの1・4・7・10列目
+const flowY = 252;                                                      // 流れを示す線の高さ
+
+const flow = `<svg class="ir-fig" style="left:64px;top:${flowY - 8}px" width="1152" height="16" viewBox="0 0 1152 16" aria-hidden="true">
+  <line x1="0" x2="1152" y1="8" y2="8" stroke="var(--ir-ink)" stroke-width="1"/>
+  ${cols.slice(1).map(c => c - 64 - 12).map(x => `<path d="M${x - 5} 3 L${x + 5} 8 L${x - 5} 13 Z" fill="var(--ir-ink)"/>`).join('')}
+</svg>`;
 
 export default {
   study: true,
   id: ID,
-  title: '事業の流れ：インプットからアウトカムまで',
   language: 'ja',
-  notes: 'Purpose: 1年間の事業を「投じた資源→行ったこと→直接の結果→子どもに起きた変化」の順に並べ、成果の数字がどこから来たかを1枚で説明する（ロジックモデル）。\nModify: cols の数値と説明を差し替える。インプットの金額は予算ページの支出合計、アウトプットの参加者数は表紙・地域別ページと同じ値にする。\nInvariant: 矢印は想定する因果の流れであり、アウトカムの変化が事業だけによるとは限らない（ページ下の注記を残す）。アウトカムの割合には調査方法と回答数を添える。\nStatic: 静的ページ。',
+  title: 'Logic model: from resources to measured changes for children',
+  notes: 'Purpose: 1年間の事業を「使った資源→行ったこと→直接の結果→子どもに起きた変化」の順に並べ、成果の数字がどこから来たか、どう測ったかを1枚で示す。\nModify: K（各ページと共通の数値）と stages の項目・測り方を差し替える。各段階は3項目まで。\nInvariant: 事業費は予算ページ、参加者数は1・2ページと同じ値にする。アウトカムには必ず測り方（調査名・時期・人数）を添える。線は想定する流れであり、変化がすべて事業の効果だとは言わない。\nStatic: 静的ページ。',
   sources: [],
   exportPolicy: 'final',
-  className: 'tpl-impact-report ir-p-logic',
-  content: `<div class="ir">
-  <div class="ir-top"><span class="ir-brand">まちの学び舎ネットワーク　2025年度 年次報告</span><span class="ir-sec"><b>03</b>事業の流れ</span></div>
-  <h1 class="ir-h1" data-region="title">${fmt(K.spend)}万円と${fmt(K.volunteers)}人の力で、${fmt(K.kids)}人に学びの場を届けました</h1>
-  <p class="ir-lead">事業の流れを、投じた資源から子どもに起きた変化までの4段階で整理しました。</p>
-  <div class="ir-cols" data-region="primary">
-    ${cols.map(c => `<section class="ir-col${c.out ? ' is-out' : ''}"><div class="ir-colhead"><svg viewBox="0 0 54 54" aria-hidden="true">${ic[c.icon]}</svg><h2>${c.h}<small>${c.sub}</small></h2></div>
-      <ul>${c.items.map(i => `<li><b>${i.v}<small>${i.u}</small></b>${i.t}</li>`).join('')}</ul></section>`).join('')}
-  </div>
-  ${[1, 2, 3].map(k => `<div class="ir-chev" style="left:${(64 + k * (colW + 40) - 40).toFixed(1)}px">${chev}</div>`).join('')}
-  <div class="ir-impact" data-region="support"><p class="ir-label">めざす姿（インパクト）</p><p>${impact}</p></div>
-  <p class="ir-foot" data-region="source"><span>矢印は事業が想定する流れです。アウトカムの割合は3月の参加者アンケート（回答${fmt(K.survey)}人）による ・ 数値は例示用の架空データです</span><span>3</span></p>
-</div>`
+  className: 'tpl-impact-report ir-logic',
+  content: `<h1 class="ir-h" data-region="title">学習会を重ねるうちに、<br>宿題を最後までやり切る子どもは${K.homework.july}%から${K.homework.feb}%に増えた</h1>
+${stages.map((s, i) => `<section class="ir-stage${s.out ? ' is-out' : ''}" style="left:${cols[i]}px" data-region="${s.out ? 'primary' : 'support'}"><h2>${s.h}<span>${s.sub}</span></h2>
+  <ul>${s.items.map(it => `<li><b>${it.pre ? `<small class="pre">${it.pre}</small>` : ''}${it.v}<small>${it.u}</small></b>${it.t}${it.how ? `<i>${it.how}</i>` : ''}</li>`).join('')}</ul></section>`).join('\n')}
+${flow}
+<p class="ir-goal"><span>めざす姿</span>${goal}</p>
+<div class="ir-foot" data-region="source"><p>矢印は事業が想定する流れ。アウトカムの変化には学校や家庭の取り組みも影響している。子どもアンケートは7月と2月に実施</p><p>ゆうがた教室　2025年度 活動報告<b>3</b></p></div>`,
 };

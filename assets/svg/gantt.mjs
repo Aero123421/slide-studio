@@ -1,7 +1,7 @@
 // Diagram study · Gantt — spans on a true time axis, so overlap and the longest chain are visible.
 // Tasks are [start, end) intervals in minutes after the line stops (start included, end excluded).
 // The critical chain, the hidden overlap and the headline are computed from `tasks`.
-import { ganttChart, fmt } from '../runtime/figure.mjs';
+import { ganttChart } from '../runtime/figure.mjs';
 
 const tasks = [ // minutes after the filling line stops (illustrative), crew in `crew`
   { label: '停止・残液回収', start: 0, end: 12, crew: '全員' },

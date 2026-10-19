@@ -4,7 +4,7 @@
 import { theme as makeTheme, svgRoot, el, g, textLines, polar, fmt } from '../runtime/figure.mjs';
 
 const buildings = [ // listed in cable order; site position in metres from the south-west corner; tag = label side on the plan
-  { id: 'main', label: 'Main hospital', x: 420, y: 260, tag: 'n' },
+  { id: 'main', label: 'Main hospital', x: 420, y: 260, tag: 's' },
   { id: 'lab', label: 'Laboratories', x: 760, y: 340, tag: 'e' },
   { id: 'energy', label: 'Energy centre', x: 850, y: 60, tag: 's' },
   { id: 'emerg', label: 'Emergency', x: 600, y: 330, tag: 'n' },
@@ -33,7 +33,7 @@ const survives = links.filter(connectedWithout).length;
 const words = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'];
 
 export function figure(theme = 'css') {
-  const t = makeTheme(theme), id = 'ring-network-fig', W = 1152, H = 444, size = 17;
+  const t = makeTheme(theme), id = 'ring-network-fig', W = 1152, H = 444, size = 18;
   const isLong = l => l === longest;
   const label = (b, x, y, anchor, valign) => textLines([b.label], { x, y, size, anchor, valign, fill: t.c('ink'), weight: 600, halo: t.c('paper') });
   const drawPanel = (pos, labelAt) => [
@@ -71,8 +71,8 @@ export function figure(theme = 'css') {
   g({ class: 'ring-network-site' }, drawPanel(sp, siteLabel)),
   g({ class: 'ring-network-ring' }, drawPanel(rp, ringLabel)),
   // the highlighted link, named in both panels
-  textLines([`${fmt(length(longest), { digits: 0 })} m`], { x: midL[0] + 14, y: midL[1] + 2, size: 17, valign: 'middle', fill: t.c('accent'), weight: 700, halo: t.c('paper') }),
-  textLines([`${fmt(length(longest), { digits: 0 })} m`], { x: midR[0], y: midR[1], size: 17, anchor: 'middle', valign: 'middle', fill: t.c('accent'), weight: 700, halo: t.c('paper') }),
+  textLines([`${fmt(length(longest), { digits: 0 })} m`], { x: midL[0] - 16, y: midL[1] + 2, size: 18, anchor: 'end', valign: 'middle', fill: t.c('accent'), weight: 700, halo: t.c('paper') }),
+  textLines([`${fmt(length(longest), { digits: 0 })} m`], { x: midR[0], y: midR[1], size: 18, anchor: 'middle', valign: 'middle', fill: t.c('accent'), weight: 700, halo: t.c('paper') }),
   // scale bar
   el('path', { d: `M${ox} ${H - 18}v-8M${ox} ${H - 22}h${scale100}M${ox + scale100} ${H - 18}v-8`, fill: 'none', stroke: t.c('ink'), 'stroke-width': 1.6 }),
   textLines(['100 m'], { x: ox + scale100 + 10, y: H - 22, size: 15, valign: 'middle', fill: t.c('muted'), weight: 600 }));

@@ -42,7 +42,7 @@ export function figure(theme = 'css') {
   el('defs', {}, el('clipPath', { id: `${id}-clip` }, el('rect', { x: box.x, y: box.y, width: box.w, height: box.h }))),
   // grid and axes
   [-300, -200, -100, 0, 100, 200, 300].map(v => g({},
-    el('line', { x1: box.x, x2: box.x + box.w, y1: y(v), y2: y(v), stroke: v === 0 ? t.c('rule') : t.c('grid'), 'stroke-width': v === 0 ? 1.4 : 1 }),
+    el('line', { fill: 'none', x1: box.x, x2: box.x + box.w, y1: y(v), y2: y(v), stroke: v === 0 ? t.c('rule') : t.c('grid'), 'stroke-width': v === 0 ? 1.4 : 1 }),
     textLines([fmt(v, { sign: v > 0 })], { x: box.x - 10, y: y(v), size: 15, anchor: 'end', valign: 'middle', fill: t.c('muted') }))),
   textLines(['V'], { x: box.x - 10, y: y(400), size: 15, anchor: 'end', valign: 'middle', fill: t.c('muted') }),
   [0, 50, 100, 150, 200, 250, 300].map(v => textLines([String(v)], { x: x(v), y: box.y + box.h + 8, size: 15, anchor: v === 0 ? 'start' : v === supply.ms ? 'end' : 'middle', valign: 'top', fill: t.c('muted') })),
@@ -51,13 +51,13 @@ export function figure(theme = 'css') {
   el('rect', { x: x(dip.from), y: box.y, width: x(dip.to) - x(dip.from), height: box.h, fill: t.c('surface') }),
   textLines([`${fmt(dip.duration, { digits: 0 })} ms below ${Math.round(threshold * 100)}%`], { x: (x(dip.from) + x(dip.to)) / 2, y: box.y + box.h - 12, size: 15, anchor: 'middle', valign: 'bottom', weight: 700, fill: t.c('ink') }),
   el('path', { d: pathFromPoints(samples.map(p => [x(p.t), y(p.v)])), fill: 'none', stroke: t.c('ink'), 'stroke-width': 1.3, 'stroke-linejoin': 'round', 'clip-path': `url(#${id}-clip)` }),
-  el('line', { x1: box.x, x2: box.x + box.w, y1: thrY, y2: thrY, stroke: t.c('muted'), 'stroke-width': 1.2, 'stroke-dasharray': '6 5' }),
+  el('line', { fill: 'none', x1: box.x, x2: box.x + box.w, y1: thrY, y2: thrY, stroke: t.c('muted'), 'stroke-width': 1.2, 'stroke-dasharray': '6 5' }),
   el('path', { d: pathFromPoints(rms.map(r => [x(r.t), y(r.v)]), { curve: 'step' }), fill: 'none', stroke: t.c('accent'), 'stroke-width': 3, 'stroke-linejoin': 'round' }),
   // label band: each label drops a leader to the line it names
   [[rms[1].t + 4, y(rms[1].v), ['RMS, derived', '1-cycle window, every ½ cycle'], t.c('accent'), 'start'],
     [dip.to - 20, y(rms.find(r => r.t >= dip.to - 20).v), [`${fmt(dip.min, { digits: 0 })} V`, `${pctMin}% of nominal`], t.c('accent'), 'middle'],
     [282, thrY, ['Dip threshold', `${Math.round(threshold * 100)}% of ${supply.vrms} V`], t.c('muted'), 'end']].map(([tm, ly, lines, c, anchor]) => g({},
-    el('line', { x1: x(tm), x2: x(tm), y1: band + 10, y2: ly - 4, stroke: c, 'stroke-width': 1.2 }),
+    el('line', { fill: 'none', x1: x(tm), x2: x(tm), y1: band + 10, y2: ly - 4, stroke: c, 'stroke-width': 1.2 }),
     el('circle', { cx: x(tm), cy: ly, r: 3.5, fill: c }),
     textLines([lines[0]], { x: x(tm) + (anchor === 'start' ? -4 : anchor === 'end' ? 4 : 0), y: band - 20, size: 16, anchor, valign: 'bottom', fill: c, weight: 700 }),
     textLines([lines[1]], { x: x(tm) + (anchor === 'start' ? -4 : anchor === 'end' ? 4 : 0), y: band, size: 15, anchor, valign: 'bottom', fill: c }))),
@@ -65,7 +65,7 @@ export function figure(theme = 'css') {
   el('rect', { x: x(t0), y: y(260), width: x(t1) - x(t0), height: y(-260) - y(260), fill: 'none', stroke: t.c('muted'), 'stroke-width': 1.2, 'stroke-dasharray': '3 3' }),
   el('path', { d: `M${x(t1)} ${y(260)}L${ins.x} ${ins.y}M${x(t1)} ${y(-260)}L${ins.x} ${ins.y + ins.h}`, fill: 'none', stroke: t.c('muted'), 'stroke-width': 1, 'stroke-dasharray': '3 3' }),
   el('rect', { x: ins.x, y: ins.y, width: ins.w, height: ins.h, rx: 6, fill: t.c('surface'), stroke: t.c('rule') }),
-  el('line', { x1: ins.x, x2: ins.x + ins.w, y1: iy(0), y2: iy(0), stroke: t.c('rule') }),
+  el('line', { fill: 'none', x1: ins.x, x2: ins.x + ins.w, y1: iy(0), y2: iy(0), stroke: t.c('rule') }),
   el('path', { d: pathFromPoints(inSamples.map(p => [ix(p.t), iy(p.v)])), fill: 'none', stroke: t.c('muted'), 'stroke-width': 1 }),
   inSamples.map(p => el('circle', { cx: ix(p.t), cy: iy(p.v), r: 2.4, fill: t.c('ink') })),
   textLines([`One cycle = ${perCycle} samples,`, `${fmt(dt, { digits: 4 })} ms apart`], { x: ins.x, y: ins.y + ins.h + 12, size: 15, valign: 'top', fill: t.c('muted'), lineHeight: 1.3 }),
@@ -80,7 +80,7 @@ export default {
   notes: 'Purpose: Show how a signal’s amplitude changes over time, with the sampling stated and any envelope marked as derived.\nModify: Edit `supply`, `sag` and `threshold`; samples, the half-cycle RMS, the dip interval and the headline numbers recompute. With logged data, replace `samples` and keep the RMS computation.\nInvariant: The time axis states its unit and the sample rate; the raw trace is drawn from samples, never smoothed; the RMS line is labelled as derived from the same samples; the threshold and its basis are on the page.\nStatic: Already static. For a talk, show the raw trace, then the RMS, then the dip interval.',
   sources: [{ type: 'original-example', file: 'assets/svg/waveform.mjs' }],
   exportPolicy: 'final',
-  content: `<h1 class="st-head">A motor start pulled the supply down to <em>${pctMin}% of nominal</em> for ${fmt(dip.duration, { digits: 0 })} ms <span class="st-quiet">— a sag, not an interruption</span></h1>
+  content: `<h1 class="st-head">A motor start pulled the supply to <em>${pctMin}%&nbsp;of&nbsp;nominal</em> for ${fmt(dip.duration, { digits: 0 })} ms <span class="st-quiet">— a sag, not an interruption</span></h1>
 <figure class="st-fig" data-region="primary">${figure()}</figure>
 <p class="st-source" data-region="source"><span>Illustrative data · single-phase ${supply.vrms} V, ${supply.f} Hz feeder at a pumping station</span><span>Time waveform with derived RMS</span></p>`,
 };

@@ -1,7 +1,7 @@
 // Motion study · Emphasize one word — the word that carries the claim changes color and
 // weight (no letter motion), and the curve it names takes the same accent at the same
 // moment. Builds: 1 word + curve, 2 the number behind the word.
-import { svgRoot, el, g, linear, axis, textLines, pathFromPoints, spreadLabels, statesAttr, theme as makeTheme, fmt } from '../runtime/figure.mjs';
+import { svgRoot, el, g, linear, axis, textLines, pathFromPoints, spreadLabels, statesAttr, theme as makeTheme } from '../runtime/figure.mjs';
 
 // Calibration of an emergency-triage admission model by age band (illustrative).
 // Predicted admission risk, bin centres in %; observed admission rate in each bin, %.
@@ -9,10 +9,10 @@ const bins = [5, 15, 25, 35, 45, 55, 65];
 const bands = [
   { name: 'Under 65', observed: [4, 14, 26, 36, 44, 57, 66] },
   { name: '65–79', observed: [5, 16, 24, 33, 43, 52, 61] },
-  { name: 'Over 80', observed: [4, 11, 17, 24, 30, 37, 44], focus: true },
+  { name: '80 and over', observed: [4, 11, 17, 24, 30, 37, 44], focus: true },
 ];
 const focus = bands.find(b => b.focus), young = bands[0];
-const at = bins.indexOf(45); // the bin quoted in the text
+const quoted = 45, at = bins.indexOf(quoted); // the predicted-risk bin quoted in the text
 const gap = Math.max(...bins.map((p, i) => p - focus.observed[i])); // largest overstatement, points
 
 export function figure(theme = 'css') {
@@ -55,11 +55,11 @@ export default {
   id: 'motion-word-emphasis',
   title: 'Word emphasis: color and weight, not motion',
   className: 'st cs-ml-eval',
-  notes: 'Purpose: Put the eye on the one word that carries the claim by changing its color and weight in place, and tie it to the mark it names with the same accent.\nModify: Replace `bands`; the gap, the quoted bin and the sentence recompute. Keep the emphasized word at a line end or keep the reserved-width wrapper so the line never reflows.\nInvariant: No letter or word moves; only color and weight change. The word and its curve take the accent together; everything else stays ink or grey.\nStatic: The final build shows the accented word, the accented curve and the gap at the quoted bin.',
+  notes: 'Purpose: Put the eye on the one phrase that carries the claim by changing its color and weight in place, and tie it to the mark it names with the same accent.\nModify: Replace `bands` and `quoted`; the gap, the band label and the sentence recompute. Keep the reserved-width wrapper (word()) so the weight change never reflows the line.\nInvariant: No letter or word moves; only color and weight change. The phrase is literally the label of the curve it names, and both take the accent together; everything else stays ink or grey.\nStatic: The final build shows the accented phrase, the accented curve and the gap at the quoted bin.',
   sources: [{ type: 'original-example', file: 'assets/motion/word-emphasis.mjs' }],
   exportPolicy: 'final',
-  content: `<h1 class="st-head" style="top:132px;max-width:430px;font-size:46px;line-height:1.1;font-weight:600;text-wrap:initial">Calibrated overall, but it overstates risk for patients ${word('over 80')}</h1>
-<p class="st-text" style="position:absolute;left:64px;top:428px;width:410px" data-step="2" data-motion="reveal">At ${bins[at]}% predicted risk, <strong>${focus.observed[at]}%</strong> of patients ${focus.name.toLowerCase()} were admitted, against ${young.observed[at]}% of those ${young.name.toLowerCase()}.</p>
+  content: `<h1 class="st-head" style="top:132px;max-width:430px;font-size:46px;line-height:1.1;font-weight:600;text-wrap:initial">Calibrated overall, but it overstates risk for patients aged ${word(focus.name)}</h1>
+<p class="st-text" style="position:absolute;left:64px;top:428px;width:410px" data-step="2" data-motion="reveal">At ${bins[at]}% predicted risk, <strong>${focus.observed[at]}%</strong> of patients aged ${focus.name} were admitted, against ${young.observed[at]}% of those ${young.name.toLowerCase()}.</p>
 <figure class="st-fig" style="left:560px;top:118px" data-region="primary">${figure()}</figure>
 <p class="st-source" data-region="source"><span>Illustrative data · 9,412 triage decisions, 2025, observed admissions within 24 h</span><span>Motion · emphasis by color and weight (2 builds)</span></p>`,
 };

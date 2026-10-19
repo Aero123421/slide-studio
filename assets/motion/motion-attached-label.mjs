@@ -5,7 +5,7 @@
 import { svgRoot, el, g, linear, textLines, theme as makeTheme, fmt } from '../runtime/figure.mjs';
 
 const routes = [ // average speed (km/h) and trips on time (%), 2024 → 2025, Tollbridge city buses (illustrative)
-  { id: '12', speed: [13.8, 17.9], onTime: [71, 88], focus: true }, // bus lane opened in May 2025
+  { id: '12', speed: [13.8, 17.9], onTime: [71, 88], focus: true, change: 'the bus lane opened in May' },
   { id: '3', speed: [19.6, 19.9], onTime: [84, 85] }, { id: '5', speed: [16.2, 16.0], onTime: [79, 78] },
   { id: '7', speed: [15.1, 15.4], onTime: [76, 77] }, { id: '9', speed: [17.8, 17.5], onTime: [82, 81] },
   { id: '14', speed: [12.9, 12.7], onTime: [68, 67] }, { id: '18', speed: [14.6, 14.9], onTime: [74, 75] },
@@ -50,7 +50,7 @@ export function figure(theme = 'css') {
       textLines([label], { x: x0 + (r.side === 'left' ? -10 : r.focus ? 14 : 10), y: y0 + (r.focus ? 20 : r.side === 'below' ? 16 : -9), size, weight: r.focus ? 700 : 500, anchor: r.side === 'left' ? 'end' : 'start',
         fill: r.focus ? t.c('accent') : t.c('muted'), halo: t.c('paper') }));
   }),
-  textLines([`+${fmt(dSpeed, { digits: 1 })} km/h and +${dOnTime} points on time`, `after the bus lane opened in May`],
+  textLines([`+${fmt(dSpeed, { digits: 1 })} km/h and +${dOnTime} points on time`, `after ${focus.change}`],
     { x: fx1 - 18, y: fy1 - 12, size: 17, fill: t.c('ink'), weight: 600, lineHeight: 1.35, halo: t.c('paper'), valign: 'middle', anchor: 'end',
       attrs: { 'data-step': 2, 'data-motion': 'reveal' } }));
 }

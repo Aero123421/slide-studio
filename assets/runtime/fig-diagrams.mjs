@@ -15,7 +15,7 @@ function setup(o, defaults = {}) {
   checkId(o.id);
   if (!o.title) throw Error(`${o.id}: title (accessible name) is required`);
   const t = theme(o.theme), size = o.fontSize ?? 18;
-  return { t, id: o.id, size, W: o.width ?? defaults.width ?? 1120, H: o.height ?? defaults.height ?? 520, build: normBuild(o.build) };
+  return { t, id: o.id, size, arrowSize: o.arrowSize, W: o.width ?? defaults.width ?? 1120, H: o.height ?? defaults.height ?? 520, build: normBuild(o.build) };
 }
 function root(o, ctx, defs, parts) {
   const notes = (o.annotate || []).map(a => callout({ theme: ctx.t, size: a.size ?? ctx.size - 1, ...a, attrs: a.step ? { 'data-step': a.step, 'data-motion': a.motion || 'reveal' } : {} }));
@@ -24,12 +24,12 @@ function root(o, ctx, defs, parts) {
     el('defs', {}, defs, o.defs || ''), o.before || '', parts, notes, extra, o.after || '');
 }
 function markers(ctx) {
-  const { t, id } = ctx;
+  const { t, id } = ctx, size = ctx.arrowSize ?? 12;
   return [
-    arrowMarker(`${id}-arr`, t.c('muted')),
-    arrowMarker(`${id}-arr-ink`, t.c('ink')),
-    arrowMarker(`${id}-arr-accent`, t.c('accent')),
-    arrowMarker(`${id}-arr-open`, t.c('muted'), { open: true }),
+    arrowMarker(`${id}-arr`, t.c('muted'), { size }),
+    arrowMarker(`${id}-arr-ink`, t.c('ink'), { size }),
+    arrowMarker(`${id}-arr-accent`, t.c('accent'), { size }),
+    arrowMarker(`${id}-arr-open`, t.c('muted'), { open: true, size }),
   ].join('');
 }
 
@@ -474,7 +474,8 @@ export function treeDiagram(o) {
     const em = !!kid.emphasis || !!kid.edgeEmphasis;
     parts.push(el('path', { d: o.curve ? (lr ? `M${n(p[0])} ${n(p[1])}C${n(midA)} ${n(p[1])} ${n(midA)} ${n(q[1])} ${n(q[0])} ${n(q[1])}` : `M${n(p[0])} ${n(p[1])}C${n(p[0])} ${n(midA)} ${n(q[0])} ${n(midA)} ${n(q[0])} ${n(q[1])}`) : roundedPolyline(pts, 10), ...edgeStyle({ emphasis: em, arrow: o.arrows === false ? false : undefined }, ctx), pathLength: build ? 1 : null, ...buildAttrs(build, { i: order.indexOf(kid), motion: 'draw' }) }));
     if (kid.edgeLabel) {
-      const lx = lr ? midA + (q[0] - midA) / 2 : q[0], ly = lr ? q[1] : midA + (q[1] - midA) / 2;
+      const f = o.labelPos ?? 0.5; // position along the last leg of the elbow (0 = bend, 1 = child)
+      const lx = lr ? midA + (q[0] - midA) * f : q[0], ly = lr ? q[1] : midA + (q[1] - midA) * f;
       parts.push(g({ ...buildAttrs(build, { i: order.indexOf(kid), label: true }) }, edgeLabel(kid.edgeLabel, lx, ly, ctx, { color: em ? t.c('accent') : t.c('ink') })));
     }
   }
@@ -586,7 +587,7 @@ export function networkDiagram(o) {
   edges.forEach((e, k) => {
     const a = byId.get(e.from), b = byId.get(e.to);
     const hl = o.highlight != null && (isHighlighted(o.highlight, a, 'id') && isHighlighted(o.highlight, b, 'id'));
-    parts.push(el('line', { x1: a.x, y1: a.y, x2: b.x, y2: b.y, stroke: hl ? t.c('accent') : t.c('rule'), 'stroke-width': 1.4 + 3 * ((e.weight ?? 1) / maxW) * (o.weighted ? 1 : 0) + (hl ? 1.2 : 0), 'stroke-linecap': 'round', ...buildAttrs(build && { ...build, start: build.start + 1 }, { i: k, motion: 'draw' }), pathLength: build ? 1 : null }));
+    parts.push(el('line', { x1: a.x, y1: a.y, x2: b.x, y2: b.y, stroke: hl ? t.c('accent') : (o.edgeColor ?? t.c('muted')), 'stroke-opacity': hl || o.edgeColor ? null : 0.55, 'stroke-width': 1.4 + 3 * ((e.weight ?? 1) / maxW) * (o.weighted ? 1 : 0) + (hl ? 1.2 : 0), 'stroke-linecap': 'round', ...buildAttrs(build && { ...build, start: build.start + 1 }, { i: k, motion: 'draw' }), pathLength: build ? 1 : null }));
   });
   nodes.forEach((nd, k) => {
     const r = nd.size ?? (o.sizeByDegree ? 9 + 3 * Math.sqrt(deg.get(nd.id)) : 13);
@@ -727,7 +728,7 @@ export function bipartiteDiagram(o) {
     const a = byId.get(l.from), b = byId.get(l.to);
     if (!a || !b) throw Error(`${o.id}: link ${l.from}→${l.to} references an unknown node`);
     const p = sidePort(a, 'right'), q = sidePort(b, 'left', 3), mx = (p[0] + q[0]) / 2;
-    parts.push(el('path', { d: `M${n(p[0])} ${n(p[1])}C${n(mx)} ${n(p[1])} ${n(mx)} ${n(q[1])} ${n(q[0])} ${n(q[1])}`, fill: 'none', stroke: l.emphasis ? t.c('accent') : t.c('rule'), 'stroke-width': 1.6 + (o.weighted ? 4 * ((l.weight ?? 1) / maxW) : 0) + (l.emphasis ? 1 : 0), 'stroke-linecap': 'round', pathLength: build ? 1 : null, ...buildAttrs(build, { i: k, motion: 'draw' }) }));
+    parts.push(el('path', { d: `M${n(p[0])} ${n(p[1])}C${n(mx)} ${n(p[1])} ${n(mx)} ${n(q[1])} ${n(q[0])} ${n(q[1])}`, fill: 'none', stroke: l.emphasis ? t.c('accent') : (o.edgeColor ?? t.c('muted')), 'stroke-opacity': l.emphasis || o.edgeColor ? null : 0.55, 'stroke-width': 1.6 + (o.weighted ? 4 * ((l.weight ?? 1) / maxW) : 0) + (l.emphasis ? 1 : 0), 'stroke-linecap': 'round', pathLength: build ? 1 : null, ...buildAttrs(build, { i: k, motion: 'draw' }) }));
   });
   [...L, ...R].forEach(nd => parts.push(drawNode(nd, ctx)));
   return root(o, ctx, markers(ctx), parts);

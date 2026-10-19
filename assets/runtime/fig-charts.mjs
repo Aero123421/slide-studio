@@ -932,13 +932,12 @@ export function timelineChart(o) {
   parts.push(el('line', { x1: box.x - 12, x2: box.x + box.w + 12, y1: ax, y2: ax, stroke: t.c('ink'), 'stroke-width': 2 }));
   const width = o.labelWidth ?? Math.min(240, (box.w / Math.max(1, ev.length - 1)) * 1.7);
   let lowest = ax + 10;
+  // Place each event's text block on the first side/stem level that collides with no
+  // block already placed (alternating sides first), so dense timelines stay readable.
+  const placed = [];
+  const hit = (a, b) => a.x0 < b.x1 + 10 && b.x0 < a.x1 + 10 && a.y0 < b.y1 + 6 && b.y0 < a.y1 + 6;
   ev.forEach((e, i) => {
-    const px = pos(e, i), up = o.side === 'above' ? true : o.side === 'below' ? false : i % 2 === 0;
-    const hl = isHighlighted(o.highlight, e);
-    const stem = o.stem ?? 46 + (o.stagger ? (i % 4 >= 2 ? 40 : 0) : 0);
-    const items = [];
-    items.push(el('line', { x1: px, x2: px, y1: ax, y2: up ? ax - stem : ax + stem, stroke: hl ? t.c('accent') : t.c('rule'), 'stroke-width': 1.5 }));
-    items.push(el('circle', { cx: px, cy: ax, r: hl ? 9 : 7, fill: hl ? t.c('accent') : t.c('paper'), stroke: hl ? t.c('accent') : t.c('ink'), 'stroke-width': 2.5 }));
+    const px = pos(e, i), hl = isHighlighted(o.highlight, e);
     const anchor = px < box.x + width / 2 ? 'start' : px > box.x + box.w - width / 2 ? 'end' : 'middle';
     const tx = anchor === 'start' ? px - 6 : anchor === 'end' ? px + 6 : px;
     const lines = [];
@@ -946,13 +945,29 @@ export function timelineChart(o) {
     if (e.title) lines.push({ text: wrapText(e.title, width, labelSize, { weight: 700 }), size: labelSize, fill: t.c('ink'), weight: 700 });
     if (e.body) lines.push({ text: wrapText(e.body, width, size - 1), size: size - 1, fill: t.c('muted') });
     const h = sum(lines.map(L => L.text.length * L.size * 1.25)) + (lines.length - 1) * 4;
-    let yy = up ? ax - stem - 8 - h : ax + stem + 8;
-    lowest = Math.max(lowest, up ? ax + 10 : ax + stem + 8 + h);
+    const w = Math.max(...lines.map(L => blockWidth(L.text, L.size, { weight: L.weight || 400 })));
+    const xs = anchor === 'start' ? [tx, tx + w] : anchor === 'end' ? [tx - w, tx] : [tx - w / 2, tx + w / 2];
+    const prefer = o.side === 'above' ? [true] : o.side === 'below' ? [false] : (i % 2 === 0 ? [true, false] : [false, true]);
+    const base = o.stem ?? 46, step = o.stemStep ?? 40;
+    const blockAt = (up, k) => { const stem = base + k * step; const y0 = up ? ax - stem - 8 - h : ax + stem + 8; return { up, stem, x0: xs[0], x1: xs[1], y0, y1: y0 + h }; };
+    let pick = null;
+    for (let k = 0; k < 4 && !pick; k++) for (const up of prefer) {
+      const b = blockAt(up, k);
+      if (b.y0 >= 0 && b.y1 <= ctx.H && !placed.some(q => hit(b, q))) { pick = b; break; }
+    }
+    pick ??= blockAt(prefer[0], o.stagger ? (i % 4 >= 2 ? 1 : 0) : 0);
+    placed.push(pick);
+    const { up, stem } = pick;
+    const items = [];
+    items.push(el('line', { x1: px, x2: px, y1: ax, y2: up ? ax - stem : ax + stem, stroke: hl ? t.c('accent') : t.c('rule'), 'stroke-width': 1.5 }));
+    items.push(el('circle', { cx: px, cy: ax, r: hl ? 9 : 7, fill: hl ? t.c('accent') : t.c('paper'), stroke: hl ? t.c('accent') : t.c('ink'), 'stroke-width': 2.5 }));
+    let yy = pick.y0;
+    lowest = Math.max(lowest, up ? ax + 10 : pick.y1);
     for (const L of lines) {
       items.push(textLines(L.text, { x: tx, y: yy, size: L.size, anchor, valign: 'top', fill: L.fill, weight: L.weight, lineHeight: 1.25 }));
       yy += L.text.length * L.size * 1.25 + 4;
     }
-    parts.push(g({ class: 'ss-event', ...buildAttrs(build, { i, motion: 'lift' }) }, items));
+    parts.push(g({ class: 'ss-event', ...buildAttrs(build, { i, motion: 'reveal' }) }, items));
   });
   // Periods: a tint on the axis plus a labeled bracket just below the lowest event text.
   const trackY = Math.min(ctx.H - 20, lowest + 34);

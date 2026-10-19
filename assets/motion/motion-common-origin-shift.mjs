@@ -11,7 +11,7 @@ const summer = [ // 架空の市の夏（6〜8月）平均気温の偏差、℃�
   1.38, 1.29, 1.71, 1.55, 1.62, // 2021–2025
 ];
 const first = 1991, years = summer.map((_, i) => first + i);
-const newPeriod = [1991, 2020];
+const oldPeriod = [1961, 1990], newPeriod = [1991, 2020]; // reference periods of the old and the new normal
 // the new normal, expressed in the old coordinates: the mean anomaly over the new reference period
 const shift = mean(summer.filter((_, i) => years[i] >= newPeriod[0] && years[i] <= newPeriod[1]));
 const last = { year: years.at(-1), old: summer.at(-1), now: summer.at(-1) - shift };
@@ -27,7 +27,7 @@ export function figure(theme = 'css') {
   const bNew = W - m.r + 26, bOld = W - m.r + 104, names = W - m.r + 186, lineEnd = names - 12;
   const [lx, ly] = pts.at(-1);
   return svgRoot({ id: 'motion-common-origin-shift-fig', width: W, height: H, theme: t,
-    title: `夏の平均気温の偏差、${first}〜${last.year}年：1961〜1990年平均からの差と、1991〜2020年平均からの差`,
+    title: `夏の平均気温の偏差、${first}〜${last.year}年：${oldPeriod[0]}〜${oldPeriod[1]}年平均からの差と、${newPeriod[0]}〜${newPeriod[1]}年平均からの差`,
     desc: `新しい平年値は旧平年値より${fmt(shift, { digits: 2 })}℃高い。すべての値と旧平年値の線が同じだけ下がり、${last.year}年の偏差は${f1(last.old)}℃から${f1(last.now)}℃になる。気温そのものは変わらない。` },
   axis(y, { orient: 'left', at: m.l, grid: [m.l, W - m.r], theme: t, size: 16, tickValues: [-1, 0, 1, 2], format: v => `${f1(v)}℃`, zero: false }),
   textLines(['平年差（℃）'], { x: m.l + 10, y: m.t - 4, size: 16, fill: t.c('muted'), valign: 'top' }),
@@ -40,7 +40,7 @@ export function figure(theme = 'css') {
   // one coordinate system: the series, the old zero and the old measurement move together by one translation
   g({ 'data-states': { 0: { translate: '0px 0px' }, 1: { translate: `0px ${dy.toFixed(2)}px` } }, 'data-duration': 1000, 'data-easing': 'smooth', style: 'transform-box:view-box' },
     el('line', { x1: m.l, x2: lineEnd, y1: y(0), y2: y(0), stroke: t.c('ink'), 'stroke-width': 1.8, 'stroke-dasharray': '6 5' }),
-    textLines(['0 = 旧平年値', '（1961〜1990年）'], { x: names, y: y(0), size: 16, weight: 650, fill: t.c('ink'), valign: 'middle', lineHeight: 1.25 }),
+    textLines(['0 = 旧平年値', `（${oldPeriod[0]}〜${oldPeriod[1]}年）`], { x: names, y: y(0), size: 16, weight: 650, fill: t.c('ink'), valign: 'middle', lineHeight: 1.25 }),
     el('path', { d: pathFromPoints(pts), fill: 'none', stroke: t.c('context'), 'stroke-width': 2.2, 'stroke-linejoin': 'round' }),
     pts.map(([px, py], i) => el('circle', { cx: px, cy: py, r: i === pts.length - 1 ? 7 : 4.5, fill: i === pts.length - 1 ? t.c('ink') : t.c('muted'), stroke: t.c('paper'), 'stroke-width': 1.5 })),
     textLines([`${last.year}年`], { x: lx, y: ly - 16, size: 16, weight: 700, anchor: 'middle', fill: t.c('ink'), halo: t.c('paper') }),

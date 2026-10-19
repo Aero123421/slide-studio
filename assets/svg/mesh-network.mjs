@@ -1,7 +1,7 @@
 // Diagram study · Partial mesh — which links the network cannot lose.
 // Positions come from the engine's seeded force layout, i.e. from the links alone, not from a map.
 // Bridges (links whose loss splits the network) and the substations they strand are computed.
-import { networkDiagram, theme as makeTheme, svgRoot, el, g, textLines, measureText } from '../runtime/figure.mjs';
+import { networkDiagram, theme as makeTheme, svgRoot, el, textLines, measureText } from '../runtime/figure.mjs';
 
 const substations = [
   { id: 'harbour', label: 'Harbour' }, { id: 'market', label: 'Market' }, { id: 'riverside', label: 'Riverside' },

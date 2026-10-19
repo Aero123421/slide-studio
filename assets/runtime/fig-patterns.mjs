@@ -164,14 +164,17 @@ export function truchet({ x = 0, y = 0, cols = 12, rows = 7, size = 80, seed = 5
 }
 
 /** Halftone dots whose radius follows f(u, v) ∈ [0, 1] over the box (u, v in 0..1). */
-export function halftone({ x = 0, y = 0, width, height, spacing = 18, f = (u, v) => u, theme: th, color, maxR, offsetRows = true, attrs = {} }) {
+export function halftone({ x = 0, y = 0, width, height, spacing = 18, f = (u, v) => u, theme: th, color, maxR, offsetRows = true, angle = 0, attrs = {} }) {
+  // Dots on a (hexagonal) screen rotated by `angle` degrees; radius = maxR · f(u, v), u/v in 0..1 across the box.
   const t = theme(th), c = color || t.c('ink'), R = maxR ?? spacing * 0.48, out = [];
-  const rows = Math.floor(height / (spacing * 0.866)), cols = Math.floor(width / spacing);
-  for (let j = 0; j <= rows; j++) for (let i = 0; i <= cols; i++) {
-    const px = x + i * spacing + (offsetRows && j % 2 ? spacing / 2 : 0), py = y + j * spacing * 0.866;
-    if (px > x + width) continue;
-    const r = R * clamp(f((px - x) / width, (py - y) / height), 0, 1);
-    if (r > 0.35) out.push(el('circle', { cx: px, cy: py, r, fill: c }));
+  const a = (angle * Math.PI) / 180, cos = Math.cos(a), sin = Math.sin(a), cx = width / 2, cy = height / 2;
+  const reach = Math.hypot(width, height) / 2 + spacing, rowH = spacing * 0.866;
+  for (let j = -Math.ceil(reach / rowH); j <= Math.ceil(reach / rowH); j++) for (let i = -Math.ceil(reach / spacing) - 1; i <= Math.ceil(reach / spacing) + 1; i++) {
+    const lx = i * spacing + (offsetRows && Math.abs(j) % 2 ? spacing / 2 : 0), ly = j * rowH;
+    const px = cx + lx * cos - ly * sin, py = cy + lx * sin + ly * cos;
+    if (px < 0 || px > width || py < 0 || py > height) continue;
+    const r = R * clamp(f(px / width, py / height), 0, 1);
+    if (r > 0.35) out.push(el('circle', { cx: x + px, cy: y + py, r, fill: c }));
   }
   return g({ class: 'ss-halftone', ...attrs }, out);
 }
@@ -215,15 +218,22 @@ export function facets({ x = 0, y = 0, width, height, cols = 10, rows = 6, jitte
 }
 
 /** Isometric lattice lines (60° family) clipped to a box. */
-export function isoGrid({ x = 0, y = 0, width, height, spacing = 40, theme: th, color, strokeWidth = 1, attrs = {} }) {
+export function isoGrid({ x = 0, y = 0, width, height, spacing = 40, theme: th, color, strokeWidth = 1, verticals = true, attrs = {} }) {
+  // A true isometric lattice: vertical lines plus lines at ±30°, all meeting at the
+  // same lattice points (edge length = spacing), clipped to the box.
   const t = theme(th), c = color || t.c('rule'), out = [];
-  const tan = Math.tan(Math.PI / 6), span = width + height / tan;
-  for (let k = -height / tan; k <= width + height / tan; k += spacing / Math.sin(Math.PI / 3)) {
-    out.push(el('line', { x1: x + k, y1: y, x2: x + k - height / tan * 1, y2: y + height, stroke: c, 'stroke-width': strokeWidth }));
-    out.push(el('line', { x1: x + k, y1: y, x2: x + k + height / tan * 1, y2: y + height, stroke: c, 'stroke-width': strokeWidth }));
+  const m = 1 / Math.sqrt(3), d = spacing * Math.sqrt(3) / 2, line = (x1, y1, x2, y2) => out.push(el('line', { x1: x + x1, y1: y + y1, x2: x + x2, y2: y + y2, stroke: c, 'stroke-width': strokeWidth }));
+  if (verticals) for (let X = 0; X <= width + 1e-6; X += d) line(X, 0, X, height);
+  for (const slope of [m, -m]) {
+    const c0 = slope > 0 ? -width * m : 0, c1 = slope > 0 ? height : height + width * m;
+    for (let k = Math.floor(c0 / spacing) * spacing; k <= c1; k += spacing) {
+      // y = slope·X + k within X ∈ [0, width], y ∈ [0, height]
+      let a = (0 - k) / slope, b = (height - k) / slope;
+      if (a > b) [a, b] = [b, a];
+      const X0 = Math.max(0, a), X1 = Math.min(width, b);
+      if (X1 - X0 > 0.5) line(X0, slope * X0 + k, X1, slope * X1 + k);
+    }
   }
-  for (let v = 0; v <= height; v += spacing) out.push(el('line', { x1: x, x2: x + width, y1: y + v, y2: y + v, stroke: c, 'stroke-width': strokeWidth * 0.6, opacity: 0.6 }));
-  void span;
   return g({ class: 'ss-isogrid', ...attrs }, out);
 }
 

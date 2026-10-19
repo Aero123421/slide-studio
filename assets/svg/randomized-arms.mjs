@@ -92,7 +92,7 @@ export default {
   notes: 'Purpose: Show how participants were assigned and compare the two arms in parallel, so the audience sees both the mechanism and the result.\nModify: Replace `screened`, `exclusions`, `allocation` and `arms`; counts, rates, the difference and its Wald 95% interval recompute. The arms must add up to the randomized total (the module throws otherwise).\nInvariant: Only call the step "Randomized" when allocation really was random, and print the mechanism under it; both arms share x positions and one outcome scale; losses to follow-up are named on each lane.\nStatic: Already static. For a build, reveal enrolment, then the arms, then the outcome bars.',
   sources: [{ type: 'original-example', file: 'assets/svg/randomized-arms.mjs' }],
   exportPolicy: 'final',
-  content: `<h1 class="st-head">Text reminders lifted second-dose completion by <em>${pts(diff)} points</em> in a randomized trial of ${n(randomized)} adults</h1>
+  content: `<h1 class="st-head">Text reminders lifted second-dose completion by <em>${pts(diff)}&nbsp;points</em> in a randomized trial of ${n(randomized)} adults</h1>
 <figure class="st-fig" data-region="primary">${figure()}</figure>
 <p class="st-source" data-region="source"><span>Illustrative data · ${outcome.toLowerCase()}, among participants followed up</span><span>Randomized flow diagram</span></p>`,
 };

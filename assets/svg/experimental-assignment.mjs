@@ -34,9 +34,9 @@ export function figure(theme = 'css') {
 
   // Timeline: stages placed by real week, the assignment step in the accent.
   const timeline = g({},
-    el('line', { x1: x(-11), x2: x(15), y1: axisY, y2: axisY, stroke: t.c('rule'), 'stroke-width': 1.5 }),
+    el('line', { fill: 'none', x1: x(-11), x2: x(15), y1: axisY, y2: axisY, stroke: t.c('rule'), 'stroke-width': 1.5 }),
     [-10, -8, -6, -4, -2, 0, 2, 4, 6, 8, 10, 12, 14].map(w => g({},
-      el('line', { x1: x(w), x2: x(w), y1: axisY, y2: axisY + 5, stroke: t.c('rule') }),
+      el('line', { fill: 'none', x1: x(w), x2: x(w), y1: axisY, y2: axisY + 5, stroke: t.c('rule') }),
       textLines([fmt(w, { locale: 'ja' })], { x: x(w), y: axisY + 11, size: 15, anchor: 'middle', valign: 'top', fill: t.c('muted') }))),
     textLines(['週'], { x: x(15), y: axisY + 11, size: 15, anchor: 'end', valign: 'top', fill: t.c('muted') }),
     stages.map(s => {
@@ -50,7 +50,7 @@ export function figure(theme = 'css') {
     }));
 
   // The opened assignment step: one row per stratum, squares in permuted blocks, in enrolment order.
-  const panel = { x: 120, y: 160, w: 912, h: 304 }, sq = 24, gap = 4, bgap = 16, rowY0 = panel.y + 118, pitch = 56, sx0 = panel.x + 132;
+  const panel = { x: 106, y: 160, w: 960, h: 304 }, sq = 24, gap = 4, bgap = 16, rowY0 = panel.y + 118, pitch = 56, sx0 = panel.x + 132;
   const ax = x(-3);
   const rows = lists.map((l, k) => {
     const y = rowY0 + k * pitch;
@@ -70,7 +70,7 @@ export function figure(theme = 'css') {
   const zoom = g({},
     // zoom lines tie the panel to the one point on the timeline it opens up
     el('path', { d: `M${ax} ${axisY + 30}L${panel.x + 1} ${panel.y}M${ax} ${axisY + 30}L${panel.x + panel.w - 1} ${panel.y}`, fill: 'none', stroke: t.c('accent'), 'stroke-width': 1.2, 'stroke-dasharray': '4 4' }),
-    el('line', { x1: ax, x2: ax, y1: axisY + 10, y2: axisY + 30, stroke: t.c('accent'), 'stroke-width': 1.2 }),
+    el('line', { fill: 'none', x1: ax, x2: ax, y1: axisY + 10, y2: axisY + 30, stroke: t.c('accent'), 'stroke-width': 1.2 }),
     el('rect', { x: panel.x, y: panel.y, width: panel.w, height: panel.h, rx: 10, fill: t.c('surface'), stroke: t.c('accent'), 'stroke-width': 1.5 }),
     textLines([`割付：地区で層別した置換ブロック法（1ブロック${block.length}校）`], { x: panel.x + 24, y: panel.y + 22, size: 19, valign: 'top', weight: 700, fill: t.c('ink') }),
     textLines([concealment], { x: panel.x + 24, y: panel.y + 52, size: 16, valign: 'top', fill: t.c('muted') }),

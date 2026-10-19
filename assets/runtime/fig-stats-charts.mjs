@@ -8,7 +8,7 @@ import {
   niceDomain, fmt, pct, pathFromPoints, axis, tickLabelWidth, callout, refLine, legend, spreadLabels, normBuild,
   buildAttrs, isHighlighted, plotBox, decimalsOf, textOn,
 } from './fig-core.mjs';
-import { boxStats, kde, bins as makeBins, ecdf as ecdfPoints, linearFit, rocPoints, prPoints, auc, beeswarm, mean, quantile, calibrationBins } from './fig-stats.mjs';
+import { boxStats, kde, bins as makeBins, ecdf as ecdfPoints, linearFit, rocPoints, prPoints, auc, beeswarm, mean, quantile, calibrationBins, tQuantile } from './fig-stats.mjs';
 import { onPalette } from './fig-charts.mjs';
 
 function setup(o, defaults = {}) {
@@ -41,7 +41,7 @@ function frame(o, ctx, { xDomain, yDomain, xTicks = 6, yTicks = 5, xFormat, yFor
   const { t, size } = ctx;
   const yTmp = yLog ? log(yDomain, [ctx.H - 50, 20]) : linear(yDomain, [ctx.H - 50, 20]);
   const yf = yFormat || tf(o, yTmp, yTicks, 'yFormat');
-  const left = tickLabelWidth(yTmp, { format: yf, size: size - 1, count: yTicks }) + 18;
+  const left = tickLabelWidth(yTmp, { format: yf, size: size - 1, count: yTicks, tickValues: o.yTickValues }) + 18;
   const m = { left, right: rightPad, top: topPad + (yLabel ? 26 : 0), bottom: 40 + (xLabel ? 26 : 0) };
   let box = plotBox(ctx.W, ctx.H, m);
   if (square) { const s = Math.min(box.w, box.h); box = { x: box.x, y: box.y + (box.h - s) / 2, w: s, h: s }; }
@@ -49,13 +49,22 @@ function frame(o, ctx, { xDomain, yDomain, xTicks = 6, yTicks = 5, xFormat, yFor
   const y = yLog ? log(yDomain, [box.y + box.h, box.y]) : linear(yDomain, [box.y + box.h, box.y]);
   const xf = xFormat || tf(o, x, xTicks, 'xFormat');
   const parts = [
-    axis(y, { orient: 'left', at: box.x, grid: [box.x, box.x + box.w], theme: t, size: size - 1, format: yf, count: yTicks }),
-    axis(x, { orient: 'bottom', at: box.y + box.h, theme: t, size: size - 1, format: xf, count: xTicks, tickSize: 5, grid: gridX ? [box.y, box.y + box.h] : null }),
+    axis(y, { orient: 'left', at: box.x, grid: [box.x, box.x + box.w], theme: t, size: size - 1, format: yf, count: yTicks, tickValues: o.yTickValues }),
+    axis(x, { orient: 'bottom', at: box.y + box.h, theme: t, size: size - 1, format: xf, count: xTicks, tickSize: 5, grid: gridX ? [box.y, box.y + box.h] : null, tickValues: o.xTickValues }),
     el('line', { x1: box.x, x2: box.x + box.w, y1: box.y + box.h, y2: box.y + box.h, stroke: t.c('ink'), 'stroke-width': 1.2 }),
   ];
   if (yLabel) parts.push(textLines([yLabel], { x: box.x - left + 4, y: box.y - 16, size: size - 1, fill: t.c('muted'), cls: 'ss-unit' }));
   if (xLabel) parts.push(textLines([xLabel], { x: box.x + box.w, y: box.y + box.h + 62, size: size - 1, anchor: 'end', fill: t.c('muted'), cls: 'ss-unit' }));
   return { box, x, y, parts };
+}
+
+/**
+ * Words used in the small statistics captions (n, median). English by default,
+ * Japanese when locale is ja; override with o.words = {n, median, sep}.
+ */
+function words(o, ctx) {
+  const ja = String(ctx.locale || '').startsWith('ja');
+  return { n: 'n', median: ja ? '中央値' : 'median', sep: ja ? '　' : ' · ', ...(o.words || {}) };
 }
 
 // ---------------------------------------------------------------- distributions
@@ -100,7 +109,8 @@ export function ecdfChart(o) {
   });
   if (o.medians !== false) parts.push(el('line', { x1: box.x, x2: box.x + box.w, y1: y(0.5), y2: y(0.5), stroke: t.c('muted'), 'stroke-width': 1, 'stroke-dasharray': '2 4' }));
   const placed = spreadLabels(o.series.map((s, k) => ({ id: k, y: y(0.5) + (k - (o.series.length - 1) / 2) * labelSize * 1.4, h: labelSize * 1.3 })), { min: box.y, max: box.y + box.h });
-  for (const p of placed) parts.push(textLines([o.series[p.id].name], { x: box.x + box.w + 12, y: p.y, size: labelSize, valign: 'middle', fill: ends[p.id].c, weight: 700 }));
+  const textOf = k => (o.highlight != null && !isHighlighted(o.highlight, o.series[k], 'name') ? t.c('muted') : ends[k].c);
+  for (const p of placed) parts.push(textLines([o.series[p.id].name], { x: box.x + box.w + 12, y: p.y, size: labelSize, valign: 'middle', fill: textOf(p.id), weight: 700 }));
   return finish(o, ctx, parts, a => ({ x: x(a.at), y: y(a.y ?? 0.5) }), { x, y, box });
 }
 
@@ -110,14 +120,23 @@ export function ecdfChart(o) {
  */
 export function boxPlot(o) {
   const ctx = setup(o);
+  const W = words(o, ctx);
   const { t, size, labelSize, build } = ctx;
   const stats = o.groups.map(gp => ({ ...gp, s: boxStats(gp.values) }));
   const all = o.groups.flatMap(gp => gp.values);
-  const lw = Math.max(...o.groups.map(gp => measureText(gp.label, labelSize, { weight: 600 }))) + 24;
+  const vfPre = nf(o, all);
+  const lw = Math.max(...stats.map(gp => Math.max(measureText(gp.label, labelSize, { weight: 600 }), measureText(`${W.n} = ${gp.s.n}${W.sep}${W.median} ${vfPre(gp.s.median)}`, Math.max(15, size - 3))))) + 24;
   ctx.H = o.height ?? Math.max(200, o.groups.length * (o.rowHeight ?? 86) + 70);
+  // Observations sit in a one-sided dot strip under each box: each dot takes the lowest
+  // free level, so no two dots overlap; the last group's strip gets room above the axis.
+  const xPre = linear(o.domain || niceDomain(extent(all), 6), [lw, ctx.W - 30]);
+  const dodgeOf = xs => { const lv = []; return [...xs].sort((a, b) => a - b).map(px => { let L = 0; while ((lv[L] ?? -Infinity) > px - 6.6) L++; lv[L] = px; return { x: px, level: L }; }); };
+  const levelsMax = o.points === 'none' ? 0 : Math.max(0, ...o.groups.map(gp => Math.max(0, ...dodgeOf(gp.values.map(xPre)).map(p => p.level))));
   const box = plotBox(ctx.W, ctx.H, { left: lw, right: 30, top: 10, bottom: 44 + (o.xLabel ? 24 : 0) });
+  const stripH = o.points === 'none' ? 0 : 9 + levelsMax * 6.4 + 10; // room for the last group's dots above the axis
   const x = linear(o.domain || niceDomain(extent(all), 6), [box.x, box.x + box.w]);
-  const yb = band(o.groups.map(gp => gp.label), [box.y, box.y + box.h], { inner: 0.45, outer: 0.15 });
+  const dodge = o.groups.map(gp => (o.points === 'none' ? [] : dodgeOf(gp.values.map(x))));
+  const yb = band(o.groups.map(gp => gp.label), [box.y, box.y + box.h - stripH], { inner: 0.45, outer: 0.15 });
   const vf = nf(o, all);
   const parts = [axis(x, { orient: 'bottom', at: box.y + box.h, grid: [box.y, box.y + box.h], theme: t, size: size - 1, format: tf(o, x, 6), count: 6 })];
   if (o.xLabel) parts.push(textLines([o.xLabel], { x: box.x + box.w, y: ctx.H - 4, size: size - 1, anchor: 'end', fill: t.c('muted') }));
@@ -125,10 +144,7 @@ export function boxPlot(o) {
     const cy = yb.center(gp.label), h = yb.bw, s = gp.s, hl = o.highlight == null || isHighlighted(o.highlight, gp);
     const c = hl ? (o.highlight != null ? t.c('highlight') : t.cat(0)) : t.c('muted');
     const items = [];
-    if (o.points !== 'none') {
-      const sw = beeswarm(gp.values.map(v => x(v)), { r: 3.2, gap: 0.6 });
-      for (const p of sw) items.push(el('circle', { cx: p.x, cy: cy + h * 0.5 + 10 + Math.abs(p.y) * 0.9, r: 3.2, fill: t.c('context') }));
-    }
+    if (o.points !== 'none') for (const p of dodge[k]) items.push(el('circle', { cx: p.x, cy: cy + h * 0.5 + 9 + p.level * 6.4, r: 3.2, fill: t.c('context') }));
     items.push(el('line', { x1: x(s.lo), x2: x(s.q1), y1: cy, y2: cy, stroke: t.c('ink'), 'stroke-width': 1.6 }));
     items.push(el('line', { x1: x(s.q3), x2: x(s.hi), y1: cy, y2: cy, stroke: t.c('ink'), 'stroke-width': 1.6 }));
     items.push(el('line', { x1: x(s.lo), x2: x(s.lo), y1: cy - h * 0.22, y2: cy + h * 0.22, stroke: t.c('ink'), 'stroke-width': 1.6 }));
@@ -138,7 +154,7 @@ export function boxPlot(o) {
     for (const v of s.outliers) items.push(el('circle', { cx: x(v), cy, r: 4.5, fill: 'none', stroke: t.c('ink'), 'stroke-width': 1.5 }));
     parts.push(g({ class: 'ss-box', ...buildAttrs(build, { i: k, motion: 'reveal' }) }, items));
     parts.push(textLines([gp.label], { x: box.x - 16, y: cy - 8, size: labelSize, anchor: 'end', valign: 'middle', fill: t.c('ink'), weight: 600 }));
-    parts.push(textLines([`n = ${s.n} · median ${vf(s.median)}`], { x: box.x - 16, y: cy + 13, size: Math.max(15, size - 3), anchor: 'end', valign: 'middle', fill: t.c('muted') }));
+    parts.push(textLines([`${W.n} = ${s.n}${W.sep}${W.median} ${vf(s.median)}`], { x: box.x - 16, y: cy + 13, size: Math.max(15, size - 3), anchor: 'end', valign: 'middle', fill: t.c('muted') }));
   });
   const resolve = a => { const gp = stats.find(q => q.label === a.at); return gp && { x: x(a.value ?? gp.s.median), y: yb.center(gp.label) - yb.bw / 2 }; };
   return finish(o, ctx, parts, resolve, { x, box });
@@ -147,6 +163,7 @@ export function boxPlot(o) {
 /** Violin plots (Gaussian KDE, Silverman bandwidth unless given) with median and IQR. */
 export function violinPlot(o) {
   const ctx = setup(o);
+  const W = words(o, ctx);
   const { t, size, labelSize, build } = ctx;
   const all = o.groups.flatMap(gp => gp.values);
   const [d0, d1] = o.domain || niceDomain(extent(all), 5);
@@ -171,7 +188,7 @@ export function violinPlot(o) {
       el('line', { x1: cx, x2: cx, y1: y(s.q1), y2: y(s.q3), stroke: t.c('ink'), 'stroke-width': 6, 'stroke-linecap': 'round' }),
       el('circle', { cx, cy: y(s.median), r: 5.5, fill: t.c('paper'), stroke: t.c('ink'), 'stroke-width': 2 })));
     parts.push(textLines([gp.label], { x: cx, y: box.y + box.h + 12, size: labelSize, anchor: 'middle', valign: 'top', fill: t.c('ink'), weight: 600 }));
-    parts.push(textLines([`median ${vf(s.median)}`], { x: cx, y: box.y + box.h + 34, size: Math.max(15, size - 3), anchor: 'middle', valign: 'top', fill: t.c('muted') }));
+    parts.push(textLines([`${W.median} ${vf(s.median)}`], { x: cx, y: box.y + box.h + 34, size: Math.max(15, size - 3), anchor: 'middle', valign: 'top', fill: t.c('muted') }));
   });
   return finish(o, ctx, parts, a => { const gp = o.groups.find(q => q.label === a.at); return gp && { x: xb.center(gp.label) + xb.bw / 2, y: y(a.value ?? boxStats(gp.values).median) }; }, { y, box });
 }
@@ -179,6 +196,7 @@ export function violinPlot(o) {
 /** Strip / beeswarm plot: every observation, grouped by row, median marked. */
 export function stripPlot(o) {
   const ctx = setup(o);
+  const W = words(o, ctx);
   const { t, size, labelSize, build } = ctx;
   const all = o.groups.flatMap(gp => gp.values);
   ctx.H = o.height ?? Math.max(160, o.groups.length * (o.rowHeight ?? 90) + 60);
@@ -197,7 +215,7 @@ export function stripPlot(o) {
       sw.map(p => el('circle', { cx: p.x, cy: cy + p.y, r, fill: hl ? (o.highlight != null ? t.c('highlight') : t.cat(k)) : t.c('context'), stroke: t.c('paper'), 'stroke-width': 1 })),
       el('line', { x1: x(md), x2: x(md), y1: cy - yb.bw / 2, y2: cy + yb.bw / 2, stroke: t.c('ink'), 'stroke-width': 2.5 })));
     parts.push(textLines([gp.label], { x: box.x - 16, y: cy - 8, size: labelSize, anchor: 'end', valign: 'middle', fill: t.c('ink'), weight: 600 }));
-    parts.push(textLines([`median ${vf(md)}`], { x: box.x - 16, y: cy + 13, size: Math.max(15, size - 3), anchor: 'end', valign: 'middle', fill: t.c('muted') }));
+    parts.push(textLines([`${W.median} ${vf(md)}`], { x: box.x - 16, y: cy + 13, size: Math.max(15, size - 3), anchor: 'end', valign: 'middle', fill: t.c('muted') }));
   });
   return finish(o, ctx, parts, null, { x, box });
 }
@@ -232,7 +250,7 @@ export function scatterPlot(o) {
   if (fit) {
     const up = fit.band.map(b => [x(b.x), y(b.hi)]), dn = fit.band.map(b => [x(b.x), y(b.lo)]).reverse();
     if (o.band !== false) parts.push(el('path', { d: pathFromPoints([...up, ...dn], { close: true }), fill: t.seq(1), opacity: 0.7, class: 'ss-ci', ...buildAttrs(build && { ...build, start: build.start + 1 }, { motion: 'reveal' }) }));
-    parts.push(el('path', { d: pathFromPoints(fit.band.map(b => [x(b.x), y(b.y)])), fill: 'none', stroke: t.c('accent'), 'stroke-width': 3, 'stroke-linecap': 'round', pathLength: build ? 1 : null, ...buildAttrs(build && { ...build, start: build.start + 1 }, { motion: 'draw' }) }));
+    parts.push(el('path', { d: pathFromPoints(fit.band.map(b => [x(b.x), y(b.y)])), fill: 'none', stroke: o.fitColor ?? t.c('accent'), 'stroke-width': 3, 'stroke-linecap': 'round', pathLength: build ? 1 : null, ...buildAttrs(build && { ...build, start: build.start + 1 }, { motion: 'draw' }) }));
   }
   const r = o.radius ?? 6;
   const colorOf = p => (o.highlight != null ? (isHighlighted(o.highlight, p) ? t.c('highlight') : t.c('context')) : groups.length ? t.cat(groups.indexOf(p.group)) : t.cat(0));
@@ -247,7 +265,7 @@ export function scatterPlot(o) {
   if (groups.length > 1) parts.push(legend(groups.map((gname, k) => ({ label: String(gname), color: t.cat(k), shape: 'dot' })), { x: box.x, y: 12, size: size - 1, theme: t }));
   if (fit && o.fitLabel !== false) {
     const last = fit.band.at(-1);
-    parts.push(textLines([o.fitLabel || `Fit: slope ${fmt(fit.slope, { digits: 2, locale: ctx.locale })}, R² ${fmt(fit.r2, { digits: 2 })}`], { x: x(last.x) - 4, y: y(last.hi) - 10, size: size - 1, anchor: 'end', fill: t.c('accent'), weight: 700, halo: t.c('paper') }));
+    parts.push(textLines([o.fitLabel || `Fit: slope ${fmt(fit.slope, { digits: 2, locale: ctx.locale })}, R² ${fmt(fit.r2, { digits: 2 })}`], { x: x(last.x) - 4, y: y(last.hi) - 10, size: size - 1, anchor: 'end', fill: o.fitColor ?? t.c('accent'), weight: 700, halo: t.c('paper') }));
   }
   const resolve = a => { const p = typeof a.at === 'string' ? pts.find(q => q.label === a.at) : a.at; return p && { x: x(p.x), y: y(p.y) }; };
   return finish(o, ctx, parts, resolve, { x, y, box, fit });
@@ -312,14 +330,15 @@ export function confusionMatrix(o) {
   const L = o.labels, M = o.matrix, k = L.length;
   const rowTot = M.map(r => sum(r));
   const rowW = Math.max(...L.map(l => measureText(l, labelSize))) + 24;
-  const box = plotBox(ctx.W, ctx.H, { left: rowW + 34, right: 10, top: size * 2 + 34, bottom: 10 });
+  const colLines = Math.max(...L.map(l => wrapText(l, Math.max(60, (Math.min(ctx.W - rowW - 44, ctx.H - size * 2 - 44) / L.length) - 8), labelSize - 1).length));
+  const box = plotBox(ctx.W, ctx.H, { left: rowW + 34, right: 10, top: size * 2 + 34 + (colLines - 1) * (labelSize - 1) * 1.15, bottom: 10 });
   const side = Math.min(box.w, box.h), cell = side / k;
   const ox = box.x, oy = box.y;
   const parts = [];
   parts.push(textLines([o.predictedLabel ?? 'Predicted'], { x: ox + side / 2, y: 8, size: size - 1, anchor: 'middle', valign: 'top', fill: t.c('muted'), weight: 700, letterSpacing: 0.02 }));
   parts.push(textLines([o.actualLabel ?? 'Actual'], { x: 6, y: oy + side / 2, size: size - 1, valign: 'middle', fill: t.c('muted'), weight: 700, attrs: { transform: `rotate(-90 ${n(14)} ${n(oy + side / 2)})`, x: 14, 'text-anchor': 'middle' } }));
   L.forEach((l, i) => {
-    parts.push(textLines([l], { x: ox + i * cell + cell / 2, y: oy - 10, size: labelSize - 1, anchor: 'middle', valign: 'bottom', fill: t.c('ink') }));
+    parts.push(textLines(wrapText(l, cell - 8, labelSize - 1), { x: ox + i * cell + cell / 2, y: oy - 10, size: labelSize - 1, anchor: 'middle', valign: 'bottom', fill: t.c('ink'), lineHeight: 1.15 }));
     parts.push(textLines([l], { x: ox - 12, y: oy + i * cell + cell / 2, size: labelSize - 1, anchor: 'end', valign: 'middle', fill: t.c('ink') }));
   });
   M.forEach((row, i) => row.forEach((v, j) => {
@@ -331,7 +350,7 @@ export function confusionMatrix(o) {
     parts.push(g({ ...buildAttrs(build, { i: i * k + j, s: i, motion: 'reveal' }) },
       el('rect', { x: cx + 2, y: cy + 2, width: cell - 4, height: cell - 4, rx: 4, fill }),
       textLines([fmt(v, { locale: ctx.locale })], { x: cx + cell / 2, y: cy + cell / 2 - 4, size: Math.min(34, cell * 0.28), anchor: 'middle', valign: 'baseline', fill: on, weight: 700, attrs: { 'font-variant-numeric': 'tabular-nums' } }),
-      textLines([pct(rate, 0)], { x: cx + cell / 2, y: cy + cell / 2 + 8, size: Math.max(14, Math.min(18, cell * 0.14)), anchor: 'middle', valign: 'top', fill: on })));
+      textLines([pct(rate, 0)], { x: cx + cell / 2, y: cy + cell / 2 + 8, size: Math.max(15, Math.min(18, cell * 0.14)), anchor: 'middle', valign: 'top', fill: on })));
   }));
   const resolve = a => { const i = L.indexOf(a.actual), j = L.indexOf(a.predicted); return i >= 0 && j >= 0 ? { x: ox + (j + 1) * cell, y: oy + i * cell + cell / 2 } : null; };
   return finish(o, ctx, parts, resolve, { cell, ox, oy });
@@ -357,7 +376,7 @@ export function rocCurve(o) {
   const placed = spreadLabels(curves.map(c => ({ id: c.k, y: y(c.pts[Math.floor(c.pts.length * 0.25)].tpr), h: labelSize * 2.6 })), { min: box.y, max: box.y + box.h });
   for (const p of placed) {
     const c = curves[p.id];
-    parts.push(textLines([c.name], { x: box.x + box.w + 18, y: p.y - 10, size: labelSize, valign: 'middle', fill: colorOf(c), weight: 700 }));
+    parts.push(textLines([c.name], { x: box.x + box.w + 18, y: p.y - 10, size: labelSize, valign: 'middle', fill: o.highlight != null && !isHighlighted(o.highlight, c, 'name') ? t.c('muted') : colorOf(c), weight: 700 }));
     parts.push(textLines([`AUC ${fmt(c.auc, { digits: 3 })}`], { x: box.x + box.w + 18, y: p.y + 12, size: size - 1, valign: 'middle', fill: t.c('muted'), attrs: { 'font-variant-numeric': 'tabular-nums' } }));
   }
   if (o.operating) {
@@ -382,7 +401,7 @@ export function prCurve(o) {
   const placed = spreadLabels(curves.map(c => ({ id: c.k, y: y(c.pts[Math.floor(c.pts.length * 0.6)].precision), h: labelSize * 2.6 })), { min: box.y, max: box.y + box.h });
   for (const p of placed) {
     const c = curves[p.id];
-    parts.push(textLines([c.name], { x: box.x + box.w + 18, y: p.y - 10, size: labelSize, valign: 'middle', fill: colorOf(c), weight: 700 }));
+    parts.push(textLines([c.name], { x: box.x + box.w + 18, y: p.y - 10, size: labelSize, valign: 'middle', fill: o.highlight != null && !isHighlighted(o.highlight, c, 'name') ? t.c('muted') : colorOf(c), weight: 700 }));
     parts.push(textLines([`AP ${fmt(c.ap, { digits: 3 })}`], { x: box.x + box.w + 18, y: p.y + 12, size: size - 1, valign: 'middle', fill: t.c('muted') }));
   }
   return finish(o, ctx, parts, null, { x, y, box });
@@ -402,8 +421,12 @@ export function calibrationChart(o) {
   ctx.H = H0;
   const { x, y, parts, box } = fr;
   parts.push(el('line', { x1: x(0), y1: y(0), x2: x(1), y2: y(1), stroke: t.c('muted'), 'stroke-width': 1.2, 'stroke-dasharray': '4 5' }));
-  parts.push(textLines([o.perfectLabel ?? 'Perfectly calibrated'], { x: x(0.08), y: y(0.08) - 10, size: Math.max(15, size - 2), fill: t.c('muted'), attrs: { transform: `rotate(${n(-Math.atan2(y(0) - y(1), x(1) - x(0)) * 180 / Math.PI)} ${n(x(0.08))} ${n(y(0.08) - 10)})` } }));
   const used = binsData.filter(b => b.n > 0 && isNum(b.meanPredicted));
+  // Put the diagonal's label on the side of the line away from the curve near its start.
+  const near = used.reduce((best, b) => (Math.abs(b.meanPredicted - 0.2) < Math.abs((best?.meanPredicted ?? 9) - 0.2) ? b : best), null);
+  const below = near ? near.observed > near.meanPredicted : false, off = below ? 22 : -10;
+  const ang = -Math.atan2(y(0) - y(1), x(1) - x(0)) * 180 / Math.PI;
+  parts.push(textLines([o.perfectLabel ?? 'Perfectly calibrated'], { x: x(0.08), y: y(0.08) + off, size: Math.max(15, size - 2), fill: t.c('muted'), attrs: { transform: `rotate(${n(ang)} ${n(x(0.08))} ${n(y(0.08) + off)})` } }));
   parts.push(el('path', { d: pathFromPoints(used.map(b => [x(b.meanPredicted), y(b.observed)])), fill: 'none', stroke: t.c('accent'), 'stroke-width': 3, 'stroke-linejoin': 'round', pathLength: build ? 1 : null, ...buildAttrs(build, { motion: 'draw' }) }));
   used.forEach((b, k) => parts.push(el('circle', { cx: x(b.meanPredicted), cy: y(b.observed), r: 6, fill: t.c('accent'), stroke: t.c('paper'), 'stroke-width': 2, ...buildAttrs(build, { i: k, label: true }) })));
   const hy = box.y + box.h + 50, maxN = Math.max(...binsData.map(b => b.n));
@@ -414,7 +437,7 @@ export function calibrationChart(o) {
   parts.push(el('line', { x1: box.x, x2: box.x + box.w, y1: hy + histH, y2: hy + histH, stroke: t.c('ink'), 'stroke-width': 1.2 }));
   parts.push(textLines([o.countLabel ?? 'Predictions per bin'], { x: box.x, y: hy - 6, size: Math.max(15, size - 2), valign: 'bottom', fill: t.c('muted') }));
   parts.push(textLines([o.xLabel ?? 'Mean predicted probability'], { x: box.x + box.w, y: hy + histH + 24, size: size - 1, anchor: 'end', fill: t.c('muted') }));
-  return finish(o, ctx, parts, a => ({ x: x(a.at), y: y(a.y ?? a.at) }), { x, y, box });
+  return finish(o, ctx, parts, a => ({ x: x(a.at), y: y(a.y ?? a.at) }), { x, y, box, hist: { y: hy, height: histH, maxN, bins: binsData } });
 }
 
 /** Residuals vs fitted (or x): zero line, points, and a ±2·SD reading band. */
@@ -534,12 +557,13 @@ export function forestPlot(o) {
  */
 export function errorBarChart(o) {
   const ctx = setup(o);
+  const W = words(o, ctx);
   const { t, size, labelSize, build } = ctx;
   const meanFn = mean, sdFn = v => { const m = mean(v); return Math.sqrt(sum(v.map(q => (q - m) ** 2)) / Math.max(1, v.length - 1)); };
   const groups = o.groups.map(gp => {
     if (isNum(gp.mean)) return gp;
     const m = meanFn(gp.values), s = sdFn(gp.values), se = s / Math.sqrt(gp.values.length);
-    const w = o.interval === 'sd' ? s : o.interval === 'se' ? se : 1.96 * se;
+    const w = o.interval === 'sd' ? s : o.interval === 'se' ? se : tQuantile(0.975, Math.max(1, gp.values.length - 1)) * se;
     const [lo, hi] = typeof o.interval === 'function' ? o.interval(gp.values) : [m - w, m + w];
     return { ...gp, mean: m, low: lo, high: hi };
   });
@@ -567,8 +591,8 @@ export function errorBarChart(o) {
     items.push(textLines([vf(gp.mean)], { x: cx + 14, y: y(gp.mean), size: size - 1, valign: 'middle', fill: t.c('ink'), weight: 700, halo: t.c('paper') }));
     parts.push(g({ class: 'ss-errorbar', ...buildAttrs(build, { i: k, motion: 'reveal' }) }, items));
     parts.push(textLines([gp.label], { x: cx, y: box.y + box.h + 12, size: labelSize, anchor: 'middle', valign: 'top', fill: t.c('ink'), weight: 600 }));
-    if (gp.values) parts.push(textLines([`n = ${gp.values.length}`], { x: cx, y: box.y + box.h + 34, size: Math.max(15, size - 3), anchor: 'middle', valign: 'top', fill: t.c('muted') }));
+    if (gp.values) parts.push(textLines([`${W.n} = ${gp.values.length}`], { x: cx, y: box.y + box.h + 34, size: Math.max(15, size - 3), anchor: 'middle', valign: 'top', fill: t.c('muted') }));
   });
-  if (o.intervalNote !== false) parts.push(textLines([o.intervalNote || ({ sd: 'Bars: mean ± 1 SD', se: 'Bars: mean ± 1 SE', ci95: 'Bars: mean with 95% CI (normal approx.)' }[o.interval || 'ci95'] || '')], { x: box.x + box.w, y: box.y - 10, size: Math.max(15, size - 2), anchor: 'end', fill: t.c('muted') }));
+  if (o.intervalNote !== false) parts.push(textLines([o.intervalNote || ({ sd: 'Bars: mean ± 1 SD', se: 'Bars: mean ± 1 SE', ci95: 'Bars: mean with 95% CI (t)' }[o.interval || 'ci95'] || '')], { x: box.x + box.w, y: box.y - 10, size: Math.max(15, size - 2), anchor: 'end', fill: t.c('muted') }));
   return finish(o, ctx, parts, a => { const gp = groups.find(q => q.label === a.at); return gp && { x: xb.center(gp.label) + 10, y: y(gp.high) }; }, { y, box });
 }

@@ -1,6 +1,6 @@
 // Motion study · Editorial text mask — display lines rise from behind their own baseline
 // mask: the letters never scale, blur or fade, so their final shapes are there from the
-// first frame. Builds: 1 the second and third lines, 2 the evidence by hour.
+// first frame. Builds: 1 the masked line (the evening share), 2 the evidence by hour.
 import { svgRoot, el, g, band, linear, textLines, statesAttr, theme as makeTheme } from '../runtime/figure.mjs';
 
 // Visitors by hour of entry on Thursdays, autumn season (illustrative gallery ticketing data).
@@ -10,7 +10,8 @@ const hours = [
   { h: 16, visitors: 540, under30: 103 }, { h: 17, visitors: 498, under30: 120 }, { h: 18, visitors: 812, under30: 309 },
   { h: 19, visitors: 905, under30: 398 }, { h: 20, visitors: 604, under30: 248 },
 ];
-const lateFrom = 18;
+const lateFrom = 18; // hour from which an entry counts as 'late'
+const lateLabel = `${lateFrom % 12 || 12} ${lateFrom < 12 ? 'am' : 'pm'}`;
 const shareOf = list => Math.round((list.reduce((s, r) => s + r.under30, 0) / list.reduce((s, r) => s + r.visitors, 0)) * 100);
 const late = shareOf(hours.filter(r => r.h >= lateFrom)), day = shareOf(hours.filter(r => r.h < lateFrom));
 
@@ -33,7 +34,7 @@ export function figure(theme = 'css') {
   (() => { const lateHours = hours.filter(r => r.h >= lateFrom), x0 = x(lateHours[0].h), x1 = x(lateHours.at(-1).h) + x.bw, top = y(Math.max(...lateHours.map(pct))) - 36;
     return g({ 'data-step': 2, 'data-motion': 'reveal', 'data-delay': 800 },
       el('path', { d: `M${x0} ${top + 8}V${top}H${x1}V${top + 8}`, fill: 'none', stroke: t.c('accent'), 'stroke-width': 1.6 }),
-      textLines(['After 6 pm'], { x: (x0 + x1) / 2, y: top - 8, size: 17, anchor: 'middle', fill: t.c('accent'), weight: 700 })); })(),
+      textLines([`After ${lateLabel}`], { x: (x0 + x1) / 2, y: top - 8, size: 17, anchor: 'middle', fill: t.c('accent'), weight: 700 })); })(),
   el('line', { x1: m.l, x2: W - m.r, y1: y(0), y2: y(0), stroke: t.c('ink'), 'stroke-width': 1.2 }),
   hours.filter((r, i) => i % 2 === 0).map(r => textLines([`${r.h}:00`], { x: x.center(r.h), y: y(0) + 10, size: 16, anchor: 'middle', valign: 'top', fill: t.c('muted') })));
 }
@@ -52,7 +53,7 @@ export default {
   notes: `Purpose: Bring in a short display line (here the evening contrast to a daytime baseline) with an editorial mask, so the letters keep their final shapes from the first frame (no scaling, blur, tracking or per-letter motion).\nModify: Edit the lines (keep each short enough for one line at 58 px); replace \`hours\` and the computed shares (${late}% and ${day}%) follow.\nInvariant: Each masked line is clipped by its own box and translates by its own height; the page before the mask is already a complete statement; the chart arrives after the claim and its evening bars carry the only accent.\nStatic: The final build shows all four lines and the chart.`,
   sources: [{ type: 'original-example', file: 'assets/motion/editorial-mask.mjs' }],
   exportPolicy: 'final',
-  content: `<h1 class="st-head" style="top:132px;max-width:520px;font-size:58px;line-height:1.08;font-weight:500;letter-spacing:-.01em;text-wrap:initial">${line('Before 6 pm,', 0)}${line(`${day}% of visitors`, 0)}${line('are under 30.', 0)}${line(`<em>After 6 pm</em>, ${late}%.`, 1)}</h1>
+  content: `<h1 class="st-head" style="top:132px;max-width:520px;font-size:58px;line-height:1.08;font-weight:500;letter-spacing:-.01em;text-wrap:initial">${line(`Before ${lateLabel},`, 0)}${line(`${day}% of visitors`, 0)}${line('are under 30.', 0)}${line(`<em>After ${lateLabel}</em>, ${late}%.`, 1)}</h1>
 <p class="st-text st-muted" style="position:absolute;left:64px;top:430px;width:480px" data-step="2" data-motion="reveal" data-delay="300">Thursday late openings, September to November. Share of visitors entering in each hour.</p>
 <figure class="st-fig" style="left:616px;top:150px" data-region="primary" data-step="2" data-motion="reveal" data-duration="400">${figure()}</figure>
 <p class="st-source" data-region="source"><span>Illustrative data · Thursday ticket scans, autumn season</span><span>Motion · editorial mask on display lines (2 builds)</span></p>`,

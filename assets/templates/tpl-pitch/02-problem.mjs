@@ -2,7 +2,7 @@
 // One exhibit: share of produce spend thrown away in each audited kitchen, sorted, with the
 // median and one kitchen worked through as the example. Headline, median, callout and
 // description all derive from `kitchens`.
-import { theme, linear, band, axis, el, g, svgRoot, textLines, wrapText, fmt } from '../../runtime/figure.mjs';
+import { theme, linear, band, axis, el, g, svgRoot, textLines, measureText, fmt } from '../../runtime/figure.mjs';
 
 const ID = 'tpl-pitch-problem';
 // Baseline bin audit, four weeks per kitchen before go-live: % of produce purchases (by value) thrown away.
@@ -24,7 +24,9 @@ const pct = v => `${fmt(v, { digits: 1 })}%`;
 
 // ---- exhibit geometry (drawn at its slide size: 1152 × 360) ----
 const t = theme('css');
-const W = 1152, H = 360, box = { x: 56, y: 12, w: W - 56, h: 300 };
+const ticks = [0, 5, 10, 15, 20, 25], tickLabel = v => `${v}%`;
+const left = Math.ceil(Math.max(...ticks.map(v => measureText(tickLabel(v), 16)))) + 10;   // tick labels start at the margin
+const W = 1152, H = 360, box = { x: left, y: 12, w: W - left, h: 300 };
 const y = linear([0, 25], [box.y + box.h, box.y]);
 const x = band(sorted.map(k => k.id), [box.x, box.x + box.w], { inner: 0.32, outer: 0.08 });
 const bars = sorted.map(k => el('rect', {
@@ -36,13 +38,13 @@ const exX = x.center(example.id), exY = y(ex.share);
 const note = [`A ${example.seats}-seat bistro in ${example.city} binned ${pct(ex.share)} of its produce:`,
   `about $${fmt(exDollars)} of the $${fmt(example.spend)} it buys a year,`,
   `mostly ${example.binned}.`];
-const noteX = x(sorted[12].id), noteY = 58;                    // above the shorter half of the bars
+const noteX = 588, noteY = 58;                                 // column 7, above the shorter half of the bars
 const figure = svgRoot({
   id: `${ID}-fig`, width: W, height: H, theme: t,
   title: 'Share of produce spend thrown away in each of 24 audited kitchens',
   desc: `Sorted from ${pct(hi)} to ${pct(lo)}; median ${pct(median)}. Highlighted: a ${example.seats}-seat bistro at ${pct(ex.share)}, about $${fmt(exDollars)} a year.`,
 },
-  axis(y, { orient: 'left', at: box.x, grid: [box.x, box.x + box.w], tickValues: [0, 5, 10, 15, 20, 25], format: v => `${v}%`, size: 16, theme: t }),
+  axis(y, { orient: 'left', at: box.x, grid: [box.x, box.x + box.w], tickValues: ticks, format: tickLabel, size: 16, theme: t }),
   g({}, bars),
   el('line', { x1: box.x, x2: box.x + box.w, y1: medY, y2: medY, stroke: t.c('ink'), 'stroke-width': 1.5, 'stroke-dasharray': '6 5' }),
   textLines([medLabel], { x: box.x + box.w, y: medY - 9, size: 17, anchor: 'end', weight: 600, fill: t.c('ink'), halo: t.c('paper') }),

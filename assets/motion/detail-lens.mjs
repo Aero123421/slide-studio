@@ -3,7 +3,7 @@
 // scaled about the source circle; event dots use non-scaling strokes, so magnification
 // separates them instead of fattening them, and the swarm resolves into two strands.
 // Builds: 1 the lens lifts out of its source, 2 what the lens resolves.
-import { svgRoot, el, g, linear, textLines, rng, theme as makeTheme, n, fmt } from '../runtime/figure.mjs';
+import { svgRoot, el, g, linear, textLines, rng, theme as makeTheme, n } from '../runtime/figure.mjs';
 
 // Illustrative microseismic catalogue on a 40 × 14 km survey grid (km east, km north).
 const faultTrace = [[1, 3.0], [10, 5.2], [20, 7.4], [28, 8.6], [39, 11.8]]; // mapped surface trace
@@ -24,7 +24,9 @@ function catalogue() {
   const out = [];
   for (let i = 0; i < background.onFault; i++) { const p = onTrace(r()), o = gauss() * background.spread; out.push({ x: p.x + p.nx * o, y: p.y + p.ny * o, m: mag(), swarm: false }); }
   for (let i = 0; i < background.diffuse; i++) out.push({ x: 1 + r() * 38, y: 0.5 + r() * 13, m: mag(), swarm: false });
-  const ang = Math.atan2(8.6 - 7.4, 28 - 20), ux = Math.cos(ang), uy = Math.sin(ang); // swarm runs along the local trace
+  // The swarm runs along the trace segment it sits on.
+  const seg = faultTrace.findIndex((p, i) => i < faultTrace.length - 1 && p[0] <= swarm.centre[0] && faultTrace[i + 1][0] >= swarm.centre[0]);
+  const ang = Math.atan2(faultTrace[seg + 1][1] - faultTrace[seg][1], faultTrace[seg + 1][0] - faultTrace[seg][0]), ux = Math.cos(ang), uy = Math.sin(ang);
   for (const off of swarm.strands) for (let i = 0; i < swarm.perStrand; i++) {
     const a = (r() - 0.5) * swarm.length, o = off + gauss() * swarm.jitter;
     out.push({ x: swarm.centre[0] + a * ux - o * uy, y: swarm.centre[1] + a * uy + o * ux, m: mag(), swarm: true, side: Math.sign(off), along: a, off: o });

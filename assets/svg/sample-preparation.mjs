@@ -42,8 +42,8 @@ export function figure(theme = 'css') {
   let acc = 0;
   const bands = [...layers].reverse().map(l => { const y1 = yOf(acc), y0 = yOf(acc + l.volume); acc += l.volume; return { ...l, y0, y1 }; });
   const fillOf = k => (k === 'P' ? t.seq(1) : k === 'B' ? t.c('paper') : t.c('muted'));   // plasma keeps one tint wherever it goes
-  const tubeA = tube(xA, 'a', [el('rect', { x: xA, y: wholeTop, width: tw, height: bottom - wholeTop + 4, fill: t.c('muted') }), el('line', { x1: xA, x2: xA + tw, y1: wholeTop, y2: wholeTop, stroke: t.c('ink'), 'stroke-width': 1 })]);
-  const tubeB = tube(xB, 'b', bands.map(b => el('rect', { x: xB, y: b.y0, width: tw, height: b.y1 - b.y0 + (b.key === 'R' ? 4 : 0), fill: fillOf(b.key) })).concat(bands.map(b => el('line', { x1: xB, x2: xB + tw, y1: b.y0, y2: b.y0, stroke: t.c('ink'), 'stroke-width': 1 }))));
+  const tubeA = tube(xA, 'a', [el('rect', { x: xA, y: wholeTop, width: tw, height: bottom - wholeTop + 4, fill: t.c('muted') }), el('line', { fill: 'none', x1: xA, x2: xA + tw, y1: wholeTop, y2: wholeTop, stroke: t.c('ink'), 'stroke-width': 1 })]);
+  const tubeB = tube(xB, 'b', bands.map(b => el('rect', { x: xB, y: b.y0, width: tw, height: b.y1 - b.y0 + (b.key === 'R' ? 4 : 0), fill: fillOf(b.key) })).concat(bands.map(b => el('line', { fill: 'none', x1: xB, x2: xB + tw, y1: b.y0, y2: b.y0, stroke: t.c('ink'), 'stroke-width': 1 }))));
   const mid = k => { const b = bands.find(q => q.key === k); return (b.y0 + b.y1) / 2; };
 
   // 3. destinations: plasma aliquots (top row), DNA (middle), red cells (bottom)

@@ -1,84 +1,96 @@
-// Template: 戦略提案（コンサル型）· 実行ロードマップ（ガント）. Synthetic example content; replace data and copy.
-// Time is in quarters from the start (0 = 2026年10月). Bars, phase band, gates and grid are computed from these arrays.
-const P = 'tpl-strategy-roadmap';
-const years = [{label: '2026年度', q: ['Q3', 'Q4']}, {label: '2027年度', q: ['Q1', 'Q2', 'Q3', 'Q4']}, {label: '2028年度', q: ['Q1', 'Q2', 'Q3', 'Q4']}];
-const nQ = years.reduce((s, y) => s + y.q.length, 0);
+// Template: 戦略提案（経営会議向け）· 実行ロードマップ. Synthetic example content; replace data and copy.
+// One time axis (months from 2026年4月) carries the phases, the work on each lever, the milestones
+// and the year-end KPIs, so every column of numbers sits under its own fiscal year.
+import { el, textLines, linear, fmt } from '../../runtime/figure.mjs';
+
+const ID = 'tpl-strategy-roadmap';
+const axis = {from: 6, to: 48, fy0: 2026};       // 月（2026年4月＝0）。2026年10月から2029年度末まで
+const ym = t => { const m = Math.floor(t) + 3; return `${axis.fy0 + Math.floor(m / 12)}年${(m % 12) + 1}月`; }; // 月番号→暦の年月
 const phases = [
-  {t: 'フェーズ1　即効策', a: 0, b: 3},
-  {t: 'フェーズ2　構造改革', a: 3, b: 6},
-  {t: 'フェーズ3　自動化と定着', a: 6, b: 10}
+  {name: '第1段階　値付けと販促', from: 6, to: 18},
+  {name: '第2段階　受け取りと物流', from: 18, to: 36},
+  {name: '第3段階　定着', from: 36, to: 48},
 ];
-const streams = [
-  {name: '料金改定', lever: '1.1', tasks: [{t: '上位荷主と交渉', a: 0, b: 2}, {t: '新料金を適用', a: 2, b: 5, soft: true}]},
-  {name: '営業集中', lever: '1.2', tasks: [{t: '専任チーム編成', a: 1, b: 2.5}, {t: '3業種で新規獲得', a: 2.5, b: 10, soft: true}]},
-  {name: '拠点統合', lever: '2.1', tasks: [{t: '戸田を改修', a: 1, b: 3}, {t: '川口から移管', a: 3, b: 5.5}], ms: [{at: 6, t: '川口閉鎖'}]},
-  {name: '部分自動化', lever: '2.2', tasks: [{t: '仕様策定・発注', a: 2, b: 4.5}, {t: '設置・試運転', a: 4.5, b: 8}, {t: '本稼働', a: 8, b: 10}]},
-  {name: '人員と組織', lever: '3.2', tasks: [{t: '配置転換計画', a: 0, b: 1.5}, {t: '多能工化の教育', a: 1.5, b: 8, soft: true}]},
-  {name: 'PMO', lever: '—', tasks: [{t: '月次でKPIと予算を確認', a: 0, b: 10, thin: true}]}
+const work = [                                    // no は論点ツリーの番号。bar = [開始, 終了]（月）。ms = 節目
+  {no: '1.1', name: '値引き販売の抑制', bar: [6, 18]},
+  {no: '2.1', name: '送料無料ラインの改定', bar: [6, 12], ms: {at: 12, text: '改定'}},
+  {no: '3.1', name: '広告配分の見直し', bar: [6, 15]},
+  {no: '2.4', name: '配送会社の再入札', bar: [9, 15], ms: {at: 15, text: '新契約'}},
+  {no: '2.2', name: '店舗受け取りの拡大', bar: [12, 23.5], ms: {at: 23.5, text: '全118店'}}, // 23.5＝2028年3月中
+  {no: '2.3', name: '仕分けの自動化', bar: [15, 30], ms: {at: 30, text: '本稼働'}},
+  {no: '1.2', name: 'PB比率の引き上げ', bar: [12, 44]},
 ];
-const gates = [{at: 2, t: '判断1　自動化を発注するか', d: '2027年3月'}, {at: 6, t: '判断2　稼働範囲を確定', d: '2028年3月'}];
+const years = [2025, 2026, 2027, 2028, 2029];    // 年度（2025年度は実績、2026年度は見込み）
+const kpis = [                                    // 各年度末の値
+  {name: '営業利益率', unit: '%', digits: 1, op: [3.6, 4.6, 9.0, 12.8, 16.2], sales: [240, 247, 255, 262, 270]}, // 営業利益・売上高（億円）から計算
+  {name: '店舗受け取り比率', unit: '%', v: [9, 10, 14, 17, 18]},
+  {name: 'PB比率', unit: '%', v: [22, 23, 26, 29, 32]},
+  {name: '平均値引率', unit: '%', v: [14, 12, 10, 10, 10]},
+];
 
-const W = 1160, H = 420, LX = 178, RX = 1156, qw = (RX - LX) / nQ;
-const X = q => LX + q * qw;
-const yHead = 0, yPh = 58, rowTop = 100, rowH = 46;
-let qi = 0;
-const header = years.map(yr => {
-  const x0 = X(qi), x1 = X(qi + yr.q.length);
-  const qs = yr.q.map((q, j) => `<text x="${(X(qi + j) + qw / 2).toFixed(1)}" y="${yHead + 44}" text-anchor="middle" class="s-sv-m">${q}</text>`).join('');
-  qi += yr.q.length;
-  return `<text x="${x0 + 8}" y="${yHead + 16}" class="s-sv-t" style="font-size:15px">${yr.label}</text><line x1="${x0}" x2="${x0}" y1="${yHead}" y2="${rowTop + streams.length * rowH}" stroke="#1c2024" stroke-width="1"/>${qs}${x1 >= RX - 1 ? `<line x1="${x1}" x2="${x1}" y1="${yHead}" y2="${rowTop + streams.length * rowH}" stroke="#1c2024" stroke-width="1"/>` : ''}`;
-}).join('');
-const qgrid = Array.from({length: nQ}, (_, i) => `<line x1="${X(i)}" x2="${X(i)}" y1="${yHead + 26}" y2="${rowTop + streams.length * rowH}" stroke="#dcdfe2"/>`).join('');
-const phaseBand = phases.map((p, i) => `<rect x="${X(p.a) + 1}" y="${yPh}" width="${X(p.b) - X(p.a) - 2}" height="26" fill="${['#e2eeeb', '#c9dfd9', '#a9ccc3'][i]}"/>
-  <text x="${X(p.a) + 10}" y="${yPh + 18}" style="font:700 15px var(--s-jp);fill:#0d5c4f">${p.t}</text>`).join('');
-const rows = streams.map((s, r) => {
-  const y0 = rowTop + r * rowH, cy = y0 + rowH / 2;
-  const label = `<text x="8" y="${cy + 6}" class="s-sv-t">${s.name}</text><text x="${LX - 12}" y="${cy + 5}" text-anchor="end" style="font:400 15px var(--s-fig);fill:#646a71">${s.lever}</text>`;
-  const tasks = s.tasks.map(t => {
-    const x = X(t.a) + 2, w = X(t.b) - X(t.a) - 4, h = t.thin ? 8 : 26;
-    const bar = t.soft
-      ? `<rect x="${x}" y="${cy - h / 2}" width="${w}" height="${h}" fill="#e2eeeb" stroke="#3d8878" stroke-dasharray="4 3"/>`
-      : `<rect x="${x}" y="${cy - h / 2}" width="${w}" height="${h}" fill="${t.thin ? '#8d949a' : '#0d5c4f'}"/>`;
-    const txt = t.thin
-      ? `<text x="${x + 10}" y="${cy - 10}" class="s-sv-m">${t.t}</text>`
-      : `<text x="${x + 10}" y="${cy + 5}" style="font:600 15px var(--s-jp);fill:${t.soft ? '#0d5c4f' : '#ffffff'}">${t.t}</text>`;
-    return bar + txt;
-  }).join('');
-  const ms = (s.ms || []).map(m => `<rect x="${X(m.at) - 8}" y="${cy - 8}" width="16" height="16" transform="rotate(45 ${X(m.at)} ${cy})" fill="#1c2024"/><text x="${X(m.at) + 14}" y="${cy + 5}" style="font:700 15px var(--s-jp);fill:#1c2024">${m.t}</text>`).join('');
-  return label + tasks + ms;
-}).join('');
-const bands = streams.map((_, r) => r % 2 === 0 ? `<rect x="0" y="${rowTop + r * rowH}" width="${RX}" height="${rowH}" fill="#f4f5f6"/>` : '').join('');
-const bottom = rowTop + streams.length * rowH;
-const gateMarks = gates.map(g => `<line x1="${X(g.at)}" x2="${X(g.at)}" y1="${yPh - 4}" y2="${bottom + 6}" stroke="#c98a12" stroke-width="2" stroke-dasharray="5 4"/>
-  <rect x="${X(g.at) - 7}" y="${bottom + 2}" width="14" height="14" transform="rotate(45 ${X(g.at)} ${bottom + 9})" fill="#c98a12"/>
-  <text x="${X(g.at) + 14}" y="${bottom + 16}" style="font:700 15px var(--s-jp);fill:#8a5a04">${g.t}</text>
-  <text x="${X(g.at) + 14}" y="${bottom + 36}" class="s-sv-m">${g.d}</text>`).join('');
+// ---- derived
+const rows = kpis.map(k => ({...k, v: k.v ?? k.op.map((o, i) => Math.round(o / k.sales[i] * 1000) / 10)}));
+const f = (v, k) => fmt(v, {digits: k.digits ?? 0});
 
-const track = ['論点', '優先度', '選択肢', '推奨', '実行'].map((t, i) => `<span${i === 4 ? ' class="on"' : ''}>${t}</span>`).join('');
+// ---- geometry (figure at x=64, y=172; 1152 wide; timeline = columns 4–12)
+const W = 1152, L = 294, x = linear([axis.from, axis.to], [L, W]);
+const Y = {phase: 16, year: 56, rows: 70, rowH: 30};
+const yRow = i => Y.rows + i * Y.rowH;
+const kTop = yRow(work.length) + 18, kRowH = 27;
+const H = kTop + 32 + rows.length * kRowH;
+const yearStart = fy => (fy - axis.fy0) * 12;     // 年度の始まり（月）
+const span = fy => [Math.max(axis.from, yearStart(fy)), Math.min(axis.to, yearStart(fy) + 12)];
+const fys = years.filter(fy => span(fy)[1] > span(fy)[0]);
+
+const gridLines = fys.map(fy => [
+  el('line', {x1: x(span(fy)[0]), x2: x(span(fy)[0]), y1: Y.year - 22, y2: H, stroke: 'var(--st-rule)', 'stroke-width': 1}),
+  yearStart(fy) + 6 > axis.from && yearStart(fy) + 6 < axis.to ? el('line', {x1: x(yearStart(fy) + 6), x2: x(yearStart(fy) + 6), y1: Y.year + 8, y2: yRow(work.length), stroke: 'var(--st-faint)', 'stroke-width': 1}) : '',
+  textLines([`${fy}年度${span(fy)[1] - span(fy)[0] < 12 ? '下期' : ''}`], {x: x(span(fy)[0]) + 10, y: Y.year, cls: 'sv-h', attrs: {style: 'fill:var(--st-ink)'}}),
+].join('')).join('');
+const phaseMarks = phases.map((p, i) => {
+  const a = x(p.from) + (i ? 4 : 0), b = x(p.to) - 4;
+  return el('path', {d: `M${a} ${Y.phase + 12}V${Y.phase + 6}H${b}V${Y.phase + 12}`, fill: 'none', stroke: 'var(--st-accent)', 'stroke-width': 1.2})
+    + textLines([p.name], {x: a, y: Y.phase - 2, cls: 'sv-h sv-a'});
+}).join('');
+const workRows = work.map((w, i) => {
+  const cy = yRow(i) + Y.rowH / 2;
+  const bar = el('rect', {x: x(w.bar[0]), y: cy - 5, width: x(w.bar[1]) - x(w.bar[0]), height: 10, fill: 'var(--st-accent)'});
+  const ms = w.ms ? el('path', {d: `M${x(w.ms.at)} ${cy - 9}L${x(w.ms.at) + 9} ${cy}L${x(w.ms.at)} ${cy + 9}L${x(w.ms.at) - 9} ${cy}Z`, fill: 'var(--st-ink)', stroke: 'var(--st-paper)', 'stroke-width': 1.5})
+    + textLines([`${ym(w.ms.at)} ${w.ms.text}`], {x: x(w.ms.at) + 16, y: cy + 6, cls: 'sv-l', attrs: {style: 'font-weight:700'}}) : '';
+  return el('line', {x1: 0, x2: W, y1: yRow(i + 1), y2: yRow(i + 1), stroke: 'var(--st-faint)', 'stroke-width': 1})
+    + textLines([`${w.no}　${w.name}`], {x: 0, y: cy + 6, cls: 'sv-l'}) + bar + ms;
+}).join('');
+const kpiBlock = [
+  el('line', {x1: 0, x2: W, y1: kTop, y2: kTop, stroke: 'var(--st-ink)', 'stroke-width': 1}),
+  textLines(['重要指標（年度末）'], {x: 0, y: kTop + 24, cls: 'sv-h', attrs: {style: 'fill:var(--st-ink)'}}),
+  textLines(['2025年度実績'], {x: L - 14, y: kTop + 24, anchor: 'end', cls: 'sv-b'}),
+  ...rows.map((k, r) => {
+    const by = kTop + 32 + r * kRowH + 20;
+    return textLines([k.name], {x: 0, y: by, cls: 'sv-l'})
+      + textLines([`${f(k.v[0], k)}${k.unit}`], {x: L - 14, y: by, anchor: 'end', cls: 'sv-n', attrs: {style: 'fill:var(--st-muted)'}})
+      + fys.map(fy => {
+        const i = years.indexOf(fy), last = fy === fys.at(-1);
+        return textLines([`${f(k.v[i], k)}${k.unit}`], {x: x(span(fy)[1]) - 12, y: by, anchor: 'end', cls: last ? 'sv-n sv-a' : 'sv-n', attrs: last ? {style: 'font-weight:700'} : {}});
+      }).join('');
+  }),
+].join('');
+
+const svg = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-labelledby="${ID}-t ${ID}-d">
+  <title id="${ID}-t">実行ロードマップと重要指標（${ym(axis.from)}〜${axis.fy0 + 3}年度末）</title>
+  <desc id="${ID}-d">${phases.map(p => `${p.name.replace('　', '：')}（${ym(p.from)}〜）`).join('、')}。${work.map(w => `${w.no} ${w.name}：${ym(w.bar[0])}〜${ym(w.bar[1] - 1)}${w.ms ? `、${ym(w.ms.at)}に${w.ms.text}` : ''}`).join('。')}。年度末の指標：${rows.map(k => `${k.name} ${years.map((fy, i) => `${fy}年度${f(k.v[i], k)}${k.unit}`).join('、')}`).join('。')}。</desc>
+  ${gridLines}${phaseMarks}${workRows}${kpiBlock}
+</svg>`;
 
 export default {
   study: true,
-  id: 'tpl-strategy-roadmap',
-  title: '実行ロードマップ（ガント）',
+  id: ID,
   language: 'ja',
-  notes: 'Purpose: 推奨案を実行する順序・期間・判断の時期を1枚で示し、今日決めてほしいことで締める。\nModify: years（四半期の並び）、phases、streams（a・b は開始・終了の四半期番号、soft は継続・準備）、gates を差し替える。\nInvariant: 各ワークストリームは論点ツリーの番号に対応させる。判断ゲートは日付と「何を決めるか」を書く。最後の枠には会議で決める事項を1つだけ置く。\nStatic: Already static.',
+  title: 'Roadmap 2026–2029: phases, milestones and year-end KPIs',
+  notes: 'Purpose: 推奨案をいつ・どの順で実行し、各年度末にどの指標がどこまで動くかを1枚で約束する。\nModify: axis（期間）、phases（段階）、work（打ち手ごとの期間と節目、月番号は2026年4月＝0）、kpis（年度末の値）を差し替える。営業利益率は営業利益と売上高から計算される。\nInvariant: 打ち手の番号は論点ツリーと同じにする。節目の日付は推奨案ページの「実現の条件」と一致させ、2029年度末の値は推奨案の数値（利益率6.0%）と一致させる。\nStatic: 静的ページ。',
   sources: [],
   exportPolicy: 'final',
-  className: 'tpl-strategy s-roadmap',
-  content: `<div class="s-wrap">
-  
-  <h1 class="s-title" data-region="title">最初の18か月で料金改定と拠点統合を終え、<br><em>自動化は2度の判断を経て</em>2029年度に本稼働させる</h1>
-  <div class="s-track" aria-label="章の位置">${track}</div>
-  <div class="s-rule"></div>
-  <div class="s-gantt" data-region="primary">
-    <svg viewBox="0 0 ${W} ${H}" role="img" aria-labelledby="${P}-t ${P}-d">
-      <title id="${P}-t">実行ロードマップ（2026年10月〜2029年3月）</title>
-      <desc id="${P}-d">${streams.map(s => `${s.name}：${s.tasks.map(t => t.t).join('→')}`).join('。')}。判断の時期は${gates.map(g => `${g.d}（${g.t.replace(/\s+/g, '')}）`).join('、')}。</desc>
-      <text x="8" y="44" class="s-sv-m">ワークストリーム</text><text x="${LX - 12}" y="44" text-anchor="end" class="s-sv-m">論点</text>
-      ${bands}${qgrid}${header}${phaseBand}${rows}${gateMarks}
-    </svg>
-  </div>
-  <div class="s-so" style="top:606px" data-region="support"><b>本日の決定事項</b><p>フェーズ1の着手とPMOの設置を承認いただきたい。自動化投資の可否は2027年3月の判断1で改めて諮る。</p></div>
-  <div class="s-foot"><span data-region="source">例示データ · 実線＝実施、点線＝継続・定着、◆＝判断の時期</span><span>北辰コンサルティング<b>6</b></span></div>
-</div>`
+  className: 'tpl-strategy st-roadmap',
+  content: `<h1 class="st-title" data-region="title">1年目に値付けと販促を見直し、<br>店舗受け取りと自動化は${ym(work.find(w => w.no === '2.3').ms.at)}までに整える</h1>
+<figure class="st-fig" style="left:64px;top:168px;width:${W}px;height:${H}px" data-region="primary">${svg}</figure>
+<div class="st-foot" data-region="source"><p>注：年度は4月〜翌3月。2025年度は実績、2026年度は見込み。◆は節目<br>出典：白峰パートナーズ分析</p><p>EC事業の収益改善<b>6</b></p></div>`,
 };

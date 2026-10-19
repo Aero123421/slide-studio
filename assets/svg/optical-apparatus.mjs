@@ -62,7 +62,7 @@ export function figure(theme = 'css') {
     const x = X(e.z);
     if (e.kind === 'source') return g({}, el('rect', { x: X(-11), y: Y(4), width: 11 * sx, height: 8 * sy, rx: 4, fill: t.c('ink') }), el('circle', { cx: x, cy: yc, r: 4, fill: t.c('accent') }));
     if (e.kind === 'lens') return el('path', { d: lensPath(e), fill: t.c('surface'), stroke: t.c('ink'), 'stroke-width': 1.5 });
-    if (e.kind === 'stop') return g({}, [1, -1].map(sg => el('line', { x1: x, x2: x, y1: Y(sg * r), y2: Y(sg * 14), stroke: t.c('ink'), 'stroke-width': 5, 'stroke-linecap': 'butt' })));
+    if (e.kind === 'stop') return g({}, [1, -1].map(sg => el('line', { fill: 'none', x1: x, x2: x, y1: Y(sg * r), y2: Y(sg * 14), stroke: t.c('ink'), 'stroke-width': 5, 'stroke-linecap': 'butt' })));
     if (e.kind === 'cell') {
       const h = (e.outer / 2) * sy;
       return g({}, el('rect', { x: X(zIn), y: yc - h + e.wall * sx, width: pathMm * sx, height: 2 * h - 2 * e.wall * sx, fill: t.seq(1), 'fill-opacity': 0.6 }),
@@ -78,7 +78,7 @@ export function figure(theme = 'css') {
     const yEnd = above ? topOf(e) - 6 : 2 * yc - topOf(e) + 6;
     const anchor = i === bench.length - 1 ? 'end' : 'middle', lx = i === bench.length - 1 ? x + 30 : x;
     return g({},
-      el('line', { x1: x, x2: x, y1: above ? ly + 10 : ly - 10, y2: yEnd, stroke: t.c('muted'), 'stroke-width': 1 }),
+      el('line', { fill: 'none', x1: x, x2: x, y1: above ? ly + 10 : ly - 10, y2: yEnd, stroke: t.c('muted'), 'stroke-width': 1 }),
       textLines([e.name], { x: lx, y: above ? ly - 20 : ly + 4, size: 16, anchor, valign: above ? 'bottom' : 'top', weight: 700, fill: t.c('ink') }),
       textLines([e.spec], { x: lx, y: above ? ly : ly + 26, size: 15, anchor, valign: above ? 'bottom' : 'top', fill: t.c('muted') }));
   });
@@ -86,13 +86,13 @@ export function figure(theme = 'css') {
     title: 'Absorbance bench: LED, collimating lens, iris, cuvette, focusing lens and photodiode on one axis',
     desc: `Rays leave the LED within ±${bench[0].half}°, become parallel after the ${lens1.f} mm lens, and the ${iris.d} mm iris passes only rays within ±${fmt(acceptDeg, { digits: 1 })}°. The ${iris.d} mm parallel beam crosses the ${pathMm} mm sample path and the ${bench[4].f} mm lens focuses it on the photodiode. Absorbance ${fmt(absorbance, { digits: 2 })} leaves ${fmt(transmitted * 100, { digits: 0 })}% of the light. Axial positions to scale; heights doubled.` },
   el('defs', {}, arrowMarker(`${id}-arr`, t.c('accent'))),
-  el('line', { x1: X(-14), x2: X(200), y1: yc, y2: yc, stroke: t.c('muted'), 'stroke-width': 1, 'stroke-dasharray': '14 4 2 4' }),
+  el('line', { fill: 'none', x1: X(-14), x2: X(200), y1: yc, y2: yc, stroke: t.c('muted'), 'stroke-width': 1, 'stroke-dasharray': '14 4 2 4' }),
   beam, rayPaths, hw, labels,
   textLines([`${iris.d} mm collimated beam`], { x: (X(zOut) + X(bench[4].z)) / 2, y: Y(r) - 14, size: 16, anchor: 'middle', valign: 'bottom', weight: 700, fill: t.c('accent') }),
   textLines([`${fmt(transmitted * 100, { digits: 0 })}% of the light left`], { x: (X(zOut) + X(bench[4].z)) / 2, y: Y(-r) + 14, size: 15, anchor: 'middle', valign: 'top', fill: t.c('accent') }),
   // scale: axial positions are true; heights are doubled
-  el('path', { d: `M${X(-11)} ${H - 22}h${20 * sx}`, stroke: t.c('ink'), 'stroke-width': 2.5 }),
-  textLines(['20 mm'], { x: X(-11) + 20 * sx + 8, y: H - 22, size: 15, valign: 'middle', weight: 600, fill: t.c('ink') }),
+  el('path', { d: `M${X(-11)} ${H - 32}h${20 * sx}`, stroke: t.c('ink'), 'stroke-width': 2.5 }),
+  textLines(['20 mm'], { x: X(-11) + 20 * sx + 8, y: H - 32, size: 15, valign: 'middle', weight: 600, fill: t.c('ink') }),
   textLines(['along the axis; heights ×2'], { x: X(-11), y: H - 2, size: 15, valign: 'bottom', fill: t.c('muted') }));
 }
 
@@ -104,7 +104,7 @@ export default {
   notes: 'Purpose: Explain how light gets from source through sample to detector, and why the beam geometry makes the measurement valid.\nModify: Edit `bench` (positions, focal lengths, apertures) and `sample`; rays are re-traced paraxially, blocked rays end where an aperture stops them, and the beam width, acceptance angle and attenuation recompute.\nInvariant: One optical axis; light travels left to right and rays keep their direction marks; the drawing is a schematic of the optics (axial positions to scale, heights exaggerated and labelled as such), not construction drawings.\nStatic: Already static. For a talk, show the bench, then the rays, then the attenuation in the sample.',
   sources: [{ type: 'original-example', file: 'assets/svg/optical-apparatus.mjs' }],
   exportPolicy: 'final',
-  content: `<h1 class="st-head">An <em>${iris.d} mm collimated beam</em> crosses all ${pathMm} mm of sample, and the detector reads ${fmt(transmitted * 100, { digits: 0 })}% of the blank</h1>
+  content: `<h1 class="st-head">An <em>${iris.d}&nbsp;mm&nbsp;collimated&nbsp;beam</em> crosses all ${pathMm} mm of sample, and the detector reads ${fmt(transmitted * 100, { digits: 0 })}% of the blank</h1>
 <figure class="st-fig" data-region="primary">${figure()}</figure>
 <p class="st-source" data-region="source"><span>Illustrative values · dye at 20 µmol/L, ε = 25,000 L·mol⁻¹·cm⁻¹, absorbance ${fmt(absorbance, { digits: 2 })}</span><span>Ray diagram (paraxial, thin lenses)</span></p>`,
 };

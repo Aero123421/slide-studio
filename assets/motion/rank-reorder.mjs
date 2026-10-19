@@ -14,6 +14,8 @@ const sources = [ // share of new sign-ups by first-touch source, % (illustrativ
   { label: 'AI assistants', y2023: 2, y2025: 19 },
 ];
 const focus = 'AI assistants';
+const years = [2023, 2025]; // the two columns above
+const span = ['', 'one year', 'two years', 'three years', 'four years', 'five years'][years[1] - years[0]] || `${years[1] - years[0]} years`;
 const rank = key => [...sources].sort((a, b) => b[key] - a[key] || sources.indexOf(a) - sources.indexOf(b)).map(s => s.label);
 const before = rank('y2023'), after = rank('y2025');
 const ordinal = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth', 'ninth', 'tenth'];
@@ -27,10 +29,10 @@ export function figure(theme = 'css') {
   const rowY = i => m.t + i * rowH; // top of rank slot i
   const dur = 900;
   return svgRoot({ id: 'motion-rank-reorder-fig', width: W, height: H, theme: t,
-    title: 'Share of new sign-ups by first-touch source, 2023 and 2025, ranked',
-    desc: `In 2023 ${focus.toLowerCase()} ranked ${ordinal[from]} with ${sources.find(s => s.label === focus).y2023}% of sign-ups; in 2025 they ranked ${ordinal[to]} with ${sources.find(s => s.label === focus).y2025}%. ${after[0]} stays first.` },
+    title: `Share of new sign-ups by first-touch source, ${years[0]} and ${years[1]}, ranked`,
+    desc: `In ${years[0]} ${focus.toLowerCase()} ranked ${ordinal[from]} with ${sources.find(s => s.label === focus).y2023}% of sign-ups; in ${years[1]} they ranked ${ordinal[to]} with ${sources.find(s => s.label === focus).y2025}%. ${after[0]} stays first.` },
   textLines(['Share of new sign-ups'], { x: x0, y: 12, size: 16, fill: t.c('muted'), valign: 'top' }),
-  [['2023', 0, 0], ['2025', 1, null]].map(([yr, step, until]) => textLines([yr], { x: W - 8, y: 4, size: 30, weight: 700, anchor: 'end', valign: 'top', fill: t.c('ink'),
+  [[years[0], 0, 0], [years[1], 1, null]].map(([yr, step, until]) => textLines([String(yr)], { x: W - 8, y: 4, size: 30, weight: 700, anchor: 'end', valign: 'top', fill: t.c('ink'),
     attrs: { 'data-step': step, 'data-until': until, 'data-motion': step ? 'reveal' : null } })),
   // rank slots do not move; rows move between them
   sources.map((_, i) => g({},
@@ -64,7 +66,7 @@ export default {
   notes: 'Purpose: Show a change of rank as two readable steps: values change in place, then each row moves to its new rank, carrying its name, colour and value.\nModify: Replace `sources` (two values per row) and `focus`; bar scales, counted values, row translations and the headline recompute. Ties keep their original order.\nInvariant: Every row is one group that moves as a unit; rank numbers are slots that stay put; values change before the order does, so no bar changes length and rank at once; only the focus row carries the accent.\nStatic: The final build shows the new ranking with values and the focus row’s former rank.',
   sources: [{ type: 'original-example', file: 'assets/motion/rank-reorder.mjs' }],
   exportPolicy: 'final',
-  content: `<h1 class="st-head"><em>${focus}</em> climbed from ${ordinal[from]} to ${ordinal[to]} place among sign-up sources in two years</h1>
+  content: `<h1 class="st-head"><em>${focus}</em> climbed from ${ordinal[from]} to ${ordinal[to]} place among sign-up sources in ${span}</h1>
 <figure class="st-fig" data-region="primary">${figure()}</figure>
 <p class="st-source" data-region="source"><span>Illustrative data · first-touch attribution, January–June of each year</span><span>Motion · values update, then rows re-rank (2 builds)</span></p>`,
 };

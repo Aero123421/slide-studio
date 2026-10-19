@@ -11,12 +11,13 @@ const stops = [
   ['総合病院前', 1760], ['市場前', 980], ['東雲町', 720], ['港通', 650], ['川端', 530], ['大橋', 810], ['新田', 690], ['工業団地', 1270],
   ['東高校前', 1150], ['学園通', 1890, 'ext'], ['大学病院前', 4120, 'ext'], ['研究所前', 1360, 'ext'], ['ニュータウン中央', 2280, 'ext'], ['東ニュータウン', 1610, 'ext'],
 ].map(([name, boardings, ext]) => ({ name, boardings, ext: ext === 'ext' }));
+const extYear = 2024; // the year the eastern extension opened
 const total = stops.reduce((s, x) => s + x.boardings, 0);
 const ext = stops.filter(s => s.ext), extShare = Math.round((ext.reduce((s, x) => s + x.boardings, 0) / total) * 100);
 const ranked = [...stops].sort((a, b) => b.boardings - a.boardings);
 const busiestExt = ranked.find(s => s.ext), extRank = ranked.indexOf(busiestExt) + 1;
 const segments = [ // labelled stretches of the line, in stop indices; labels sit at each stretch's start
-  { from: 0, to: 9, label: '西部　住宅地と城下町' }, { from: 10, to: 22, label: '中心部から東の工業団地まで' }, { from: 23, to: 27, label: '2024年の延伸区間', ext: true },
+  { from: 0, to: 9, label: '西部　住宅地と城下町' }, { from: 10, to: 22, label: '中心部から東の工業団地まで' }, { from: 23, to: 27, label: `${extYear}年の延伸区間`, ext: true },
 ];
 // What each build frames: the west end, the centre (on 中央駅前), the east end.
 const focusStop = [0, stops.findIndex(s => s.name === '中央駅前'), stops.length - 1];
@@ -33,7 +34,7 @@ export function figure(theme = 'css') {
   const win = Object.fromEntries(offsets.map((o, k) => [k, { transform: `matrix(1,0,0,1,${n(mm(o) - mm(0))},0)` }]));
   return svgRoot({ id: 'motion-bounded-pan-fig', width: W, height: H, theme: t,
     title: '市電東西線の全停留場の乗車人員（概観）と、いま拡大している範囲',
-    desc: `全${stops.length}停留場、1日${fmt(total, { locale: 'ja' })}人。最多は${ranked[0].name}の${fmt(ranked[0].boardings, { locale: 'ja' })}人。2024年に延伸した${ext.length}停留場で全体の${extShare}%、${busiestExt.name}は全線で${extRank}番目。` },
+    desc: `全${stops.length}停留場、1日${fmt(total, { locale: 'ja' })}人。最多は${ranked[0].name}の${fmt(ranked[0].boardings, { locale: 'ja' })}人。${extYear}年に延伸した${ext.length}停留場で全体の${extShare}%、${busiestExt.name}は全線で${extRank}番目。` },
   el('line', { x1: mm(sx(0)), x2: mm(sx(stops.length - 1)), y1: base + 1, y2: base + 1, stroke: t.c('ink'), 'stroke-width': 2 }),
   stops.map((s, i) => el('rect', { x: mm(sx(i)) - 4, y: base - mmH(s.boardings), width: 8, height: mmH(s.boardings), fill: s.ext ? t.c('accent') : t.c('context') })),
   textLines([stops[0].name], { x: mm(sx(0)) - 4, y: base + 10, size: 16, valign: 'top', fill: t.c('muted') }),
@@ -71,7 +72,7 @@ export default {
   notes: `Purpose: Traverse a structure wider than the slide (a 28-stop line) without moving the slide frame: the canvas pans inside a clipped viewport, and an overview strip shows where the frame is.\nModify: Replace \`stops\` (name, boardings, extension flag) and \`focusStop\` (the stop each build centres on); canvas width, pan offsets and the overview window are computed and clamped to the canvas.\nInvariant: Only the canvas and the overview window move, by the same offset; bars share one scale; the overview always shows the whole line, so the final (east) frame still carries the whole picture.\nStatic: The final build frames the 2024 extension; the overview strip shows every stop.`,
   sources: [{ type: 'original-example', file: 'assets/motion/bounded-pan.mjs' }],
   exportPolicy: 'final',
-  content: `<h1 class="st-head" style="font-family:var(--ss-font-sans)">2024年の<em>延伸区間</em>の${ext.length}停留場で、全線の乗車の${extShare}%を占める</h1>
+  content: `<h1 class="st-head" style="font-family:var(--ss-font-sans)">${extYear}年の<em>延伸区間</em>の${ext.length}停留場で、全線の乗車の${extShare}%を占める</h1>
 <figure class="st-fig" data-region="primary"><div style="position:relative;width:${W}px;height:470px">${figure()}
 <div style="position:absolute;left:0;top:${viewY}px;width:${W}px;height:${viewH}px;overflow:hidden"><div style="width:${canvasW}px;height:${viewH}px" data-states="${statesAttr(pan)}" data-duration="1100" data-easing="smooth">${canvas()}</div></div></div></figure>
 <p class="st-source" data-region="source"><span>架空のデータ · 2025年度の平日平均、ICカードの乗車記録</span><span>モーション · 固定した枠の中でパンする（2ステップ）</span></p>`,

@@ -2,7 +2,7 @@
 // that no move redefines. Top: the payment state machine. Bottom: one payment's record, aligned
 // to the states it passed through; fields that never change run as unbroken bars. The history is
 // checked against the allowed moves and the invariants before anything is drawn.
-import { theme as makeTheme, svgRoot, el, g, textLines, measureText, measureNode, drawNode, arrowMarker, fmt } from '../runtime/figure.mjs';
+import { theme as makeTheme, svgRoot, el, textLines, measureNode, drawNode, arrowMarker, fmt } from '../runtime/figure.mjs';
 
 const states = [ // main path in row 0; side states below the state they leave from
   { id: 'created', label: 'Created', col: 0, row: 0 },

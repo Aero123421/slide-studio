@@ -43,6 +43,7 @@
 /* Big type */
 .st-num { font: 650 128px/.9 var(--ss-font-display, var(--ss-font-sans, Inter, sans-serif)); letter-spacing: -.035em; font-variant-numeric: tabular-nums lining-nums; }
 .st-num small { font-size: .38em; letter-spacing: 0; font-weight: 500; margin-left: .12em; color: var(--ss-muted, #5a6676); }
+.st-kpi .st-num, .st-kpi b.st-num { font: 650 128px/.9 var(--ss-font-display, var(--ss-font-sans, Inter, sans-serif)); letter-spacing: -.035em; } /* a hero number inside a KPI block keeps hero size */
 
 /* Source line: honest provenance, readable size. */
 .st-source { position: absolute; left: var(--st-x); right: var(--st-x); bottom: 22px; display: flex; justify-content: space-between; gap: 24px; font: 400 15px/1.3 var(--ss-font-sans, Inter, sans-serif); color: var(--ss-muted, #5a6676); }
@@ -57,3 +58,6 @@
 .st .st-origin-left { transform-origin: 0% 50%; }
 .st .st-origin-bottom { transform-origin: 50% 100%; }
 .st .st-origin-center { transform-origin: 50% 50%; }
+
+/* Japanese: break headlines and short text between phrases (Chromium; others fall back to normal breaking). */
+.st:lang(ja) .st-head, .st:lang(ja) .st-dek, .st:lang(ja) .st-text, .st:lang(ja) .st-kpi span { word-break: auto-phrase; line-break: strict; }

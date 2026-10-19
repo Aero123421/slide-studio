@@ -4,7 +4,7 @@
 import { svgRoot, el, g, textLines, theme as makeTheme, fmt, statesAttr } from '../runtime/figure.mjs';
 
 // Annual mean temperature, difference from the 1901–1960 average, °C (illustrative valley station).
-const start = 1901;
+const start = 1901, baseline = [1901, 1960]; // first year of the record; the reference period
 const anomaly = [-0.29, 0.06, 0.2, -0.13, -0.31, -0.03, 0.09, 0.22, -0.29, -0.3, 0.14, 0.08, 0.32, 0.2, -0.04, -0.08, 0.55, -0.08, -0.19, -0.27,
   0.0, 0.01, -0.1, -0.03, 0.04, 0.13, 0.22, 0.03, -0.41, 0.13, -0.33, -0.06, -0.34, -0.02, -0.19, 0.03, 0.71, -0.03, 0.17, -0.31,
   -0.08, 0.13, -0.03, 0.08, -0.04, -0.28, 0.07, -0.23, 0.37, -0.15, 0.11, -0.03, 0.18, -0.16, 0.2, -0.04, 0.27, 0.13, 0.03, -0.17,
@@ -28,8 +28,8 @@ export function figure(theme = 'css') {
   const x = year => (year - start) * sw;
   const cls = v => classes.find(c => v < c.below).k;
   return svgRoot({ id: 'motion-title-to-caption-fig', width: W, height: H, theme: t,
-    title: `Warming stripes: annual mean temperature against the 1901–1960 average, ${start}–${end}`,
-    desc: `One stripe per year, blue cooler and red warmer than the 1901–1960 average. Every year from ${runFrom} to ${end} was warmer; the warmest was ${start + anomaly.indexOf(Math.max(...anomaly))} at +${fmt(Math.max(...anomaly), { digits: 2 })} °C.` },
+    title: `Warming stripes: annual mean temperature against the ${baseline[0]}–${baseline[1]} average, ${start}–${end}`,
+    desc: `One stripe per year, blue cooler and red warmer than the ${baseline[0]}–${baseline[1]} average. Every year from ${runFrom} to ${end} was warmer; the warmest was ${start + anomaly.indexOf(Math.max(...anomaly))} at +${fmt(Math.max(...anomaly), { digits: 2 })} °C.` },
   anomaly.map((v, i) => el('rect', { x: i * sw, y: 0, width: sw + 0.6, height: stripeH, fill: t.div(cls(v)) })),
   [start, end].map((yr, j) => textLines([String(yr)], { x: j ? W : 0, y: stripeH + 12, size: 17, anchor: j ? 'end' : 'start', valign: 'top', fill: t.c('muted') })),
   // Build 1: the unbroken run of warm years is outlined and counted.
@@ -45,8 +45,11 @@ export function figure(theme = 'css') {
 // The headline block sits above the figure (z-index) so it stays visible while it moves.
 const capScale = 0.75, capTop = poster.y + H * k + 20;
 const grow = { 0: { translate: '0px 0px', scale: '1' }, 2: { translate: `${poster.x - at0.x}px ${poster.y - at0.y}px`, scale: k.toFixed(5) } };
-const toCaption = { 0: { translate: '0px 0px', scale: '1' }, 2: { translate: `0px ${capTop - 48}px`, scale: String(capScale) } };
-const swatch = c => `<span style="display:inline-block;width:.8em;height:.8em;vertical-align:-.05em;background:var(--ss-div-${c})"></span>`;
+const headTop = 48; // the headline's top on the page grammar (--st-top)
+const toCaption = { 0: { translate: '0px 0px', scale: '1' }, 2: { translate: `0px ${capTop - headTop}px`, scale: String(capScale) } };
+// Colour key for the dek, built from the same classes as the stripes (--ss-div-1 is the warmest).
+const swatch = c => `<span style="display:inline-block;width:.8em;height:.8em;vertical-align:-.05em;background:var(--ss-div-${c.k + 1})"></span>`;
+const cool = classes.filter(c => c.below <= 0).map(swatch).join(''), warm = classes.filter(c => c.below > 0).map(swatch).join('');
 
 export default {
   study: true,
@@ -57,8 +60,8 @@ export default {
   sources: [{ type: 'original-example', file: 'assets/motion/title-to-caption.mjs' }],
   exportPolicy: 'final',
   content: `<div style="position:absolute;left:0;top:0;width:1280px;height:200px;z-index:2;transform-origin:64px 48px" data-states="${statesAttr(toCaption)}" data-duration="1000" data-easing="smooth">
-<h1 class="st-head">Every year since ${runFrom} has been warmer than the 1901–1960 average in the valley</h1>
-<p class="st-dek" style="max-width:1040px">One stripe per year, ${start}–${end}: ${swatch(6)}${swatch(5)} cooler, ${swatch(3)}${swatch(2)}${swatch(1)} warmer than that average; darker is further from it.</p>
+<h1 class="st-head">Every year since ${runFrom} has been warmer than the ${baseline[0]}–${baseline[1]} average in the valley</h1>
+<p class="st-dek" style="max-width:1040px">One stripe per year, ${start}–${end}: ${cool} cooler, ${warm} warmer than that average; darker is further from it.</p>
 </div>
 <figure class="st-fig" style="left:${at0.x}px;top:${at0.y}px;width:${W}px;height:${H}px;right:auto;bottom:auto;transform-origin:0 0" data-region="primary" data-states="${statesAttr(grow)}" data-duration="1000" data-easing="smooth">${figure()}</figure>
 <p class="st-source" data-region="source"><span>Illustrative data · valley weather station, annual means</span><span>Motion · title becomes caption (2 builds)</span></p>`,

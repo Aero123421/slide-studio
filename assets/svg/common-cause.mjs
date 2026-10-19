@@ -59,7 +59,7 @@ export function figure(theme = 'css') {
     return g({},
       textLines([r.label], { x: px, y: r.sub ? y - 9 : y, size: 17, valign: 'middle', weight: strong ? 700 : 400, fill: t.c('ink') }),
       r.sub ? textLines([r.sub], { x: px, y: y + 13, size: 15, valign: 'middle', fill: t.c('muted') }) : '',
-      el('line', { x1: x(lo), x2: x(hi), y1: y, y2: y, stroke: color, 'stroke-width': strong ? 2.5 : 1.8, 'stroke-linecap': 'round' }),
+      el('line', { fill: 'none', x1: x(lo), x2: x(hi), y1: y, y2: y, stroke: color, 'stroke-width': strong ? 2.5 : 1.8, 'stroke-linecap': 'round' }),
       r.kind === 'adjusted' ? el('path', { d: `M${x(r.est)} ${y - 9}l9 9l-9 9l-9 -9z`, fill: color }) : el('circle', { cx: x(r.est), cy: y, r: strong ? 6.5 : 5, fill: r.kind === 'crude' ? t.c('paper') : color, stroke: color, 'stroke-width': 2 }),
       textLines([f1(r.est)], { x: x(hi) + 10, y, size: 16, valign: 'middle', weight: strong ? 700 : 400, fill: color, attrs: { 'font-variant-numeric': 'tabular-nums' } }));
   });
@@ -72,10 +72,10 @@ export function figure(theme = 'css') {
   textLines(['App users − non-users, points'], { x: px, y: 16, size: 16, valign: 'top', weight: 700, fill: t.c('ink') }),
   textLines(['dot = estimate, line = 95% CI'], { x: px, y: 40, size: 15, valign: 'top', fill: t.c('muted') }),
   [-4, 0, 4, 8, 12].map(v => g({},
-    el('line', { x1: x(v), x2: x(v), y1: yTop, y2: yBot, stroke: v === 0 ? t.c('ink') : t.c('grid'), 'stroke-width': v === 0 ? 1.4 : 1 }),
+    el('line', { fill: 'none', x1: x(v), x2: x(v), y1: yTop, y2: yBot, stroke: v === 0 ? t.c('ink') : t.c('grid'), 'stroke-width': v === 0 ? 1.4 : 1 }),
     textLines([v === 0 ? '0' : fmt(v, { sign: true })], { x: x(v), y: yBot + 8, size: 15, anchor: 'middle', valign: 'top', fill: t.c('muted') }))),
-  el('line', { x1: px, x2: Wd, y1: (rowY(0) + rowY(1)) / 2, y2: (rowY(0) + rowY(1)) / 2, stroke: t.c('rule') }),
-  el('line', { x1: px, x2: Wd, y1: (rowY(list.length - 2) + rowY(list.length - 1)) / 2, y2: (rowY(list.length - 2) + rowY(list.length - 1)) / 2, stroke: t.c('rule') }),
+  el('line', { fill: 'none', x1: px, x2: Wd, y1: (rowY(0) + rowY(1)) / 2, y2: (rowY(0) + rowY(1)) / 2, stroke: t.c('rule') }),
+  el('line', { fill: 'none', x1: px, x2: Wd, y1: (rowY(list.length - 2) + rowY(list.length - 1)) / 2, y2: (rowY(list.length - 2) + rowY(list.length - 1)) / 2, stroke: t.c('rule') }),
   est,
   textLines(['Arrows are assumed causes, not findings. Dashed: not measured, so not adjusted for.'], { x: 0, y: H - 2, size: 15, valign: 'bottom', fill: t.c('muted') }));
 }
@@ -88,7 +88,7 @@ export default {
   notes: 'Purpose: Show how a third variable that causes both exposure and outcome can produce an association, and what the association looks like once that variable is held fixed.\nModify: Replace `strata` (group sizes and means) and `withinSD`; the crude, per-stratum and weighted estimates and their normal-approximation intervals recompute. Edit `nodes`/`edges` to state your own hypothesis.\nInvariant: Arrows are hypothesized direct causes, said in words on the page; the confounder points into both exposure and outcome; an unmeasured confounder stays in the graph (dashed) instead of being dropped for symmetry.\nStatic: Already static. For a talk, show the crude estimate first, then the confounder, then the within-group estimates.',
   sources: [{ type: 'original-example', file: 'assets/svg/common-cause.mjs' }],
   exportPolicy: 'final',
-  content: `<h1 class="st-head"><em>Prior attainment</em> explains most of the app’s ${fmt(crude.est, { digits: 0 })}-point lead: within attainment groups it is ${fmt(adjusted.est, { digits: 0 })} point${Math.round(adjusted.est) === 1 ? '' : 's'}</h1>
+  content: `<h1 class="st-head"><em>Prior&nbsp;attainment</em> explains most of the app’s lead: ${fmt(crude.est, { digits: 0 })} points overall, ${fmt(adjusted.est, { digits: 0 })} point${Math.round(adjusted.est) === 1 ? '' : 's'} within attainment groups</h1>
 <figure class="st-fig" data-region="primary">${figure()}</figure>
 <p class="st-source" data-region="source"><span>Illustrative data · ${U.n + O.n} pupils in one district, scores out of 100</span><span>Causal graph with stratified estimates</span></p>`,
 };

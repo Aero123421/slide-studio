@@ -18,6 +18,8 @@ const week = { from: 64, days: 7 }; // index of 8月4日 and the length of the c
 const date = i => new Date(start + i * 864e5);
 const md = i => `${date(i).getUTCMonth() + 1}/${date(i).getUTCDate()}`;
 const dow = i => '日月火水木金土'[date(i).getUTCDay()];
+const mdj = i => `${date(i).getUTCMonth() + 1}月${date(i).getUTCDate()}日`;
+const monthStarts = maxTemp.map((_, i) => i).filter(i => date(i).getUTCDate() === 1);
 const hot = maxTemp.map((v, i) => i).filter(i => maxTemp[i] >= hotAt);
 const total = transports.reduce((s, v) => s + v, 0), onHot = hot.reduce((s, i) => s + transports[i], 0);
 const share = Math.round((onHot / total) * 100);
@@ -30,8 +32,8 @@ export function figure(theme = 'css') {
   const fade = (on, off) => ({ 'data-states': { 0: { opacity: on }, 1: { opacity: off } }, 'data-duration': 450 });
   const isHot = i => maxTemp[i] >= hotAt;
   return svgRoot({ id: 'motion-detail-to-context-fig', width: W, height: H, theme: t,
-    title: '熱中症による救急搬送人員（日別、2025年6〜9月）、8月4日〜10日の週から夏全体へ',
-    desc: `8月7日（最高気温${maxTemp[peak]}℃）の搬送は${transports[peak]}人。夏全体では最高気温${hotAt}℃以上の${hot.length}日間に、${total}人中${onHot}人（${share}%）が集中した。` },
+    title: `熱中症による救急搬送人員（日別、${date(0).getUTCFullYear()}年${date(0).getUTCMonth() + 1}〜${date(maxTemp.length - 1).getUTCMonth() + 1}月）、${mdj(week.from)}〜${mdj(week.from + week.days - 1)}の週から夏全体へ`,
+    desc: `${mdj(peak)}（最高気温${maxTemp[peak]}℃）の搬送は${transports[peak]}人。夏全体では最高気温${hotAt}℃以上の${hot.length}日間に、${total}人中${onHot}人（${share}%）が集中した。` },
   [0, 10, 20, 30].map(v => g({}, el('line', { x1: px, x2: W, y1: y(v), y2: y(v), stroke: v ? t.c('grid') : t.c('ink'), 'stroke-width': v ? 1 : 1.4 }),
     textLines([String(v)], { x: px - 12, y: y(v), size: 16, anchor: 'end', valign: 'middle', fill: t.c('muted') }))),
   textLines(['熱中症の救急搬送（人/日）'], { x: 0, y: 4, size: 16, valign: 'top', fill: t.c('muted') }),
@@ -55,7 +57,7 @@ export function figure(theme = 'css') {
   })),
   textLines([`${md(week.from)}〜${md(week.from + week.days - 1)}　最高気温と搬送人員`], { x: W, y: 4, size: 16, anchor: 'end', valign: 'top', fill: t.c('muted'), attrs: fade(1, 0) }),
   // Context labels (from build 1): months, and the outline of the week we started from.
-  g(fade(0, 1), [0, 30, 61, 92].map((i, m) => textLines([`${6 + m}月`], { x: px + i * step, y: base + 12, size: 17, valign: 'top', fill: t.c('ink') })),
+  g(fade(0, 1), monthStarts.map(i => textLines([`${date(i).getUTCMonth() + 1}月`], { x: px + i * step, y: base + 12, size: 17, valign: 'top', fill: t.c('ink') })),
     el('rect', { x: px + week.from * step - 2, y: top - 6, width: week.days * step + 4, height: base - top + 6, fill: 'none', stroke: t.c('ink'), 'stroke-width': 1.6, 'stroke-dasharray': '5 4' }),
     textLines([`${md(week.from)}〜${md(week.from + week.days - 1)}`], { x: px + (week.from + week.days / 2) * step, y: top - 14, size: 16, anchor: 'middle', fill: t.c('ink'), weight: 600 })),
   // Build 2 — the explanation: every hot day, not just the one we read closely.

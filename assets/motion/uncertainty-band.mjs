@@ -62,7 +62,7 @@ export function figure(theme = 'css') {
   const mid = forecast[low];
   return svgRoot({ id: 'motion-uncertainty-band-fig', width: W, height: H, theme: t,
     title: 'Reservoir storage: observed October to April, and the forecast to October with 50% and 80% bands',
-    desc: `Storage reached ${observed[now]}% at the end of April. The median forecast bottoms out at ${mid.p50}% in ${lowMonth}; half of the runs end between ${mid.p25}% and ${mid.p75}%, and the lowest tenth fall below the ${trigger}% trigger from ${riskMonth}.` },
+    desc: `Storage reached ${observed[now]}% at the end of ${monthName[months[now]]}. The median forecast bottoms out at ${mid.p50}% in ${lowMonth}; half of the runs end between ${mid.p25}% and ${mid.p75}%, and the lowest tenth fall below the ${trigger}% trigger from ${riskMonth}.` },
   axis(y, { orient: 'left', at: m.l, grid: [m.l, W - m.r], theme: t, size: 16, tickValues: [0, 25, 50, 75, 100], format: v => `${v}%` }),
   months.map((mo, i) => textLines([mo], { x: x(i), y: H - m.b + 12, size: 16, anchor: 'middle', valign: 'top', fill: t.c('muted') })),
   [[0, '2025'], [3, '2026']].map(([i, yr]) => textLines([yr], { x: x(i), y: H - m.b + 34, size: 15, anchor: 'middle', valign: 'top', fill: t.c('muted'), weight: 650 })),
@@ -95,7 +95,7 @@ export default {
   content: `<h1 class="st-head">Ashby Water should stay above its ${trigger}% restriction trigger this summer — with a <em>${chance} chance</em> it won’t</h1>
 <figure class="st-fig" data-region="primary">${figure()}</figure>
 <div class="st-rail" data-region="support">
-  <div class="st-kpi"><b>${observed[now]}%</b><span>Storage at the end of April, after a wet winter.</span></div>
+  <div class="st-kpi"><b>${observed[now]}%</b><span>Storage at the end of ${monthName[months[now]]}, after a wet winter.</span></div>
   <hr class="st-rule">
   <div class="st-kpi" data-step="1" data-motion="reveal" data-delay="500"><b>${forecast[low].p50}%</b><span>Median for ${lowMonth}, the low point. Half of runs: ${forecast[low].p25}–${forecast[low].p75}%.</span></div>
   <hr class="st-rule" data-step="1" data-motion="reveal">

@@ -17,10 +17,11 @@ const areas = [
 // Schedule facts (pages 2 and 3)
 const dev = { planEnd: '2026-11-27', remaining: 280, velocity: 70, planVelocity: 75, added: 20, sprintDays: 14 }; // pt, pt/sprint
 const bufferWeeks = 3;                                       // 予備期間（基準計画）
+const goLive = '2027-05-06';                                 // 本番稼働日（変更しない）
 const uat = { testers: 8, start: '2027-02-08' };             // 受入テストの担当者数と開始日（見込み）
 const asks = [                                               // 本日ご判断いただきたいこと（6ページ）
   { what: '帳票アドオン10本（70ポイント）を本番稼働後の第2期に回す', due: '2026-10-21' },
-  { what: `受入テストの担当者${uat.testers}名を業務部門から指名する`, due: '2026-11-06' },
+  { what: `受入テストの担当者${uat.testers}名を各部門から指名する`, due: '2026-11-06' },
 ];
 const page = 1;
 
@@ -40,7 +41,7 @@ const messages = [
   [`開発の完了見込みは<span class="nw">${md(forecastEnd)}</span>。計画より<span class="nw">${slipWeeks}週間</span>遅い`,
     `直近3スプリントの平均は${dev.velocity}ポイント（計画${dev.planVelocity}）。変更要求で${dev.added}ポイント増えた`],
   [`後続の工程も${slipWeeks}週間ずれるが、予備期間の中に収まる`,
-    `予備期間${bufferWeeks}週間のうち${slipWeeks}週間を使い、残りは${bufferLeft}週間。これ以上の遅れは吸収できない`],
+    `予備期間${bufferWeeks}週間のうち${slipWeeks}週間を使い、残りは${bufferLeft}週間。これ以上遅れると${md(t(goLive))}の本番稼働に響く`],
   [`受入テストの担当者${uat.testers}名が、まだ決まっていない`,
     `受入テストは${ymd(t(uat.start))}から。各部門の指名を${md(t(asks[1].due))}までにいただきたい`],
 ];
@@ -55,7 +56,7 @@ export default {
   exportPolicy: 'final',
   className: 'tpl-project-status p-summary',
   content: `<p class="p-run" data-region="support"><span>${project.name}　${project.meeting}</span><span class="num">${ymd(t(project.date))}　${page}</span></p>
-<h1 class="p-head" data-region="title">開発は${slipWeeks}週間遅れているが、本番稼働日は守れる見通し。本日は<span class="nw">${asks.length}件の判断</span>をお願いしたい</h1>
+<h1 class="p-head" data-region="title"><span class="nw">開発は${slipWeeks}週間遅れているが、本番稼働日は守れる見通し。</span><span class="nw">本日は${asks.length}件の判断をお願いしたい</span></h1>
 <section class="p-rail g" style="--c:1;--s:4;top:214px" data-region="primary">
   <div>
     <p class="p-label">全体状況</p>

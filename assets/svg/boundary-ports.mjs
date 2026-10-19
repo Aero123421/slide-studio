@@ -2,7 +2,7 @@
 // Components declare their domain and grid cell; crossings declare the port they use. Every
 // crossing is routed component → out-port → in-port → component and checked; the retired direct
 // read is drawn as what it was: a path that bypasses the ports.
-import { theme as makeTheme, svgRoot, el, g, textLines, measureNode, drawNode, arrowMarker, roundRectPath, fmt } from '../runtime/figure.mjs';
+import { theme as makeTheme, svgRoot, el, textLines, measureNode, drawNode, arrowMarker, roundRectPath, fmt } from '../runtime/figure.mjs';
 
 const domains = [{ id: 'orders', label: 'Orders domain' }, { id: 'billing', label: 'Billing domain' }]; // left, right
 const components = [ // col counts away from the shared boundary's far side: orders col 1 and billing col 0 face each other

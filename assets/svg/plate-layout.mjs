@@ -73,7 +73,7 @@ export function figure(theme = 'css') {
   legendRow(168, el('circle', { cx: lx + 12, cy: 168, r: 12, fill: t.c('paper'), stroke: t.c('muted'), 'stroke-width': 1.2, 'stroke-dasharray': '3 3' }), controls.blank.label, `column ${controls.blank.col}`),
   legendRow(222, el('circle', { cx: lx + 12, cy: 222, r: 10.5, fill: t.c('paper'), stroke: t.c('ink'), 'stroke-width': 3 }), controls.vehicle.label, `${controls.vehicle.rows[0]}${controls.vehicle.col}–${controls.vehicle.rows.at(-1)}${controls.vehicle.col}`),
   legendRow(276, el('circle', { cx: lx + 12, cy: 276, r: 12, fill: t.c('ink') }), controls.positive.label.split(', ')[0], `${controls.positive.label.split(', ')[1]}, ${controls.positive.rows[0]}${controls.positive.col}–${controls.positive.rows.at(-1)}${controls.positive.col}`),
-  el('line', { x1: lx, x2: W, y1: 322, y2: 322, stroke: t.c('rule') }),
+  el('line', { fill: 'none', x1: lx, x2: W, y1: 322, y2: 322, stroke: t.c('rule') }),
   textLines([`${out.id} excluded`], { x: lx, y: 344, size: 18, valign: 'top', weight: 700, fill: t.c('accent') }),
   textLines([`${out.out.reason}; kept on the map`, `and in the run log, not refilled`], { x: lx, y: 372, size: 15, valign: 'top', fill: t.c('muted'), lineHeight: 1.35 }),
   // leader leaves the flagged well upward and runs in the gap between rows, never across other wells
@@ -88,7 +88,7 @@ export default {
   notes: 'Purpose: Map what is in every well of a plate, so results can be traced to the right compound, dose and control.\nModify: Edit `series`, `compounds`, `controls` and `excluded`; each well’s role, shade, the counts and the headline recompute from the design. Change `plate` for 384-well or other footprints.\nInvariant: Well IDs follow the plate’s row letters and column numbers; the map is the run record, so never permute wells for visual balance; excluded wells stay on the map with their reason; the plate is drawn to its real footprint with a scale bar.\nStatic: Already static. For a talk, reveal controls first, then the dilution series.',
   sources: [{ type: 'original-example', file: 'assets/svg/plate-layout.mjs' }],
   exportPolicy: 'final',
-  content: `<h1 class="st-head">Plate ${plate.id}: ${doseWells} dose wells and ${controlWells} controls, with <em>${out.id} excluded</em> and logged</h1>
+  content: `<h1 class="st-head">Plate ${plate.id}: ${doseWells} dose wells and ${controlWells} controls, with <em>${out.id}&nbsp;excluded</em> and logged</h1>
 <figure class="st-fig" data-region="primary">${figure()}</figure>
 <p class="st-source" data-region="source"><span>Illustrative design · cell-viability assay, compounds K-17 and K-22 against reference Ref-3</span><span>96-well plate map</span></p>`,
 };

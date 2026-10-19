@@ -4,7 +4,6 @@
 const ID = 'tpl-editorial-quote';
 const quote = {
   text: 'By the time the water reaches the coffee, almost everything that will be in the cup has already been decided.',
-  from: 'Twenty-eight seconds',                 // the essay the sentence comes from
 };
 
 export default {
@@ -16,6 +15,5 @@ export default {
   exportPolicy: 'final',
   className: 'tpl-editorial ed-dark ed-quote-page',
   content: `<blockquote class="ed-quote" style="margin:0" data-region="title"><p><span class="q">“</span>${quote.text}<span class="q">”</span></p></blockquote>
-<p class="ed-quote-src" data-region="support">From “${quote.from}”</p>
 <p class="ed-folio" data-region="source"><span>Quire, Winter 2026</span><span>40</span></p>`,
 };

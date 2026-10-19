@@ -1,101 +1,101 @@
-// Template: プロジェクト定例・進捗報告 · バーンダウン（計画線と実績線を計算で描画）. Synthetic example content; replace data and copy.
-// 計画線・実績線・見込み線・見出しの数値は、すべて下の remaining 配列と計画値から計算します。
-const P = 'tpl-project-status-burndown';
-const meta = { project: 'MINATO', name: '受発注システム刷新', meeting: '第14回 定例', date: '2026年9月23日（水）' };
-const DAY = 86400000;
-const D = s => Date.UTC(+s.slice(0, 4), +s.slice(5, 7) - 1, +s.slice(8, 10));
-const md = t => { const d = new Date(t); return `${d.getUTCMonth() + 1}/${d.getUTCDate()}`; };
-const WD = ['日', '月', '火', '水', '木', '金', '土'];
-const mdj = t => { const d = new Date(t); return `${d.getUTCMonth() + 1}月${d.getUTCDate()}日（${WD[d.getUTCDay()]}）`; };
+// Template: プロジェクト月次状況報告 · 開発のバーンダウン. Synthetic example content; replace data and copy.
+// Remaining story points per sprint against the plan line. The forecast date is computed from the average
+// velocity of the last `lookback` sprints; the headline and rail repeat those computed numbers.
+import { svgRoot, el, g, textLines, linear, pathFromPoints, fmt } from '../../runtime/figure.mjs';
 
-const start = D('2026-07-31');          // 週次スナップショットの起点（金曜）
-const planWeeks = 9;                    // 計画完了 = 起点から9週後
-const initialScope = 420;               // 起点時点の総ストーリーポイント
-const remaining = [420, 378, 338, 309, 290, 238, 188, 146]; // 各週金曜の残ポイント（追加分を含む）
-const scopeChanges = [{ week: 4, pts: 24, label: '変更要求 CR-07・08' }];
-const today = D('2026-09-23');
-const lookback = 3;                       // 見込みに使う直近の週数
+const ID = 'tpl-project-status-burndown';
+const project = { name: '基幹システム移行プロジェクト', meeting: '第7回ステアリングコミッティ', date: '2026-10-21' };
+const sprint = { first: '2026-08-10', days: 14, planned: 8 };   // 2-week sprints from Monday; 8 planned → ends 2026-11-27
+const scope = 600;                                             // 当初の総ポイント
+const done = [64, 66, 68, 71, 71];                             // completed points per sprint (1–5)
+const added = [0, 0, 20, 0, 0];                                // points added by change requests per sprint
+const change = { sprint: 3, label: '変更要求 +20' };            // annotation on the actual line
+const lookback = 3;                                            // sprints averaged for the forecast
+const page = 3;
 
-const last = remaining.length - 1;
-const burned = remaining.slice(-lookback - 1).reduce((a, v, i, arr) => i ? a + (arr[i - 1] - v) : a, 0);
-const velocity = burned / lookback;
-const finishWeek = last + remaining[last] / velocity;
-const weekDate = w => start + Math.round(w * 7) * DAY;
-const finishDate = weekDate(finishWeek), planDate = weekDate(planWeeks);
-const ideal = w => Math.max(0, initialScope * (1 - w / planWeeks));
-const gap = Math.round(remaining[last] - ideal(last));
-const need = Math.round(remaining[last] / (planWeeks - last));
-const lateDays = Math.round((finishDate - planDate) / DAY);
-const lateText = lateDays % 7 === 0 ? `${lateDays / 7}週間` : `${lateDays}日`;
-const mdk = t => { const d = new Date(t); return `${d.getUTCMonth() + 1}月${d.getUTCDate()}日`; };
+// ---- derived
+const DAY = 86400000, WD = '日月火水木金土';
+const t = iso => Date.parse(`${iso}T00:00:00Z`);
+const start = t(sprint.first);
+const endOf = k => start + (k * sprint.days - 3) * DAY;         // sprint k ends on Friday
+const md = ms => { const d = new Date(ms); return `${d.getUTCMonth() + 1}月${d.getUTCDate()}日`; };
+const slash = ms => { const d = new Date(ms); return `${d.getUTCMonth() + 1}/${d.getUTCDate()}`; };
+const ymd = ms => `${new Date(ms).getUTCFullYear()}年${md(ms)}`;
+const remaining = [scope];
+done.forEach((d, i) => remaining.push(remaining[i] + added[i] - d));
+const last = done.length, left = remaining[last], asOf = endOf(last);
+const velocity = done.slice(-lookback).reduce((s, v) => s + v, 0) / lookback;
+const planVelocity = scope / sprint.planned;
+const forecast = asOf + Math.round(left / velocity * sprint.days) * DAY;
+const planEnd = endOf(sprint.planned);
+const slipWeeks = Math.round((forecast - planEnd) / (7 * DAY));
+const needed = left / (sprint.planned - last);
 
-// geometry
-const W = 820, H = 468, x0 = 64, x1 = 800, y0 = 408, y1 = 28, maxW = 11, maxPt = 450;
-const sx = w => x0 + (w / maxW) * (x1 - x0), sy = v => y0 - (v / maxPt) * (y0 - y1);
-const todayW = (today - start) / (7 * DAY);
-
-const yTicks = [0, 100, 200, 300, 400].map(v => `<line x1="${x0}" x2="${x1}" y1="${sy(v)}" y2="${sy(v)}" stroke="${v ? '#e8ecf1' : '#1b2433'}" stroke-width="${v ? 1 : 1.5}"/>
-  <text x="${x0 - 10}" y="${sy(v) + 5}" font-size="15" fill="#5f6b7c" text-anchor="end">${v}</text>`).join('');
-const xTicks = Array.from({ length: maxW + 1 }, (_, w) => `<line x1="${sx(w)}" x2="${sx(w)}" y1="${y0}" y2="${y0 + 6}" stroke="#1b2433"/>
-  <text x="${sx(w)}" y="${y0 + 26}" font-size="15" fill="#5f6b7c" text-anchor="middle">${md(weekDate(w))}</text>`).join('')
-  + `<text x="${sx(planWeeks)}" y="${y0 + 46}" font-size="15" font-weight="700" fill="#465264" text-anchor="middle">計画</text>`
-  + (Math.abs(finishWeek - Math.round(finishWeek)) < 0.15 ? `<text x="${sx(Math.round(finishWeek))}" y="${y0 + 46}" font-size="15" font-weight="700" fill="#0c7478" text-anchor="middle">見込み</text>` : '');
-const planLine = `<path d="M${sx(0)} ${sy(initialScope)} L${sx(planWeeks)} ${sy(0)}" fill="none" stroke="#8a96a8" stroke-width="2.2" stroke-dasharray="7 6"/>
-  <path d="M${sx(planWeeks)} ${sy(0) - 9}l9 9-9 9-9-9z" fill="#fff" stroke="#6b778a" stroke-width="1.6"/>
-  <text x="${sx(3.2)}" y="${sy(ideal(3.2)) + 22}" font-size="15" fill="#5f6b7c" transform="rotate(${(Math.atan2(sy(0) - sy(initialScope), sx(planWeeks) - sx(0)) * 180 / Math.PI).toFixed(1)} ${sx(3.2)} ${sy(ideal(3.2)) + 22})">計画線（当初スコープ${initialScope}pt）</text>`;
-const pts = remaining.map((v, w) => [sx(w), sy(v)]);
-const actual = `<path d="M${pts.map(p => p.join(' ')).join(' L')}" fill="none" stroke="#0c7478" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
-  ${pts.map(([x, y], w) => `<circle cx="${x}" cy="${y}" r="${w === last ? 6 : 4}" fill="${w === last ? '#0c7478' : '#fff'}" stroke="#0c7478" stroke-width="2.2"/>`).join('')}
-  <text x="${pts[0][0] + 12}" y="${pts[0][1] - 10}" font-size="15" font-weight="700" fill="#0c7478">実績 ${remaining[0]}pt</text>
-  <text x="${pts[last][0] + 12}" y="${pts[last][1] - 12}" font-size="17" font-weight="700" fill="#0c7478">${remaining[last]}pt</text>`;
-const gapMark = `<line x1="${sx(last)}" x2="${sx(last)}" y1="${sy(remaining[last]) + 8}" y2="${sy(ideal(last))}" stroke="#b8372a" stroke-width="2.4"/>
-  <circle cx="${sx(last)}" cy="${sy(ideal(last))}" r="3.5" fill="#b8372a"/>
-  <text x="${sx(last) + 4}" y="${sy(ideal(last)) + 26}" font-size="15" font-weight="700" fill="#b8372a" text-anchor="end">計画より +${gap}pt</text>`;
-const scope = scopeChanges.map(c => `<path d="M${sx(c.week)} ${sy(remaining[c.week]) - 12} v-44" stroke="#946000" stroke-width="1.6" marker-end="url(#${P}-up)"/>
-  <text x="${sx(c.week) + 8}" y="${sy(remaining[c.week]) - 66}" font-size="15" fill="#946000">+${c.pts}pt ${c.label}</text>`).join('');
-const forecast = `<g data-step="1" data-motion="wipe">
-  <path d="M${sx(last)} ${sy(remaining[last])} L${sx(finishWeek)} ${sy(0)}" fill="none" stroke="#0c7478" stroke-width="2.6" stroke-dasharray="2 6" stroke-linecap="round"/>
-  <circle cx="${sx(finishWeek)}" cy="${sy(0)}" r="7" fill="#0c7478" stroke="#fff" stroke-width="2"/>
-  <path d="M${sx(finishWeek)} ${sy(0) - 9} V ${sy(260) + 54}" stroke="#0c7478" stroke-width="1.2"/>
-  <rect x="${sx(finishWeek) - 150}" y="${sy(260)}" width="186" height="54" rx="8" fill="#e0f1f1"/>
-  <text x="${sx(finishWeek) - 138}" y="${sy(260) + 22}" font-size="15" fill="#0c5558">現ペースの完了見込み</text>
-  <text x="${sx(finishWeek) - 138}" y="${sy(260) + 43}" font-size="17" font-weight="700" fill="#0c5558">${md(finishDate)}（計画+${lateDays}日）</text>
-  </g>`;
-const todayLine = `<line x1="${sx(todayW)}" x2="${sx(todayW)}" y1="${y1 - 8}" y2="${y0}" stroke="#b8372a" stroke-width="1.5" stroke-dasharray="4 3"/>
-  <text x="${sx(todayW)}" y="${y1 - 14}" font-size="15" font-weight="700" fill="#b8372a" text-anchor="middle">今日 ${md(today)}</text>`;
-
-const svg = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-labelledby="${P}-t ${P}-d" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic','Meiryo','IPAGothic',sans-serif">
-<title id="${P}-t">開発フェーズのバーンダウン：計画線、実績、現ペースでの見込み</title>
-<desc id="${P}-d">残作業は${md(weekDate(last))}時点で${remaining[last]}ポイント、計画線より${gap}ポイント多い。直近${lookback}週の平均消化は週${velocity.toFixed(0)}ポイントで、完了見込みは${md(finishDate)}、計画は${md(planDate)}。例示データ。</desc>
-<defs><marker id="${P}-up" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#946000"/></marker></defs>
-<text x="${x0 - 10}" y="${y1 - 14}" font-size="15" fill="#5f6b7c" text-anchor="end">残pt</text>
-${yTicks}${xTicks}${todayLine}${planLine}${scope}${actual}${gapMark}${forecast}
-</svg>`;
-
-const logo = `<svg viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="6" fill="#1d3a5f"/><path d="M4 14c2.7-2.6 5.3-2.6 8 0s5.3 2.6 8 0" fill="none" stroke="#5ec4c4" stroke-width="2" stroke-linecap="round"/><path d="M4 9c2.7-2.6 5.3-2.6 8 0s5.3 2.6 8 0" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>`;
-const bar = () => `<header class="ps-bar">${logo}<p>${meta.project}<span>${meta.name}プロジェクト</span></p><p class="ps-meta"><b>${meta.meeting}</b>${meta.date}</p></header>`;
+// ---- figure: 8 columns × 404 px
+const W = 760, H = 404, left0 = 52, top = 34, bottom = 62;
+const xEnd = forecast + 10 * DAY;
+const x = linear([start, xEnd], [left0, W - 8]);
+const y = linear([0, Math.ceil(scope / 200) * 200], [H - bottom, top]);
+const pts = remaining.map((v, k) => [x(k ? endOf(k) : start), y(v)]);
+const grid = y.ticks(3).map(v => g({},
+  el('line', { x1: left0, x2: W, y1: y(v), y2: y(v), stroke: v ? 'var(--grid)' : 'var(--ink)', 'stroke-width': v ? 1 : 1.5 }),
+  textLines([fmt(v, { locale: 'ja' })], { x: left0 - 10, y: y(v), size: 16, anchor: 'end', valign: 'middle', fill: 'var(--muted)' })));
+const keyDate = ms => (ms === asOf ? ['基準日', 'var(--ink)'] : ms === planEnd ? ['計画', 'var(--muted)'] : ms === forecast ? ['見込み', 'var(--teal)'] : null);
+const ticks = Array.from({ length: Math.floor((xEnd - start) / (sprint.days * DAY)) }, (_, i) => endOf(i + 1)).map(ms => {
+  const k = keyDate(ms);
+  return g({},
+    el('line', { x1: x(ms), x2: x(ms), y1: y(0), y2: y(0) + 6, stroke: 'var(--ink)' }),
+    textLines(k ? [slash(ms), k[0]] : [slash(ms)], { x: x(ms), y: y(0) + 12, size: 16, anchor: 'middle', valign: 'top', lineHeight: 1.3, fill: k ? k[1] : 'var(--muted)', weight: k ? 700 : null }));
+});
+const planLine = g({},
+  el('line', { x1: x(start), y1: y(scope), x2: x(planEnd), y2: y(0), stroke: 'var(--context)', 'stroke-width': 2 }),
+  textLines(['計画'], { x: x(start + (planEnd - start) * 0.62) - 12, y: y(scope * 0.38) + 12, size: 16, anchor: 'end', valign: 'top', fill: 'var(--muted)' }));
+const actual = g({},
+  el('path', { d: pathFromPoints(pts), fill: 'none', stroke: 'var(--ink)', 'stroke-width': 2.5, 'stroke-linejoin': 'round' }),
+  ...pts.map(([px, py], k) => el('circle', { cx: px, cy: py, r: k === last ? 5 : 3.5, fill: 'var(--ink)' })),
+  textLines([`残り${left}`], { x: pts[last][0] + 12, y: pts[last][1] - 14, size: 18, weight: 700, fill: 'var(--ink)' }));
+const cp = pts[change.sprint];
+const changeNote = g({},
+  el('line', { x1: cp[0], y1: cp[1] - 8, x2: cp[0], y2: cp[1] - 40, stroke: 'var(--muted)', 'stroke-width': 1 }),
+  textLines([change.label], { x: cp[0] + 6, y: cp[1] - 40, size: 16, valign: 'middle', fill: 'var(--muted)' }));
+const fx = x(forecast);
+const forecastLine = g({},
+  el('line', { x1: pts[last][0], y1: pts[last][1], x2: fx, y2: y(0), stroke: 'var(--teal)', 'stroke-width': 2.5, 'stroke-dasharray': '7 6' }),
+  el('circle', { cx: fx, cy: y(0), r: 5, fill: 'var(--teal)' }),
+  textLines(['見込み'], { x: (pts[last][0] + fx) / 2 + 14, y: (pts[last][1] + y(0)) / 2 - 12, size: 16, weight: 700, fill: 'var(--teal)' }));
+const figure = svgRoot({
+  id: `${ID}-fig`, width: W, height: H,
+  title: '開発の残りポイントの推移と完了見込み',
+  desc: `当初${scope}ポイント。第${last}スプリント終了時点（${md(asOf)}）の残りは${left}ポイントで、計画線より${Math.round(left - (scope - planVelocity * last))}ポイント多い。直近${lookback}スプリントの平均${fmt(velocity, { digits: 0 })}ポイントで進むと、完了は${md(forecast)}（計画${md(planEnd)}）。`,
+}, grid, ticks, planLine, actual, changeNote, forecastLine,
+textLines(['残りポイント'], { x: 0, y: 4, size: 16, valign: 'top', fill: 'var(--muted)' }));
 
 export default {
   study: true,
-  id: 'tpl-project-status-burndown',
-  title: 'バーンダウン：計画線・実績線・完了見込み',
+  id: ID,
   language: 'ja',
-  notes: 'Purpose: 残作業の推移を計画と比べ、現在のペースでいつ終わるかを数字で示す。\nModify: start、planWeeks、initialScope、remaining（週次の残ポイント）、scopeChanges、today を書き換える。線・差分・見込み日・見出しの数値は自動で再計算される。\nInvariant: 縦軸は0から始める。計画線は当初計画のまま残し、スコープ追加は注記で示す。見込みの計算期間（lookback）を明記する。\nStatic: 見込み線はステップ1で表示。最終状態ですべて読める。',
+  title: 'Development burn-down with a velocity-based finish date',
+  notes: `Purpose: 開発の残作業を計画線と比べ、今のペースだといつ終わるかを日付で示す。遅れを「感覚」ではなく速度から説明する。\nModify: sprint（初日・日数・計画スプリント数）、scope、done（各スプリントの完了ポイント）、added（変更要求で増えたポイント）、change の注記を書き換える。残り・平均速度・完了見込み日・必要なペース・見出しは自動。見込みに使うスプリント数は lookback で変える。\nInvariant: 縦軸は0から。計画線は当初計画のまま残し、スコープの追加は注記で示す。見込みの計算方法（直近${lookback}スプリントの平均）を注記に書く。完了見込み日は2ページの工程表と一致させる。\nStatic: Already static.`,
   sources: [],
   exportPolicy: 'final',
-  className: 'tpl-project-status ps-burndown',
-  content: `<div class="ps-page">${bar()}
-<div class="ps-abs" style="left:56px;top:66px;right:56px">
-  <p class="ps-sec">03　進捗（開発フェーズ）</p>
-  <h1 class="ps-title" data-region="title">残り${remaining[last]}pt。今のペースでは開発完了は${mdk(finishDate)}、計画より${lateText}遅れます</h1>
+  className: 'tpl-project-status p-burndown',
+  content: `<p class="p-run" data-region="support"><span>${project.name}　${project.meeting}</span><span class="num">${ymd(t(project.date))}　${page}</span></p>
+<h1 class="p-head" data-region="title">残り<span class="nw">${left}ポイント</span>。直近の平均ペース<span class="nw">${fmt(velocity, { digits: 0 })}ポイント</span>では、開発の完了は計画より<span class="nw">${slipWeeks}週間</span>遅い<span class="nw">${md(forecast)}</span>になる</h1>
+<figure class="g" style="--c:1;--s:8;top:214px;margin:0" data-region="primary">${figure}</figure>
+<div class="p-rail g" style="--c:9;--s:4;top:214px" data-region="support">
+  <div>
+    <p class="p-label">開発の完了見込み</p>
+    <p class="p-fig num accent">${md(forecast)}</p>
+    <p class="p-body">計画（${md(planEnd)}）より${slipWeeks}週間遅い</p>
+  </div>
+  <div>
+    <dl class="p-pairs">
+      <dt>残り</dt><dd>${left}<small>pt</small></dd>
+      <dt>直近${lookback}スプリントの平均</dt><dd>${fmt(velocity, { digits: 0 })}<small>pt</small></dd>
+      <dt>当初計画のペース</dt><dd>${fmt(planVelocity, { digits: 0 })}<small>pt</small></dd>
+      <dt>計画どおりに終えるには</dt><dd>${fmt(needed, { digits: 0 })}<small>pt</small></dd>
+    </dl>
+  </div>
 </div>
-<div class="ps-fig" data-region="primary" style="left:44px;top:166px">${svg}</div>
-<div class="ps-rail" data-region="support" style="left:916px;right:56px;top:176px">
-  <div><p>残作業（${md(weekDate(last))}時点）</p><strong class="ps-num">${remaining[last]}<small>pt</small></strong><p class="ps-rail-note">うち変更要求による追加 ${scopeChanges.reduce((a, c) => a + c.pts, 0)}pt</p></div>
-  <div class="is-bad"><p>計画線との差</p><strong class="ps-num">+${gap}<small>pt</small></strong></div>
-  <div><p>直近${lookback}週の平均消化</p><strong class="ps-num">${velocity.toFixed(0)}<small>pt／週</small></strong></div>
-  <div><p>${md(planDate)}に間に合わせるには</p><strong class="ps-num">${need}<small>pt／週</small></strong><p class="ps-rail-note">現ペースの${(need / velocity).toFixed(1)}倍。増員では届かないため、完了日を${mdj(finishDate)}に置き直します。</p></div>
-</div>
-<p class="ps-source" data-region="source">例示データ・金曜時点の週次スナップショット・ストーリーポイントは委託先を含む開発チーム全体の見積もり</p>
-</div>`
+<p class="p-note" data-region="source">1スプリント＝2週間、ペースは1スプリントあたりの完了ポイント。完了見込み＝基準日（${md(asOf)}）＋残り÷直近${lookback}スプリントの平均。</p>`,
 };

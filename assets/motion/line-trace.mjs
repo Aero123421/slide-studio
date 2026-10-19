@@ -37,13 +37,13 @@ export function figure(theme = 'css') {
     }));
     dots.push(el('circle', {
       cx: x(d.year), cy: y(d.males), r: d === last ? 7 : 5.5, fill: t.c('accent'), stroke: t.c('paper'), 'stroke-width': 2,
-      style: 'transform-origin:center', 'data-step': 1, 'data-motion': 'zoom', 'data-delay': at(d.year), 'data-duration': 260,
+      'data-step': 1, 'data-motion': 'reveal', 'data-delay': at(d.year), 'data-duration': 200,
     }));
   });
   const ex = x(restoredAt), preY = y(preMean), preEnd = x(before.at(-1).year);
   return svgRoot({ id: 'motion-line-trace-fig', width: W, height: H, theme: t,
     title: `Booming male bitterns counted each spring at Marrow Fen, ${first}–${last.year}`,
-    desc: `Counts held near ${fmt(preMean, { digits: 0 })} until the reed beds were restored in winter 2016–17, then rose to ${last.males} in ${last.year}. No survey was made in ${gaps.map(d => d.year).join(' or ')}; those years are gaps, not estimates.` },
+    desc: `Counts held near ${fmt(preMean, { digits: 0 })} until the reed beds were restored in winter ${Math.floor(restoredAt)}–${String(Math.ceil(restoredAt)).slice(2)}, then rose to ${last.males} in ${last.year}. No survey was made in ${gaps.map(d => d.year).join(' or ')}; those years are gaps, not estimates.` },
   axis(y, { orient: 'left', at: m.l, grid: [m.l, W - m.r], theme: t, size: 16, tickValues: [0, 5, 10, 15, 20] }),
   textLines(['Booming males heard'], { x: m.l - 46, y: 14, size: 16, fill: t.c('muted'), valign: 'top' }),
   survey.map(d => el('line', { x1: x(d.year), x2: x(d.year), y1: H - m.b, y2: H - m.b + 5, stroke: t.c('rule') })),
@@ -55,7 +55,7 @@ export function figure(theme = 'css') {
   g({ 'data-step': 2, 'data-motion': 'reveal', 'data-duration': 600 },
     el('line', { x1: ex, x2: ex, y1: m.t - 30, y2: H - m.b, stroke: t.c('ink'), 'stroke-width': 1.4, 'stroke-dasharray': '5 5' }),
     textLines(['Reed beds restored'], { x: ex + 10, y: m.t - 22, size: 17, weight: 700, fill: t.c('ink'), valign: 'top' }),
-    textLines(['winter 2016–17'], { x: ex + 10, y: m.t, size: 16, fill: t.c('muted'), valign: 'top' }),
+    textLines([`winter ${Math.floor(restoredAt)}–${String(Math.ceil(restoredAt)).slice(2)}`], { x: ex + 10, y: m.t, size: 16, fill: t.c('muted'), valign: 'top' }),
     el('line', { x1: x(first), x2: preEnd, y1: preY, y2: preY, stroke: t.c('muted'), 'stroke-width': 2, 'stroke-dasharray': '0.1 6', 'stroke-linecap': 'round' }),
     textLines([`${first}–${String(before.at(-1).year).slice(2)} average: ${fmt(preMean, { digits: 1 })}`], { x: x(first), y: preY - 30, size: 16, weight: 600, fill: t.c('ink'), halo: t.c('paper') })),
   trace, dots,
@@ -64,7 +64,7 @@ export function figure(theme = 'css') {
   textLines([`males in ${last.year}`], { x: x(last.year) + 16, y: y(last.males) + 24, size: 16, valign: 'middle', fill: t.c('muted'),
     attrs: { 'data-step': 1, 'data-motion': 'reveal', 'data-delay': at(last.year) + 150 } }),
   textLines([`${fmt(ratio, { digits: 1 })}× the`, 'earlier average'], { x: x(last.year) + 16, y: y(last.males) + 74, size: 16, weight: 650, valign: 'top', fill: t.c('ink'), lineHeight: 1.3,
-    attrs: { 'data-step': 2, 'data-motion': 'lift', 'data-delay': 250 } }));
+    attrs: { 'data-step': 2, 'data-motion': 'reveal', 'data-delay': 250 } }));
 }
 
 export default {

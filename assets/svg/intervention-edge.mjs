@@ -59,7 +59,7 @@ export function figure(theme = 'css') {
     desc: `Left, the observed causal graph: customer loyalty and season both cause who gets the member discount and whether they buy again. Right, the same graph under do(discount): the ${cut.length} arrows into the discount are cut and a coin flip becomes its only cause; all other arrows are unchanged. The repeat-purchase gap falls from ${fmt(gap.observed, { digits: 1 })} to ${fmt(gap.randomized, { digits: 1 })} percentage points.` },
   el('defs', {}, arrowMarker(`${id}-arr`, t.c('muted')), arrowMarker(`${id}-arr-ink`, t.c('ink')), arrowMarker(`${id}-arr-accent`, t.c('accent'))),
   panel(0, true),
-  el('line', { x1: split - 22, x2: split - 22, y1: 0, y2: H, stroke: t.c('rule'), 'stroke-width': 1 }),
+  el('line', { fill: 'none', x1: split - 22, x2: split - 22, y1: 0, y2: H, stroke: t.c('rule'), 'stroke-width': 1 }),
   panel(split, false));
 }
 
@@ -71,7 +71,7 @@ export default {
   notes: 'Purpose: Show exactly which assumption an intervention changes: the arrows into the intervened variable, and nothing else.\nModify: Edit `nodes` (fixed positions), `edges`, `target` and `assigner`; the cut edges, the kept edges and the added assignment edge are computed. Replace `gap` with your observational and experimental estimates.\nInvariant: Both panels share node positions; every cross marks an edge that the graph edit actually removes; arrows out of the target and all other edges stay identical; say in words what the intervention removes.\nStatic: Already static. As motion, keep one graph and let the cut edges fade while the crosses and the coin edge appear.',
   sources: [{ type: 'original-example', file: 'assets/svg/intervention-edge.mjs' }],
   exportPolicy: 'final',
-  content: `<h1 class="st-head">A <em>coin flip</em> cuts the ${words[cut.length] ?? cut.length} arrows into the discount, and its apparent lift falls from ${fmt(gap.observed, { digits: 0 })} to ${fmt(gap.randomized, { digits: 0 })} points</h1>
+  content: `<h1 class="st-head">A <em>coin&nbsp;flip</em> cuts the ${words[cut.length] ?? cut.length} arrows into the discount, and its apparent lift falls from ${fmt(gap.observed, { digits: 0 })} to ${fmt(gap.randomized, { digits: 0 })} points</h1>
 <figure class="st-fig" data-region="primary">${figure()}</figure>
 <p class="st-source" data-region="source"><span>Illustrative data · loyalty programme of a fictional grocery chain, 60-day repeat purchase</span><span>Causal graph before and after intervention</span></p>`,
 };

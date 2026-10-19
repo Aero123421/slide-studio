@@ -51,13 +51,14 @@ export function figure(theme = 'css') {
     const tip = ax.v.map(c => c * ax.len), others = axes.filter((_, j) => j !== k).map(o => o.v);
     const [e1, e2] = k === 1 ? [others[1], others[0]] : others;   // (e1, e2, axis) right-handed
     const arc = ring(P, tip.map(c => c * 0.74), e1, e2, 0.055, 0.4, 1.7 * Math.PI, 48);
-    const [tx, ty] = P(tip.map(c => c * 1.1)), labelRight = tx >= P([0, 0, 0])[0] - 1;
-    const dir = tx - P([0, 0, 0])[0];
+    // Label just beyond the tip: to its right unless the axis points left (a vertical axis gets an offset).
+    const [tx, ty] = P(tip.map(c => c * 1.1)), dir = tx - P([0, 0, 0])[0];
+    const s = Math.abs(dir) < 4 || dir > 0 ? 1 : -1, lx = tx + (Math.abs(dir) < 4 ? 12 : 0), anchor = s > 0 ? 'start' : 'end';
     return g({},
       el('path', { d: pathFromPoints([P([0, 0, 0]), P(tip)]), stroke: t.c('ink'), 'stroke-width': 2.5, 'marker-end': `url(#${id}-ink)` }),
       el('path', { d: pathFromPoints(arc), fill: 'none', stroke: t.c('ink'), 'stroke-width': 1.5, 'marker-end': `url(#${id}-ink-s)` }),
-      textLines([ax.key], { x: tx + (Math.abs(dir) < 4 ? 12 : 0), y: ty, size: 24, anchor: Math.abs(dir) < 4 ? 'start' : labelRight ? 'start' : 'end', valign: 'middle', weight: 700, fill: t.c('ink'), italic: true }),
-      textLines([ax.name, ax.angle], { x: tx + (Math.abs(dir) < 4 ? 12 : 0) + (Math.abs(dir) < 4 ? 22 : labelRight ? 22 : -22), y: ty, size: 15, anchor: Math.abs(dir) < 4 || labelRight ? 'start' : 'end', valign: 'middle', fill: t.c('muted'), lineHeight: 1.25 }));
+      textLines([ax.key], { x: lx, y: ty, size: 24, anchor, valign: 'middle', weight: 700, fill: t.c('ink'), italic: true }),
+      textLines([ax.name, ax.angle], { x: lx + s * 22, y: ty, size: 15, anchor, valign: 'middle', fill: t.c('muted'), lineHeight: 1.25 }));
   });
 
   // Velocity panel: the three components of one logged velocity as signed bars on one m/s scale,
@@ -73,7 +74,7 @@ export function figure(theme = 'css') {
         textLines([`v_${ax.key} = ${fmt(val, { digits: 1, sign: true })} m/s`], { x: 548, y, size: 16, valign: 'middle', weight: 700, fill: c }),
         textLines([`+ ${ax.name}, − ${ax.opposite}${focus ? (val < 0 ? ': climbing' : ': descending') : ''}`], { x: 548, y: y + 20, size: 15, valign: 'middle', fill: focus ? t.c('accent') : t.c('muted') }),
         el('rect', { x: Math.min(zero, zero + val * k), y: y + 34, width: Math.abs(val) * k, height: 16, fill: focus ? t.c('accent') : t.c('context') }),
-        el('line', { x1: zero, x2: zero, y1: y + 30, y2: y + 54, stroke: t.c('ink'), 'stroke-width': 1.5 }));
+        el('line', { fill: 'none', x1: zero, x2: zero, y1: y + 30, y2: y + 54, stroke: t.c('ink'), 'stroke-width': 1.5 }));
     }));
 
   return svgRoot({ id, width: W, height: H, theme: t,
@@ -82,7 +83,7 @@ export function figure(theme = 'css') {
   el('defs', {}, arrowMarker(`${id}-ink`, t.c('ink'), { size: 13 }), arrowMarker(`${id}-ink-s`, t.c('ink'), { size: 9 }), arrowMarker(`${id}-acc`, t.c('accent'), { size: 12 })),
   behind.map(rotor), body, front.map(rotor), axisSvg,
   el('circle', { cx: P([0, 0, 0])[0], cy: P([0, 0, 0])[1], r: 5, fill: t.c('paper'), stroke: t.c('ink'), 'stroke-width': 2 }),
-  el('line', { x1: 522, x2: 522, y1: 70, y2: 420, stroke: t.c('rule') }),
+  el('line', { fill: 'none', x1: 522, x2: 522, y1: 70, y2: 420, stroke: t.c('rule') }),
   velPanel,
   textLines(['Orthographic view from behind, right and above. Sizes schematic.'], { x: 0, y: H - 2, size: 15, valign: 'bottom', fill: t.c('muted') }));
 }
@@ -95,7 +96,7 @@ export default {
   notes: 'Purpose: Declare a coordinate frame (axis directions, handedness, rotation signs, units) before showing any vector or angle measured in it.\nModify: Edit `axes`, `velocity` and `camera`; every point is projected from 3-D, the handedness check and the reading of v_z recompute. Swap the airframe for your object.\nInvariant: Axis directions, units and handedness are written on the page; rotation arcs follow the right-hand rule; the view is a stated orthographic projection, schematic in size; vector components are given with the meaning of their sign in this frame.\nStatic: Already static. For a talk, show the axes, then the arcs, then the velocity components.',
   sources: [{ type: 'original-example', file: 'assets/svg/coordinate-frame.mjs' }],
   exportPolicy: 'final',
-  content: `<h1 class="st-head">In the body frame z points down, so this climb is logged as <em>v_z = ${fmt(velocity[2], { digits: 1 })} m/s</em></h1>
+  content: `<h1 class="st-head">In the body frame z points down, so this climb is logged as <em>v_z&nbsp;=&nbsp;${fmt(velocity[2], { digits: 1 })}&nbsp;m/s</em></h1>
 <figure class="st-fig" data-region="primary">${figure()}</figure>
 <div class="st-rail" data-region="support">
   <p class="st-text"><strong>x</strong> forward, <strong>y</strong> right, <strong>z</strong> down. ${rightHanded ? 'Right-handed' : 'Left-handed'}: x × y = z.</p>

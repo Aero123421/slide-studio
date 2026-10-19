@@ -61,13 +61,13 @@ export function figure(theme = 'css') {
   // the right-hand column: within-person difference per sequence, then their average
   textLines(['Low − usual'], { x: 1152, y: bandTop - 26, size: 16, anchor: 'end', valign: 'bottom', weight: 700, fill: t.c('ink') }),
   textLines(['mmHg, same people'], { x: 1152, y: bandTop - 6, size: 15, anchor: 'end', valign: 'bottom', fill: t.c('muted') }),
-  el('line', { x1: 1046, x2: 1152, y1: laneY[1] + 40, y2: laneY[1] + 40, stroke: t.c('rule') }),
+  el('line', { fill: 'none', x1: 1046, x2: 1152, y1: laneY[1] + 40, y2: laneY[1] + 40, stroke: t.c('rule') }),
   textLines(['average'], { x: 1152, y: laneY[1] + 60, size: 15, anchor: 'end', valign: 'middle', fill: t.c('muted') }),
   textLines([f1(effect)], { x: 1152, y: laneY[1] + 88, size: 24, anchor: 'end', valign: 'middle', weight: 700, fill: t.c('ink') }),
   textLines([`period effect ${f1(periodEffect)}`], { x: 1152, y: laneY[1] + 118, size: 15, anchor: 'end', valign: 'middle', fill: t.c('muted') }),
   // true-time axis
-  el('line', { x1: x(-schedule.runIn), x2: x(P2[1]), y1: axisY, y2: axisY, stroke: t.c('ink'), 'stroke-width': 1.2 }),
-  ticks.map(d => g({}, el('line', { x1: x(d), x2: x(d), y1: axisY, y2: axisY + 6, stroke: t.c('ink'), 'stroke-width': 1.2 }),
+  el('line', { fill: 'none', x1: x(-schedule.runIn), x2: x(P2[1]), y1: axisY, y2: axisY, stroke: t.c('ink'), 'stroke-width': 1.2 }),
+  ticks.map(d => g({}, el('line', { fill: 'none', x1: x(d), x2: x(d), y1: axisY, y2: axisY + 6, stroke: t.c('ink'), 'stroke-width': 1.2 }),
     textLines([fmt(d)], { x: x(d), y: axisY + 12, size: 15, anchor: 'middle', valign: 'top', fill: t.c('muted') }))),
   textLines(['Study day (day 0 = first diet day; spacing is real time)'], { x: x(-schedule.runIn), y: axisY + 40, size: 15, valign: 'top', fill: t.c('muted') }));
 }
@@ -80,7 +80,7 @@ export default {
   notes: 'Purpose: Put two protocols (here, crossover sequences) on parallel timelines so the audience sees which observation windows are comparable.\nModify: Change `schedule` (days), `sequences`, `diets` and the window means in `sbp`. Bars, compared windows, labels and the within-person and crossover estimates recompute.\nInvariant: Time is encoded: spacing is real days on one axis for both timelines; a compared window spans both timelines at the same study days; if spacing is schematic, say so on the axis.\nStatic: Already static. For a build, show the two timelines, then lay the compared windows across them.',
   sources: [{ type: 'original-example', file: 'assets/svg/paired-protocol.mjs' }],
   exportPolicy: 'final',
-  content: `<h1 class="st-head">Only <em>the final week</em> of each ${schedule.period}-day diet is compared — there, low sodium is ${f1(Math.abs(effect))} mmHg lower</h1>
+  content: `<h1 class="st-head">Only <em>the&nbsp;final&nbsp;week</em> of each ${schedule.period}-day diet is compared — there, low sodium is ${f1(Math.abs(effect))} mmHg lower</h1>
 <figure class="st-fig" data-region="primary">${figure()}</figure>
 <p class="st-source" data-region="source"><span>Illustrative data · two-period crossover, home blood pressure monitor, ${comparedDays} of ${totalDays} study days compared</span><span>Parallel protocol timelines</span></p>`,
 };

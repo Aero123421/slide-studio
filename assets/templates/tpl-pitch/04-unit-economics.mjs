@@ -47,7 +47,7 @@ const figure = lineChart({
       <circle cx="${px}" cy="${py}" r="6" fill="var(--ss-accent)" stroke="var(--ss-paper)" stroke-width="2"/>
       <text x="${px + 14}" y="${py + 44}" font-size="17" font-weight="600" style="fill:var(--pp-accent-ink)">Paid back in month ${payback}</text>
       <circle cx="${ex}" cy="${ey}" r="4.5" fill="var(--ss-ink)"/>
-      <text x="${ex}" y="${ey - 16}" font-size="17" text-anchor="end" style="fill:var(--ss-ink)">${usd(cum[unit.horizon])} by month ${unit.horizon}, ${fmt(multiple, { digits: 1 })}× the cost</text>
+      <text x="${ex}" y="${ey - 16}" font-size="17" text-anchor="end" style="fill:var(--ss-ink)">${usd(cum[unit.horizon])} by month ${unit.horizon}: ${fmt(multiple, { digits: 1 })}× the acquisition cost</text>
     </g>`;
   },
 });

@@ -43,7 +43,7 @@ export function figure(theme = 'css') {
     const parts = [textLines([label], { x: headX(k), y: headY, size: 17, valign: 'middle', weight: 700, fill: k === 'o' ? t.c('ink') : t.c('muted') })];
     if (n < heads.length - 1) {
       const x0 = headX(k) + measureText(label, 17, { weight: 700 }) + 14, x1 = headX(heads[n + 1][0]) - 12;
-      parts.push(el('line', { x1: x0, x2: x1, y1: headY, y2: headY, stroke: t.c('muted'), 'stroke-width': 1.5, 'marker-end': `url(#${id}-arr)` }));
+      parts.push(el('line', { fill: 'none', x1: x0, x2: x1, y1: headY, y2: headY, stroke: t.c('muted'), 'stroke-width': 1.5, 'marker-end': `url(#${id}-arr)` }));
     }
     return g({}, parts);
   });
@@ -68,7 +68,7 @@ export function figure(theme = 'css') {
     pairs.map((p, k) => {
       const x = dx0 + k * step + (step - dom) / 2;
       const box = (room, y) => el('rect', { x, y, width: dom, height: dom, rx: 2, fill: p.coatedRoom === room ? t.c('ink') : t.c('paper'), stroke: t.c('ink'), 'stroke-width': 1.5 });
-      return g({}, box('A', domY), box('B', domY + dom + 4), el('line', { x1: x + dom / 2, x2: x + dom / 2, y1: domY + dom, y2: domY + dom + 4, stroke: t.c('ink'), 'stroke-width': 1.5 }));
+      return g({}, box('A', domY), box('B', domY + dom + 4), el('line', { fill: 'none', x1: x + dom / 2, x2: x + dom / 2, y1: domY + dom, y2: domY + dom + 4, stroke: t.c('ink'), 'stroke-width': 1.5 }));
     }),
     el('rect', { x: pc.x, y: domY + 46, width: 12, height: 12, rx: 2, fill: t.c('ink') }),
     textLines(['coated room, by coin toss'], { x: pc.x + 19, y: domY + 52, size: 15, valign: 'middle', fill: t.c('muted') }),
@@ -88,13 +88,13 @@ export function figure(theme = 'css') {
     el('rect', { x: oc.x, y: panelTop, width: oc.w, height: panelBottom - panelTop, rx: 10, fill: t.c('surface') }),
     textLines(['Coated − uncoated, °C'], { x: oc.x + 16, y: panelTop + 18, size: 15, valign: 'top', fill: t.c('muted') }),
     textLines([`${cooler} of ${pairs.length} pairs cooler`], { x: oc.x + oc.w - 16, y: panelTop + 18, size: 15, anchor: 'end', valign: 'top', weight: 700, fill: t.c('ink') }),
-    [-3, -2, -1, 0, 1].map(v => g({}, el('line', { x1: x(v), x2: x(v), y1: rowY(0) - 12, y2: meanY + 12, stroke: v === 0 ? t.c('ink') : t.c('grid'), 'stroke-width': v === 0 ? 1.5 : 1 }),
+    [-3, -2, -1, 0, 1].map(v => g({}, el('line', { fill: 'none', x1: x(v), x2: x(v), y1: rowY(0) - 12, y2: meanY + 12, stroke: v === 0 ? t.c('ink') : t.c('grid'), 'stroke-width': v === 0 ? 1.5 : 1 }),
       textLines([v === 0 ? '0' : fmt(v, { sign: true })], { x: x(v), y: axisY, size: 15, anchor: 'middle', valign: 'top', fill: t.c('muted') }))),
     rows.map((r, k) => g({},
       textLines([r.id], { x: oc.x + 16, y: rowY(k), size: 15, valign: 'middle', fill: t.c('muted') }),
-      el('line', { x1: x(0), x2: x(r.d), y1: rowY(k), y2: rowY(k), stroke: t.c('context'), 'stroke-width': 1.5 }),
+      el('line', { fill: 'none', x1: x(0), x2: x(r.d), y1: rowY(k), y2: rowY(k), stroke: t.c('context'), 'stroke-width': 1.5 }),
       el('circle', { cx: x(r.d), cy: rowY(k), r: 5, fill: t.c('ink') }))),
-    el('line', { x1: x(ci[0]), x2: x(ci[1]), y1: meanY, y2: meanY, stroke: t.c('accent'), 'stroke-width': 3, 'stroke-linecap': 'round' }),
+    el('line', { fill: 'none', x1: x(ci[0]), x2: x(ci[1]), y1: meanY, y2: meanY, stroke: t.c('accent'), 'stroke-width': 3, 'stroke-linecap': 'round' }),
     el('path', { d: `M${x(m)} ${meanY - 8}l8 8l-8 8l-8 -8z`, fill: t.c('accent') }),
     textLines(['Mean'], { x: oc.x + 16, y: meanY, size: 15, valign: 'middle', weight: 700, fill: t.c('accent') }),
     textLines([`${f1(Math.abs(m))} °C cooler on average (95% CI ${f1(Math.abs(ci[1]))} to ${f1(Math.abs(ci[0]))})`], { x: oc.x + 16, y: panelBottom - 16, size: 16, valign: 'bottom', fill: t.c('accent'), weight: 700 }));
@@ -125,7 +125,7 @@ export default {
   notes: 'Purpose: Keep the question, the protocol, the observations and the inference visibly separate, so an audience can see which part is evidence and how far the claim reaches.\nModify: Replace `question`, `terms`, `protocol`, `pairs` and `notTested`. The dots, the mean, its t-interval, the headline and the claim recompute from `pairs`.\nInvariant: Observation, method and inference stay in separate columns; only the observation column carries data; arrows mean "leads to", never "proves"; the inference states what was not tested.\nStatic: Already static. For a talk, build the columns left to right with data-step on each column group.',
   sources: [{ type: 'original-example', file: 'assets/svg/study-design.mjs' }],
   exportPolicy: 'final',
-  content: `<h1 class="st-head">Coated roofs kept classrooms <em>${f1(Math.abs(m))} °C cooler</em> on hot afternoons <span class="st-quiet">— learning was not measured</span></h1>
+  content: `<h1 class="st-head">Coated roofs kept classrooms <em>${f1(Math.abs(m))}&nbsp;°C&nbsp;cooler</em> on hot afternoons <span class="st-quiet">— learning was not measured</span></h1>
 <figure class="st-fig" data-region="primary">${figure()}</figure>
 <p class="st-source" data-region="source"><span>Illustrative data · ${pairs.length} matched classroom pairs, ${protocol.days} school days ≥ ${protocol.hotAbove} °C</span><span>Study design diagram</span></p>`,
 };

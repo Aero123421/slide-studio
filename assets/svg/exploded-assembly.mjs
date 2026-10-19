@@ -37,7 +37,8 @@ export function figure(theme = 'css') {
     const out = [el('path', { d: side, fill: t.c('context'), stroke: t.c('ink'), 'stroke-width': 1.5, 'stroke-linejoin': 'round' })];
     if (p.ring) {
       const inner = ell(R - p.ring, p.z1, i);
-      out.push(el('path', { d: `M${top.cx - top.rx} ${top.cy}a${top.rx} ${top.ry} 0 1 0 ${2 * top.rx} 0a${top.rx} ${top.ry} 0 1 0 ${-2 * top.rx} 0ZM${inner.cx - inner.rx} ${inner.cy}a${inner.rx} ${inner.ry} 0 1 0 ${2 * inner.rx} 0a${inner.rx} ${inner.ry} 0 1 0 ${-2 * inner.rx} 0Z`, fill: t.c('surface'), 'fill-rule': 'evenodd', stroke: t.c('ink'), 'stroke-width': 1.5 }));
+      const loop = e => `M${e.cx - e.rx} ${e.cy}a${e.rx} ${e.ry} 0 1 0 ${2 * e.rx} 0a${e.rx} ${e.ry} 0 1 0 ${-2 * e.rx} 0Z`;
+      out.push(el('path', { d: loop(top) + loop(inner), fill: t.c('surface'), 'fill-rule': 'evenodd', stroke: t.c('ink'), 'stroke-width': 1.5 }));   // annulus: the hole stays open
     } else out.push(el('ellipse', { ...top, fill: t.c('surface'), stroke: t.c('ink'), 'stroke-width': 1.5 }));
     if (p.vent) out.push(el('ellipse', { ...ell(p.vent / 2, p.z1, i), fill: t.c('ink') }));
     if (p.chips) for (const [x0, y0, w, d] of [[-21, -12, 14, 10], [0, -19, 10, 9], [-15, 6, 12, 7]]) {   // chips, clear of the key slot
@@ -68,9 +69,9 @@ export function figure(theme = 'css') {
   return svgRoot({ id, width: W, height: H, theme: t,
     title: 'Exploded view of a seven-part sensor housing on one axis',
     desc: `Seven parts, numbered in assembly order from the base shell up to the top cap, drawn to scale on one vertical axis and separated by ${explode} mm for clarity. ${words[keyed.length]} parts carry a key slot ${keySlot.r} mm from the axis at the same angle, so the slots line up on one registration line. Assembled stack height ${fmt(stackHeight, { digits: 1 })} mm. The O-ring is replaced at every opening.` },
-  el('line', { x1: cx, x2: cx, y1: axisTop, y2: axisBot, stroke: t.c('muted'), 'stroke-width': 1, 'stroke-dasharray': '16 4 3 4' }),
+  el('line', { fill: 'none', x1: cx, x2: cx, y1: axisTop, y2: axisBot, stroke: t.c('muted'), 'stroke-width': 1, 'stroke-dasharray': '16 4 3 4' }),
   draw,
-  el('line', { x1: kx, x2: kx, y1: kTop - 34, y2: kBot + 4, stroke: t.c('accent'), 'stroke-width': 1.5, 'stroke-dasharray': '5 4' }),
+  el('line', { fill: 'none', x1: kx, x2: kx, y1: kTop - 34, y2: kBot + 4, stroke: t.c('accent'), 'stroke-width': 1.5, 'stroke-dasharray': '5 4' }),
   textLines([`one key slot, ${keySlot.r} mm off axis`], { x: kx + 8, y: kTop - 40, size: 15, valign: 'bottom', weight: 700, fill: t.c('accent') }),
   textLines([`Parts to scale; the ${explode} mm gaps between them are not.`], { x: listX - 14, y: H - 2, size: 15, valign: 'bottom', fill: t.c('muted') }),
   list);
@@ -84,7 +85,7 @@ export default {
   notes: 'Purpose: Show what goes together in which order, and how the parts register to each other, before anyone opens a drawing set.\nModify: Edit `parts` (bottom to top; diameter, height, material, key, service note), `keySlot` and `explode`. Heights, positions, the registration line, leaders, balloon numbers and the parts list recompute; the module throws if the key slot falls outside a keyed part.\nInvariant: One shared axis; parts keep mating order from bottom to top; balloon numbers are the assembly order; registration features sit at the same angle and radius so they align; the explode gap is labelled as illustrative.\nStatic: Already static. As motion, collapse the gaps part by part from the bottom.',
   sources: [{ type: 'original-example', file: 'assets/svg/exploded-assembly.mjs' }],
   exportPolicy: 'final',
-  content: `<h1 class="st-head">Seven parts stack on one axis, and <em>one key slot</em> lines up ${words[keyed.length]} of them</h1>
+  content: `<h1 class="st-head">Seven parts stack on one axis, and <em>one&nbsp;key&nbsp;slot</em> lines up ${words[keyed.length]} of them</h1>
 <figure class="st-fig" data-region="primary">${figure()}</figure>
 <p class="st-source" data-region="source"><span>Illustrative design · outdoor air-quality sensor node, ${fmt(stackHeight, { digits: 1 })} mm assembled height</span><span>Exploded view with parts list</span></p>`,
 };

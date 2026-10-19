@@ -1,12 +1,63 @@
-// Original editable study. Read notes for purpose, modifications, and invariants.
-// Asset placeholders are embedded by scripts/craft-core.mjs. Change content and geometry freely.
+// Composition study · Geometric poster — one geometric grammar, derived from the subject.
+// Every arc is a vibrating segment of one string: the nth harmonic divides the string into n
+// equal parts, so its arcs have diameter L/n. Nothing is placed by eye; the geometry is the content.
+import { svgRoot, el, g, textLines, theme as makeTheme, n } from '../runtime/figure.mjs';
+
+const harmonics = 8;          // how many harmonics to draw
+const featured = 3;           // the one in the accent: touch the string at 1/3 to sound it
+const concert = {
+  title: 'Overtones',
+  line: 'A lecture-concert on the natural harmonics of a single string',
+  people: ['Mira Okafor, cello', 'Anton Vahl, lecture'],
+  when: 'Friday 4 December 2026, 19:30',
+  where: 'Small Hall, Linden Conservatory',
+};
+// The string spans columns 4–12 on the slide; the drawing is authored at that size.
+const string = { x0: 358, x1: 1216, y: 640 };
+const L = string.x1 - string.x0;
+const fraction = ['', '', '½', '⅓', '¼', '⅕', '⅙', '⅐', '⅛'];
+const thirds = [1, 2].map(k => ({ x: string.x0 + (k * L) / featured, label: k === 1 ? '⅓' : '⅔' }));
+const ordinal = k => `${k}${k % 10 === 1 && k !== 11 ? 'st' : k % 10 === 2 && k !== 12 ? 'nd' : k % 10 === 3 && k !== 13 ? 'rd' : 'th'}`;
+
+function drawing(theme = 'css') {
+  const t = makeTheme(theme), W = 1280, H = 720;
+  const arcs = Array.from({ length: harmonics }, (_, i) => {
+    const h = i + 1, d = L / h, hot = h === featured;
+    const path = Array.from({ length: h }, (_, k) => {
+      const a = string.x0 + k * d;
+      return `M${n(a)} ${string.y}A${n(d / 2)} ${n(d / 2)} 0 0 1 ${n(a + d)} ${string.y}`;
+    }).join('');
+    return el('path', { d: path, fill: 'none', stroke: hot ? t.c('accent') : t.c('ink'), 'stroke-width': hot ? 3 : 1.25, opacity: hot ? 1 : 0.78 });
+  });
+  // Harmonic numbers above the last arc of the first three (higher ones are too close to label).
+  const numbers = [1, 2, 3].map(h => {
+    const r = L / (2 * h), cx = string.x1 - r;
+    return textLines([String(h)], { x: cx, y: string.y - r - 12, size: 16, anchor: 'middle', fill: h === featured ? t.c('accent') : t.c('muted'), weight: h === featured ? 700 : 400 });
+  });
+  return svgRoot({ id: 'composition-geometric-poster-arcs', width: W, height: H, theme: t,
+    title: `The first ${harmonics} harmonics of one string, drawn to scale`,
+    desc: `A horizontal string with ${harmonics} families of semicircles above it: one arc for the fundamental, two for the second harmonic, up to ${harmonics} for the ${ordinal(harmonics)}. The ${ordinal(featured)} harmonic is highlighted; its nodes divide the string at one third and two thirds.` },
+  g({}, arcs),
+  el('line', { x1: string.x0, x2: string.x1, y1: string.y, y2: string.y, stroke: t.c('ink'), 'stroke-width': 2 }),
+  [string.x0, string.x1].map(x => el('line', { x1: x, x2: x, y1: string.y - 9, y2: string.y + 9, stroke: t.c('ink'), 'stroke-width': 2 })),
+  numbers,
+  thirds.map(p => g({}, el('circle', { cx: p.x, cy: string.y, r: 5.5, fill: t.c('accent') }),
+    textLines([p.label], { x: p.x, y: string.y + 30, size: 20, anchor: 'middle', fill: t.c('accent'), weight: 600 }))),
+  textLines(['Nut'], { x: string.x0, y: string.y + 30, size: 15, anchor: 'middle', fill: t.c('muted') }),
+  textLines(['Bridge'], { x: string.x1, y: string.y + 30, size: 15, anchor: 'end', fill: t.c('muted') }));
+}
+
 export default {
   study: true,
-  "id": "composition-geometric-poster",
-  "title": "Geometric poster",
-  "notes": "Original composition study. Replace the subject, copy and evidence; preserve the relevant design principle. Photographs are separately credited.\nTreat shapes as a deliberate composition with a readable text zone.\nOne geometric grammar; large quiet areas; never imply fabricated data.",
-  "sources": [],
-  "exportPolicy": "final",
-  "className": "c-slide",
-  "content": "<div style=\"position:absolute;inset:0;background:#f5f0e6;color:#17252d\"><div aria-hidden=\"true\" style=\"position:absolute;left:690px;top:0px;width:590px;height:720px;background:#d0ad71;\"></div><div aria-hidden=\"true\" style=\"position:absolute;left:775px;top:80px;width:355px;height:355px;background:#b44832;border-radius:50%\"></div><div aria-hidden=\"true\" style=\"position:absolute;left:942px;top:240px;width:220px;height:325px;background:#214a61;\"></div><div aria-hidden=\"true\" style=\"position:absolute;left:710px;top:532px;width:475px;height:25px;background:#f5f0e6;\"></div><h1 class=\"c-title\" style=\"left:60px;top:102px;width:630px;font-size:96px\">Form<br/>with intent.</h1><p class=\"c-body\" style=\"left:65px;top:447px;width:555px;\">A coherent family of shapes.<br/>A quiet field for the message.</p><div class=\"c-foot\">Decorative forms. No values or trends are encoded.</div></div>"
+  id: 'composition-geometric-poster',
+  title: 'Geometric poster: shapes constructed from the subject’s own proportions',
+  className: 'st cs-luxury-noir cmp-geometric-poster',
+  notes: `Purpose: Make a poster-like title page (a concert, an exhibition, a lecture series) whose shapes are a construction drawing of the subject, so the image is also a true statement: here the arcs are the vibrating segments of the first ${harmonics} harmonics of one string.\nModify: Keep one geometric rule and derive every shape from the subject's numbers: change \`harmonics\` or \`featured\`, or replace the rule (paper sizes halving at 1:√2, a scale's frequency ratios, orbits to scale). Replace \`concert\`.\nInvariant: One kind of mark (arcs on one baseline), thin and unfilled; one accent for the one element the event is about; the text keeps its own zone (columns 1–3 and the top band) and never crosses a line; a caption says what the geometry is, so it cannot be read as data it is not.\nStatic: Already static.`,
+  sources: [{ type: 'original-example', file: 'assets/compositions/geometric-poster.mjs' }],
+  exportPolicy: 'final',
+  content: `<figure class="gp-art" data-region="primary">${drawing()}</figure>
+<h1 class="gp-title" data-region="title">${concert.title}</h1>
+<p class="gp-line" data-region="support">${concert.line}</p>
+<p class="gp-meta" data-region="support">${concert.people.join('<br>')}<br><br>${concert.when}<br>${concert.where}</p>
+<p class="gp-caption" data-region="source">Drawn to scale: the arcs are the vibrating parts of one string in its first ${harmonics} harmonics. Touched lightly at ${fraction[featured]} of its length, the string sounds the ${ordinal(featured)} (gold).</p>`,
 };

@@ -13,12 +13,13 @@ const errors = [ // share of requests returning 5xx, %, same samples (illustrati
   6.6, 5.1, 3.2, 1.8, 0.9, 0.5, 0.3, 0.3, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2,
 ];
 const slo = 500; // latency objective, ms
+const release = '4.18';
 const clock = i => { const t = start.h * 60 + start.m + i * every; return `${Math.floor(t / 60)}:${String(t % 60).padStart(2, '0')}`; };
 const deploy = 6, rollback = 20; // sample indices of the release and of the start of the rollback
 const peak = latency.indexOf(Math.max(...latency));
 const recovered = latency.findIndex((v, i) => i > peak && v <= slo);
 const stops = [ // cursor instants, one per build
-  { i: deploy, what: 'v4.18 deployed', crumb: 'deploy' }, { i: peak, what: 'Peak', crumb: 'peak' }, { i: recovered, what: `Back under ${slo} ms`, crumb: 'recovered' },
+  { i: deploy, what: `v${release} deployed`, crumb: 'deploy' }, { i: peak, what: 'Peak', crumb: 'peak' }, { i: recovered, what: `Back under ${slo} ms`, crumb: 'recovered' },
 ];
 const above = latency.map((v, i) => (v > slo ? i : -1)).filter(i => i >= 0);
 const aboveMin = above.length * every;
@@ -40,7 +41,7 @@ export function figure(theme = 'css') {
     const l1 = [clock(s.i), s.what], l2 = [`p95 ${fmt(latency[s.i])} ms`, `errors ${fmt(errors[s.i], { digits: 1 })}%`];
     const w = Math.max(measureText(l1.join('   '), 18, { weight: 700 }), measureText(l2.join('   '), 17, { family: 'mono' })) + 28;
     const bx = Math.min(Math.max(x(s.i) - w / 2, m.l), W - m.r - w);
-    return g({ 'data-step': k + 1, 'data-until': k + 1, 'data-motion': 'reveal', 'data-delay': k ? move - 100 : 250, 'data-duration': 300 },
+    return g({ 'data-step': k + 1, 'data-until': k < stops.length - 1 ? k + 1 : null, 'data-motion': 'reveal', 'data-delay': k ? move - 100 : 250, 'data-duration': 300 },
       // two readout lines; fields are separated by space, not by punctuation
       el('text', { x: bx + 14, y: 28, 'font-size': 18, 'font-weight': 700, fill: t.c('accent') }, l1[0], el('tspan', { dx: 14 }, l1[1])),
       el('text', { x: bx + 14, y: 52, 'font-size': 17, fill: t.c('ink'), 'font-family': mono }, l2[0], el('tspan', { dx: 18 }, l2[1])),
@@ -48,7 +49,7 @@ export function figure(theme = 'css') {
   };
   return svgRoot({ id: 'motion-time-cursor-fig', width: W, height: H, theme: t,
     title: `p95 latency and error rate, ${clock(0)} to ${clock(latency.length - 1)}, with a cursor at three instants`,
-    desc: `After v4.18 was deployed at ${clock(deploy)}, p95 latency rose to ${fmt(latency[peak])} ms at ${clock(peak)} with ${errors[peak]}% errors. It stayed above the ${slo} ms objective for ${aboveMin} minutes and was back under it at ${clock(recovered)}, ${(recovered - rollback) * every} minutes after the rollback began.` },
+    desc: `After v${release} was deployed at ${clock(deploy)}, p95 latency rose to ${fmt(latency[peak])} ms at ${clock(peak)} with ${errors[peak]}% errors. It stayed above the ${slo} ms objective for ${aboveMin} minutes and was back under it at ${clock(recovered)}, ${(recovered - rollback) * every} minutes after the rollback began.` },
   // build 3: the span above the objective, shaded behind the series and bracketed in the gap below it
   g({ 'data-step': 3, 'data-motion': 'reveal', 'data-delay': move, 'data-duration': 500 },
     el('rect', { x: x(above[0] - 0.5), y: p1.top, width: x(above.at(-1) + 0.5) - x(above[0] - 0.5), height: p1.bottom - p1.top, fill: t.c('grid') }),
@@ -81,7 +82,7 @@ export default {
   notes: 'Purpose: Keep the full trajectory visible while a cursor highlights one instant per build, with readouts taken from the data at that instant.\nModify: Replace `latency`, `errors`, the sampling clock and `stops`; cursor positions, readouts, the time above the objective and the headline recompute.\nInvariant: The series never redraw or rescale; only the cursor moves, at a pace proportional to elapsed time (linear easing); each readout shows the sampled values at its instant, not interpolated ones.\nStatic: The final build shows the last instant, the span above the objective and the rollback time. If every instant matters in print, export each build as its own page.',
   sources: [{ type: 'original-example', file: 'assets/motion/time-cursor.mjs' }],
   exportPolicy: 'final',
-  content: `<h1 class="st-head">Release 4.18 held p95 latency above the ${slo}&nbsp;ms objective for <em>${aboveMin}&nbsp;minutes</em>, peaking at ${fmt(latency[peak] / 1000, { digits: 1 })}&nbsp;s</h1>
+  content: `<h1 class="st-head">Release ${release} held p95 latency above the ${slo}&nbsp;ms objective for <em>${aboveMin}&nbsp;minutes</em>, peaking at ${fmt(latency[peak] / 1000, { digits: 1 })}&nbsp;s</h1>
 <figure class="st-fig" data-region="primary">${figure()}</figure>
 <p class="st-source" data-region="source"><span>Illustrative data · 2-minute samples from the edge proxies, ${clock(0)}–${clock(latency.length - 1)}</span><span>Motion · time cursor with looked-up readouts (3 builds)</span></p>`,
 };

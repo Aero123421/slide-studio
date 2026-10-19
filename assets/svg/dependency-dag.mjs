@@ -1,7 +1,7 @@
 // Diagram study · Dependency graph — which work waits on which, and which chain sets the date.
 // Tasks and "must finish before" edges are data; earliest starts, slack, the critical path,
 // the accent and the headline are computed. Columns are dependency depth, not dates.
-import { flowDiagram, theme as makeTheme, fmt } from '../runtime/figure.mjs';
+import { flowDiagram, theme as makeTheme } from '../runtime/figure.mjs';
 
 const tasks = [ // working days (illustrative), listed so that every dependency comes first
   { id: 'cut', label: 'Branch cut', days: 1, after: [] },

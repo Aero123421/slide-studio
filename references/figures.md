@@ -107,38 +107,42 @@ wrap, `marker: 'dot'|'ring'|'none'`, `leader: 'elbow'|'straight'|'none'`.
 | `areaChart` | same | Filled to zero |
 | `smallMultiples` | `panels:[{title, values}]`, `x` | Shared y scale across panels |
 | `ganttChart` | `tasks:[{label, start, end, group, milestone, done}]`, `ticks` | `today` line |
-| `timelineChart` | `events:[{at, label, title, body}]`, `periods` | True time spacing unless `equal:true` |
+| `timelineChart` | `events:[{at, label, title, body}]`, `periods` | True time spacing unless `equal:true`; text blocks take the first free side/stem level (`stem`, `stemStep`, `side`) |
 | `funnelChart` | `stages:[{label, value}]` | Step conversion between stages; `alertBelow` |
 | `sankeyChart` | `nodes`, `links:[{source, target, value}]` | Layered; link width ∝ value |
 
 ### Distribution and uncertainty (computed from raw values)
 | `histogram` | `values`, `bins` | `highlightRange`, `marks:[{value,label}]` |
 | `ecdfChart` | `series:[{name, values}]` | Median guides |
-| `boxPlot` | `groups:[{label, values}]` | Tukey 1.5×IQR; points shown by default; n and median labelled |
+| `boxPlot` | `groups:[{label, values}]` | Tukey 1.5×IQR; observations as a non-overlapping dot strip; n and median labelled (Japanese words with `locale:'ja'`, or `words:{n, median, sep}`) |
 | `violinPlot` | `groups` | Gaussian KDE (Silverman) with IQR and median |
 | `stripPlot` | `groups` | Deterministic beeswarm |
-| `errorBarChart` | `groups:[{label, values}]` or `{mean, low, high}` | `interval:'ci95'|'se'|'sd'|fn`; states its definition |
+| `errorBarChart` | `groups:[{label, values}]` or `{mean, low, high}` | `interval:'ci95'` (t-based) `|'se'|'sd'|fn`; states its definition |
 | `forestPlot` | `rows:[{label, estimate, low, high, weight}]` | `reference`, `summary` diamond, `favors`, `xLog` |
 
 ### Relationship and models
-| `scatterPlot` | `points:[{x, y, label, group}]` | `fit:'linear'` with 95% band of the mean; `quadrants`; labeled points spread |
+| `scatterPlot` | `points:[{x, y, label, group}]` | `fit:'linear'` with 95% band of the mean (`fitColor`); `quadrants`; labeled points spread |
 | `heatmap` | `rows`, `cols`, `values` | `scale:'sequential'|'diverging'`, `center`; contrast-safe cell labels |
 | `confusionMatrix` | `labels`, `matrix[actual][predicted]` | Counts and row rates |
 | `rocCurve`, `prCurve` | `curves:[{name, scores, labels}]` | AUC / AP computed; `operating` point |
-| `calibrationChart` | `probs`, `labels` | Reliability curve + counts per bin |
+| `calibrationChart` | `probs`, `labels` | Reliability curve + counts per bin; `extra(ctx)` gets the count-histogram geometry |
 | `residualPlot` | `points:[{x, residual}]` | ±2 SD band; outliers flagged |
 | `learningCurve` | `sizes`, `train`, `val` (`{mean, sd}`) | Log x by default; gap bracket |
 
 ### Diagrams
 | `flowDiagram` | `nodes:[{id, label, sub, kind, emphasis, muted}]`, `edges:[{from, to, label, style, emphasis, back}]` | Layered layout (`direction:'lr'|'tb'`), cycles as feedback arcs, `groups` (boundaries), `lanes` (swimlanes), or manual `x,y` |
-| `treeDiagram` | `root:{label, children, edgeLabel}` | Decision / issue trees, `direction:'tb'|'lr'` |
+| `treeDiagram` | `root:{label, children, edgeLabel}` | Decision / issue trees, `direction:'tb'|'lr'`; `labelPos` (0–1 along the last leg) |
 | `sequenceDiagram` | `actors` (names or `{id, label}`), `messages:[{from, to, label, kind}]` | sync / reply / async / self; `numbered` |
-| `networkDiagram` | `nodes`, `edges` | `layout:'force'|'ring'|'star'|'grid'|'manual'`; seeded, deterministic |
+| `networkDiagram` | `nodes`, `edges` | `layout:'force'|'ring'|'star'|'grid'|'manual'`; seeded, deterministic; `edgeColor` |
 | `quadrantChart` | `quadrants`, `items:[{label, x, y}]`, `x`, `y` | Quadrant names in the outer corners; item labels placed to avoid collisions; `highlightQuadrant`. Positions are judgments — say so |
 | `cycleDiagram` | `steps:[{label, sub}]`, `center` | Arrows along the circle |
 | `bipartiteDiagram` | `left`, `right` (names or `{id, label}`), `links` (`[from, to]` or `{from, to, weight}`) | Two kinds of entities kept apart |
 | `layerDiagram` | `layers:[{label, items}]` | Architecture strata |
 | `matrixDiagram` | `rows`, `cols`, `cells`, `symbols` | RACI / coverage with ●◐○ |
+
+All statistics charts accept `xTickValues` / `yTickValues` for explicit ticks (e.g. hourly marks).
+Diagrams accept `arrowSize` (default 12). In `flowDiagram`, `labelPos: 0.5` on an edge puts its
+label at the middle of the connector — use it when labels would meet arrowheads in tight layers.
 
 Node kinds: `process` (default), `terminal`, `decision`, `data`, `store`, `note`,
 `circle`, `plain`. Edge `style`: `'dashed'|'dotted'`; `emphasis:true` uses the

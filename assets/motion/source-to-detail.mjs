@@ -22,11 +22,14 @@ const dies = (() => {
   return out;
 })();
 const fails = dies.filter(d => d.value > limit);
-const clock = d => ((Math.round(((90 - (Math.atan2(d.cy, d.cx) * 180) / Math.PI) / 30) + 12) % 12) || 12);
-const edgeFails = fails.filter(d => Math.hypot(d.cx, d.cy) > radius * 0.5 && [1, 2, 3].includes(clock(d)));
-// The block we enlarge: 6 × 5 dies centred on the densest fails.
-const block = { col: 17, row: 4, cols: 6, rows: 5 };
-const inBlock = d => d.col >= block.col && d.col < block.col + block.cols && d.row >= block.row && d.row < block.row + block.rows;
+const clock = d => ((Math.round(((90 - (Math.atan2(d.cy, d.cx) * 180) / Math.PI) / 30) + 12) % 12) || 12); // clock hour of a die
+const edgeHour = 2; // the edge the headline names; fails within an hour either side count
+const edgeFails = fails.filter(d => Math.hypot(d.cx, d.cy) > radius * 0.5 && Math.abs(clock(d) - edgeHour) <= 1);
+// The block we enlarge: the 6 × 5 window holding the most failing dies.
+const inWin = (b, d) => d.col >= b.col && d.col < b.col + b.cols && d.row >= b.row && d.row < b.row + b.rows;
+const block = Array.from({ length: (gridN - 5) * (gridN - 4) }, (_, i) => ({ col: i % (gridN - 5), row: Math.floor(i / (gridN - 5)), cols: 6, rows: 5 }))
+  .reduce((best, b) => (fails.filter(d => inWin(b, d)).length > fails.filter(d => inWin(best, d)).length ? b : best));
+const inBlock = d => inWin(block, d);
 
 export function figure(theme = 'css') {
   const t = makeTheme(theme), W = 1152, H = 470, p = 18.4, C = { x: 250, y: 232 }, k = 4.2;
@@ -62,7 +65,7 @@ export function figure(theme = 'css') {
       const [x0, y0] = toDet(dx(d.col), dy(d.row)), fail = d.value > limit;
       return textLines([d.value.toFixed(1)], { x: x0 + (p * k) / 2, y: y0 + (p * k) / 2, size: 18, anchor: 'middle', valign: 'middle', fill: fail ? t.c('onAccent') : t.c('ink'), weight: fail ? 700 : 400, attrs: { 'font-variant-numeric': 'tabular-nums' } });
     })),
-  textLines([`Leakage, nA, at 4.2×: fails are above ${limit}`], { x: det.x, y: det.y + det.h + 26, size: 16, fill: t.c('muted'), attrs: { 'data-step': 2, 'data-motion': 'reveal', 'data-delay': 300 } }),
+  textLines([`Leakage in nA, enlarged 4.2×; dies above ${limit} nA fail`], { x: det.x, y: det.y + det.h + 26, size: 16, fill: t.c('muted'), attrs: { 'data-step': 2, 'data-motion': 'reveal', 'data-delay': 300 } }),
   g({},
     el('rect', { x: 0, y: H - 18, width: 14, height: 14, fill: t.c('accent') }),
     textLines([`Failing dies (${fails.length})`], { x: 20, y: H - 11, size: 16, valign: 'middle', fill: t.c('ink') }),
@@ -75,10 +78,10 @@ export default {
   id: 'motion-source-to-detail',
   title: 'Source to detail: a tethered, enlarged crop',
   className: 'st cs-manufacturing-plant',
-  notes: `Purpose: Move from a whole object to a detail without losing where the detail came from: the crop stays outlined on the source, tethers connect it to the enlarged view, and the values appear only once the detail is large enough to hold them.\nModify: Replace \`dies\` with measured values and move \`block\` to the region you need; the crop, the 4.2× transform, the tethers and the labels are computed from it.\nInvariant: The detail is the same drawing through <use>, scaled from the crop (registered at state 0); the crop outline and the tethers stay in every later build.\nStatic: The final build shows the wafer, the outlined crop, the tethered detail and the die values.`,
+  notes: `Purpose: Move from a whole object to a detail without losing where the detail came from: the crop stays outlined on the source, tethers connect it to the enlarged view, and the values appear only once the detail is large enough to hold them.\nModify: Replace \`dies\` with measured values; the enlarged block is the 6 × 5 window holding the most failing dies, and the crop, the 4.2× transform, the tethers and the labels are computed from it. Set \`edgeHour\` to the edge the headline names.\nInvariant: The detail is the same drawing through <use>, scaled from the crop (registered at state 0); the crop outline and the tethers stay in every later build.\nStatic: The final build shows the wafer, the outlined crop, the tethered detail and the die values.`,
   sources: [{ type: 'original-example', file: 'assets/motion/source-to-detail.mjs' }],
   exportPolicy: 'final',
-  content: `<h1 class="st-head">${edgeFails.length} of the wafer’s ${fails.length} <em>failing dies</em> sit at the 2 o’clock edge</h1>
+  content: `<h1 class="st-head">${edgeFails.length} of the wafer’s ${fails.length} <em>failing dies</em> sit at the ${edgeHour} o’clock edge</h1>
 <figure class="st-fig" data-region="primary">${figure()}</figure>
 <p class="st-source" data-region="source"><span>Illustrative data · probe test of one 300 mm wafer, ${dies.length} dies</span><span>Motion · tethered crop grows into a detail (2 builds)</span></p>`,
 };

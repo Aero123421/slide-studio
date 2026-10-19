@@ -2,7 +2,7 @@
 // Conditions are written on the branches they govern. Payoffs are drawn as signed bars on one
 // zero line, with each option's expected value marked between its outcomes. Expected values,
 // the preferred option, the break-even probability and the headline are rolled back from data.
-import { theme as makeTheme, svgRoot, el, g, textLines, linear, measureNode, drawNode, roundedPolyline, arrowMarker, fmt, sum } from '../runtime/figure.mjs';
+import { theme as makeTheme, svgRoot, el, textLines, linear, measureNode, drawNode, roundedPolyline, arrowMarker, fmt, sum } from '../runtime/figure.mjs';
 
 const growth = 0.4; // probability that summer demand grows ≥ 3 %/yr (planning estimate)
 const conditions = [{ key: 'grows', label: 'demand grows', p: growth }, { key: 'flat', label: 'demand flat', p: 1 - growth }];

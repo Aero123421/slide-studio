@@ -11,9 +11,9 @@
  *   inputs, sliders, editors, media or [data-interactive] regions.
  *
  * Authoring hooks (see references/motion-and-interaction.md)
- *   data-step="n"            visible from build n (0 = start); data-until="m" hides after m
+ *   data-step="n"            visible from build n (0 = start); data-until="m" hides after m (alone: visible 0..m)
  *   data-motion="preset"     entry effect when the element appears
- *   data-delay="ms"          wait before the entry effect (stagger by hand)
+ *   data-delay="ms"          wait before the entry effect or data-states change (stagger by hand)
  *   data-stagger="ms"        animate the element's children one after another
  *   data-duration="ms"       effect length (default 500, max 1600)
  *   data-easing="name|css"   standard | emphasized | decelerate | accelerate | linear | smooth | any CSS easing
@@ -36,8 +36,10 @@
 
   // ------------------------------------------------------------ build bookkeeping
 
-  const max = i => Math.max(0, ...[...slides[i].querySelectorAll('[data-step],[data-states]')].flatMap(el => {
+  const max = i => Math.max(0, ...[...slides[i].querySelectorAll('[data-step],[data-until],[data-states]')].flatMap(el => {
     const v = [Number(el.dataset.step) || 0];
+    // data-until="m" hides the element after build m, so build m + 1 must exist.
+    if (el.dataset.until !== undefined) v.push(Number(el.dataset.until) + 1);
     try { if (el.dataset.states) v.push(...Object.keys(JSON.parse(el.dataset.states)).map(Number)); } catch { /* reported below */ }
     return v.filter(Number.isFinite);
   }));
@@ -204,8 +206,8 @@
 
   /** Static state for a slide root (also used on presenter clones). */
   function applyStatic(root, at, original = root) {
-    for (const el of root.querySelectorAll('[data-step]')) {
-      const on = at >= Number(el.dataset.step) && (el.dataset.until === undefined || at <= Number(el.dataset.until));
+    for (const el of root.querySelectorAll('[data-step],[data-until]')) {
+      const on = at >= Number(el.dataset.step ?? 0) && (el.dataset.until === undefined || at <= Number(el.dataset.until));
       el.dataset.studioHidden = String(!on);
     }
     const originals = [...original.querySelectorAll('[data-states]')];
@@ -218,8 +220,8 @@
 
   function apply(i, at, animate) {
     const slide = slides[i];
-    for (const el of slide.querySelectorAll('[data-step]')) {
-      const on = at >= Number(el.dataset.step) && (el.dataset.until === undefined || at <= Number(el.dataset.until));
+    for (const el of slide.querySelectorAll('[data-step],[data-until]')) {
+      const on = at >= Number(el.dataset.step ?? 0) && (el.dataset.until === undefined || at <= Number(el.dataset.until));
       const was = el.dataset.studioHidden === 'false';
       el.dataset.studioHidden = String(!on);
       el.setAttribute('aria-hidden', String(!on));
@@ -234,7 +236,10 @@
       const tr = tracks.get(el);
       if (!tr) continue;
       const to = stateAt(tr, at);
-      transition(el, to, animate);
+      // data-delay (and a parent's data-stagger) sequence transformations the same way as entries.
+      const parent = el.parentElement, gap = parent && parent.dataset.stagger !== undefined ? Math.max(0, Number(parent.dataset.stagger) || 0) : 0;
+      const delay = Math.min(2400, delayOf(el) + (gap ? [...parent.children].indexOf(el) * gap : 0));
+      transition(el, to, animate, null, { delay });
       const hidden = el.dataset.studioHidden === 'true' || to.opacity === 0 || to.opacity === '0' || to.visibility === 'hidden';
       el.setAttribute('aria-hidden', String(hidden));
       el.inert = hidden;
@@ -282,7 +287,7 @@
     step = Math.max(0, Math.min(max(current), Math.floor(Number(n) || 0)));
     if (exporting) step = max(current);
     const changed = previous !== current;
-    if (changed) { pauseSlide(previous); for (const el of slides[current].querySelectorAll('[data-step]')) el.dataset.studioHidden = 'true'; }
+    if (changed) { pauseSlide(previous); for (const el of slides[current].querySelectorAll('[data-step],[data-until]')) el.dataset.studioHidden = 'true'; }
     document.body.dataset.export = String(exporting);
     slides.forEach((sl, j) => {
       const active = j === current;

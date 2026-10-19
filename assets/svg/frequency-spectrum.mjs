@@ -81,16 +81,16 @@ export function figure(theme = 'css') {
     title: 'Vibration velocity spectrum of a pump bearing, 0–250 Hz',
     desc: `RMS velocity spectrum (Hann window, ${M}-point FFT, ${averages} averages, ${binHz} Hz bins) on a log scale. Peaks: ${peaks.map(p => `${p.name} at ${hz(p.f)} Hz, ${fmt(p.at.a, { digits: 2 })} mm/s`).join('; ')}. The outer-race defect tone stands ${fmt(focus.db, { digits: 0 })} dB above the local background.` },
   // axes: log amplitude, linear frequency
-  [0.01, 0.1, 1].map(v => g({}, el('line', { x1: box.x, x2: box.x + box.w, y1: y(v), y2: y(v), stroke: t.c('grid') }),
+  [0.01, 0.1, 1].map(v => g({}, el('line', { fill: 'none', x1: box.x, x2: box.x + box.w, y1: y(v), y2: y(v), stroke: t.c('grid') }),
     textLines([fmt(v)], { x: box.x - 10, y: y(v), size: 15, anchor: 'end', valign: 'middle', fill: t.c('muted') }))),
   textLines(['mm/s RMS'], { x: box.x - 54, y: box.y - 6, size: 15, valign: 'bottom', fill: t.c('muted') }),
-  el('line', { x1: box.x, x2: box.x + box.w, y1: box.y + box.h, y2: box.y + box.h, stroke: t.c('ink'), 'stroke-width': 1.2 }),
-  [0, 50, 100, 150, 200, 250].map(v => g({}, el('line', { x1: x(v), x2: x(v), y1: box.y + box.h, y2: box.y + box.h + 5, stroke: t.c('ink') }),
+  el('line', { fill: 'none', x1: box.x, x2: box.x + box.w, y1: box.y + box.h, y2: box.y + box.h, stroke: t.c('ink'), 'stroke-width': 1.2 }),
+  [0, 50, 100, 150, 200, 250].map(v => g({}, el('line', { fill: 'none', x1: x(v), x2: x(v), y1: box.y + box.h, y2: box.y + box.h + 5, stroke: t.c('ink') }),
     textLines([String(v)], { x: x(v), y: box.y + box.h + 10, size: 15, anchor: v === 0 ? 'start' : v === fMax ? 'end' : 'middle', valign: 'top', fill: t.c('muted') }))),
   textLines(['Frequency, Hz'], { x: box.x + box.w, y: H - 2, size: 15, anchor: 'end', valign: 'bottom', fill: t.c('muted') }),
   // background, spectrum, and the one prominence that matters
   el('path', { d: line(background), fill: 'none', stroke: t.c('muted'), 'stroke-width': 1.5, 'stroke-dasharray': '6 4' }),
-  el('line', { x1: bgX, x2: bgX, y1: y(0.3) + 22, y2: bgY - 3, stroke: t.c('muted'), 'stroke-width': 1 }),
+  el('line', { fill: 'none', x1: bgX, x2: bgX, y1: y(0.3) + 22, y2: bgY - 3, stroke: t.c('muted'), 'stroke-width': 1 }),
   textLines(['background', 'running median'], { x: bgX, y: y(0.3), size: 15, anchor: 'middle', valign: 'middle', fill: t.c('muted'), lineHeight: 1.2 }),
   el('path', { d: line(spectrum), fill: 'none', stroke: t.c('ink'), 'stroke-width': 1.5, 'stroke-linejoin': 'round' }),
   el('path', { d: `M${fx + 6} ${fy}H${fx}V${ty}H${fx + 6}`, fill: 'none', stroke: t.c('accent'), 'stroke-width': 1.6 }),
@@ -106,7 +106,7 @@ export default {
   notes: 'Purpose: Show which frequencies carry energy, how far each peak stands above the background, and the processing that defines the amplitudes.\nModify: Edit `components`, `shaft` and `acquisition`; the signal is re-synthesized and re-analyzed (Hann window, Welch averaging), and the peak labels, background and dB figure recompute. With measured data, replace `signal` and keep the analysis.\nInvariant: Frequency in Hz on a linear axis; the amplitude convention (RMS velocity, mm/s), the window, FFT length, averages and bin width are stated on the page; the background is computed, not sketched.\nStatic: Already static. For a talk, show the spectrum, then the defect tone and its prominence.',
   sources: [{ type: 'original-example', file: 'assets/svg/frequency-spectrum.mjs' }],
   exportPolicy: 'final',
-  content: `<h1 class="st-head">The ${fmt(focus.f, { digits: 0 })} Hz outer-race tone stands <em>${fmt(focus.db, { digits: 0 })} dB</em> above the background: the bearing, not the impeller, needs attention</h1>
+  content: `<h1 class="st-head">The ${fmt(focus.f, { digits: 0 })} Hz outer-race tone stands <em>${fmt(focus.db, { digits: 0 })}&nbsp;dB</em> above the background: the bearing, not the impeller, needs attention</h1>
 <div class="st-rail" data-region="support">
   <div class="st-kpi"><b class="st-accent">${fmt(focus.at.a, { digits: 2 })}<small style="font-size:.4em;font-weight:500;margin-left:.15em">mm/s</small></b><span>RMS velocity at the bearing-defect frequency, ${fmt(3.58, { digits: 2 })} × shaft speed.</span></div>
   <hr class="st-rule">

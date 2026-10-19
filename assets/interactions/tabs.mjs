@@ -1,5 +1,6 @@
 // Interaction study · Sections on demand — one research summary page whose background, method, result and
-// limits open on request (Japanese page). Every number in the text is computed from `study` below.
+// limits open on request (Japanese page). Every number in the text and the figures is computed from `study` below.
+import { forestPlot } from '../runtime/figure.mjs';
 const study = {
   period: '2025年4月〜2026年3月', minutes: 10, grade: '4年生',
   schools: { reading: 6, comparison: 6 },
@@ -16,6 +17,27 @@ const m = (n.reading + n.comparison) / (study.schools.reading + study.schools.co
 const ciSchool = [diff - 1.96 * se * Math.sqrt(deff), diff + 1.96 * se * Math.sqrt(deff)];
 const p1 = v => v.toFixed(1), total = n.reading + n.comparison, schools = study.schools.reading + study.schools.comparison;
 const range = ([a, b]) => `${p1(a)}〜${p1(b)}点`;
+// Each group's mean gain with its 95% interval (pupil level), for the result figure.
+const groupCI = k => { const h = 1.96 * g[k].sd / Math.sqrt(n[k]); return [g[k].mean - h, g[k].mean + h]; };
+const ciText = r => `${p1(r.estimate)}点  [${p1(r.low)}, ${p1(r.high)}]`;
+const FIG = { width: 816, size: 17, labelSize: 18, columnText: ciText };
+const resultFigure = forestPlot({ ...FIG, id: 'interaction-tabs-result', height: 196, rowHeight: 40,
+  title: '1年間の語彙の伸び（平均と95%信頼区間）', desc: `朝読書の学校${p1(g.reading.mean)}点、比べた学校${p1(g.comparison.mean)}点`,
+  rows: [
+    { label: `朝読書の${study.schools.reading}校（${n.reading}人）`, estimate: g.reading.mean, low: groupCI('reading')[0], high: groupCI('reading')[1] },
+    { label: `比べた${study.schools.comparison}校（${n.comparison}人）`, estimate: g.comparison.mean, low: groupCI('comparison')[0], high: groupCI('comparison')[1] },
+  ],
+  highlight: `朝読書の${study.schools.reading}校（${n.reading}人）`, marker: 'circle', domain: [0, 12], xTickValues: [0, 2, 4, 6, 8, 10, 12],
+  columnTitle: '平均の伸び［95%区間］', xLabel: '語彙テスト（100点満点）の1年間の伸び（点）' });
+// The same difference with the interval at pupil level and with the school clustering, for the limits figure.
+const limitsFigure = forestPlot({ ...FIG, id: 'interaction-tabs-limits', height: 176, rowHeight: 40,
+  title: '伸びの差の95%区間：児童単位と学校単位', desc: `児童単位${range(ci)}、学校単位${range(ciSchool)}`,
+  rows: [
+    { label: '児童ごとに独立と見なす', estimate: diff, low: ci[0], high: ci[1] },
+    { label: `学校のまとまりを考える（級内相関${study.icc}）`, estimate: diff, low: ciSchool[0], high: ciSchool[1] },
+  ],
+  highlight: `学校のまとまりを考える（級内相関${study.icc}）`, marker: 'circle', reference: 0, domain: [0, 6], xTickValues: [0, 1, 2, 3, 4, 5, 6],
+  columnTitle: '伸びの差［95%区間］', xLabel: '朝読書の学校と比べた学校の伸びの差（点）' });
 
 const sections = [
   { id: 'background', name: '背景', title: '語彙の差は4年生で開き始める',
@@ -26,10 +48,10 @@ const sections = [
     facts: [{ value: `${total}人`, label: `${study.grade}、2校群の合計` }], status: `方法：${total}人の伸びを2群で比べた。` },
   { id: 'result', name: '結果', title: `伸びの差は${p1(diff)}点`,
     body: [`朝読書の学校は平均${p1(g.reading.mean)}点、比べた学校は${p1(g.comparison.mean)}点伸びた。差は${p1(diff)}点で、95%信頼区間は${range(ci)}。`],
-    facts: [{ value: `+${p1(diff)}点`, label: '1年間の伸びの差' }, { value: range(ci), label: '95%信頼区間（児童単位）' }], status: `結果：差は${p1(diff)}点（${range(ci)}）。` },
+    facts: [{ value: `+${p1(diff)}点`, label: '1年間の伸びの差' }], figure: resultFigure, status: `結果：差は${p1(diff)}点（${range(ci)}）。` },
   { id: 'limits', name: '限界', title: '因果とまでは言えない',
-    body: ['学校が自分で朝読書を選んだので、熱心な学校ほど始めた可能性がある。', `児童は学校ごとにまとまっている。学校内の相関を${study.icc}と仮定すると、区間は${range(ciSchool)}に広がる。テストは1種類で、読解力は測っていない。`],
-    facts: [{ value: range(ciSchool), label: '学校単位で見た95%区間' }], status: `限界：学校単位で見ると区間は${range(ciSchool)}。` },
+    body: ['学校が自分で朝読書を選んだので、熱心な学校ほど始めた可能性がある。', `学校のまとまりを考えると、区間は${range(ciSchool)}に広がる。テストは1種類で、読解力は測っていない。`],
+    facts: [{ value: range(ciSchool), label: '学校単位で見た95%区間' }], figure: limitsFigure, status: `限界：学校単位で見ると区間は${range(ciSchool)}。` },
 ];
 const ID = 'interaction-tabs';
 

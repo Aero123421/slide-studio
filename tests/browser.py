@@ -64,7 +64,7 @@ def main():
    check('component inspection updates explanation',hotspots)
    def tabs():
     cfg=study('tabs');sec=cfg['data']['sections'][-1];r=show('tabs');r.get_by_label(sec['name'],exact=True).check()
-    expect(sec['body'][0][:20] in r.inner_text());expect(state('tabs')['tab']==sec['id']);reset('tabs')
+    expect(sec['body'][0][:20] in r.inner_text());expect(state('tabs')['tab']==sec['id']);expect(('figure' in sec)==(r.locator('.w-reading-figure svg').count()==1),'a section draws its figure, and only then');reset('tabs')
    check('optional section changes actual content',tabs)
    def layers():
     cfg=study('layers');shown=[l for l in cfg['data']['layers'] if cfg['initial'].get(l['id'])]

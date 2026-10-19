@@ -75,8 +75,8 @@ finished example with computed headlines.
   Japanese, each computing its headline from the data it passes to the widget.
   `widgets.js` takes richer, optional config per kind — control labels with units, axes,
   per-kind data, status and readout templates, documented parameter models (`dosing`,
-  `decay`, `logistic`) — draws real axes and direct labels, and renders meshes with a
-  depth buffer so hidden surfaces are exact at every angle. Decks that pass no data get
+  `decay`, `logistic`), a figure under a `tabs` section — draws real axes and direct
+  labels, and renders meshes with a depth buffer so hidden surfaces are exact at every angle. Decks that pass no data get
   the original fixtures and behaviour (a browser check keeps it so).
 - Player: switching reduced motion *off* no longer settles a build that is still running
   (only switching it on does); a late media-change event used to cut a delayed build short.

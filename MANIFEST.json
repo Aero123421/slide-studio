@@ -17,8 +17,8 @@
     },
     {
       "path": "CHANGELOG.md",
-      "bytes": 14585,
-      "sha256": "76e6c6df61e218a2b9ea1b5149fefac0c22a44acfa5d94e83e1a3f2e75ddcc37"
+      "bytes": 14618,
+      "sha256": "2dfa71e1fde4b5fa204e7ae35cec34ccda85a0f861f28e3a26983f93b0736053"
     },
     {
       "path": "CONTRIBUTING.md",
@@ -637,13 +637,13 @@
     },
     {
       "path": "assets/interactions/study.css",
-      "bytes": 84559,
-      "sha256": "17fd352b100310157da26b0ec055c7251426cfb9051e4dddc6e99a0576874289"
+      "bytes": 84780,
+      "sha256": "eedfeb9d1149c98bfffaf37486698c893b1e21e7365f642582d910af89a67218"
     },
     {
       "path": "assets/interactions/study.extra.css",
-      "bytes": 14477,
-      "sha256": "6e3ce178b6fe4093d2e4b41ed670d3022de77d805e08d0a06fd9a6048e1078ce"
+      "bytes": 14698,
+      "sha256": "9f9c63279fb8f2ef4660b5d3820bb93762b1abcfe0f39585d4db9427fd2f154e"
     },
     {
       "path": "assets/interactions/table.mjs",
@@ -652,8 +652,8 @@
     },
     {
       "path": "assets/interactions/tabs.mjs",
-      "bytes": 5608,
-      "sha256": "5b54e7eb8c532314f0a37c16fd554afdb0992f12a18735f99c20d404a9b08535"
+      "bytes": 7700,
+      "sha256": "48e73c40377828e2da1dccbf83773cedb96613899e8660c087eb6f27e06cc42c"
     },
     {
       "path": "assets/interactions/threshold.mjs",
@@ -1147,8 +1147,8 @@
     },
     {
       "path": "assets/runtime/widgets.js",
-      "bytes": 134584,
-      "sha256": "a86e8e90bb6382a2aa7dd14544e9759c14ff6019b4ed8566be744aeb35d8d98e"
+      "bytes": 134828,
+      "sha256": "23d84b8abab4bb12376caef03fe645d0c3640105b78b78cc20426cb98e47ee7c"
     },
     {
       "path": "assets/story.schema.json",
@@ -2757,8 +2757,8 @@
     },
     {
       "path": "gallery/interactions.html",
-      "bytes": 831018,
-      "sha256": "550ba5a88ef637ac3166f8416f8db5ec095edc2a60ba7aba559dcde72eb8aa53"
+      "bytes": 842839,
+      "sha256": "ea5f6312dda5f40fd8d280c3b7ea2695dbf5863f8e63c7953dea2ac0c5ad68d5"
     },
     {
       "path": "gallery/languages.html",
@@ -2782,8 +2782,8 @@
     },
     {
       "path": "gallery/research.html",
-      "bytes": 298225,
-      "sha256": "2478033d0cec7d91e06e6d3154da03d3560ede7cae583a4988a46d605f06a60c"
+      "bytes": 298690,
+      "sha256": "40999e562b9c1d71479781d614e909dd4deee0bca3e35964ae254a13afe083c6"
     },
     {
       "path": "gallery/templates.html",
@@ -3342,8 +3342,8 @@
     },
     {
       "path": "gallery/thumbs/interaction-tabs.webp",
-      "bytes": 4614,
-      "sha256": "9a78add477f72b44508f008c887fb5bfc97c7f8ded6c9f80caa9c6f74e822114"
+      "bytes": 5040,
+      "sha256": "b60025467c2256def0de031a5884e53ff05a3f6d6c02a4d4b652a9a1a9cf41e4"
     },
     {
       "path": "gallery/thumbs/interaction-threshold.webp",
@@ -4372,8 +4372,8 @@
     },
     {
       "path": "references/motion-and-interaction.md",
-      "bytes": 19314,
-      "sha256": "df3244e8e1aa4b00dbb4e265e5bc3eec9300b8bdfd0d8115c759f3b9a8ce3b3b"
+      "bytes": 19387,
+      "sha256": "a226596449d650dc1771d5c4b4af6a7edad6ef5a32d8258fee62b0e328a4a388"
     },
     {
       "path": "references/repair.md",
@@ -4382,8 +4382,8 @@
     },
     {
       "path": "references/verification-and-delivery.md",
-      "bytes": 23525,
-      "sha256": "270f3102f0c878b63d5735a2ea495fb5e3d8d028eb2c39f68b34327362d55a97"
+      "bytes": 23634,
+      "sha256": "a11b4c1447234f4daf4f276b0dea7b22d6f0e936b0164a236ec39dca84afe334"
     },
     {
       "path": "references/visual-design.md",
@@ -4632,8 +4632,8 @@
     },
     {
       "path": "tests/browser.py",
-      "bytes": 30549,
-      "sha256": "86471568baff5becea02d4ea61f896c7e3ba3e116f17680392aaea24afa344f1"
+      "bytes": 30668,
+      "sha256": "d18a1f7134f86f25867e7c8921555030aef369d37775ae37b6f17f1ac9cb8025"
     },
     {
       "path": "tests/cli.test.mjs",

@@ -218,6 +218,9 @@ body.overview .slide { display: block; transform-origin: top left; transform: sc
 .st .w-reading h2 { grid-column: 1 / -1; font: 650 32px/1.25 var(--ss-font-display, var(--ss-font-sans, Inter, sans-serif)); margin: 0 0 24px; padding-bottom: 18px; border-bottom: 1px solid var(--ss-rule, #d5dbe3); letter-spacing: -.01em; text-wrap: balance; }
 .st .w-reading-body p { font: 400 22px/1.6 var(--ss-font-sans, Inter, sans-serif); margin: 0 0 16px; max-width: 30em; text-wrap: pretty; }
 .st .w-facts { display: grid; gap: 26px; align-content: start; min-width: 200px; }
+.st .w-reading.has-figure { grid-template-rows: auto auto 1fr; }
+.st .w-reading-figure { grid-column: 1 / -1; align-self: end; }
+.st .w-reading-figure svg { display: block; width: 100%; height: auto; overflow: visible; }
 .st:lang(ja) .w-reading h2 { letter-spacing: 0; line-height: 1.4; font-size: 30px; }
 .st:lang(ja) .w-reading-body p { line-height: 1.85; font-size: 21px; max-width: 24em; word-break: auto-phrase; line-break: strict; }
 
@@ -1914,7 +1917,9 @@ KINDS.tabs = w => {
       const i = Math.max(0, sections.findIndex(x => x.id === s.tab)), sec = sections[i];
       const body = (Array.isArray(sec.body) ? sec.body : [sec.body]).map(p => `<p>${esc(p)}</p>`).join('');
       const facts = (sec.facts || []).map(f => `<div class="w-kpi"><b>${esc(f.value)}</b><span>${esc(f.label)}</span></div>`).join('');
-      w.draw(`<article class="w-reading"><h2>${esc(sec.title || sec.name)}</h2><div class="w-reading-body">${body}</div>${facts ? `<div class="w-facts">${facts}</div>` : ''}</article>`);
+      // sec.figure: trusted SVG markup from the deck module (e.g. a figure-engine chart), drawn under the text.
+      const figure = sec.figure ? `<div class="w-reading-figure">${sec.figure}</div>` : '';
+      w.draw(`<article class="w-reading${figure ? ' has-figure' : ''}"><h2>${esc(sec.title || sec.name)}</h2><div class="w-reading-body">${body}</div>${facts ? `<div class="w-facts">${facts}</div>` : ''}${figure}</article>`);
       const vals = { name: sec.name, index: i + 1, count: sections.length };
       return { status: sec.status ?? w.fill(w.text.status || 'Use sections when optional detail would distract from the main explanation.', vals), values: vals };
     },

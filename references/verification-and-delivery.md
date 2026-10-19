@@ -305,8 +305,9 @@ variants such as `cv08`). Chromium writes those code points into the PDF text la
 "18:00" or "1,234" cannot be searched or copied. When the postflight finds that, the
 export renders the PDF once more with those substitutions turned off (layout features
 such as Japanese `palt`, kerning and ligatures stay) and reports
-`textLayerFallback` in its result. Look at the PDF: figures may be proportional instead
-of tabular. A font with standard mappings (Helvetica Neue, Hiragino, Noto) avoids the
+`textLayerFallback` in its result. The fallback also covers elements drawn while the page
+prints (a widget's `onExport` runs on `beforeprint`). Look at the PDF: figures may be
+proportional instead of tabular. A font with standard mappings (Helvetica Neue, Hiragino, Noto) avoids the
 fallback. Screen-reader-only text is not expected in the PDF, because it is never painted.
 CJK fonts that draw a radical and its ideograph with one glyph make Chromium name the
 radical in the text layer (⽉ for 月, ⻑ for 長), so "店長" cannot be found. The export

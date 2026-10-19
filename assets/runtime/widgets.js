@@ -878,7 +878,9 @@ KINDS.tabs = w => {
       const i = Math.max(0, sections.findIndex(x => x.id === s.tab)), sec = sections[i];
       const body = (Array.isArray(sec.body) ? sec.body : [sec.body]).map(p => `<p>${esc(p)}</p>`).join('');
       const facts = (sec.facts || []).map(f => `<div class="w-kpi"><b>${esc(f.value)}</b><span>${esc(f.label)}</span></div>`).join('');
-      w.draw(`<article class="w-reading"><h2>${esc(sec.title || sec.name)}</h2><div class="w-reading-body">${body}</div>${facts ? `<div class="w-facts">${facts}</div>` : ''}</article>`);
+      // sec.figure: trusted SVG markup from the deck module (e.g. a figure-engine chart), drawn under the text.
+      const figure = sec.figure ? `<div class="w-reading-figure">${sec.figure}</div>` : '';
+      w.draw(`<article class="w-reading${figure ? ' has-figure' : ''}"><h2>${esc(sec.title || sec.name)}</h2><div class="w-reading-body">${body}</div>${facts ? `<div class="w-facts">${facts}</div>` : ''}${figure}</article>`);
       const vals = { name: sec.name, index: i + 1, count: sections.length };
       return { status: sec.status ?? w.fill(w.text.status || 'Use sections when optional detail would distract from the main explanation.', vals), values: vals };
     },

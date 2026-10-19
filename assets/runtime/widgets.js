@@ -1155,19 +1155,29 @@ KINDS.quiz = w => {
     `<div class="w-explain">${q.explanation ? `<p>${esc(q.explanation)}</p>` : ''}${q.figure || ''}</div></div>`;
   const quiz = w.plot.querySelector('.w-quiz'), explain = w.plot.querySelector('.w-explain');
   w.radios('choice', w.spec('choice', { label: t.choose || 'Select an answer', options: q.options.map(o => [o.id, o.label]), cls: 'w-answers' }), w.plot.querySelector('.w-options'));
+  // Optional share of an earlier group per option, revealed with the answer (and in a static export).
+  for (const label of quiz.querySelectorAll('.w-radio')) {
+    const o = q.options.find(x => x.id === label.querySelector('input').value);
+    if (isNum(o?.share)) label.insertAdjacentHTML('beforeend', `<span class="w-share" data-static="show"><i style="width:${clamp(o.share, 0, 100)}%"></i><em>${esc(fill(t.share || '{v}%', { v: o.share }, w.locale))}</em></span>`);
+  }
   w.button(t.check || 'Check answer', () => { w.state.checked = true; w.render(); }, { cls: 'w-primary' });
   w.on(quiz, 'change', () => { w.state.checked = false; w.render(); });
   return {
     render(s) {
       const chosen = q.options.find(o => o.id === s.choice), right = s.choice === q.answer;
       quiz.dataset.checked = String(!!s.checked && !!chosen);
+      const done = !!s.checked && !!chosen;
       for (const label of quiz.querySelectorAll('.w-radio')) {
-        const id = label.querySelector('input').value;
-        label.classList.toggle('is-answer', !!s.checked && !!chosen && id === q.answer);
-        label.classList.toggle('is-wrong', !!s.checked && id === s.choice && !right);
+        const id = label.querySelector('input').value, isAnswer = done && id === q.answer, isWrong = done && id === s.choice && !right;
+        label.classList.toggle('is-answer', isAnswer);
+        label.classList.toggle('is-wrong', isWrong);
+        const mark = isAnswer ? t.answerMark || 'Correct answer' : isWrong ? t.yourMark || 'Your answer' : '';
+        if (mark) label.dataset.mark = mark; else delete label.dataset.mark;
+        const share = label.querySelector('.w-share');
+        if (share) { if (done) share.removeAttribute('data-static'); else share.dataset.static = 'show'; }
       }
       // The explanation shows after checking, and always in a static export.
-      if (s.checked && chosen) explain.removeAttribute('data-static'); else explain.dataset.static = 'show';
+      if (done) explain.removeAttribute('data-static'); else explain.dataset.static = 'show';
       let status;
       if (!s.checked) status = t.prompt || (own ? '' : 'Local practice only. No scores leave this page.');
       else if (!chosen) status = t.none || 'Choose an answer first.';
@@ -1320,7 +1330,8 @@ KINDS.matrix = w => {
       w.draw(`<table class="w-matrix">${d.caption ? `<caption>${esc(d.caption)}</caption>` : ''}<thead>${head}</thead><tbody>${body}</tbody></table>`);
       const v = values[R - 1][K - 1], min = Math.min(...values.flat());
       const vals = { row: R, column: K, rowName: rows[R - 1], columnName: cols[K - 1], value: cell(v), raw: v, ratio: fmt(v / min, 1, w.locale), cheapest: cell(min),
-        rowMin: cell(Math.min(...values[R - 1])), rowMax: cell(Math.max(...values[R - 1])), rowRatio: fmt(Math.max(...values[R - 1]) / Math.min(...values[R - 1]), 1, w.locale) };
+        rowMin: cell(Math.min(...values[R - 1])), rowMax: cell(Math.max(...values[R - 1])), rowRatio: fmt(Math.max(...values[R - 1]) / Math.min(...values[R - 1]), 1, w.locale),
+        first: cell(values[R - 1][0]), vsFirst: fmt(v / values[R - 1][0], 1, w.locale) };
       return { status: w.fill(t.status || 'Selected row {row}, column {column}; synthetic value {value}', vals), values: vals };
     },
   };

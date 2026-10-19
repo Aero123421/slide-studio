@@ -587,8 +587,8 @@
     },
     {
       "path": "assets/interactions/decision.mjs",
-      "bytes": 1720,
-      "sha256": "1b49a36a52a53764002cf41218821fca0f7046d57d2a3fdfaa831f4f04c4446d"
+      "bytes": 3667,
+      "sha256": "7b937d9a0907e22e01a00880df736c1d96c06603c14e08c37aa57b98ff53544d"
     },
     {
       "path": "assets/interactions/graph.mjs",
@@ -632,8 +632,8 @@
     },
     {
       "path": "assets/interactions/quiz.mjs",
-      "bytes": 1739,
-      "sha256": "ee9e7c339816ffd0d48566dceaa3c3826a3449383a116db2f23b7e04fdb735df"
+      "bytes": 5816,
+      "sha256": "55862d6c8fd880fc1c25d8e74da2abc5da36505fefced8084c01c5c9a190da5a"
     },
     {
       "path": "assets/interactions/scrubber.mjs",
@@ -642,13 +642,13 @@
     },
     {
       "path": "assets/interactions/study.css",
-      "bytes": 83434,
-      "sha256": "d1c76eecd759a8fc6f7a044763228a7960a11ef2ba43fb9561ccfe4d4d08a01b"
+      "bytes": 84048,
+      "sha256": "56ae6425cb7d199e02ccfbb8a99ba6137fe57861112aa337eb4f722da39ccc3c"
     },
     {
       "path": "assets/interactions/study.extra.css",
-      "bytes": 13352,
-      "sha256": "ea03640b43b86be5af6719d959c10c445dde474ec9669b5fe96b1f1646256e00"
+      "bytes": 13966,
+      "sha256": "2c5b1060051805f312c5cb0203ea1525543cfc17c7b32752126f1204a89efcb2"
     },
     {
       "path": "assets/interactions/table.mjs",
@@ -1152,8 +1152,8 @@
     },
     {
       "path": "assets/runtime/widgets.js",
-      "bytes": 120371,
-      "sha256": "4a5b2ddf242bfc6984d2a1ac30ec44caf1a8a2dc1926ea9cf0f43deffb5f1868"
+      "bytes": 121328,
+      "sha256": "c22b19c8d1b36bd1af9ccb05a8b2a82b01b8ac6f6b5424ffa3dd70601cac5902"
     },
     {
       "path": "assets/story.schema.json",
@@ -2758,12 +2758,12 @@
     {
       "path": "gallery/index.html",
       "bytes": 170515,
-      "sha256": "da80308f986e46c2a6cd6c564fb2a113cacb5ead80b050850c5e3f5ca454cd07"
+      "sha256": "bb08417bfd1958320ca51f8a8665d45a432cbbc47eb1b4688ad810709c82c0fb"
     },
     {
       "path": "gallery/interactions.html",
-      "bytes": 701196,
-      "sha256": "a3fb7b990fa4892994c44587f86bdc6a11f7bb659e6eeb96f49d36ca113e75a8"
+      "bytes": 708206,
+      "sha256": "0de592bc9d93cddfc15dffa573579de11d5893d795ecdd85cff2b7fd06621571"
     },
     {
       "path": "gallery/languages.html",
@@ -2787,8 +2787,8 @@
     },
     {
       "path": "gallery/research.html",
-      "bytes": 276432,
-      "sha256": "da963683a40db1ac35cd36185d77bc67f6f421a884fb6be61a7317dee5e18d3f"
+      "bytes": 277389,
+      "sha256": "111077dd95cccfe48c067a2a5e9024351d70520a2cea3cd3c5613c260b675440"
     },
     {
       "path": "gallery/templates.html",

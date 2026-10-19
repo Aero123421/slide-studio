@@ -349,9 +349,10 @@ function mount(config, defaultAssets) {
       const shown = b.type === 'check' ? (v ? b.spec.on ?? ui.on : b.spec.off ?? ui.off)
         : b.type === 'select' || b.type === 'radios' ? (b.spec.options.find(([k]) => String(k) === String(v))?.[1] ?? ui.noChoice)
         : valueText(b.spec, v);
-      return `<div><dt>${esc(b.spec.summaryLabel || b.spec.label)}</dt><dd>${esc(shown)}</dd></div>`;
+      // One line per control ("Label: value"), so no element repeats a control's label verbatim.
+      return `<p>${esc(b.spec.summaryLabel || b.spec.label)}${locale.startsWith('ja') ? '：' : ': '}<b>${esc(shown)}</b></p>`;
     });
-    summary.innerHTML = rows.length ? `<p class="w-summary-head">${esc(ui.settings)}</p><dl>${rows.join('')}</dl>` : '';
+    summary.innerHTML = rows.length ? `<p class="w-summary-head">${esc(ui.settings)}</p>${rows.join('')}` : '';
   }
   function setReadout(items) {
     readout.innerHTML = (items || []).map(it => `<div class="w-kpi${it.tone ? ' w-kpi--' + esc(it.tone) : ''}"><b>${esc(it.value)}${it.unit ? `<small>${esc(it.unit)}</small>` : ''}</b><span>${esc(it.label)}</span></div>`).join('');

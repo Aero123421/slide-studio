@@ -6,99 +6,122 @@
   "theme": "technical",
   "slides": [
     {
+      "id": "cover",
       "layout": "cover",
-      "kicker": "設計メモ",
-      "title": "再試行しても、\n二重に処理しない。",
-      "body": "冪等性キーを使った設計例",
-      "notes": "この作例の数値・状況は架空。実務では検証した情報へ置き換える。"
+      "kicker": "設計メモ　注文API",
+      "title": "再試行しても、\n二重に注文しない。",
+      "body": "冪等性キーを使った設計と、確かめるべき条件",
+      "notes": "対象は注文APIのPOSTだけ。決済は別の設計メモで扱う。"
     },
     {
+      "id": "flow",
       "layout": "architecture",
-      "title": "成功したか不明なまま、通信が切れる",
+      "title": "キーの表を1つ加えるだけで、再送を見分けられる",
       "nodes": [
         {
-          "id": "client",
-          "x": 72,
-          "y": 310,
-          "w": 250,
-          "h": 90,
-          "label": "クライアント"
+          "id": "app",
+          "label": "モバイルアプリ",
+          "body": "10秒で再送する",
+          "col": 0,
+          "row": 0
         },
         {
           "id": "api",
-          "x": 498,
-          "y": 310,
-          "w": 270,
-          "h": 90,
           "label": "注文API",
+          "body": "キーを先に確認する",
+          "col": 1,
+          "row": 0,
           "accent": true
         },
         {
-          "id": "db",
-          "x": 947,
-          "y": 310,
-          "w": 261,
-          "h": 90,
-          "label": "注文DB"
+          "id": "orders",
+          "label": "注文DB",
+          "body": "注文を保存する",
+          "col": 2,
+          "row": 0
+        },
+        {
+          "id": "keys",
+          "label": "キーの表",
+          "body": "キーと結果を24時間保存",
+          "col": 1,
+          "row": 1
         }
       ],
       "links": [
         {
-          "from": "client",
+          "from": "app",
           "to": "api",
-          "label": "POST"
+          "label": "POST /orders"
         },
         {
           "from": "api",
-          "to": "db",
-          "label": "保存"
+          "to": "orders",
+          "label": "INSERT"
+        },
+        {
+          "from": "api",
+          "to": "keys",
+          "label": "同じトランザクション"
         }
       ],
-      "notes": "この作例の数値・状況は架空。実務では検証した情報へ置き換える。"
+      "notes": "キーはクライアントが注文ごとに1つ作り、再送でも変えない。"
     },
     {
+      "id": "code",
       "layout": "code",
       "title": "同じキーには、保存済みの結果を返す",
-      "code": "key = request.idempotency_key\nresult = store.find(key)\n\nif result:\n    return result\n\nreturn create_once(key)",
-      "explanation": "再送でもキーは変えない。\n\n処理結果とキーを同じトランザクションで保存する。",
-      "notes": "この作例の数値・状況は架空。実務では検証した情報へ置き換える。"
+      "code": "key = request.idempotency_key\nsaved = keys.find(key)\n\nif saved:\n    return saved.response\n\nwith db.transaction():\n    order = orders.create(request.body)\n    keys.save(key, order.response)\nreturn order.response",
+      "explanation": "再送されても、キーは変えない。\n\n注文とキーを同じトランザクションで保存すれば、片方だけが残ることはない。",
+      "notes": "キーの表への保存を別トランザクションにすると、二重注文が起きうる。"
     },
     {
+      "id": "cases",
       "layout": "table",
-      "title": "同時実行と期限切れも確認する",
+      "title": "同時実行と期限切れの扱いも、仕様に書いておく",
       "columns": [
-        "条件",
-        "期待する結果"
+        "状況",
+        "期待する結果",
+        "応答"
       ],
       "widths": [
-        1,
+        3,
+        3,
+        1
+      ],
+      "numericColumns": [
         2
       ],
       "rows": [
         [
-          "同じキーを再送",
-          "同じ結果を返す"
+          "同じキーで再送",
+          "保存済みの結果を返す",
+          "200"
         ],
         [
           "同じキーで内容が違う",
-          "競合として拒否する"
+          "競合として拒否する",
+          "409"
         ],
         [
-          "2件を同時に実行",
-          "作成は1件だけ"
+          "同じキーが同時に届く",
+          "1件だけ作り、残りは拒否する",
+          "409"
         ],
         [
-          "キーの保持期限を過ぎる",
-          "仕様に沿って扱う"
+          "保持期限の24時間を過ぎた",
+          "新しい注文として受け付ける",
+          "201"
         ]
       ],
-      "notes": "この作例の数値・状況は架空。実務では検証した情報へ置き換える。"
+      "notes": "409を返すときは、どちらの理由かを本文に書く。"
     },
     {
+      "id": "spec",
       "layout": "closing",
       "title": "再試行の前に、\n処理の一意性を決める。",
-      "body": "キーの範囲・保存期間・競合時の応答を、API仕様へ書く。",
-      "notes": "この作例の数値・状況は架空。実務では検証した情報へ置き換える。"
+      "body": "キーの範囲、保存期間、競合時の応答を、API仕様に書く。",
+      "notes": "レビューでは、この3点が仕様にあるかを確認する。"
     }
   ]
 }

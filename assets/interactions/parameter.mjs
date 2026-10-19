@@ -47,6 +47,7 @@ Static: The export shows the starting state (${start.dose} mg, half-life ${start
     axes: { x: { title: 'Hours after the first dose', ticks: Array.from({ length: drug.horizon / drug.interval + 1 }, (_, i) => i * drug.interval) },
       y: { title: 'Concentration in plasma (mg/L)', min: 0, max: 60, ticks: [0, 10, 20, 30, 40, 50, 60], digits: 1 } },
     text: {
+      reset: 'Reset',
       status: `In the first ${drug.horizon} hours: {hoursAbove}\u00a0h above ${limits.max}\u00a0mg/L and {hoursBelow}\u00a0h below ${limits.min}\u00a0mg/L.`,
       readout: [{ value: '{peak}', unit: 'mg/L', label: 'peak after the last dose' }, { value: '{trough}', unit: 'mg/L', label: `trough at ${drug.horizon} hours` }],
       figure: 'Plasma concentration over 72 hours with the effective and toxic limits',

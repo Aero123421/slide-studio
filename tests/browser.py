@@ -4,7 +4,7 @@ Use --out a JSON path to retain a compact machine-readable record outside the sk
 Use SLIDE_STUDIO_INLINE=1 only when file navigation is unavailable and HTML is self-contained.
 """
 from pathlib import Path
-import argparse,json,sys,hashlib,struct
+import argparse,json,sys,hashlib,struct,math,subprocess
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'scripts'))
 from qa import launch,open_deck,guard_network
 from playwright.sync_api import sync_playwright
@@ -28,86 +28,142 @@ def main():
    def state(kind):return page.evaluate('(id)=>SlideStudio.getWidgetState(id)','interaction-'+kind+'-widget')
    def value(root,label,v):
     el=root.get_by_label(label,exact=True);el.evaluate('(el,v)=>{el.value=v;el.dispatchEvent(new Event("input",{bubbles:true}))}',str(v))
-   def reset(kind):show(kind).get_by_role('button',name='Reset example',exact=True).click()
+   def reset(kind):show(kind).locator('[data-w-reset]').click()
+   # Expected values come from each study's own module (its widget config), computed here independently of the runtime.
+   def study(name):return json.loads(subprocess.check_output(['node','--input-type=module','-e',f"import m from './assets/interactions/{name}.mjs';console.log(JSON.stringify(m.widgets[0]))"],cwd=ROOT,text=True))
+   def label(cfg,key):return cfg['controls'][key]['label']
    check('page identity, content and registered 24 widgets',lambda:(expect('Interactive' in page.title() or 'Interaction' in page.title()),expect(page.locator('.slide').count()==24),expect(len(page.evaluate('SlideStudio.getState().widgets'))==24)))
    def parameter():
-    r=show('parameter');before=state('parameter')['frequency'];el=r.get_by_label('Frequency',exact=True);el.focus();el.press('ArrowRight');expect(state('parameter')['frequency']>before);expect(page.evaluate('SlideStudio.getState().current')==0);expect(r.locator('polyline').get_attribute('points') is not None);reset('parameter');expect(state('parameter')['frequency']==before)
-   check('range keyboard changes parameter without advancing slide; reset',parameter)
+    cfg=study('parameter');c=cfg['data']['constants'];dose=cfg['initial']['dose'];r=show('parameter');before=state('parameter')['halfLife']
+    el=r.get_by_label(label(cfg,'halfLife'),exact=True);el.focus();el.press('ArrowRight');expect(state('parameter')['halfLife']>before);expect(page.evaluate('SlideStudio.getState().current')==0)
+    expect(r.locator('.w-plot svg path').count()>0);reset('parameter');expect(state('parameter')['halfLife']==before)
+    # Peak after the last dose of a repeated IV bolus: sum of (dose/volume)·e^(−k(t−n·interval)) over the doses given so far.
+    last=math.ceil(c['horizon']/c['interval']-1e-9)-1;k=math.log(2)/before
+    peak=sum(dose/c['volume']*math.exp(-k*(last-n)*c['interval']) for n in range(last+1))
+    expect(f'{peak:.1f}' in r.locator('.w-readout').inner_text(),'readout peak does not match the dosing formula')
+   check('range keyboard changes parameter without advancing slide; reset; peak matches the model',parameter)
    def threshold():
-    r=show('threshold');value(r,'Decision threshold',.35);s=state('threshold');expect(s['counts']=={'tp':9,'fp':4,'fn':2,'tn':5});value(r,'Decision threshold',.65);expect(state('threshold')['counts']=={'tp':5,'fp':1,'fn':6,'tn':8});reset('threshold')
-   check('threshold counts recomputed exactly from 20 observations',threshold)
+    cfg=study('threshold');v=cfg['data']['values'];l=cfg['data']['labels']
+    def counts(t):return {'tp':sum(1 for a,b in zip(v,l) if a>=t and b),'fp':sum(1 for a,b in zip(v,l) if a>=t and not b),'fn':sum(1 for a,b in zip(v,l) if a<t and b),'tn':sum(1 for a,b in zip(v,l) if a<t and not b)}
+    r=show('threshold')
+    for t in (3,7):value(r,label(cfg,'threshold'),t);expect(state('threshold')['counts']==counts(t),f'counts at {t}')
+    reset('threshold');expect(state('threshold')['counts']==counts(cfg['initial']['threshold']))
+   check('threshold counts recomputed exactly from the study\'s scores',threshold)
    def scrubber():
-    r=show('scrubber');value(r,'Time index',27);expect('Sample 28 / 28' in r.inner_text());reset('scrubber')
+    cfg=study('scrubber');labels=cfg['data']['labels'];r=show('scrubber');value(r,label(cfg,'time'),len(labels)-1)
+    expect(labels[-1] in r.locator('.w-status').inner_text());expect(state('scrubber')['time']==len(labels)-1);reset('scrubber')
    check('time scrubber reaches last observation',scrubber)
    def comparison():
-    r=show('comparison');value(r,'Reveal original (%)',75);expect('25%' in r.locator('img').nth(1).get_attribute('style'));reset('comparison')
-   check('registered image comparison changes clipping, not source identity',comparison)
+    cfg=study('comparison');r=show('comparison');value(r,label(cfg,'split'),75);expect('25%' in r.locator('img').nth(1).get_attribute('style'))
+    page.wait_for_function("!document.querySelector('#interaction-comparison-widget .w-status').textContent.includes('Measuring')")
+    expect('L* ' in r.locator('.w-status').inner_text(),'lightness was not measured from the pixels');reset('comparison')
+   check('registered image comparison changes clipping, not source identity; regions measured',comparison)
    def hotspots():
-    r=show('hotspots');r.get_by_label('Inspect a component').select_option('detector');expect('records the output' in r.inner_text());reset('hotspots')
+    cfg=study('hotspots');part=next(p for p in cfg['data']['parts'] if p['id']!=cfg['initial']['part'])
+    r=show('hotspots');r.get_by_label(label(cfg,'part')).select_option(part['id']);expect(part['body'][:40] in r.inner_text());reset('hotspots')
    check('component inspection updates explanation',hotspots)
    def tabs():
-    r=show('tabs');r.get_by_label('Read a section').select_option('limits');expect('Synthetic data cannot' in r.inner_text());reset('tabs')
+    cfg=study('tabs');sec=cfg['data']['sections'][-1];r=show('tabs');r.get_by_label(sec['name'],exact=True).check()
+    expect(sec['body'][0][:20] in r.inner_text());expect(state('tabs')['tab']==sec['id']);reset('tabs')
    check('optional section changes actual content',tabs)
    def layers():
-    r=show('layers');r.locator('input[type=checkbox]').evaluate_all('(xs)=>xs.forEach(e=>{e.checked=false;e.dispatchEvent(new Event("change",{bubbles:true}))})');expect(r.locator('.w-plot svg rect,.w-plot svg line,.w-plot svg text').count()==0);reset('layers');expect(r.locator('.w-plot svg rect').count()==2)
+    cfg=study('layers');shown=[l for l in cfg['data']['layers'] if cfg['initial'].get(l['id'])]
+    r=show('layers');r.locator('input[type=checkbox]').evaluate_all('(xs)=>xs.forEach(e=>{e.checked=false;e.dispatchEvent(new Event("change",{bubbles:true}))})')
+    expect(r.locator('.w-plot svg rect,.w-plot svg line,.w-plot svg text').count()==0);reset('layers')
+    expect(r.locator('.w-plot svg rect').count()==sum(l['svg'].count('<rect') for l in shown));expect(r.locator('.w-plot [data-layer]').count()==len(shown))
    check('all layers off clears stale drawing; reset restores it',layers)
    def table():
-    r=show('table');expect(state('table')['order']==['A','D','C','B']);r.get_by_role('button',name='Reverse sort').click();expect(state('table')['order']==['B','C','D','A']);reset('table')
+    cfg=study('table');d=cfg['data'];key=cfg['initial']['sortBy'];order=[x[d['id']] for x in sorted(d['rows'],key=lambda x:x[key])]
+    r=show('table');expect(state('table')['order']==order);r.get_by_role('button',name=cfg['text']['reverse']).click();expect(state('table')['order']==order[::-1])
+    # A column header is a sort button: Referrals sorts largest first (the column's declared default direction).
+    col=d['columns'][1];r.get_by_role('button',name=col['name'],exact=True).click()
+    expect(state('table')['order']==[x[d['id']] for x in sorted(d['rows'],key=lambda x:x[col['key']],reverse=not col.get('ascending',True))]);reset('table');expect(state('table')['order']==order)
    check('table sort changes numeric order and preserves row identity',table)
    def brush():
-    r=show('brushing');value(r,'Lower bound',0);value(r,'Upper bound',100);expect(len(state('brushing')['selected'])==28);reset('brushing')
+    cfg=study('brushing');r=show('brushing');value(r,label(cfg,'low'),cfg['controls']['low']['min']);value(r,label(cfg,'high'),cfg['controls']['high']['max'])
+    expect(len(state('brushing')['selected'])==len(cfg['data']['points']));reset('brushing')
    check('linked selection conserves all observations at full range',brush)
    def histogram():
-    r=show('histogram')
-    for n in [3,7,12]:value(r,'Number of bins',n);expect(len(state('histogram')['counts'])==n);expect(sum(state('histogram')['counts'])==20)
+    cfg=study('histogram');opts=cfg['controls']['bins']['values'];r=show('histogram')
+    for i,n in enumerate(opts):value(r,label(cfg,'bins'),i);expect(len(state('histogram')['counts'])==n);expect(sum(state('histogram')['counts'])==len(cfg['data']['values']))
     reset('histogram')
    check('histogram recomputes bins and conserves total count',histogram)
    def bootstrap():
     r=show('bootstrap');before=state('bootstrap')['mean'];r.get_by_role('button',name='Resample',exact=True).click();expect(state('bootstrap')['mean']!=before);reset('bootstrap');expect(state('bootstrap')['mean']==before)
    check('seeded resampling changes sample and resets deterministically',bootstrap)
    def ablation():
-    r=show('ablation');r.locator('input[type=checkbox]').evaluate_all('(xs)=>xs.forEach(e=>{e.checked=false;e.dispatchEvent(new Event("change",{bubbles:true}))})');expect(state('ablation')['value']==40);reset('ablation');expect(state('ablation')['value']==75)
-   check('toy ablation computes from selected components',ablation)
+    cfg=study('ablation');m=cfg['data']['measured'];full='+'.join(c['id'] for c in cfg['data']['components'])
+    r=show('ablation');r.locator('input[type=checkbox]').evaluate_all('(xs)=>xs.forEach(e=>{e.checked=false;e.dispatchEvent(new Event("change",{bubbles:true}))})');expect(state('ablation')['value']==m['none'])
+    reset('ablation');expect(state('ablation')['value']==m[full])
+   check('ablation looks up the measured score of the selected components',ablation)
    def quiz():
-    r=show('quiz');r.get_by_label('Select an answer').select_option('range');r.get_by_role('button',name='Check answer').click();expect('Correct:' in r.inner_text());reset('quiz')
+    cfg=study('quiz');d=cfg['data'];right=next(o for o in d['options'] if o['id']==d['answer']);wrong=next(o for o in d['options'] if o['id']!=d['answer'])
+    r=show('quiz');r.get_by_label(wrong['label'],exact=True).check();r.get_by_role('button',name=cfg['text']['check']).click();expect(cfg['text']['wrongPrefix'] in r.inner_text())
+    r.get_by_label(right['label'],exact=True).check();r.get_by_role('button',name=cfg['text']['check']).click();expect(cfg['text']['correctPrefix'] in r.inner_text());expect(right['feedback'] in r.inner_text());reset('quiz')
    check('local quiz supplies feedback without network',quiz)
    def decision():
-    r=show('decision');r.get_by_label('Evidence available?').select_option('no');expect(state('decision')['result']=='Gather evidence');reset('decision')
+    cfg=study('decision');q=cfg['data']['questions'][0];v=next(o[0] for o in q['options'] if o[0]!=cfg['initial'][q['id']])
+    r=show('decision');r.get_by_label(q['label']).select_option(v);expect(state('decision')['result']==cfg['data']['tree']['branches'][v]['result']);reset('decision')
    check('decision branch follows actual selected condition',decision)
    def graph():
-    r=show('graph');r.get_by_text('Enable bridge',exact=True).click();expect(state('graph')['reachable']==[0,1]);r.get_by_text('Enable direct edge',exact=True).click();expect(state('graph')['reachable']==[0,1,3]);reset('graph')
-   check('graph recomputes reachability when edges change',graph)
+    cfg=study('graph');d=cfg['data'];ids=[n['id'] for n in d['nodes']]
+    def reach(on):
+     adj={i:[] for i in ids}
+     for e in d['edges']:
+      if not e.get('toggle') or on.get(e['toggle']):adj[e['from']].append(e['to']);adj[e['to']].append(e['from'])
+     seen={d['origin']};todo=[d['origin']]
+     while todo:
+      for b in adj[todo.pop()]:
+       if b not in seen:seen.add(b);todo.append(b)
+     return sorted(ids.index(i) for i in seen)
+    r=show('graph');on=dict(cfg['initial']);expect(state('graph')['reachable']==reach(on))
+    for t in d['toggles']:r.get_by_text(t['label'],exact=True).click();on[t['key']]=not on[t['key']];expect(state('graph')['reachable']==reach(on),t['key'])
+    reset('graph')
+   check('graph recomputes reachability when links open or close',graph)
    def matrix():
-    r=show('matrix');value(r,'Row',4);value(r,'Column',5);expect('value 20' in r.inner_text());reset('matrix')
+    cfg=study('matrix');d=cfg['data'];row,col=len(d['rows']),len(d['columns'])-1
+    r=show('matrix');r.get_by_label(label(cfg,'row')).select_option(str(row));r.get_by_label(label(cfg,'column')).select_option(str(col))
+    expect(f"{d['values'][row-1][col-1]:,}{d['suffix']}" in r.locator('.w-status').inner_text());expect(state('matrix')['row']==row and state('matrix')['column']==col);reset('matrix')
    check('matrix control identifies exact row and column',matrix)
    def magnifier():
-    r=show('magnifier');value(r,'Zoom',2.5);expect('scale(2.5)' in r.locator('img').get_attribute('style'));reset('magnifier')
+    cfg=study('magnifier');r=show('magnifier');value(r,label(cfg,'zoom'),2.5);expect('scale(2.5)' in r.locator('img').get_attribute('style'));reset('magnifier')
    check('image focus changes declared crop with unchanged pixels',magnifier)
    def video():
-    r=show('video');v=r.locator('video');page.wait_for_function("document.querySelector('#interaction-video-widget video').readyState>=2",timeout=15000);expect(not v.evaluate('(v)=>!v.paused'));expect(abs(v.evaluate('(v)=>v.duration')-5)<.15)
-    first=v.screenshot();r.get_by_role('button',name='Seek to 2 seconds').click();page.wait_for_function("Math.abs(document.querySelector('#interaction-video-widget video').currentTime-2)<.1");page.wait_for_timeout(120);second=v.screenshot();expect(first!=second,'video frames did not change');r.get_by_role('button',name='Play / pause').click();page.wait_for_function("!document.querySelector('#interaction-video-widget video').paused");show('audio');expect(v.evaluate('(v)=>v.paused'));reset('video');expect(v.evaluate('(v)=>v.currentTime')==0)
+    cfg=study('video');to=cfg['data']['seekTo'];r=show('video');v=r.locator('video');page.wait_for_function("document.querySelector('#interaction-video-widget video').readyState>=2",timeout=15000);expect(not v.evaluate('(v)=>!v.paused'));expect(abs(v.evaluate('(v)=>v.duration')-5)<.15)
+    first=v.screenshot();r.get_by_role('button',name=cfg['text']['seek']).click();page.wait_for_function(f"Math.abs(document.querySelector('#interaction-video-widget video').currentTime-{to})<.1");page.wait_for_timeout(120);second=v.screenshot();expect(first!=second,'video frames did not change');r.get_by_role('button',name=cfg['text']['playPause']).click();page.wait_for_function("!document.querySelector('#interaction-video-widget video').paused");show('audio');expect(v.evaluate('(v)=>v.paused'));reset('video');expect(v.evaluate('(v)=>v.currentTime')==0)
    check('real video duration, seek/frame change, play, leave-pause and reset',video)
    def audio():
-    r=show('audio');v=r.locator('audio');page.wait_for_function("document.querySelector('#interaction-audio-widget audio').readyState>=2",timeout=15000);expect(abs(v.evaluate('(v)=>v.duration')-2)<.1);r.get_by_role('button',name='Play / pause').click();page.wait_for_function("!document.querySelector('#interaction-audio-widget audio').paused");show('parameter');expect(v.evaluate('(v)=>v.paused'));reset('audio')
-   check('real audio duration, deliberate playback and leave-pause',audio)
+    r=show('audio');v=r.locator('audio');page.wait_for_function("document.querySelector('#interaction-audio-widget audio').readyState>=2",timeout=15000);expect(abs(v.evaluate('(v)=>v.duration')-2)<.1);expect('330' in r.locator('.w-status').inner_text(),'pitch not measured from the samples')
+    r.get_by_role('button',name='Play / pause').click();page.wait_for_function("!document.querySelector('#interaction-audio-widget audio').paused");show('parameter');expect(v.evaluate('(v)=>v.paused'));reset('audio')
+   check('real audio duration, measured pitch, deliberate playback and leave-pause',audio)
    def orbit():
-    r=show('cad-orbit');cv=r.locator('canvas');before=cv.screenshot();value(r,'Yaw (degrees)',90);expect(cv.screenshot()!=before);current=page.evaluate('SlideStudio.getState().current');cv.focus();cv.press('ArrowRight');expect(state('cad-orbit')['yaw']==95);expect(page.evaluate('SlideStudio.getState().current')==current);reset('cad-orbit')
-   check('mesh vertex rendering responds to yaw and keyboard without slide leakage',orbit)
+    cfg=study('cad-orbit');r=show('cad-orbit');cv=r.locator('canvas');before=cv.screenshot();value(r,label(cfg,'yaw'),90);expect(cv.screenshot()!=before);current=page.evaluate('SlideStudio.getState().current');cv.focus();cv.press('ArrowRight');expect(state('cad-orbit')['yaw']==95);expect(page.evaluate('SlideStudio.getState().current')==current)
+    expect(r.locator('.w-mesh-labels text').count()>=2*len(cfg['data']['parts']),'parts are not labelled');reset('cad-orbit')
+   check('mesh vertex rendering responds to yaw and keyboard without slide leakage; parts labelled',orbit)
    def explode():
-    r=show('cad-explode');before=r.locator('canvas').screenshot();value(r,'Explode amount',.8);expect(r.locator('canvas').screenshot()!=before);reset('cad-explode')
+    cfg=study('cad-explode');r=show('cad-explode');before=r.locator('canvas').screenshot();value(r,label(cfg,'explode'),.8);expect(r.locator('canvas').screenshot()!=before);reset('cad-explode')
    check('assembly groups actually separate',explode)
    def section():
-    r=show('cad-section');before=state('cad-section')['drawn'];value(r,'Visible height fraction',.2);expect(state('cad-section')['drawn']<before);reset('cad-section')
+    cfg=study('cad-section');r=show('cad-section');before=state('cad-section')['drawn'];value(r,label(cfg,'cut'),.2);expect(state('cad-section')['drawn']<before);reset('cad-section')
    check('cut plane clips actual triangles',section)
    def imports():
     r=show('cad-import');file=r.get_by_label('Open local mesh');file.set_input_files({'name':'triangle.obj','mimeType':'text/plain','buffer':b'v 0 0 0\nv 1 0 0\nv 0 1 0\nf 1 2 3'});page.wait_for_function("SlideStudio.getWidgetState('interaction-cad-import-widget').triangles===1");expect('triangle.obj' in r.inner_text());buf=bytearray(134);struct.pack_into('<I',buf,80,1);struct.pack_into('<f',buf,108,1);struct.pack_into('<f',buf,124,1);file.set_input_files({'name':'triangle.stl','mimeType':'application/octet-stream','buffer':bytes(buf)});page.wait_for_function("SlideStudio.getWidgetState('interaction-cad-import-widget').filename==='triangle.stl'");expect(state('cad-import')['triangles']==1);file.set_input_files({'name':'bad.obj','mimeType':'text/plain','buffer':b'not a mesh'});page.wait_for_function("document.querySelector('#interaction-cad-import-widget .w-status').textContent.includes('No triangle')");expect(state('cad-import')['triangles']==1);reset('cad-import');expect(state('cad-import')['triangles']==328)
    check('local OBJ and binary STL import, invalid-file retention, fixture reset',imports)
    def ink():
-    r=show('ink');r.get_by_role('button',name='Add focus annotation').click();expect(len(state('ink')['paths'])==1);reset('ink');expect(state('ink')['paths']==[]);r.get_by_role('button',name='Add focus annotation').click();r.get_by_role('button',name='Clear annotations').click();expect(state('ink')['paths']==[])
+    cfg=study('ink');t=cfg['text'];r=show('ink');r.get_by_role('button',name=t['preset']).click();expect(len(state('ink')['paths'])==1);reset('ink');expect(state('ink')['paths']==[]);r.get_by_role('button',name=t['preset']).click();r.get_by_role('button',name=t['clear']).click();expect(state('ink')['paths']==[])
    check('annotation reset does not mutate its initial array',ink)
    def reentry():
-    r=show('threshold');value(r,'Decision threshold',.7);before=state('threshold');show('parameter');show('threshold');expect(state('threshold')==before);page.evaluate('SlideStudio.prepareExport()');expect(page.evaluate('SlideStudio.getState().exporting'));expect(state('threshold')==before);page.evaluate('SlideStudio.setExport(false)');reset('threshold')
+    cfg=study('threshold');r=show('threshold');value(r,label(cfg,'threshold'),7);before=state('threshold');show('parameter');show('threshold');expect(state('threshold')==before);page.evaluate('SlideStudio.prepareExport()');expect(page.evaluate('SlideStudio.getState().exporting'));expect(state('threshold')==before)
+    # The static view shows the chosen setting in words where the inputs were.
+    expect(f"{label(cfg,'threshold')}: 7 or above" in r.locator('.w-export-summary').inner_text());expect(not r.locator('.w-controls').is_visible());page.evaluate('SlideStudio.setExport(false)');reset('threshold')
    check('widget selection survives re-entry and static export mode',reentry)
+   def config_paths():
+    # controls[key]=false hides a control; text templates (with plurals) and readouts fill from derived values; plain years have no digit grouping.
+    r=show('bootstrap');expect(r.get_by_label('Sample size').count()==0);expect(r.get_by_role('button',name='Draw 100 more').count()==1)
+    r=show('brushing');expect(r.locator('.w-value').first.inner_text()=='1900');expect('homes' in r.locator('.w-status').inner_text())
+    r=show('ablation');expect(r.locator('.w-readout b').count()==1);r=show('parameter');expect(r.locator('.w-readout .w-kpi').count()==2)
+    r=show('threshold');expect('Sepsis' in r.locator('.w-plot svg text').evaluate_all('(xs)=>xs.map(x=>x.textContent)'),'named classes are not drawn')
+   check('richer config: hidden controls, templates, readouts, plain numbers, named classes',config_paths)
    def overview():
     show('parameter');page.locator('#studio-overview').click();expect(page.locator('.studio-thumb').count()==24);page.locator('.studio-thumb').nth(4).focus();page.keyboard.press('Enter');expect(page.evaluate('SlideStudio.getState().current')==4);expect(page.locator('.studio-thumb').count()==0)
    check('overview is keyboard-operable and restores slide structure',overview)
@@ -118,11 +174,41 @@ def main():
     page.set_viewport_size({'width':390,'height':844});show('parameter');b=page.locator('.slide.is-current').bounding_box();expect(b['x']>=-1 and b['x']+b['width']<=391);expect(page.locator('#studio-next').is_visible());page.set_viewport_size({'width':1280,'height':780})
    check('390px viewport keeps fitted canvas and navigation in viewport',mobile)
    def custom_data():
-    import subprocess
-    source="import fs from 'node:fs/promises';import slide from './assets/interactions/threshold.mjs';import {renderCraft} from './scripts/craft-core.mjs';slide.widgets[0].data={values:[.1,.3,.7,.9],labels:[0,1,0,1]};console.log(await renderCraft({title:'Data override test',mode:'workshop',slides:[slide],css:await fs.readFile('./assets/interactions/study.css','utf8')}));"
+    # Project-owned data replaces the study's scores: four patients on the study's 0–10 scale, alert at its starting threshold (5).
+    source="import fs from 'node:fs/promises';import slide from './assets/interactions/threshold.mjs';import {renderCraft} from './scripts/craft-core.mjs';slide.widgets[0].data={values:[1,3,7,9],labels:[0,1,0,1],domain:[0,10],step:1};console.log(await renderCraft({title:'Data override test',mode:'workshop',slides:[slide],css:await fs.readFile('./assets/interactions/study.css','utf8')}));"
     content=subprocess.check_output(['node','--input-type=module','-e',source],cwd=ROOT,text=True)
     page.set_content(content,wait_until='load');expect(state('threshold')['counts']=={'tp':1,'fp':1,'fn':1,'tn':1})
-   check('project-owned data overrides toy fixture and recomputes actual counts',custom_data)
+   check('project-owned data overrides the study data and recomputes actual counts',custom_data)
+   def defaults():
+    # Decks that pass no data still get the original fixtures and behaviour (the widget contract before richer config).
+    kinds={'parameter':{'frequency':2,'amplitude':.7},'threshold':{'threshold':.5},'scrubber':{'time':0},'hotspots':{'part':'source'},'tabs':{'tab':'method'},'layers':{'base':True,'labels':True,'path':True},
+     'table':{'ascending':True},'brushing':{'low':20,'high':75},'histogram':{'bins':6},'bootstrap':{'seed':1,'n':12},'ablation':{'a':True,'b':True,'c':True},'quiz':{'choice':'none','checked':False},
+     'decision':{'evidence':'yes','interactive':'yes'},'graph':{'bridge':True,'direct':False},'matrix':{'row':1,'column':1},'ink':{'paths':[]}}
+    slides=[{'id':'d-'+k,'title':'Default '+k,'className':'st','content':f'<h1 class="st-head">Default {k}</h1><div class="widget" data-interactive id="d-{k}-w"><div class="w-plot"></div><div class="w-controls"></div><output aria-live="polite" class="w-status"></output></div>','widgets':[{'id':f'd-{k}-w','kind':k,'initial':v}]} for k,v in kinds.items()]
+    source="import fs from 'node:fs/promises';import {renderCraft} from './scripts/craft-core.mjs';const slides="+json.dumps(slides)+";console.log(await renderCraft({title:'Default fixtures',mode:'workshop',slides,css:await fs.readFile('./assets/interactions/study.css','utf8')}));"
+    page.set_content(subprocess.check_output(['node','--input-type=module','-e',source],cwd=ROOT,text=True),wait_until='load')
+    def go(k):page.evaluate('(id)=>SlideStudio.show(SlideStudio.meta.slides.findIndex(s=>s.id===id))','d-'+k);return page.locator(f'#d-{k}-w')
+    def st(k):return page.evaluate('(id)=>SlideStudio.getWidgetState(id)',f'd-{k}-w')
+    def rs(k):go(k).locator('[data-w-reset]').click()
+    expect(len(page.evaluate('SlideStudio.getState().widgets'))==len(kinds))
+    r=go('parameter');el=r.get_by_label('Frequency',exact=True);el.focus();el.press('ArrowRight');expect(st('parameter')['frequency']>2,'defaults step 1');rs('parameter');expect(st('parameter')['frequency']==2,'defaults step 2')
+    r=go('threshold');value(r,'Decision threshold',.35);expect(st('threshold')['counts']=={'tp':9,'fp':4,'fn':2,'tn':5},'defaults step 3');value(r,'Decision threshold',.65);expect(st('threshold')['counts']=={'tp':5,'fp':1,'fn':6,'tn':8},'defaults step 4');rs('threshold')
+    r=go('scrubber');value(r,'Time index',27);expect('Sample 28 / 28' in r.inner_text(),'defaults step 5')
+    r=go('hotspots');r.get_by_label('Inspect a component').select_option('detector');expect('records the output' in r.inner_text(),'defaults step 6')
+    r=go('tabs');r.get_by_label('Limitations',exact=True).check();expect('Synthetic data cannot' in r.inner_text(),'defaults step 7')
+    r=go('layers');r.locator('input[type=checkbox]').evaluate_all('(xs)=>xs.forEach(e=>{e.checked=false;e.dispatchEvent(new Event("change",{bubbles:true}))})');expect(r.locator('.w-plot svg rect,.w-plot svg line,.w-plot svg text').count()==0,'defaults step 8');rs('layers');expect(r.locator('.w-plot svg rect').count()==2,'defaults step 9')
+    r=go('table');expect(st('table')['order']==['A','D','C','B'],'defaults step 10');r.get_by_role('button',name='Reverse sort').click();expect(st('table')['order']==['B','C','D','A'],'defaults step 11')
+    r=go('brushing');value(r,'Lower bound',0);value(r,'Upper bound',100);expect(len(st('brushing')['selected'])==28,'defaults step 12')
+    r=go('histogram')
+    for n in [3,7,12]:value(r,'Number of bins',n);expect(len(st('histogram')['counts'])==n,'defaults step 13');expect(sum(st('histogram')['counts'])==20,'defaults step 14')
+    r=go('bootstrap');before=st('bootstrap')['mean'];r.get_by_role('button',name='Resample',exact=True).click();expect(st('bootstrap')['mean']!=before,'defaults step 15');rs('bootstrap');expect(st('bootstrap')['mean']==before,'defaults step 16')
+    r=go('ablation');r.locator('input[type=checkbox]').evaluate_all('(xs)=>xs.forEach(e=>{e.checked=false;e.dispatchEvent(new Event("change",{bubbles:true}))})');expect(st('ablation')['value']==40,'defaults step 17');rs('ablation');expect(st('ablation')['value']==75,'defaults step 18')
+    r=go('quiz');r.get_by_label('Estimate with interval',exact=True).check();r.get_by_role('button',name='Check answer').click();expect('Correct:' in r.inner_text(),'defaults step 19')
+    r=go('decision');r.get_by_label('Evidence available?').select_option('no');expect(st('decision')['result']=='Gather evidence','defaults step 20')
+    r=go('graph');r.get_by_text('Enable bridge',exact=True).click();expect(st('graph')['reachable']==[0,1],'defaults step 21');r.get_by_text('Enable direct edge',exact=True).click();expect(st('graph')['reachable']==[0,1,3],'defaults step 22')
+    r=go('matrix');value(r,'Row',4);value(r,'Column',5);expect('value 20' in r.inner_text(),'defaults step 23')
+    r=go('ink');r.get_by_role('button',name='Add focus annotation').click();expect(len(st('ink')['paths'])==1,'defaults step 24');rs('ink');expect(st('ink')['paths']==[],'defaults step 25')
+   check('default fixtures keep the original behaviour when a deck passes no data',defaults)
    def index_search():
     page.set_content((ROOT/'gallery/index.html').read_text(),wait_until='load');expect(page.locator('#results tr').count()==300);page.get_by_label('Search by explanatory purpose').fill('error-bars');expect(page.locator('#results tr').count()==1)
    check('offline workshop index filters actual source catalog',index_search)

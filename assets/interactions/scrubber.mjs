@@ -43,10 +43,12 @@ Static: 書き出しは見出しと同じピーク時刻（${label(peak)}）を�
     },
     controls: { time: { label: '時刻（1時間ごと）' } },
     axes: {
-      x: { ticks: Array.from({ length: hours / 6 }, (_, k) => ({ value: k * 6, label: k * 6 % 24 ? `${(k * 6) % 24}時` : `${start.day + k / 4}日 0時` })) },
+      // 0時 の目盛りは日付だけを書く（14日 = 14日0時）。
+      x: { ticks: Array.from({ length: hours / 6 }, (_, k) => ({ value: k * 6, label: k * 6 % 24 ? `${(k * 6) % 24}時` : `${start.day + k / 4}日` })) },
       y: { title: '潮位（cm）', min: 0, max: 300, ticks: [0, 50, 100, 150, 200, 250, 300], digits: 0, unit: 'cm' },
     },
     text: {
+      reset: '元に戻す',
       status: '{label}　観測 {y}\u00a0cm、推算 {y2}\u00a0cm。偏差は {delta}\u00a0cm。',
       statusAbove: '{label}　観測 {y}\u00a0cm。警報基準を {overRef}\u00a0cm 上回り、推算との差は {delta}\u00a0cm。',
       figure: '東浜港の観測潮位と推算潮位、48時間',

@@ -22,6 +22,7 @@ import {
 const read = file => fs.readFile(new URL(file, import.meta.url), 'utf8');
 const SYSTEM = 'laboratory';
 const frame = await read('../../assets/runtime/study-frame.css');
+const widgetCSS = await read('../../assets/interactions/study.extra.css');   // layout and controls of the threshold widget
 const block = (await read('../../assets/color-systems/color-systems.css'))
   .match(new RegExp(String.raw`/\*[^*]*\*/\n\.cs-${SYSTEM}\{[^}]*\}`))?.[0];
 if (!block) throw Error(`color-systems.css has no block for cs-${SYSTEM}`);
@@ -46,38 +47,10 @@ const deckCSS = String.raw`
 .talk .cover-by { position: absolute; left: 64px; right: 64px; bottom: 56px; padding-top: 18px; border-top: 1px solid var(--ss-rule); display: flex; justify-content: space-between; font: 400 19px/1.4 var(--ss-font-sans); }
 .talk .cover-by span:last-child { color: var(--ss-muted); }
 
-/* Explore: the threshold widget owns .w-plot, .w-controls and .w-status; this page only places and
-   tunes them. The plot keeps the widget's 700 × 360 viewBox aspect (here 1.15×), so the overlay registers.
-   Widget internals this page relies on (assets/runtime/widgets.js): dots use --ss-cat-1 below and
-   --ss-cat-2 at or above the threshold; the second <line> is an unlabelled vertical axis, hidden here. */
-.talk #research-threshold { --ss-cat-1: var(--ss-context); --ss-cat-2: var(--ss-accent); }
-.talk .widget { position: absolute; left: 64px; top: 176px; width: 1152px; height: 470px; display: grid;
-  grid-template-columns: 805px 1fr; grid-template-rows: 414px 1fr; column-gap: 40px; }
-.talk .w-plot { grid-column: 1; grid-row: 1; }
-.talk .w-plot > svg { width: 100%; height: 100%; display: block; }
-.talk .w-plot line:nth-of-type(2) { display: none; }
-.talk .w-controls { grid-column: 2; grid-row: 1; align-self: start; display: grid; gap: 14px; padding-top: 4px; }
-.talk .w-controls label { display: grid; row-gap: 12px; font: 600 18px/1.3 var(--ss-font-sans); }
-.talk .w-controls output { display: none; }   /* the readout prints the threshold as 0.50, like every other page */
-.talk .w-controls input[type=range] { width: 100%; margin: 0; accent-color: var(--ss-accent); }
-.talk .w-controls button { justify-self: start; font: 500 16px/1.2 var(--ss-font-sans); color: var(--ss-ink); background: none; border: 1px solid var(--ss-rule); border-radius: 6px; padding: 8px 12px; cursor: pointer; }
-/* .w-status sits in .sr-only (player.css): announced, not shown, because the readout states the same counts in words.
-   The wrapper is parked on blank paper below the plot, so its unclipped text box covers nothing. */
-.talk .widget .sr-only { left: 0; top: 440px; white-space: nowrap; }
-/* In static export the readout is this page's selected-state view, so the widget's generic summary steps aside. */
-body[data-export="true"] .talk .w-export-summary { display: none !important; }
-.talk .ro-static { position: absolute; left: 909px; top: 186px; width: 307px; font: 400 17px/1.45 var(--ss-font-sans); color: var(--ss-muted); }
-.talk .w-axis { position: absolute; left: 64px; top: 176px; width: 805px; height: 414px; pointer-events: none; }
-.talk .readout { position: absolute; left: 909px; top: 300px; width: 307px; }
-.talk .readout .ro-t { font: 400 18px/1.4 var(--ss-font-sans); margin-bottom: 10px; }
-.talk .readout .ro-t b { font: 400 34px/1 var(--ss-font-display); color: var(--ss-accent); margin-left: 4px; font-variant-numeric: tabular-nums lining-nums; }
-.talk .readout table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
-.talk .readout thead th { font: 600 16px/1.3 var(--ss-font-sans); color: var(--ss-muted); text-align: left; padding: 0 0 8px; }
-.talk .readout tbody th { font: 600 16px/1.3 var(--ss-font-sans); text-align: left; padding: 14px 8px 12px 0; border-top: 1px solid var(--ss-rule); vertical-align: top; }
-.talk .readout tbody td { padding: 10px 0 12px; border-top: 1px solid var(--ss-rule); font: 400 16px/1.25 var(--ss-font-sans); color: var(--ss-muted); vertical-align: top; }
-.talk .readout td b { display: block; font: 400 34px/1.05 var(--ss-font-display); color: var(--ss-ink); font-variant-numeric: tabular-nums lining-nums; }
-.talk .readout td.sent b { color: var(--ss-accent); }
-.talk .readout .ro-rates { margin-top: 12px; font: 400 18px/1.4 var(--ss-font-sans); border-top: 1px solid var(--ss-rule); padding-top: 12px; }
+/* Explore: the threshold widget (assets/runtime/widgets.js) draws the plot, its axis and the four counts;
+   its layout comes from assets/interactions/study.extra.css. The deck only sets its numbers in the claim face. */
+.talk .w-kpi b { font: 400 40px/1 var(--ss-font-display); letter-spacing: -.01em; }
+.talk .w-kpi span { font-size: 17px; color: var(--ss-muted); }
 
 /* Compare: a table for reading; tabular figures, hairlines, the current rule in bold. */
 .talk .tbl { position: absolute; left: 64px; top: 196px; width: 1152px; border-collapse: collapse; font: 400 22px/1.3 var(--ss-font-sans); font-variant-numeric: tabular-nums lining-nums; }
@@ -309,18 +282,6 @@ function accuracyFigure() {
   });
 }
 
-/** Page 6: labels for the threshold widget's plot. The widget draws scores at x = 55 + 610·score and its
- *  axis at y = 300 in a 700 × 360 viewBox (assets/runtime/widgets.js); this overlay uses the same frame. */
-function widgetAxis() {
-  const X = v => 55 + 610 * v, s = 16 / 1.15;                        // 16 px at the plot's 1.15× scale
-  return el('svg', { class: 'w-axis', viewBox: '0 0 700 360', 'aria-hidden': 'true' },
-    [0, .1, .2, .3, .4, .5, .6, .7, .8, .9, 1].map(v => g({}, el('line', { x1: X(v), x2: X(v), y1: 300, y2: 304.5, stroke: t.c('rule') }),
-      textLines([fmt(v, { digits: 1 })], { x: X(v), y: 322, size: s, anchor: 'middle', fill: t.c('muted'), attrs: { 'font-variant-numeric': 'tabular-nums' } }))),
-    textLines(['Leak score'], { x: X(1), y: 348, size: s, anchor: 'end', fill: t.c('muted') }),
-    el('circle', { cx: 64, cy: 20, r: 7, fill: t.c('accent') }), textLines(['Crew sent (score at or above the threshold)'], { x: 78, y: 20, size: s, valign: 'middle', fill: t.c('ink') }),
-    el('circle', { cx: 444, cy: 20, r: 7, fill: t.c('context') }), textLines(['Not sent'], { x: 458, y: 20, size: s, valign: 'middle', fill: t.c('ink') }));
-}
-
 /** Page 8: cost of each threshold, in dry-dig equivalents, for three prices of a missed leak. */
 function valueFigure() {
   return lineChart({
@@ -374,24 +335,6 @@ function coverageFigure() {
   }));
 }
 
-// ------------------------------------------------------------------ the widget's live 2 × 2 readout
-// The widget writes its state (threshold and counts) to data-state on every render; this script mirrors it.
-const readoutScript = String.raw`
-(() => {
-  const root = document.getElementById('research-threshold'), out = document.getElementById('explore-readout');
-  if (!root || !out) return;
-  const pct = v => Number.isFinite(v) ? Math.round(v * 100) + '%' : '–';
-  const set = (key, text) => { const el = out.querySelector('[data-k="' + key + '"]'); if (el) el.textContent = text; };
-  const render = () => {
-    let s; try { s = JSON.parse(root.dataset.state || '{}'); } catch { return; }
-    const c = s.counts; if (!c) return;
-    set('t', Number(s.threshold).toFixed(2)); set('tp', c.tp); set('fn', c.fn); set('fp', c.fp); set('tn', c.tn);
-    set('sens', pct(c.tp / (c.tp + c.fn))); set('dry', pct(c.fp / (c.tp + c.fp)));
-  };
-  new MutationObserver(render).observe(root, { attributes: true, attributeFilter: ['data-state'] });
-  render();
-})();`;
-
 // ------------------------------------------------------------------ pages
 const cls = (layout = '') => `st cs-${SYSTEM} talk ${layout}`.trim();
 const source = (left, method) => `<p class="st-source" data-region="source"><span>${left}</span><span>${method}, fictional data</span></p>`;
@@ -400,8 +343,7 @@ const sources = [{ file: 'examples/research/data.json', status: 'illustrative' }
 export default {
   title: `Where should the crews dig? Leak score validation, ${study.district} 2026`,
   language: 'en', readingMode: 'live', transition: 'fade', sample: true,
-  css: [frame, block, deckCSS].join('\n'),
-  script: readoutScript,
+  css: [frame, block, widgetCSS, deckCSS].join('\n'),
   slides: [
     {
       id: 'question', title: 'Where should the crews dig?', className: cls('cover'),
@@ -462,20 +404,24 @@ ${source(`${SOURCE_STUDY} Wilson score intervals; area under the ROC curve ${fmt
       id: 'explore', className: cls(),
       title: `Between 0.30 and 0.60, each 0.05 step down finds one more leak and adds ${stepDry[0]} to ${stepDry[1]} dry digs`,
       content: `<h1 class="st-head" data-region="title">Between 0.30 and 0.60, each 0.05 step down finds one more leak and adds ${stepDry[0]} to ${stepDry[1]} dry digs</h1>
-<div class="widget" data-interactive="" id="research-threshold" data-region="primary"><div class="w-plot"></div><div class="w-controls"></div><div class="sr-only" data-qa-text-clip="screen-reader-only status"><output aria-live="polite" class="w-status"></output></div></div>
-${widgetAxis()}
-<p class="ro-static" data-static="show">Static view of an interactive page. In the HTML deck the threshold can be moved and every count recomputes.</p>
-<div class="readout" id="explore-readout" data-region="support">
-  <p class="ro-t">At threshold <b data-k="t">${t2(T0)}</b></p>
-  <table><thead><tr><td></td><th scope="col">Crew sent</th><th scope="col">Not sent</th></tr></thead>
-  <tbody><tr><th scope="row">Leak</th><td class="sent"><b data-k="tp">${now.tp}</b>found</td><td><b data-k="fn">${now.fn}</b>missed</td></tr>
-  <tr><th scope="row">No leak</th><td class="sent"><b data-k="fp">${now.fp}</b>dry digs</td><td><b data-k="tn">${now.tn}</b>left alone</td></tr></tbody></table>
-  <p class="ro-rates"><b data-k="sens">${pc(sens.p)}</b> of leaks found<br><b data-k="dry">${pc(now.fp / now.digs)}</b> of digs dry</p>
-</div>
+<div class="widget" data-interactive="" id="research-threshold" data-region="primary"><div class="w-plot"></div><div class="w-controls"></div><output aria-live="polite" class="w-status"></output></div>
 ${source(`${SOURCE_STUDY} Counts recomputed from the same scores.`, 'Interactive threshold')}`,
-      notes: `Move the threshold and watch the two right-hand cells. Going down from 0.60 to 0.30, each step picks up exactly one more leak, and two to five more dry digs. Going up, dry digs vanish quickly but leaks go with them. The static handout keeps today's ${t2(T0)}; the next page has the other thresholds as a table.`,
+      notes: `Move the threshold and watch dots change side of the line: leaks turn from missed to found, and no-leak sites from left alone to dry digs. Going down from 0.60 to 0.30, each step picks up exactly one more leak, and two to five more dry digs. Going up, dry digs vanish quickly but leaks go with them. The static handout keeps today's ${t2(T0)}; the next page has the other thresholds as a table.`,
       sources,
-      widgets: [{ id: 'research-threshold', kind: 'threshold', initial: { threshold: T0 }, data: { values: scores, labels: leaks } }],
+      widgets: [{
+        id: 'research-threshold', kind: 'threshold', initial: { threshold: T0 },
+        data: { values: scores, labels: leaks, domain: [0, 1] },
+        controls: { threshold: { label: 'Threshold (leak score)', min: thresholds[0], max: thresholds.at(-1), step: 0.05, digits: 2 } },
+        axes: { x: { title: 'Leak score', ticks: Array.from({ length: 11 }, (_, i) => i / 10), digits: 1 } },
+        text: {
+          positive: 'Leak', negative: 'No leak', rowCount: '{n} sites',
+          tp: '{tp} found', fn: '{fn} missed', fp: '{fp} dry digs', tn: '{tn} left alone',
+          rule: 'Crew sent at {threshold} or above', reset: `Reset to ${t2(T0)}`,
+          status: 'At {threshold}: crews go to {flagged} of {total} sites, find {tp} of {positives} leaks and dig {fp} dry holes.',
+          readout: [{ value: '{sensitivity}%', label: 'of leaks found' }, { value: '{falseShare}%', label: 'of digs dry' }],
+          figure: 'Leak scores of the surveyed sites by survey result, with the threshold',
+        },
+      }],
     },
     {
       id: 'compare', className: cls(),

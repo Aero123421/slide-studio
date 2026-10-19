@@ -184,18 +184,44 @@ audience copy; `build` refuses to overwrite without `--force`. Run `validate`,
 Run scripts using their absolute path. They do not rely on the skill being the working directory.
 
 - `studio.mjs list`: layout IDs and bundled theme IDs.
-- `studio.mjs init DIR --example executive`: copy one worked deck without overwriting.
+- `studio.mjs init DIR --example executive`: copy one worked deck (and the images it uses, into `DIR/media/`) without overwriting.
 - `studio.mjs validate deck.json`: check data, fit estimates, and bounds.
 - `studio.mjs build deck.json --out deck.html`: self-contained HTML plus `deck.scene.json`.
+- `export-pptx.mjs deck.html deck.pptx --mode editable`: native PowerPoint from the same scene (see below).
 - `studio.mjs brand "Company" --out theme.json --base neutral`: draft theme tokens.
 - `inspect-brand.py template.pptx --out brand-inspection.json`: inspect source theme/layout facts; no invented brand authority.
 - `lint.mjs deck.json`: writing/evidence/rhythm warnings.
 
 Use `--force` only when replacing generated output intentionally. Retain the editable JSON with the deliverable. Do not hand-edit the HTML and then expect editable PPTX export to reflect those edits.
 
+### What the engine decides, and what you decide
+
+The compiler owns the page: a 12-column grid (74 px columns, 24 px gutters, 64 px margins on
+1280×720), a headline at most two lines high, an evidence region of 1152×452 px under it, and one
+quiet footer line (source or sample note on the left, deck name and page number on the right).
+Type sizes belong to the layout and scale with the number of items, never with the length of
+the copy: headline 36–44 px (theme `titleSize`), body 20–26 px (`bodySize`), labels and axes
+16–18 px, footer 15 px. Copy that does not fit raises `text does not fit … Shorten or change
+layout` instead of shrinking or clipping; shorten it or choose another layout.
+
+You decide the claim and the emphasis. Write every content title as the specific claim the page
+proves. Colour follows that claim: ink and greys carry the page and the theme accent marks only
+the item the title is about. Set `highlight` (an index, a label, a list of either, or `null` for
+none); without it, data labels named in the title are accented. Numbers appear on steps and agenda
+rows only with `numbered: true`, for a sequence the audience must follow.
+
+Charts take round axis ticks from the figure engine (`niceDomain`/`ticks`), state the unit once
+(`unit`), label values directly and keep a zero baseline; bar and waterfall charts drop the value
+axis because every bar carries its label. Japanese copy wraps between phrases and keeps numbers
+with their units; put a deliberate `\n` in titles where the phrase breaks best.
+
 ### Start from a close example
 
-`assets/examples/`: executive (decision), talk (stage), casual (workshop), technical (engineering), editorial (self-read), training (practice), patterns (layout coverage). `commented-deck.mjs` shows how to generate JSON with explanatory comments. Node 20+ is the baseline; HTML generation has no package dependency.
+`assets/examples/`: executive (decision: month-end close), talk (stage, dark theme), casual
+(workshop, with a photo), technical (engineering: idempotent API), editorial (self-read),
+training (practice), patterns (all 25 layouts as one café-chain proposal). `commented-deck.mjs`
+shows how to generate JSON with explanatory comments. Node 20+ is the baseline; HTML generation
+has no package dependency.
 
 ```json
 {
@@ -204,12 +230,13 @@ Use `--force` only when replacing generated output intentionally. Retain the edi
   "language": "ja",
   "theme": "neutral",
   "sample": false,
-  "brand": { "footer": "Operations / September", "name": "Company" },
+  "brand": { "footer": "運用改善の提案", "name": "Company" },
   "slides": [{
     "id": "time-comparison",
     "layout": "bar",
     "title": "確認作業を月25時間に抑えた",
-    "unit": "時間 / 月",
+    "unit": "時間／月",
+    "highlight": "改善後",
     "data": [{"label":"改善前","value":40},{"label":"改善後","value":25}],
     "notes": "測定期間と対象範囲を口頭でも補足する。",
     "sources": [{"file":"user-report.xlsx","title":"対象部署、8月集計"}]
@@ -217,17 +244,25 @@ Use `--force` only when replacing generated output intentionally. Retain the edi
 }
 ```
 
-The numbers above illustrate the schema; they are not evidence for a real claim. Replace with source-backed data. Keep `sample:true` in fictional demonstration decks; a visible DEMO marker is added.
+The numbers above illustrate the schema; they are not evidence for a real claim. Replace with source-backed data. Keep `sample:true` in fictional demonstration decks; data pages then say so in the footer.
 
 ### Common fields
 
-`layout`, `title` required. Optional `id` (unique), `kicker`, `notes`, `sources`, and
-`chrome:false` to omit the title, kicker, logo, footer, page number and DEMO marker
-for a full-bleed page. `reveal:[elementId,…]` assigns builds 1, 2, … in that order;
-`build:'content'` reveals the whole content band at step 1 and `build:'sequential'`
-reveals it column by column. `theme` is a bundled name, an inline token object, or a JSON path relative to the deck. CLI `--theme path.json` is relative to the working directory. Local image paths are relative to the deck JSON. Assets are embedded; network fetches are not implicit.
+`layout`, `title` required. Optional `id` (unique; not `prev`, `next`, `overview`, `notes`,
+`full` or `announce`, which the player uses), `kicker` (a short label above the title in the deck
+language), `notes`, `sources` (strings or `{title, file, url}`; shown in the footer and the speaker
+notes), and `chrome:false` to omit the title, kicker, logo and footer for a full-bleed page.
+`reveal:[elementId,…]` assigns builds 1, 2, … in that order; `build:'content'` reveals everything
+below the title at step 1 and `build:'sequential'` reveals items (columns, steps, bars, points)
+one at a time. `theme` is a bundled name, an inline token object, or a JSON path relative to the
+deck. CLI `--theme path.json` is relative to the working directory. Local image paths are
+relative to the deck JSON. Assets are embedded; network fetches are not implicit.
 
-`brand.footer` changes the footer. `brand.logo` is a local image path with `brand.name` for alt text. The small standard logo frame is 120×42 px; for a brand requiring another placement/clear space, adapt the layout before calling it compliant.
+`brand.footer` replaces the deck title in the footer. `brand.logo` is a local image path with `brand.name` for alt text; the logo frame is 120×42 px at the top right, and titles narrow to make room. For a brand requiring another placement/clear space, adapt the layout before calling it compliant.
+
+Themes set `paper`, `ink`, `accent` (one), `secondary` (kept for compatibility), `font`,
+`headingFont`, `radius`, `titleSize`, `bodySize`. The compiler derives the rest: muted text at
+≥ 4.5:1, hairlines, the accent tint, and greys for marks that are not "this".
 
 ### Layout fields and intended use
 
@@ -235,27 +270,27 @@ reveals it column by column. `theme` is a bundled name, an inline token object, 
 |---|---|---|
 | cover | `body`, `kicker`, `byline` optional | Short title; purposeful line break |
 | statement | `body` optional | One big claim or question |
-| section | `number`, `body` optional | Chapter transition |
-| agenda | `items: string[]` | 1–5 items |
+| section | `number`, `body` optional | Chapter transition; the number is set small, as navigation |
+| agenda | `items: (string \| {title, body?})[]`, `numbered?` | 1–5 rows across the page; `body` for a duration or owner |
 | split | `leftTitle,leftBody,rightTitle,rightBody` | Two related arguments, not two unrelated piles |
-| metric | `value,label`, `body,baseline` optional | One primary number with context |
-| metrics | `items:[{value,label,note?}]` | 2–4 metrics |
-| quote | `attribution` | Exact sourced quote, or explicit sample |
-| comparison | `items:[{title,body}],highlight?` | 2–3 options; highlight is zero-based |
-| table | `columns,rows`, `widths,numericColumns,highlight` optional | 2–6 columns, 1–6 data rows; numeric columns right-align |
+| metric | `value,label`, `body,baseline` optional; `breakdown:[{label,value}]`, `breakdownUnit?`, `highlight?` | One primary number with context; a breakdown draws signed parts as bars |
+| metrics | `items:[{value,label,note?}]`, `highlight?` | 2–4 metrics; a unit after the figure (`84%`, `100時間`) is set smaller |
+| quote | `attribution` | Exact sourced quote, or explicit sample; quotation marks are added if absent |
+| comparison | `items:[{title,body?,facts?:[[label,value]]}]`, `highlight?` | 2–3 options; `facts` line up across options; the recommended one sits on a tinted panel |
+| table | `columns,rows`, `widths,numericColumns,highlight` optional | 2–6 columns, 1–6 data rows; a native table in PPTX |
 | bar | `data:[{label,value}],unit,highlight?` | 1–12 values; signed values supported; zero baseline |
-| line | `data:[{label,value}],unit` | Ordered observations; spacing is categorical/equal |
-| stacked | `data:[{label,values:[]}],series:[],unit` | 1–4 nonnegative series; consistent series length |
-| waterfall | `data:[{label,value,total?}],unit` | `total:true` resets total; other values are deltas |
-| donut | `data:[{label,value}],unit,center?` | 1–5 nonnegative parts; positive total; angular share computed |
-| scatter | `data:[{x,y,label?}],unit,xLabel?` | Numeric x/y; no causal claim by default |
-| timeline | `items:[{date,title,body?}]` | 2–5 milestones; equal spacing, not duration-proportional |
-| process | `items:[{title,body?}]` | 2–4 steps |
+| line | `data:[{label,value}],unit,highlight?` | Ordered observations; the latest value is "this" by default |
+| stacked | `data:[{label,values:[]}],series:[],unit,highlight?` | 1–4 nonnegative series; series named beside the last bar |
+| waterfall | `data:[{label,value,total?}],unit,highlight?` | `total:true` resets total; other values are signed deltas; totals in ink |
+| donut | `data:[{label,value}],unit,center?,centerLabel?,highlight?` | 1–6 parts; labels beside the ring; the centre states the total and what it counts |
+| scatter | `data:[{x,y,label?}],unit,xLabel?,highlight?` | Numeric x/y; every labelled point placed clear of the others; no causal claim by default |
+| timeline | `items:[{date,title,body?}]`, `highlight?` | 2–5 milestones; equal spacing, not duration-proportional |
+| process | `items:[{title,body?}]`, `numbered?` | 2–4 steps, set as a descending staircase |
 | matrix | `items:[{title,body}],xLabel,yLabel,highlight?` | Exactly four cells; top-left, top-right, bottom-left, bottom-right |
-| architecture | `nodes:[{id,x,y,w,h,label,accent?}],links:[{from,to,label?}]` | 1–12 nodes; manually place concise nodes in content area |
-| code | `code,explanation` | Short code excerpt; roughly 10 lines at default size |
+| architecture | `nodes:[{id,label,body?,accent?, x,y,w,h \| col,row}]`, `links:[{from,to,label?,dashed?,arrow?}]` | 1–12 nodes; omit coordinates and give `col`/`row` for automatic layout |
+| code | `code,explanation` | Short excerpt: 10 lines at 22 px, 13 lines at most |
 | equation | `equation,body?` | Unicode/plain equation; complex math: render TeX/SVG through an available math engine |
-| image | `src,alt,body,fit?` | Local PNG/JPEG/WebP/SVG; cover or contain |
+| image | `src,alt,body?,fit?` | Local PNG/JPEG/WebP/SVG; cover or contain; full width without `body` |
 | closing | `body,kicker` optional | Decision, action, or synthesis |
 | freeform | `elements:[]` | Deliberate custom composition using the scene primitives |
 
@@ -263,15 +298,29 @@ Keep titles brief enough for their allotted two lines. A large room may require 
 
 ### Scene primitives for custom work
 
-Each element uses `type,x,y,w,h`. Types: `text`, `rect`, `ellipse`, `line`, `image`, `svg`. Use stable unique `id` values to identify custom objects. All dimensions are px on a 1280×720 canvas.
+Each element uses `type,x,y,w,h` and an integer `step`. Types: `text`, `rect`, `ellipse`, `line`,
+`image`, `svg` (freeform accepts these); the compiler also emits `path` (chart lines, donut
+rings, staircase rules) and `table`. Use stable unique `id` values to identify custom objects.
+All dimensions are px on a 1280×720 canvas.
 
-- Text: `text,size,font,color,weight,align,lineHeight`. Use normal font names and #RRGGBB colors. Meaningful explicit newlines are retained.
+- Text: `text,size,font,color,weight,align,lineHeight`. Use normal font names and #RRGGBB colors. Meaningful explicit newlines are retained; a blank line starts a new paragraph with half a line of space (`paraGap`). Compiled text may carry `runs` (one line in several sizes, such as a figure and its unit), `numeric` (tabular figures) and `tracking` (em).
 - Shapes: `fill,stroke,strokeWidth,radius`. Set fill/stroke to `none` when absent.
-- Line: positive bounding size; optional `x1,y1,x2,y2` for direction. Keep connectors behind labels/nodes.
+- Colours are #RRGGBB, or a theme role (`ink`, `paper`, `muted`, `accent`, `line`, `grid`, `tint`, `context`, `series`) so the page follows a change of theme.
+- Line: positive bounding size; optional `x1,y1,x2,y2` for direction, `arrow:'end'|'start'|'both'` and `dash:true`. Keep connectors behind labels/nodes.
+- Path: `d` is a list of `['M',x,y]`, `['L',x,y]`, `['A',cx,cy,r,startDeg,endDeg]` (the pen is at the arc's start) and `['Z']`.
 - Image: local `src`, meaningful `alt`, `fit`. SVG: literal `svg` markup, `alt`; no scripts, active embeds, or external references.
-- Build: `step` integer 0+ (0 = visible from the start), or use the slide-level `reveal`/`build` fields above.
+- Every compiled element also carries `role` (`title`, `body`, `label`, `data`, `axis`, `mark`, `source`, …), used for HTML semantics (`h1`, `data-region`), build steps and PPTX shape names.
 
 The freeform layout keeps the standard header/footer unless the slide sets `chrome:false`; use that for a full-bleed native composition. Do not place a second title over an existing one.
+
+### Editable PowerPoint
+
+`export-pptx.mjs --mode editable` turns the scene into native objects: each slide title is a real
+title placeholder (outline view, accessibility checker), text boxes keep the measured line breaks
+as soft breaks (Shift+Enter) with exact line spacing and the deck language, tables are PowerPoint
+tables, chart lines and donut rings are freeform shapes, connectors carry arrowheads, and the
+theme fonts follow the deck. Nothing on a chart page is a picture; only `image`/`svg` nodes stay
+pictures. Render the PPTX (for example through LibreOffice to PDF) and look at it as well as the HTML.
 
 ### Iterating without losing control
 

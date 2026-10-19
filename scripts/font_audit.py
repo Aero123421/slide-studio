@@ -102,10 +102,20 @@ def audit_fonts(page,contract=None):
 
 def normalized(text):
     # U+02BC and U+2019 are one glyph in many fonts; PDF text extraction may return either.
-    text=unicodedata.normalize('NFKC',text).replace('\u02bc','\u2019').replace('\u02ee','\u201d').casefold()
+    text=unicodedata.normalize('NFKC',text).replace('\u02bc','\u2019').replace('\u02ee','\u201d')
+    # Middle dots and slashes that fonts draw with one glyph.
+    for a in ('\u00b7','\u2027','\u22c5'):text=text.replace(a,'\u30fb')
+    for a in ('\u2215','\u2044'):text=text.replace(a,'/')
+    text=text.casefold()
     return ''.join(c for c in text if not c.isspace() and unicodedata.category(c)!='Cf' and c not in ('\ufe0e','\ufe0f','\u00ad'))
 def private_use(text):
     return sum(1 for c in text if 0xE000<=ord(c)<=0xF8FF)
+def is_radical(c):
+    # CJK Radicals Supplement: some fonts map a radical and its ideograph (⻑/長, ⻄/西) to one glyph,
+    # and the PDF text layer may then carry the radical code point.
+    return 0x2E80<=ord(c)<=0x2EFF
+def is_ideograph(c):
+    return 0x3400<=ord(c)<=0x9FFF or 0xF900<=ord(c)<=0xFAFF or 0x20000<=ord(c)<=0x3134F
 
 def print_text(page):
     return page.locator('.slide').evaluate_all(r'''slides=>slides.map(slide=>{
@@ -153,7 +163,10 @@ def pdf_postflight(file,expected_text):
         if len(doc.pages)!=len(expected_text):errors.append(f'Page count mismatch: HTML {len(expected_text)}, PDF {len(doc.pages)}')
         for i,p in enumerate(doc.pages):
             text=p.extract_text() or '';expected=expected_text[i] if i<len(expected_text) else ''
-            missing=collections.Counter(normalized(expected))-collections.Counter(normalized(text));lost=sum(missing.values())
+            missing=collections.Counter(normalized(expected))-collections.Counter(normalized(text))
+            radicals=sum(1 for c in normalized(text) if is_radical(c));lost_ideographs=sum(n for c,n in missing.items() if is_ideograph(c))
+            as_radical=min(radicals,lost_ideographs);lost=sum(missing.values())-as_radical
+            if as_radical:warnings.append(f'Page {i+1}: {as_radical} ideographs came out as CJK radical code points (the font draws both with one glyph); text search for them may fail in some PDF viewers')
             if lost:errors.append(f'Page {i+1}: {lost} expected text characters not recoverable from PDF; inspect glyphs, clipping and font encoding')
             if '\ufffd' in text or '\x00' in text:errors.append(f'Page {i+1}: replacement/null characters in extracted text')
             pua=private_use(text)

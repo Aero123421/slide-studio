@@ -178,18 +178,69 @@ record which choices you exercised.
 
 ### Built-in teaching widgets
 
-24 examples in `assets/interactions/` cover parameter and threshold exploration,
-time scrubbing, image comparison, component and layer inspection, sortable tables,
-linked selection, histogram bins, seeded resampling, toy ablation, quizzes,
-decisions, reachability, matrix lookup, magnification, video/audio, mesh
-orbit/explode/cut/import and annotation. They are teaching mechanisms, not domain
-engines: replace their data and formulas, and localize their labels (they are
-English by default). `config.data` overrides the toy fixtures:
+`assets/runtime/widgets.js` mounts one mechanism per `kind`. The 24 studies in
+`assets/interactions/` are pages from fictional decks — a sepsis alert threshold, a
+dosing curve, a tide gauge during a typhoon, a bus network with a closed bridge, a
+parcel-rate matrix, a measured model ablation — and each module computes its headline
+from the same data it passes to the widget. Start from the closest study, replace its
+data and words, and recompute the headline the same way; never type a number into a
+headline. Without `data` every kind still draws a small default fixture (older decks
+rely on it); a fixture checks the mechanism, it is not a finding.
 
 ```js
-widgets: [{ id: 'risk-threshold', kind: 'threshold', initial: { threshold: 0.5 },
-  data: { values: [0.1, 0.3, 0.7, 0.9], labels: [0, 1, 0, 1] } }]
+widgets: [{ id: 'alert-widget', kind: 'threshold', initial: { threshold: 5 },
+  data: { values: scores, labels: hadSepsis, domain: [0, 10], step: 1 },   // one 0/1 label per score
+  controls: { threshold: { label: 'Alert threshold (score)', min: 1, max: 10, step: 1, format: '{v} or above' } },
+  axes: { x: { title: 'Early-warning score at triage', ticks: [0, 2, 4, 6, 8, 10] } },
+  text: { positive: 'Sepsis', negative: 'No sepsis', rowCount: '{n} patients', fp: '{fp} false alarms',
+    status: 'Alert at {threshold} or above: {tp} of {positives} cases caught; {flagged|alert|alerts}, {fp} of them false.',
+    readout: [{ value: '{sensitivity}', unit: '%', label: 'of sepsis cases caught' }] } }]
 ```
+
+**Shared config.** `initial` is the state at entry and after reset (deep-copied).
+`controls.<stateKey>` overrides one control: `label` (plain words with the unit),
+`min`, `max`, `step`, `digits`, `format` (`'{v} mg'`), `values` with `labels` for a
+slider over named stops, `plain` (no digit grouping, for years), `summaryLabel`;
+`false` hides the control and keeps its state. `axes.x` / `axes.y`: `title`, `min`,
+`max`, `ticks` (numbers or `{value, label}`), `digits`, `plain`, `unit`. `text` holds
+every visible word: `status` is the one sentence announced in the live region
+(`{key}` inserts a derived value from the table below, `{n|stop|stops}` adds the
+right noun), `readout` is a list of large numbers `{value, unit, label}` (templates
+too), `reset` names the reset button, `figure` is the drawing's accessible name.
+`locale` defaults to the slide's `lang`; `ja` switches the built-in words to Japanese.
+Colours are role tokens: `tone: 'accent' | 'ink' | 'muted' | 'negative' | 'positive' |
+'context' | 'cat-1'…'cat-8'`. A static export hides the controls and prints
+"Label: value" for each.
+
+| kind | `data` (state keys) | values for `text` templates |
+|---|---|---|
+| `parameter` | `model` (below), `constants`, `window: [low, high]` (the curve above `high` turns negative), `bands: [{from, to, label}]`, `refs: [{y, label, tone, align, side}]` (the model's parameter names) | each parameter; dosing adds `peak`, `trough`, `ssPeak`, `ssTrough`, `hoursAbove`, `hoursBelow`, `firstAbove`, `accumulation` |
+| `threshold` | `values`, `labels` (0/1 each), `domain`, `step` (whole-number scores: the cut is drawn half a step below); words `positive`, `negative`, `rowCount`, `tp`, `fp`, `fn`, `tn`, `rule` (`threshold`, `counts`) | `threshold`, `tp`, `fp`, `fn`, `tn`, `positives`, `negatives`, `total`, `flagged`, `sensitivity`, `specificity`, `ppv`, `falseShare` (%) |
+| `scrubber` | `x`, `labels` (one per sample), `lines: [{name, short, values, tone, dash}]`, `refs`, or `series: [{x, y, label}]`; `axes.y.unit`; `text.statusAbove` replaces `status` at or above `refs[0]` (`time`) | `label`, `y`, `y2`, `delta`, `change`, `trend`, `ref`, `vsRef`, `overRef`, `n`, `count` |
+| `comparison` | `regions: [{name, x, y, w, h, label}]` (fractions of the image), `filter` (CSS, default `grayscale(1)`); `text.before`, `text.after` (`split`, %) | `L0`, `L1`… (CIE L* measured from the rendered pixels), pairwise `d01`, `d02`, `d12`…, `name0`…, `split` |
+| `hotspots` | `parts: [{id, name, body, at}]`, `links: [{from, to, label}]`, `layout: 'cycle'` (parts `at` top, right, bottom, left), `flows: [{part, side, dir, value, label, tone}]` (width ∝ value) (`part`) | `name`, `body` |
+| `tabs` | `sections: [{id, name, title, body, facts: [{value, label}], status}]`, `body` a string or a list of paragraphs (`tab`) | `name`, `index`, `count` |
+| `layers` | `viewBox`, `layers: [{id, name, svg, note}]`, `controlOrder` (one boolean per layer) | `shown`, `count`, `notes` (of the visible layers) |
+| `table` | `columns: [{key, name, short, unit, digits, suffix, plain, bar: {max, ref}, flag: {above \| below}, ascending}]`, `rows`, `id`, `sortBy`, `caption`; a header click sorts, a second click reverses (`sortBy`, `ascending`, `order`) | `column`, `direction`, `first`, `last`, `firstValue`, `lastValue`, `count`, `flagged` |
+| `brushing` | `points: [{id, x, y}]`; bounds are in x units, `axes.x.plain` for years (`low`, `high`, `selected`) | `k`, `n`, `others`, `low`, `high`, `median`, `rest`, `ratio` |
+| `histogram` | `values`, `domain` (peak bins in accent); `controls.bins.values` with `labels` offers named bin widths; `text.statusTwoPeaks` (`bins`, `counts`) | `bins`, `width`, `total`, `peaks`, `peakList`, `first` |
+| `bootstrap` | `values`, `batch` (adds "Draw n more"), `minDraws` (interval shown from then on, default 20); `controls.n: false` resamples all values; `axes.x.signed` (`seed`, `n`, `mean`, `low`, `high`) | `mean`, `draws`, `lo`, `hi`, `observed`, `above` (means above 0) |
+| `ablation` | `components: [{id, name, short}]` with `measured: {none: v, a: v, 'a+b': v, …}` (included ids in component order) and `n` (evaluated cases → 95% margins); or additive `base` and `effect` (one boolean per component, `value`) | `value`, `config`, `full`, `delta`, `margin` |
+| `quiz` | `question`, `prompt`, `options: [{id, label, feedback, share}]`, `answer`, `explanation`, `figure`; `text.correctPrefix`, `text.wrongPrefix` (`choice`, `checked`); the export is the answer sheet | `choice` |
+| `decision` | `questions: [{id, label, name, options: [[value, label, short]]}]`, `tree: {ask, branches: {value: {result} \| {ask, branches}}}` (one key per question, `result`) | `result` |
+| `graph` | `nodes: [{id, name, x, y, label}]`, `edges: [{from, to, minutes, toggle, oneway, bend, label, closedLabel, labelAt}]` (two-way unless `oneway`; shortest times by Dijkstra), `toggles: [{key, label}]`, `origin`, `areas: [{points, tone: 'water', label, labelAt}]`; `text.statusCut` when a stop is cut off (toggle keys, `reachable`, `minutes`) | `reached`, `count`, `cut`, `cutList`, `list`, `farthest`, `origin` |
+| `matrix` | `rows`, `columns` (names), `values`, `prefix`, `suffix`, `cellSuffix`, `digits`, `corner`, `caption` (`row`, `column`, from 1) | `rowName`, `columnName`, `value`, `cheapest`, `ratio`, `rowMin`, `rowMax`, `rowRatio`, `first`, `vsFirst` |
+| `magnifier` | `pixelated`, `print: {widthMm, ppi}` (`zoom`, `x`, `y`) | `zoom`, `screen` (screen px per image px), `visible`, `ppi`, `needed`, `maxMm`, `pixelMm` |
+| `video` | `seekTo` (s), `duration`; `assets.video`, `poster`, `captions` | `time`, `duration`, `state` |
+| `audio` | `reference: {name, hz}`, `windowMs`; a 16-bit PCM WAV data URI is decoded and measured in the page (`time`) | `hz` (zero crossings), `seconds`, `peak`, `rms` (dBFS), `cents`, `note`, `time`, `state` |
+| `cad-orbit`, `cad-explode`, `cad-section`, `cad-import` | `parts: [{group, name, note, tone, explode}]` (an OBJ group becomes a direct label with its measured size), `scaleBar` (mm); `text.statusFile` after an import (`yaw`, `pitch`, `explode`, `cut`, `filename`) | `triangles`, `drawn`, `x`, `y`, `z`, `yaw`, `pitch`, `gap`, `height`, `cutPct`, `file` |
+| `ink` | a chart to mark up: `lines`, `x`, `labels` as for `scrubber`, `refs`, `marks: [{at, label}]`, `preset: {at, rx, ry}` (the keyboard preset rings sample `at`), `inkTone` (`paths`) | `marks` |
+
+Parameter models: `dosing` (one-compartment IV bolus, C(t) = Σ dose/volume ·
+e^(−k(t − n·interval)), k = ln 2 / halfLife; constants `volume`, `interval`, `horizon`;
+state `dose`, `halfLife`), `decay` (N = initial · 2^(−t/halfLife)), `logistic`
+(P = capacity / (1 + (capacity/start − 1) e^(−rate·t))) and `sine` (the default
+fixture). A curve that leaves a fixed axis says so instead of rescaling.
 
 ## 10. Media and 3D boundaries
 

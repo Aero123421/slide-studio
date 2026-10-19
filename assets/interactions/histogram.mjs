@@ -50,6 +50,7 @@ Static: The export shows ${start}-minute bins. Show the ${wide}-minute version b
     controls: { bins: { label: 'Bin width', values: widths.map(binsFor), labels: widths.map(w => `${w} min`) } },
     axes: { x: { title: 'Minutes from order to doorstep', digits: 0 }, y: { title: 'Orders' } },
     text: {
+      reset: 'Reset',
       status: '{width}-minute bins: one peak, at {peakList} minutes. All {total} orders are counted at every width.',
       statusTwoPeaks: '{width}-minute bins: peaks at {peakList} minutes. All {total} orders are counted at every width.',
       figure: 'Histogram of delivery times with a rug of every order',

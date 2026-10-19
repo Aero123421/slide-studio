@@ -187,13 +187,17 @@ function linear([d0, d1], [r0, r1]) {
 /** Horizontal axis: tick labels under `y`, optional grid lines, crowded labels thinned. */
 function axisX(x, { y, values, format = String, grid, size = 16, family, zeroLine = false } = {}) {
   let out = '', right = -Infinity;
+  const r0 = Math.min(...(x.range || [-Infinity]));
   for (const v of values) {
     const px = x(v);
     if (grid) out += line(px, grid[0], px, grid[1], { stroke: zeroLine && v === 0 ? C.ink : C.grid, width: zeroLine && v === 0 ? 1.4 : 1 });
     const label = typeof v === 'object' ? v.label : format(v), w = textWidth(label, size, 400, family);
-    if (px - w / 2 < right + 10) continue;
-    out += text(px, y + 8, label, { size, fill: C.muted, anchor: 'middle', valign: 'top', num: true });
-    right = px + w / 2;
+    // A label that would reach into the y axis's labels (which end 10 px left of the plot) starts at its tick.
+    const anchor = px - w / 2 < r0 - 8 ? 'start' : 'middle';
+    const left = anchor === 'start' ? px : px - w / 2;
+    if (left < right + 10) continue;
+    out += text(px, y + 8, label, { size, fill: C.muted, anchor, valign: 'top', num: true });
+    right = left + w;
   }
   return out;
 }
@@ -265,6 +269,12 @@ function mount(config, defaultAssets) {
   const readout = document.createElement('div');
   readout.className = 'w-readout';
   panel.after(summary, readout);
+  // The rail: one column beside the plot holding the controls, the settings shown in a static export,
+  // the readout, the status sentence and reset. The plot keeps the widget's full height whatever the rail holds.
+  const rail = root.querySelector('.w-rail') || document.createElement('div');
+  rail.className = 'w-rail';
+  if (!rail.parentNode) root.append(rail);
+  rail.append(panel, summary, readout, status);
 
   const spec = (key, defaults) => {
     const own = config.controls?.[key];
@@ -381,8 +391,8 @@ function mount(config, defaultAssets) {
     wrap: (s, width, size = 16, weight = 400) => wrapText(s, width, size, weight, w.font()),
   };
   const view = make(w) || {};
-  // Reset sits in its own row of the widget (after the status), so a long status never runs under it.
-  const resetButton = button(ui.reset, () => reset(), { cls: 'w-reset', container: root, hideStatic: true });
+  // Reset closes the rail, after the status sentence.
+  const resetButton = button(ui.reset, () => reset(), { cls: 'w-reset', container: rail, hideStatic: true });
   resetButton.dataset.wReset = '';
 
   function render() {
@@ -509,7 +519,7 @@ KINDS.parameter = w => {
       out += axisX(x, { y: b.b, values: xt, format: fx });
       out += line(b.l, b.b, b.r, b.b, { stroke: C.ink, width: 1.4 });
       out += yTitle(b, ax.y?.title) + xTitle(b, ax.x?.title);
-      for (const band of d.bands || []) out += rect(b.l, y(band.to), b.w, y(band.from) - y(band.to), { fill: C.surface }) +
+      for (const band of d.bands || []) out += path(`M${r2(b.l)} ${r2(y(band.to))}H${r2(b.r)}V${r2(y(band.from))}H${r2(b.l)}Z`, { fill: C.surface, stroke: 'none', width: 0 }) +
         (band.label ? text(b.l + 10, y(band.to) + 8, band.label, { size: 16, fill: C.muted, valign: 'top' }) : '');
       // Sample the curve; dosing jumps at each dose instead of ramping.
       const pts = [];
@@ -532,8 +542,7 @@ KINDS.parameter = w => {
       const exit = pts.find(([, v]) => v > yd[1]);
       if (exit) {
         const top = Math.max(...pts.map(([, v]) => v)), note = fill(w.text.offScale || '↑ off scale, up to {v}', { v: w.fmt(top, ax.y?.digits ?? 1) }, w.locale);
-        const ex = clamp(x(exit[0]) + 8, b.l, b.r - w.tw(note, 16, 650));
-        out += text(ex, b.t + 6, note, { size: 16, weight: 650, fill: C.negative, valign: 'top', halo: C.paper });
+        out += text(b.r, b.t - 18, note, { size: 16, weight: 650, fill: C.negative, anchor: 'end', valign: 'bottom' });
       }
       const values = Object.fromEntries(keys.map(key => [key, w.fmt(p[key], (w.config.controls?.[key]?.digits ?? model.params[key].digits) || 0)]));
       if (d.model === 'dosing') {
@@ -546,9 +555,9 @@ KINDS.parameter = w => {
         const lastDose = Math.ceil(p.horizon / p.interval - 1e-9) - 1, tp = lastDose * p.interval, tt = (lastDose + 1) * p.interval - 1e-6;
         if (tp >= xd[0] && tt <= xd[1] + 1e-6) {
           const cp = model.at(p, tp), ct = model.at(p, tt);
-          out += circle(x(tp), y(cp), 5.5, { fill: C.paper, stroke: cp > (d.window?.[1] ?? Infinity) ? C.negative : C.accent, width: 2.6 });
-          out += circle(x(tt), y(ct), 5.5, { fill: C.paper, stroke: C.accent, width: 2.6 });
-          if (w.text.peakLabel) out += text(x(tp), Math.max(b.t + 4, y(cp) - 12), fill(w.text.peakLabel, { v: w.fmt(cp, dg) }, w.locale), { size: 16, anchor: 'middle', valign: 'bottom', weight: 650, fill: cp > (d.window?.[1] ?? Infinity) ? C.negative : C.ink, halo: C.paper });
+          if (cp <= yd[1]) out += circle(x(tp), y(cp), 5.5, { fill: C.paper, stroke: cp > (d.window?.[1] ?? Infinity) ? C.negative : C.accent, width: 2.6 });
+          if (ct <= yd[1]) out += circle(x(tt), y(ct), 5.5, { fill: C.paper, stroke: C.accent, width: 2.6 });
+          if (w.text.peakLabel && cp <= yd[1]) out += text(x(tp), Math.max(b.t + 4, y(cp) - 12), fill(w.text.peakLabel, { v: w.fmt(cp, dg) }, w.locale), { size: 16, anchor: 'middle', valign: 'bottom', weight: 650, fill: cp > (d.window?.[1] ?? Infinity) ? C.negative : C.ink, halo: C.paper });
         }
       } else if (d.model === 'decay') values.end = w.fmt(model.at(p, xd[1]), 1);
       else if (d.model === 'logistic') values.half = w.fmt(Math.log(p.capacity / p.start - 1) / p.rate, 1);
@@ -608,8 +617,12 @@ KINDS.threshold = w => {
         out += text(b.l - 20, ly + 12, countLine(n), { size: 18, anchor: 'end', valign: 'middle', fill: C.muted });
         const left = row.cls ? fill(t.fn || '{fn} missed', { fn }, w.locale) : fill(t.tn || '{tn} cleared', { tn }, w.locale);
         const right = row.cls ? fill(t.tp || '{tp} caught', { tp }, w.locale) : fill(t.fp || '{fp} false alarms', { fp }, w.locale);
-        out += text(b.l + 4, row.y0 + 4, left, { size: 18, weight: 650, valign: 'top', fill: row.cls && fn ? C.negative : C.muted });
-        out += text(b.r - 4, row.y0 + 4, right, { size: 18, weight: 650, valign: 'top', anchor: 'end', fill: C.ink });
+        const lstyle = { size: 18, weight: 650, valign: 'top', fill: row.cls && fn ? C.negative : C.muted }, rstyle = { size: 18, weight: 650, valign: 'top', fill: C.ink };
+        // A count that does not fit on its side of the line moves across it, with an arrow pointing back.
+        if (b.l + 4 + w.tw(left, 18, 650) <= bx - 10) out += text(b.l + 4, row.y0 + 4, left, lstyle);
+        else out += text(bx + 10, row.y0 + 4, '← ' + left, lstyle);
+        if (b.r - 4 - w.tw(right, 18, 650) >= bx + 10) out += text(b.r - 4, row.y0 + 4, right, { ...rstyle, anchor: 'end' });
+        else out += text(bx - 10, row.y0 + 4, right + ' →', { ...rstyle, anchor: 'end' });
       }
       // Axis and the threshold line with its rule in words.
       const tickVals = ax.x?.ticks || ticks(domain[0], domain[1], 10);
@@ -622,7 +635,8 @@ KINDS.threshold = w => {
       w.draw(svgRoot(W, H, out, t.figure || 'Scored cases by true outcome, split at the threshold'));
       const pos = tp + fn, neg = fp + tn, total = pos + neg;
       const vals = { threshold: w.fmt(th, w.config.controls?.threshold?.digits ?? 2), tp, fp, fn, tn, positives: pos, negatives: neg, total, flagged: tp + fp,
-        sensitivity: w.fmt(pos ? (100 * tp) / pos : 0, 0), specificity: w.fmt(neg ? (100 * tn) / neg : 0, 0), ppv: w.fmt(tp + fp ? (100 * tp) / (tp + fp) : 0, 0) };
+        sensitivity: w.fmt(pos ? (100 * tp) / pos : 0, 0), specificity: w.fmt(neg ? (100 * tn) / neg : 0, 0), ppv: w.fmt(tp + fp ? (100 * tp) / (tp + fp) : 0, 0),
+        falseShare: tp + fp ? w.fmt((100 * fp) / (tp + fp), 0) : '–' };
       return { status: w.fill(t.status || 'Synthetic labels · TP {tp}, FP {fp}, FN {fn}, TN {tn}', vals), values: vals };
     },
   };
@@ -645,13 +659,16 @@ function lineChart(w, S, { W, H, cursor, refs, margin } = {}) {
   const [y0, y1] = ax.y?.min !== undefined && ax.y?.max !== undefined ? yd : niceDomain(yd[0], yd[1], 5);
   const xd = [ax.x?.min ?? S.xs[0], ax.x?.max ?? S.xs[S.xs.length - 1]];
   const endW = Math.max(0, ...S.lines.map(l => (l.name ? w.tw(l.name, 17, 650) : 0)));
-  const b = box(W, H, margin || { l: 64, r: endW ? endW + 22 : 18, t: 74, b: 62 });
+  const lastTick = ax.x?.ticks?.length ? ax.x.ticks[ax.x.ticks.length - 1] : null;
+  const tickHalf = lastTick && typeof lastTick === 'object' ? w.tw(lastTick.label, 16) / 2 + 4 : 18;
+  const b = box(W, H, margin || { l: 64, r: endW ? Math.max(endW + 22, tickHalf) : Math.max(18, tickHalf), t: 74, b: 62 });
   const x = linear(xd, [b.l, b.r]), y = linear([y0, y1], [b.b, b.t]);
   const dg = ax.y?.digits ?? (y1 - y0 <= 2 ? 2 : 0);
   let out = axisY(y, { x: b.l, values: ax.y?.ticks || ticks(y0, y1, 5), format: v => w.fmt(v, ax.y?.tickDigits ?? (y1 - y0 <= 2 ? 1 : 0)), grid: [b.l, b.r], zeroLine: y0 < 0 });
   const xt = ax.x?.ticks ? ax.x.ticks.map(tk => (typeof tk === 'object' ? { value: tk.value, label: tk.label } : { value: tk, label: w.fmt(tk, ax.x?.digits ?? 0) }))
     : ticks(xd[0], xd[1], 8).map(v => ({ value: v, label: w.fmt(v, ax.x?.digits ?? (xd[1] - xd[0] <= 2 ? 1 : 0)) }));
-  out += axisX(v => x(v.value), { y: b.b, values: xt });
+  const xv = v => x(v.value); xv.range = x.range;
+  out += axisX(xv, { y: b.b, values: xt });
   out += line(b.l, b.b, b.r, b.b, { stroke: C.ink, width: 1.4 });
   out += yTitle(b, ax.y?.title) + xTitle(b, ax.x?.title, b.b + 36);
   out += refLines(refs, y, b);
@@ -663,8 +680,8 @@ function lineChart(w, S, { W, H, cursor, refs, margin } = {}) {
     if (l.name) ends.push({ y: y(l.values[last]), name: l.name, col });
   });
   const ey = spread(ends.map(e => e.y), 22, b.t, b.b);
-  ends.forEach((e, k) => { out += text(b.r + 10, ey[k], e.name, { size: 17, weight: 650, fill: e.col, valign: 'middle' }); });
-  return { out, x, y, b, dg };
+  const endLabels = ends.map((e, k) => text(b.r + 10, ey[k], e.name, { size: 17, weight: 650, fill: e.col, valign: 'middle' })).join('');
+  return { out, endLabels, x, y, b, dg };
 }
 KINDS.scrubber = w => {
   const S = seriesData(w.data), n = S.xs.length, labelOf = i => (S.labels ? S.labels[i] : `${i + 1} / ${n}`);
@@ -673,9 +690,10 @@ KINDS.scrubber = w => {
     render(s) {
       const i = clamp(Math.round(Number(s.time) || 0), 0, n - 1);
       const { width: W, height: H } = w.size();
-      const { out: chart, x, y, b, dg } = lineChart(w, S, { W, H, refs: w.data.refs });
-      let out = chart;
+      const { out: chart, endLabels, x, y, b, dg } = lineChart(w, S, { W, H, refs: w.data.refs });
       const cx = x(S.xs[i]);
+      // Near the right end the cursor's own labels name the lines; the end labels would crowd them.
+      let out = chart + (cx < b.r - 120 ? endLabels : '');
       out += line(cx, b.t - 30, cx, b.b, { stroke: C.ink, width: 1.6 });
       const head = labelOf(i), hw = w.tw(head, 17, 700);
       out += text(clamp(cx, b.l + hw / 2, b.r - hw / 2), b.t - 36, head, { size: 17, weight: 700, anchor: 'middle', valign: 'bottom' });
@@ -745,19 +763,24 @@ KINDS.comparison = w => {
       frame.style.width = fw + 'px'; frame.style.height = fh + 'px';
       before.style.clipPath = `inset(0 ${100 - split}% 0 0)`;
       divider.style.left = split + '%';
+      // A tag names a side only while that side is wide enough to hold it.
+      const tagL = frame.querySelector('.w-tag--left'), tagR = frame.querySelector('.w-tag--right');
+      if (tagL) tagL.style.visibility = (split / 100) * fw >= tagL.offsetWidth + 20 ? '' : 'hidden';
+      if (tagR) tagR.style.visibility = (1 - split / 100) * fw >= tagR.offsetWidth + 20 ? '' : 'hidden';
       let marks = '';
       regions.forEach((r, i) => {
         const X = r.x * fw, Y = r.y * fh, RW = r.w * fw, RH = r.h * fh, below = r.label === 'below';
         marks += rect(X, Y, RW, RH, { fill: 'none', stroke: '#ffffff', width: 2.5 }) + rect(X, Y, RW, RH, { fill: 'none', stroke: '#111111', width: 1 });
-        const caption = measured ? `${r.name} · L* ${w.fmt(measured[i], 0)}` : r.name;
+        const caption = measured ? `${r.name}: L* ${w.fmt(measured[i], 0)}` : r.name;
         marks += text(X + RW / 2, below ? Y + RH + 8 : Y - 8, caption, { size: 16, weight: 650, anchor: 'middle', valign: below ? 'top' : 'bottom', fill: '#111111', halo: '#ffffff' });
       });
       overlay.setAttribute('viewBox', `0 0 ${fw} ${fh}`);
       overlay.innerHTML = marks;
       const vals = { split, hidden: 100 - split };
       regions.forEach((r, i) => { vals['name' + i] = r.name; vals['L' + i] = measured ? w.fmt(measured[i], 0) : '…'; });
-      if (measured && measured.length > 1) vals.dL = w.fmt(Math.abs(measured[0] - measured[1]), 1);
-      if (measured && measured.length > 3) vals.dL2 = w.fmt(Math.abs(measured[2] - measured[3]), 1);
+      // Every pairwise difference in L*: {d01}, {d02}, {d12}, …
+      if (measured) for (let i = 0; i < measured.length; i++) for (let j = i + 1; j < measured.length; j++) vals[`d${i}${j}`] = w.fmt(Math.abs(measured[i] - measured[j]), 0);
+      if (vals.d01) vals.dL = vals.d01;
       const status = regions.length && !measured ? w.ui.measuring : w.fill(t.status || 'Same photograph and registration; grayscale is a declared display transformation.', vals);
       return { status, values: vals };
     },
@@ -798,9 +821,11 @@ KINDS.hotspots = w => {
         const ang = Math.atan2(z[1] - a[1], z[0] - a[0]), tip = [z[0] - Math.cos(ang) * (sw * 0.9), z[1] - Math.sin(ang) * (sw * 0.9)];
         const col = tone(f.tone, C.muted);
         out += line(a[0], a[1], tip[0], tip[1], { stroke: col, width: sw }) + arrowHead(z[0], z[1], ang, sw * 1.15, col);
-        const lx = far[0] + v[0] * 10, ly = far[1] + v[1] * 10;
-        out += text(lx, ly, w.wrap(f.label, f.labelWidth || 220, 17, 650), { size: 17, weight: 650, fill: col === C.muted ? C.ink : col,
-          anchor: v[0] > 0 ? 'start' : v[0] < 0 ? 'end' : 'middle', valign: v[1] > 0 ? 'top' : v[1] < 0 ? 'bottom' : 'middle', lh: 1.25 });
+        // The label sits beside the shaft: right of a vertical arrow, above a horizontal one.
+        const mid = [(start[0] + far[0]) / 2, (start[1] + far[1]) / 2], lines = w.wrap(f.label, f.labelWidth || 220, 17, 650);
+        out += v[0] === 0
+          ? text(mid[0] + sw / 2 + 12, mid[1], lines, { size: 17, weight: 650, fill: col === C.muted ? C.ink : col, valign: 'middle', lh: 1.25 })
+          : text(far[0] + v[0] * 10, far[1], lines, { size: 17, weight: 650, fill: col === C.muted ? C.ink : col, anchor: v[0] > 0 ? 'start' : 'end', valign: 'middle', lh: 1.25 });
       }
       for (const l of links) {
         const [ax, ay] = pos[l.from], [bx, by] = pos[l.to];
@@ -814,12 +839,14 @@ KINDS.hotspots = w => {
         const endPt = [p2[0] - Math.cos(ang) * 3, p2[1] - Math.sin(ang) * 3];
         out += polyline([...pts.slice(0, -1), [endPt[0] - Math.cos(ang) * 8, endPt[1] - Math.sin(ang) * 8]], { stroke: tone(l.tone, C.muted), width: 2.4, join: 'miter' }) + arrowHead(endPt[0], endPt[1], ang, 11, tone(l.tone, C.muted));
         if (l.label) {
-          const corner = pts.length === 3 ? pts[1] : [(pts[0][0] + pts[1][0]) / 2, (pts[0][1] + pts[1][1]) / 2];
-          const right = corner[0] > W / 2, low = corner[1] > H / 2;
-          const lines = w.wrap(l.label, 170, 16, 400);
-          out += pts.length === 3
-            ? text(corner[0] + (right ? -12 : 12), corner[1] + (low ? -12 : 12), lines, { size: 16, fill: C.muted, anchor: right ? 'end' : 'start', valign: low ? 'bottom' : 'top' })
-            : text(corner[0], corner[1] - 12, lines, { size: 16, fill: C.muted, anchor: 'middle', valign: 'bottom' });
+          const lines = w.wrap(l.label, l.labelWidth || 150, 16, 400);
+          if (pts.length === 3) {
+            // Beside the vertical run, on the outside of the loop.
+            const vert = Math.abs(pts[0][0] - pts[1][0]) < 1 ? [pts[0], pts[1]] : [pts[1], pts[2]];
+            // Inside the loop, where the drawing leaves room.
+            const vx = vert[0][0], vy = (vert[0][1] + vert[1][1]) / 2, rightSide = vx > W * (d.cx ?? 0.47);
+            out += text(vx + (rightSide ? -12 : 12), vy, lines, { size: 16, fill: C.muted, anchor: rightSide ? 'end' : 'start', valign: 'middle' });
+          } else out += text((pts[0][0] + pts[1][0]) / 2, pts[0][1] - 12, lines, { size: 16, fill: C.muted, anchor: 'middle', valign: 'bottom' });
         }
       }
       for (const p of parts) {
@@ -843,7 +870,7 @@ const DEFAULT_SECTIONS = [
 ];
 KINDS.tabs = w => {
   const sections = w.data.sections || DEFAULT_SECTIONS;
-  w.radios('tab', w.spec('tab', { label: 'Read a section', options: sections.map(s => [s.id, s.name]), cls: 'w-toc' }));
+  w.radios('tab', w.spec('tab', { label: 'Read a section', options: sections.map(s => [s.id, s.name]), cls: 'w-toc', showLegend: true }));
   return {
     render(s) {
       const i = Math.max(0, sections.findIndex(x => x.id === s.tab)), sec = sections[i];
@@ -851,7 +878,7 @@ KINDS.tabs = w => {
       const facts = (sec.facts || []).map(f => `<div class="w-kpi"><b>${esc(f.value)}</b><span>${esc(f.label)}</span></div>`).join('');
       w.draw(`<article class="w-reading"><h2>${esc(sec.title || sec.name)}</h2><div class="w-reading-body">${body}</div>${facts ? `<div class="w-facts">${facts}</div>` : ''}</article>`);
       const vals = { name: sec.name, index: i + 1, count: sections.length };
-      return { status: w.fill(w.text.status || 'Use sections when optional detail would distract from the main explanation.', vals), values: vals };
+      return { status: sec.status ?? w.fill(w.text.status || 'Use sections when optional detail would distract from the main explanation.', vals), values: vals };
     },
   };
 };
@@ -872,7 +899,8 @@ KINDS.layers = w => {
       w.draw(visible.length ? svgRoot(size[0], size[1], visible.map(l => tag('g', { 'data-layer': l.id }, l.svg)).join(''), w.text.figure || 'Layered figure')
         : `<p class="w-empty">${esc(w.ui.allHidden)}</p>`);
       const notes = visible.map(l => l.note).filter(Boolean);
-      const vals = { shown: visible.map(l => l.name).join(w.locale.startsWith('ja') ? '・' : ', ') || '—', count: visible.length, notes: notes.join(' ') };
+      const listed = order.map(id => layers.find(l => l.id === id)).filter(l => s[l.id]);
+      const vals = { shown: listed.map(l => l.name).join(w.locale.startsWith('ja') ? '・' : ', ') || '—', count: visible.length, notes: notes.join(w.locale.startsWith('ja') ? '' : ' ') };
       return { status: w.fill(w.text.status || 'Toggle layers without deleting their source geometry.', vals), values: vals };
     },
   };
@@ -968,7 +996,8 @@ KINDS.brushing = w => {
       w.draw(svgRoot(W, H, out, t.figure || 'Scatter plot with a selected range'));
       const vals = { k: picked.length, n: pts.length, others: rest.length, low: w.ax(lo, ax.x, own ? 0 : 2), high: w.ax(hi, ax.x, own ? 0 : 2),
         median: w.fmt(mSel, dg), rest: w.fmt(mRest, dg), ratio: isNum(mSel / mRest) ? w.fmt(mSel / mRest, 1) : '–' };
-      return { status: w.fill(t.status || 'Selected {k} / {n} observations. Range changes both selection and count.', vals), values: vals };
+      const template = !picked.length && t.statusNone ? t.statusNone : !rest.length && t.statusAll ? t.statusAll : t.status;
+      return { status: w.fill(template || 'Selected {k} / {n} observations. Range changes both selection and count.', vals), values: vals };
     },
   };
 };
@@ -1262,7 +1291,8 @@ KINDS.decision = w => {
 KINDS.graph = w => {
   const d = w.data.nodes ? w.data : {
     nodes: ['A', 'B', 'C', 'D'].map((name, i) => ({ id: name, name, x: i, y: 0 })), origin: 'A',
-    edges: [{ from: 'A', to: 'B' }, { from: 'C', to: 'D' }, { from: 'B', to: 'C', toggle: 'bridge' }, { from: 'A', to: 'D', toggle: 'direct', bend: -1 }],
+    // The original fixture is directed: links are followed from → to only (edges default to two-way).
+    edges: [{ from: 'A', to: 'B', oneway: true }, { from: 'C', to: 'D', oneway: true }, { from: 'B', to: 'C', toggle: 'bridge', oneway: true }, { from: 'A', to: 'D', toggle: 'direct', bend: -1, oneway: true }],
     toggles: [{ key: 'bridge', label: 'Enable bridge' }, { key: 'direct', label: 'Enable direct edge' }],
   };
   const t = w.text, index = Object.fromEntries(d.nodes.map((n, i) => [n.id, i])), origin = index[d.origin ?? d.nodes[0].id];
@@ -1303,7 +1333,7 @@ KINDS.graph = w => {
         const dpath = e.bend ? `M${r2(x1)} ${r2(y1)}Q${r2((x1 + x2) / 2)} ${r2((y1 + y2) / 2 + e.bend * 90)} ${r2(x2)} ${r2(y2)}` : `M${r2(x1)} ${r2(y1)}L${r2(x2)} ${r2(y2)}`;
         out += path(dpath, { stroke: !isOpen ? C.context : used ? C.ink : C.muted, width: isOpen ? 4 : 2.5, dash: isOpen ? null : '7 6' });
         if (e.label && (isOpen ? e.showLabel !== false : true)) {
-          const mx = (x1 + x2) / 2, my = (y1 + y2) / 2 + (e.bend ? e.bend * 45 : 0), txt = isOpen ? e.label : (e.closedLabel || e.label);
+          const f = e.labelAt ?? 0.5, mx = x1 + (x2 - x1) * f, my = y1 + (y2 - y1) * f + (e.bend ? e.bend * 45 : 0), txt = isOpen ? e.label : (e.closedLabel || e.label);
           out += text(mx + (e.labelDx || 0), my + (e.labelDy ?? -12), txt, { size: 16, weight: isOpen ? 400 : 650, fill: isOpen ? C.muted : C.negative, anchor: 'middle', valign: 'bottom', halo: C.paper });
         }
       }
@@ -1364,7 +1394,7 @@ KINDS.magnifier = w => {
   w.slider('zoom', w.spec('zoom', { label: 'Zoom', min: 1, max: 3, step: 0.1, digits: 1, format: '{v}×' }));
   w.slider('x', w.spec('x', { label: 'Horizontal focus (%)', min: 0, max: 100, step: 1, format: '{v}%' }));
   w.slider('y', w.spec('y', { label: 'Vertical focus (%)', min: 0, max: 100, step: 1, format: '{v}%' }));
-  w.plot.innerHTML = `<div class="w-magnifier"><img src="${esc(w.assets.photo)}" alt="${esc(t.alt || 'Coffee photograph: user-selected crop')}"></div><svg class="w-inset" aria-hidden="true"></svg>`;
+  w.plot.innerHTML = `<div class="w-magnifier"><img src="${esc(w.assets.photo)}" alt="${esc(t.alt || 'Coffee photograph: user-selected crop')}"><svg class="w-inset" aria-hidden="true"></svg></div>`;
   const frame = w.plot.querySelector('.w-magnifier'), img = frame.querySelector('img'), inset = w.plot.querySelector('.w-inset');
   w.on(img, 'load', () => w.render());
   return {
@@ -1460,10 +1490,11 @@ KINDS.audio = w => {
       const { width: W, height: H } = w.size(), h = H - 64;
       let out = '';
       if (wav) {
-        const x = wav.samples, n = x.length, b = box(W, h, { l: 64, r: 16, t: 40, b: 50 });
+        const x = wav.samples, n = x.length, b = box(W, h, { l: 64, r: 30, t: 40, b: 50 });
         const topH = b.h * 0.36, bt = b.t + topH + 70, bb = b.b;
         // Whole clip: min/max envelope per pixel column, with the playback position.
-        const xs = linear([0, stats.seconds], [b.l, b.r]), amp = Math.max(0.05, ...[1, 0.5, 0.25, 0.1, 0.05].filter(a => a >= stats.peakDb && false)), A = d.fullScale ? 1 : Math.min(1, 10 ** (stats.peakDb / 20) * 1.6);
+        // Vertical scale: full scale when asked, else the peak with headroom (the level is stated in words).
+        const xs = linear([0, stats.seconds], [b.l, b.r]), A = d.fullScale ? 1 : Math.min(1, 10 ** (stats.peakDb / 20) * 1.6);
         const yTop = linear([-A, A], [b.t + topH, b.t]);
         out += text(b.l, b.t - 14, t.wholeTitle || 'Whole clip', { size: 16, fill: C.muted, valign: 'bottom' });
         const cols = Math.round(b.w), per = n / cols;
@@ -1512,6 +1543,17 @@ function clipBelow(points, limit) { // keep the part of a polygon with z <= limi
   }
   return out;
 }
+/** Connected pieces per face (faces that share a vertex position within the same group). */
+function meshPieces(mesh) {
+  const parent = new Map(), find = k => { while (parent.get(k) !== k) { parent.set(k, parent.get(parent.get(k))); k = parent.get(k); } return k; };
+  const keyOf = (g, i) => g + '|' + mesh.vertices[i].map(c => Math.round(c * 1000)).join(',');
+  for (const f of mesh.faces) {
+    const ks = f.indices.map(i => keyOf(f.group, i));
+    for (const k of ks) if (!parent.has(k)) parent.set(k, k);
+    for (let j = 1; j < ks.length; j++) { const a = find(ks[0]), b = find(ks[j]); if (a !== b) parent.set(a, b); }
+  }
+  return mesh.faces.map(f => find(keyOf(f.group, f.indices[0])));
+}
 function meshBounds(mesh) {
   const min = [Infinity, Infinity, Infinity], max = [-Infinity, -Infinity, -Infinity], groups = {};
   for (const f of mesh.faces) {
@@ -1526,7 +1568,7 @@ function meshBounds(mesh) {
 }
 function meshWidget(w) {
   const t = w.text, kind = w.config.kind, d = w.data;
-  let mesh = StudioMesh.parseOBJ(w.assets.obj), info = meshBounds(mesh);
+  let mesh = StudioMesh.parseOBJ(w.assets.obj), info = meshBounds(mesh), pieces = meshPieces(mesh);
   w.plot.innerHTML = `<canvas tabindex="0" role="img" aria-label="${esc(t.canvasLabel || 'Interactive triangle mesh. Drag to rotate, or use yaw and pitch sliders.')}"></canvas><svg class="w-mesh-labels" aria-hidden="true"></svg>`;
   const canvas = w.plot.querySelector('canvas'), labels = w.plot.querySelector('.w-mesh-labels');
   w.slider('yaw', w.spec('yaw', { label: 'Yaw (degrees)', min: -180, max: 180, step: 1, format: '{v}°' }));
@@ -1544,7 +1586,7 @@ function meshWidget(w) {
         if (!f) return;
         if (f.size > 8 * 1024 * 1024) throw Error(t.tooLarge || 'File exceeds 8 MiB');
         const m = /\.obj$/i.test(f.name) ? StudioMesh.parseOBJ(await f.text()) : StudioMesh.parseSTL(await f.arrayBuffer());
-        mesh = m; info = meshBounds(mesh); w.state.filename = f.name; w.render();
+        mesh = m; info = meshBounds(mesh); pieces = meshPieces(mesh); w.state.filename = f.name; w.render();
       } catch (err) { w.status.textContent = err.message; }
     });
   }
@@ -1581,18 +1623,20 @@ function meshWidget(w) {
         const xx = x * ca - y * sa, yy = x * sa + y * ca;
         return [cxp + xx * scale, cyp + (yy * cb - z * sb) * scale, yy * sb + z * cb];
       };
-      const colorOf = g => { const p = partOf(g), i = groups.indexOf(g); return rgbOf(p?.tone === 'accent' ? tok.accent : p?.tone === 'context' ? tok.context : p?.tone === 'ink' ? tok.ink : tok.cat[(p?.color ?? i) % 8]); };
+      // Part colour: a role (accent, ink, muted, context …) or a categorical slot (cat-1 … cat-8).
+      const colorOf = g => { const p = partOf(g), i = groups.indexOf(g), m = /^cat-(\d)$/.exec(p?.tone || '');
+        return rgbOf(m ? tok.cat[(Number(m[1]) - 1) % 8] : tok[p?.tone] || tok.cat[i % 8]); };
       const limit = min[2] + (max[2] - min[2]) * cut, polys = [];
-      for (const f of mesh.faces) {
+      mesh.faces.forEach((f, fi) => {
         let pts = f.indices.map(i => mesh.vertices[i]);
         if (cut < 1) pts = clipBelow(pts, limit);
-        if (pts.length < 3) continue;
+        if (pts.length < 3) return;
         const p = pts.map(v => project(v, f.group));
         const a = [p[1][0] - p[0][0], p[1][1] - p[0][1], p[1][2] - p[0][2]], b = [p[2][0] - p[0][0], p[2][1] - p[0][1], p[2][2] - p[0][2]];
         const nrm = [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]], len = Math.hypot(...nrm) || 1;
         const shade = 0.62 + 0.38 * Math.abs((nrm[0] * 0.3 - nrm[1] * 0.55 + nrm[2] * 0.78) / len);
-        polys.push({ p, depth: p.reduce((acc, v) => acc + v[2], 0) / p.length, rgb: colorOf(f.group).map(c => Math.round(c * shade)) });
-      }
+        polys.push({ p, g: f.group, piece: pieces[fi], depth: p.reduce((acc, v) => acc + v[2], 0) / p.length, rgb: colorOf(f.group).map(c => Math.round(c * shade)) });
+      });
       polys.sort((a, b) => a.depth - b.depth);
       for (const f of polys) {
         ctx.beginPath();
@@ -1602,21 +1646,55 @@ function meshWidget(w) {
         ctx.lineWidth = 0.6; ctx.fill(); ctx.stroke();
       }
       s.triangles = mesh.faces.length; s.drawn = polys.length;
-      // Direct labels: part name and its measured size, leader to the part's centre.
+      // Direct labels: part name and its measured size, with a leader to a point where the part itself
+      // is visible. A part hidden behind others (or above the cut) gets a dashed leader and a muted label.
       let svg = '';
       if (named.length) {
+        for (const f of polys) {
+          const xs = f.p.map(v => v[0]), ys = f.p.map(v => v[1]);
+          f.box = [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)];
+          f.area = Math.abs(f.p.reduce((acc, v, i) => { const u = f.p[(i + 1) % f.p.length]; return acc + v[0] * u[1] - u[0] * v[1]; }, 0)) / 2;
+        }
+        const inside = (pt, p) => { let c = false; for (let i = 0, j = p.length - 1; i < p.length; j = i++) if ((p[i][1] > pt[1]) !== (p[j][1] > pt[1]) && pt[0] < ((p[j][0] - p[i][0]) * (pt[1] - p[i][1])) / (p[j][1] - p[i][1]) + p[i][0]) c = !c; return c; };
+        const topAt = pt => { for (let k = polys.length - 1; k >= 0; k--) { const f = polys[k], b = f.box; if (pt[0] >= b[0] && pt[0] <= b[2] && pt[1] >= b[1] && pt[1] <= b[3] && inside(pt, f.p)) return f; } return null; };
+        // Sample points inside a face: its centre, and points towards each corner and each edge.
+        const samples = f => { const c = [mean(f.p.map(v => v[0])), mean(f.p.map(v => v[1]))], out = [c];
+          f.p.forEach((v, i) => { const u = f.p[(i + 1) % f.p.length]; out.push([c[0] + (v[0] - c[0]) * 0.7, c[1] + (v[1] - c[1]) * 0.7], [c[0] + ((v[0] + u[0]) / 2 - c[0]) * 0.7, c[1] + ((v[1] + u[1]) / 2 - c[1]) * 0.7]); });
+          return out; };
+        const testable = polys.length <= 20000;
         const items = named.map(g => {
           const gb = info.groups[g], mid = gb.min.map((v, k) => (v + gb.max[k]) / 2), dims = gb.max.map((v, k) => v - gb.min[k]);
-          const anchor = project(cut < 1 ? [mid[0], mid[1], Math.min(mid[2], limit)] : mid, g);
-          const hidden = cut < 1 && gb.min[2] > limit;
+          const own = polys.filter(f => f.g === g);
+          // Visible sample points per connected piece (largest faces first, at most 200 faces tested).
+          const seen = new Map();
+          if (testable) for (const f of [...own].sort((a, b) => b.area - a.area).slice(0, 200)) {
+            if (f.area < 2) continue;
+            for (const pt of samples(f)) if (topAt(pt)?.g === g) { if (!seen.has(f.piece)) seen.set(f.piece, []); seen.get(f.piece).push({ pt, wgt: f.area }); }
+          }
+          let anchor, hidden = cut < 1 && gb.min[2] > limit;
+          const best = [...seen.values()].sort((a, b) => sum(b.map(s => s.wgt)) - sum(a.map(s => s.wgt)))[0];
+          if (best && !hidden) {
+            // The visible point nearest the weighted centre of what shows of the most visible piece.
+            const W0 = sum(best.map(s => s.wgt)), cx = sum(best.map(s => s.pt[0] * s.wgt)) / W0, cy = sum(best.map(s => s.pt[1] * s.wgt)) / W0;
+            anchor = best.reduce((a, s) => (Math.hypot(s.pt[0] - cx, s.pt[1] - cy) < Math.hypot(a[0] - cx, a[1] - cy) ? s.pt : a), best[0].pt);
+          } else {
+            // Not visible: point at where the part is (the front half of its front-most piece).
+            const byPiece = new Map();
+            for (const f of own) { if (!byPiece.has(f.piece)) byPiece.set(f.piece, []); byPiece.get(f.piece).push(f); }
+            const nearest = [...byPiece.values()].sort((a, b) => mean(b.map(f => f.depth)) - mean(a.map(f => f.depth)))[0] || [];
+            const front = [...nearest].sort((a, b) => b.depth - a.depth).slice(0, Math.max(1, Math.ceil(nearest.length / 2)));
+            anchor = front.length ? [mean(front.map(f => mean(f.p.map(v => v[0])))), mean(front.map(f => mean(f.p.map(v => v[1]))))]
+              : project(cut < 1 ? [mid[0], mid[1], Math.min(mid[2], limit)] : mid, g);
+            hidden = hidden || testable;
+          }
           return { g, anchor, hidden, name: partOf(g).name, sub: partOf(g).note ?? fill(t.dims || '{a} × {b} × {c} mm', { a: fmt(dims[0], 0, w.locale), b: fmt(dims[1], 0, w.locale), c: fmt(dims[2], 1, w.locale).replace(/\.0$/, '') }, w.locale) };
         }).sort((a, b) => a.anchor[1] - b.anchor[1]);
-        const lx = W - labelRoom + 24, ys = spread(items.map(it => it.anchor[1]), 56, 40, H - 40);
+        const lx = W - labelRoom + 24, ys = spread(items.map(it => it.anchor[1]), 62, 44, H - 44);
         items.forEach((it, k) => {
           const col = it.hidden ? C.muted : C.ink;
           svg += path(`M${r2(lx - 8)} ${r2(ys[k])}L${r2(lx - 26)} ${r2(ys[k])}L${r2(it.anchor[0])} ${r2(it.anchor[1])}`, { stroke: col, width: 1.2, dash: it.hidden ? '3 3' : null });
           svg += circle(it.anchor[0], it.anchor[1], 3.5, { fill: col, stroke: C.paper, width: 1.5 });
-          svg += text(lx, ys[k] - 2, it.name, { size: 17, weight: 650, fill: col, valign: 'bottom' }) + text(lx, ys[k] + 2, it.sub, { size: 16, fill: C.muted, valign: 'top' });
+          svg += text(lx, ys[k] - 5, it.name, { size: 17, weight: 650, fill: col, valign: 'bottom' }) + text(lx, ys[k] + 5, it.sub, { size: 16, fill: C.muted, valign: 'top', num: true });
         });
       }
       if (kind === 'cad-section' && cut < 1) {
@@ -1639,7 +1717,7 @@ function meshWidget(w) {
       const template = s.filename ? t.statusFile : t.status;
       return { status: template ? w.fill(template, vals) : fallback, values: vals };
     },
-    reset() { mesh = StudioMesh.parseOBJ(w.assets.obj); info = meshBounds(mesh); },
+    reset() { mesh = StudioMesh.parseOBJ(w.assets.obj); info = meshBounds(mesh); pieces = meshPieces(mesh); },
   };
 }
 KINDS['cad-orbit'] = KINDS['cad-explode'] = KINDS['cad-section'] = KINDS['cad-import'] = meshWidget;
@@ -1647,6 +1725,7 @@ KINDS['cad-orbit'] = KINDS['cad-explode'] = KINDS['cad-section'] = KINDS['cad-im
 /* ---------- ink: annotate the evidence while speaking ---------- */
 KINDS.ink = w => {
   const t = w.text, d = w.data, hasChart = !!(d.lines || d.series);
+  // The canvas lies over the chart for drawing but lets hits through; the plot itself takes the pointer.
   w.plot.innerHTML = `<div class="w-ink-chart"></div><canvas class="w-ink" tabindex="0" role="img" aria-label="${esc(t.canvasLabel || 'Annotation canvas. Choose a preset annotation for a keyboard alternative.')}"></canvas>`;
   const chart = w.plot.querySelector('.w-ink-chart'), cv = w.plot.querySelector('canvas');
   let geom = null;
@@ -1663,17 +1742,17 @@ KINDS.ink = w => {
   w.button(t.clear || 'Clear annotations', () => { w.state.paths = []; w.render(); });
   let drawing = false;
   const point = e => { const r = cv.getBoundingClientRect(), { width: W, height: H } = w.size(); return [r2(((e.clientX - r.left) * W) / r.width), r2(((e.clientY - r.top) * H) / r.height)]; };
-  w.on(cv, 'pointerdown', e => { drawing = true; cv.setPointerCapture(e.pointerId); w.state.paths.push([point(e)]); w.render(); });
-  w.on(cv, 'pointermove', e => { if (drawing) { w.state.paths.at(-1).push(point(e)); w.render(); } });
-  w.on(cv, 'pointerup', () => { drawing = false; });
-  w.on(cv, 'pointercancel', () => { drawing = false; });
+  w.on(w.plot, 'pointerdown', e => { drawing = true; w.plot.setPointerCapture(e.pointerId); w.state.paths.push([point(e)]); w.render(); });
+  w.on(w.plot, 'pointermove', e => { if (drawing) { w.state.paths.at(-1).push(point(e)); w.render(); } });
+  w.on(w.plot, 'pointerup', () => { drawing = false; });
+  w.on(w.plot, 'pointercancel', () => { drawing = false; });
   return {
     render(s) {
       const { width: W, height: H } = w.size(), tok = literalTokens(w.root), dpr = Math.min(2, window.devicePixelRatio || 1);
       if (hasChart) {
         const S = seriesData(d), g = lineChart(w, S, { W, H, refs: d.refs });
         geom = g;
-        let out = g.out;
+        let out = g.out + g.endLabels;
         for (const m of d.marks || []) {
           const mx = g.x(S.xs[m.at]);
           out += line(mx, g.b.t - 8, mx, g.b.b, { stroke: C.ink, width: 1.4, dash: '4 4' }) + text(mx + 8, g.b.t - 6, m.label, { size: 16, weight: 650, valign: 'top', halo: C.paper });
@@ -1684,7 +1763,7 @@ KINDS.ink = w => {
       const ctx = cv.getContext('2d');
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
       if (!hasChart) { ctx.strokeStyle = tok.rule; ctx.lineWidth = 1; ctx.strokeRect(0.5, 0.5, W - 1, H - 1); }
-      ctx.strokeStyle = d.inkTone === 'negative' ? tok.negative : tok.accent; ctx.lineWidth = 4; ctx.lineCap = ctx.lineJoin = 'round';
+      ctx.strokeStyle = tok[d.inkTone] || tok.accent; ctx.lineWidth = 4; ctx.lineCap = ctx.lineJoin = 'round';
       for (const p of s.paths) { ctx.beginPath(); p.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y))); ctx.stroke(); }
       const vals = { marks: s.paths.length };
       return { status: w.fill(t.status || 'Pointer drawing has a keyboard-accessible preset and reset. Annotations are session-local.', vals), values: vals };

@@ -308,6 +308,11 @@ such as Japanese `palt`, kerning and ligatures stay) and reports
 `textLayerFallback` in its result. Look at the PDF: figures may be proportional instead
 of tabular. A font with standard mappings (Helvetica Neue, Hiragino, Noto) avoids the
 fallback. Screen-reader-only text is not expected in the PDF, because it is never painted.
+CJK fonts that draw a radical and its ideograph with one glyph make Chromium name the
+radical in the text layer (⽉ for 月, ⻑ for 長), so "店長" cannot be found. The export
+rewrites those ToUnicode entries to the ideograph (Kangxi radicals by Unicode
+normalization, the supplement by its equivalence table) and reports `radicalsRepaired`;
+glyphs and layout are untouched.
 
 Actual DOM text inspection does not see text painted into Canvas, images or opaque
 embedded frames. Those regions need visual inspection and an accessible alternative.

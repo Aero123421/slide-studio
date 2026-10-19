@@ -157,6 +157,154 @@ body.overview .slide { display: block; transform-origin: top left; transform: sc
 
 /* Laboratory — light */
 .cs-laboratory{--ss-paper:#ffffff;--ss-surface:#f3f6f7;--ss-ink:#102b39;--ss-muted:#4d6371;--ss-rule:#d3dde2;--ss-grid:#e7ecef;--ss-accent:#23647c;--ss-on-accent:#ffffff;--ss-positive:#2f7d4f;--ss-negative:#b3432f;--ss-highlight:#23647c;--ss-context:#c3ced4;--ss-cat-1:#23647c;--ss-on-cat-1:#ffffff;--ss-cat-2:#c07a1e;--ss-on-cat-2:#102b39;--ss-cat-3:#7a5aa6;--ss-on-cat-3:#ffffff;--ss-cat-4:#5d8c3a;--ss-on-cat-4:#ffffff;--ss-cat-5:#23647c;--ss-on-cat-5:#ffffff;--ss-cat-6:#c07a1e;--ss-on-cat-6:#102b39;--ss-cat-7:#7a5aa6;--ss-on-cat-7:#ffffff;--ss-cat-8:#5d8c3a;--ss-on-cat-8:#ffffff;--ss-seq-1:#e3f0f4;--ss-on-seq-1:#102b39;--ss-seq-2:#bcdae4;--ss-on-seq-2:#102b39;--ss-seq-3:#90bfd0;--ss-on-seq-3:#102b39;--ss-seq-4:#5fa0b8;--ss-on-seq-4:#102b39;--ss-seq-5:#377890;--ss-on-seq-5:#ffffff;--ss-seq-6:#1c5469;--ss-on-seq-6:#ffffff;--ss-seq-7:#0e3342;--ss-on-seq-7:#ffffff;--ss-div-1:#b3432f;--ss-on-div-1:#ffffff;--ss-div-2:#d28472;--ss-on-div-2:#102b39;--ss-div-3:#e7beb3;--ss-on-div-3:#102b39;--ss-div-4:#f2f2f0;--ss-on-div-4:#102b39;--ss-div-5:#b0d0da;--ss-on-div-5:#102b39;--ss-div-6:#6ba1b3;--ss-on-div-6:#102b39;--ss-div-7:#23647c;--ss-on-div-7:#ffffff;--ss-font-sans:"Helvetica Neue","Segoe UI","Liberation Sans",Arial,sans-serif,"Hiragino Sans","Noto Sans JP","Yu Gothic","Meiryo","IPAPGothic",sans-serif;--ss-font-display:"Helvetica Neue","Segoe UI","Liberation Sans",Arial,sans-serif,"Hiragino Sans","Noto Sans JP","Yu Gothic","Meiryo","IPAPGothic",sans-serif;--ss-font-serif:"Iowan Old Style","Charter","Bitstream Charter",Georgia,Caladea,"Hiragino Mincho ProN","Noto Serif JP","Yu Mincho",serif;--ss-font-mono:"JetBrains Mono","SFMono-Regular",Menlo,Consolas,"DejaVu Sans Mono",monospace;color-scheme:light}
+/* Interaction studies. The evidence fills the left region on the page's paper; the rail on the right
+   (.w-rail, built by the runtime) holds the controls, the settings shown in a static export, an optional
+   readout of big numbers, the status sentence (the live region) and reset. */
+.st .widget {
+  position: absolute; left: var(--st-x, 64px); right: var(--st-x, 64px); top: var(--st-fig-top, 176px); bottom: 64px;
+  display: grid; grid-template-columns: minmax(0, 1fr) 288px; grid-template-rows: minmax(0, 1fr); column-gap: 48px;
+  font-family: var(--ss-font-sans, Inter, "Helvetica Neue", Arial, sans-serif); color: var(--ss-ink, #17202b);
+}
+.st .w-plot { grid-column: 1; grid-row: 1; position: relative; min-height: 0; overflow: hidden; }
+.st .w-plot > svg { width: 100%; height: 100%; display: block; overflow: visible; }
+.st .w-rail { grid-column: 2; grid-row: 1; display: flex; flex-direction: column; gap: 24px; min-height: 0; min-width: 0; }
+.st .w-controls { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+.st .w-readout { display: grid; gap: 18px; }
+.st .w-readout:empty { display: none; }
+.st .w-status { font: 400 18px/1.5 var(--ss-font-sans, Inter, sans-serif); color: var(--ss-ink, #17202b); text-wrap: pretty; }
+.st:lang(ja) .w-status { line-height: 1.7; word-break: auto-phrase; line-break: strict; }
+
+/* Controls: a label and its current value on one line, the input underneath. */
+.st .w-field { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; gap: 6px 12px; }
+.st .w-label { font: 600 17px/1.3 var(--ss-font-sans, Inter, sans-serif); color: var(--ss-ink, #17202b); }
+.st .w-value { font: 600 17px/1.3 var(--ss-font-sans, Inter, sans-serif); color: var(--ss-ink, #17202b); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.st .w-field input[type=range], .st .w-field select, .st .w-field input[type=file] { grid-column: 1 / -1; }
+.st .w-field input[type=range] { width: 100%; height: 28px; margin: 0; accent-color: var(--ss-accent, #2457c5); cursor: pointer; }
+.st .w-field select { font: 500 17px/1.3 var(--ss-font-sans, Inter, sans-serif); padding: 9px 12px; background: var(--ss-paper, #fff); color: var(--ss-ink, #17202b); border: 1px solid var(--ss-rule, #c3cad4); border-radius: 6px; cursor: pointer; }
+.st .w-field input[type=file] { font: 400 16px/1.3 var(--ss-font-sans, Inter, sans-serif); color: var(--ss-ink, #17202b); }
+.st .w-check { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 10px; align-items: center; font: 500 17px/1.35 var(--ss-font-sans, Inter, sans-serif); color: var(--ss-ink, #17202b); cursor: pointer; }
+.st .w-check input { width: 19px; height: 19px; margin: 0; accent-color: var(--ss-accent, #2457c5); }
+.st .widget button { font: 600 16px/1.25 var(--ss-font-sans, Inter, sans-serif); min-height: 42px; padding: 9px 16px; background: var(--ss-paper, #fff); color: var(--ss-ink, #17202b); border: 1px solid var(--ss-rule, #c3cad4); border-radius: 6px; cursor: pointer; }
+.st .widget button:hover { border-color: var(--ss-muted, #5a6676); }
+.st .widget button.w-primary { background: var(--ss-accent, #2457c5); color: var(--ss-on-accent, #fff); border-color: var(--ss-accent, #2457c5); }
+.st .w-rail > .w-reset { margin-top: auto; flex: none; color: var(--ss-muted, #5a6676); font-weight: 500; }
+.st .w-radios { border: 0; margin: 0; padding: 0; display: grid; gap: 0; min-width: 0; }
+.st .w-radios legend.w-label { margin-bottom: 8px; padding: 0; }
+.st .w-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.st .w-radio { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 10px; align-items: center; cursor: pointer; }
+.st .w-radio input { width: 18px; height: 18px; margin: 0; accent-color: var(--ss-accent, #2457c5); }
+
+/* A table of contents for sections (tabs): one hairline per entry, the open one in weight. */
+.st .w-toc .w-radio { padding: 12px 0; border-top: 1px solid var(--ss-rule, #d5dbe3); font: 500 18px/1.35 var(--ss-font-sans, Inter, sans-serif); }
+.st .w-toc .w-radio:last-child { border-bottom: 1px solid var(--ss-rule, #d5dbe3); }
+.st .w-toc .w-radio:has(input:checked) { font-weight: 700; }
+
+/* Static export: the settings that produced the figure, in place of the inputs. */
+.st .w-summary-head { font: 600 16px/1.3 var(--ss-font-sans, Inter, sans-serif); color: var(--ss-muted, #5a6676); margin: 0 0 12px; }
+.st .w-export-summary p:not(.w-summary-head) { margin: 0 0 10px; font: 400 17px/1.4 var(--ss-font-sans, Inter, sans-serif); color: var(--ss-muted, #5a6676); }
+.st .w-export-summary b { font-weight: 650; color: var(--ss-ink, #17202b); }
+
+/* Readout: one or two numbers the current state produces. */
+.st .w-kpi { display: grid; gap: 4px; }
+.st .w-kpi b { font: 650 44px/1 var(--ss-font-display, var(--ss-font-sans, Inter, sans-serif)); letter-spacing: -.02em; font-variant-numeric: tabular-nums lining-nums; color: var(--ss-ink, #17202b); }
+.st .w-kpi b small { font-size: .5em; font-weight: 500; letter-spacing: 0; margin-left: .2em; color: var(--ss-muted, #5a6676); }
+.st .w-kpi span { font: 400 17px/1.35 var(--ss-font-sans, Inter, sans-serif); color: var(--ss-muted, #5a6676); }
+.st .w-kpi--accent b { color: var(--ss-accent, #2457c5); }
+.st .w-kpi--negative b { color: var(--ss-negative, #b5432f); }
+.st:lang(ja) .w-kpi b { letter-spacing: 0; }
+
+/* Reading (tabs) */
+.st .w-reading { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto 1fr; column-gap: 48px; height: 100%; align-content: start; padding-top: 22px; }
+.st .w-reading h2 { grid-column: 1 / -1; font: 650 32px/1.25 var(--ss-font-display, var(--ss-font-sans, Inter, sans-serif)); margin: 0 0 24px; padding-bottom: 18px; border-bottom: 1px solid var(--ss-rule, #d5dbe3); letter-spacing: -.01em; text-wrap: balance; }
+.st .w-reading-body p { font: 400 22px/1.6 var(--ss-font-sans, Inter, sans-serif); margin: 0 0 16px; max-width: 30em; text-wrap: pretty; }
+.st .w-facts { display: grid; gap: 26px; align-content: start; min-width: 200px; }
+.st:lang(ja) .w-reading h2 { letter-spacing: 0; line-height: 1.4; font-size: 30px; }
+.st:lang(ja) .w-reading-body p { line-height: 1.85; font-size: 21px; max-width: 24em; word-break: auto-phrase; line-break: strict; }
+
+/* Tables (table, matrix) */
+.st .w-table, .st .w-matrix { width: 100%; border-collapse: collapse; font: 400 18px/1.3 var(--ss-font-sans, Inter, sans-serif); color: var(--ss-ink, #17202b); }
+.st .w-table td, .st .w-matrix td { font-variant-numeric: tabular-nums; }
+.st .w-table caption, .st .w-matrix caption { text-align: left; font: 400 16px/1.4 var(--ss-font-sans, Inter, sans-serif); color: var(--ss-muted, #5a6676); padding-bottom: 12px; }
+.st .w-table th, .st .w-table td { padding: 7px 10px; border-bottom: 1px solid var(--ss-rule, #d5dbe3); text-align: right; vertical-align: middle; }
+.st .w-table thead th { vertical-align: bottom; border-bottom: 1.5px solid var(--ss-ink, #17202b); font-weight: 600; }
+.st .w-table thead th button { all: unset; cursor: pointer; font: 600 16px/1.25 var(--ss-font-sans, Inter, sans-serif); color: var(--ss-ink, #17202b); }
+.st .w-table thead th button:focus-visible { outline: 3px solid var(--ss-accent, #2457c5); outline-offset: 3px; }
+.st .w-table thead th button.is-sorted { color: var(--ss-accent, #2457c5); }
+.st .w-table .w-unit { display: block; font: 400 15px/1.3 var(--ss-font-sans, Inter, sans-serif); color: var(--ss-muted, #5a6676); margin-top: 2px; }
+.st .w-table .w-left, .st .w-table tbody th { text-align: left; }
+.st .w-table tbody th { font-weight: 600; }
+.st .w-table td.is-sorted { font-weight: 650; }
+.st .w-table td.is-flagged { color: var(--ss-negative, #b5432f); }
+.st .w-table .w-barcol { width: 34%; }
+.st .w-table td .w-bar { position: relative; display: inline-block; width: calc(100% - 64px); height: 12px; margin-right: 12px; vertical-align: middle; }
+.st .w-table td .w-bar i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--ss-context, #c3cad4); }
+.st .w-table td .w-bar i.is-flagged { background: var(--ss-negative, #b5432f); }
+.st .w-table td .w-bar u { position: absolute; top: -5px; bottom: -5px; width: 2px; margin-left: -1px; background: var(--ss-ink, #17202b); }
+.st .w-table td > span { display: inline-block; min-width: 48px; }
+.st .w-matrix th, .st .w-matrix td { padding: 11px 10px; text-align: right; border-bottom: 1px solid var(--ss-rule, #d5dbe3); }
+.st .w-matrix thead th { font: 600 17px/1.3 var(--ss-font-sans, Inter, sans-serif); color: var(--ss-muted, #5a6676); border-bottom: 1.5px solid var(--ss-ink, #17202b); vertical-align: bottom; }
+.st .w-matrix tbody th { text-align: left; font-weight: 600; color: var(--ss-muted, #5a6676); white-space: nowrap; }
+.st .w-matrix th.is-on { color: var(--ss-ink, #17202b); font-weight: 700; }
+.st .w-matrix td { cursor: pointer; }
+.st .w-matrix td.is-cross { background: var(--ss-surface, #f3f5f8); }
+.st .w-matrix td.is-pick { background: var(--ss-accent, #2457c5); color: var(--ss-on-accent, #fff); font-weight: 700; }
+
+/* Photographs: registered comparison and magnifier */
+.st .w-compare, .st .w-magnifier { position: relative; overflow: hidden; max-width: 100%; max-height: 100%; }
+.st .w-compare { touch-action: none; cursor: ew-resize; }
+.st .w-compare img, .st .w-magnifier img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; user-select: none; -webkit-user-drag: none; }
+.st .w-divider { position: absolute; top: 0; bottom: 0; width: 3px; margin-left: -1.5px; background: var(--ss-paper, #fff); box-shadow: 0 0 0 1px rgba(0, 0, 0, .35); pointer-events: none; }
+.st .w-tag { position: absolute; top: 12px; margin: 0; padding: 4px 10px; background: var(--ss-paper, #fff); color: var(--ss-ink, #17202b); font: 600 16px/1.3 var(--ss-font-sans, Inter, sans-serif); pointer-events: none; }
+.st .w-tag--left { left: 12px; }
+.st .w-tag--right { right: 12px; }
+.st .w-regions { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; font-family: var(--ss-font-sans, Inter, sans-serif); }
+.st .w-inset { position: absolute; right: 12px; bottom: 12px; border: 2px solid var(--ss-paper, #fff); box-sizing: content-box; }
+
+/* Media */
+.st .w-plot video { width: 100%; height: 100%; object-fit: contain; object-position: left top; display: block; }
+.st .w-plot > img { width: 100%; height: 100%; object-fit: contain; object-position: left top; }
+.st .w-wave > svg { width: 100%; height: 100%; display: block; overflow: visible; }
+.st .w-plot audio { position: absolute; left: 64px; right: 16px; bottom: 0; width: calc(100% - 80px); }
+
+/* Canvas drawings: mesh viewer and annotation */
+.st .w-plot canvas { display: block; touch-action: none; }
+.st .w-plot canvas:focus-visible { outline: 3px solid var(--ss-accent, #2457c5); outline-offset: -3px; }
+.st .w-mesh-labels { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; font-family: var(--ss-font-sans, Inter, sans-serif); font-variant-numeric: tabular-nums; }
+.st .w-ink-chart, .st .w-ink { position: absolute; inset: 0; width: 100%; height: 100%; }
+.st .w-ink-chart > svg { width: 100%; height: 100%; display: block; overflow: visible; }
+.st .w-kind-ink .w-plot { cursor: crosshair; touch-action: none; }
+.st .w-ink { pointer-events: none; }
+
+/* Quiz: the question, options as a grid of choices, the answer sheet revealed on checking */
+.st .w-quiz { display: grid; align-content: start; gap: 16px; height: 100%; padding-top: 6px; }
+.st .w-question { font: 600 25px/1.4 var(--ss-font-sans, Inter, sans-serif); margin: 0; max-width: 30em; text-wrap: balance; }
+.st .w-prompt { font: 400 19px/1.5 var(--ss-font-sans, Inter, sans-serif); color: var(--ss-muted, #5a6676); margin: 0; }
+.st .w-answers { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 12px; }
+.st .w-answers .w-radio { grid-template-columns: 22px minmax(0, 1fr) auto; grid-template-rows: auto auto; row-gap: 6px; padding: 12px 16px; border: 1px solid var(--ss-rule, #c3cad4); border-radius: 6px; font: 500 20px/1.35 var(--ss-font-sans, Inter, sans-serif); }
+.st .w-answers .w-radio > input { grid-column: 1; grid-row: 1; }
+.st .w-answers .w-radio > span:first-of-type { grid-column: 2; grid-row: 1; }
+.st .w-answers .w-radio:has(input:checked) { border-color: var(--ss-ink, #17202b); box-shadow: inset 0 0 0 1px var(--ss-ink, #17202b); }
+.st .w-answers .w-radio.is-answer { border-color: var(--ss-positive, #2c7a4b); box-shadow: inset 0 0 0 1px var(--ss-positive, #2c7a4b); }
+.st .w-answers .w-radio.is-wrong { border-color: var(--ss-negative, #b5432f); box-shadow: inset 0 0 0 1px var(--ss-negative, #b5432f); }
+.st .w-answers .w-radio[data-mark]::after { content: attr(data-mark); grid-column: 3; grid-row: 1; align-self: center; font: 650 16px/1.3 var(--ss-font-sans, Inter, sans-serif); color: var(--ss-muted, #5a6676); white-space: nowrap; }
+.st .w-answers .w-radio.is-answer[data-mark]::after { color: var(--ss-positive, #2c7a4b); }
+.st .w-answers .w-radio.is-wrong[data-mark]::after { color: var(--ss-negative, #b5432f); }
+.st .w-answers .w-share { grid-column: 2 / 4; grid-row: 2; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 10px; }
+.st .w-answers .w-share:not([data-static]) { display: grid; }
+.st .w-answers .w-share i { display: block; height: 8px; background: var(--ss-context, #c3cad4); }
+.st .w-answers .w-radio.is-answer .w-share i { background: var(--ss-positive, #2c7a4b); }
+.st .w-answers .w-share em { font: 400 16px/1.3 var(--ss-font-sans, Inter, sans-serif); font-style: normal; color: var(--ss-muted, #5a6676); font-variant-numeric: tabular-nums; }
+body[data-export="true"] .st .w-answers .w-share { display: grid !important; }
+.st .w-explain { display: none; }
+.st .w-quiz[data-checked="true"] .w-explain { display: block; }
+body[data-export="true"] .st .w-explain[data-static="show"] { display: block !important; }
+.st .w-explain p { font: 400 19px/1.55 var(--ss-font-sans, Inter, sans-serif); margin: 0 0 10px; max-width: 38em; }
+.st .w-explain svg { display: block; width: 100%; max-width: 640px; height: auto; overflow: visible; }
+.st:lang(ja) .w-question { line-height: 1.55; font-size: 24px; word-break: auto-phrase; }
+.st:lang(ja) .w-explain p, .st:lang(ja) .w-prompt { line-height: 1.75; word-break: auto-phrase; }
+
+.st .w-empty { margin: 0; font: 400 18px/1.4 var(--ss-font-sans, Inter, sans-serif); color: var(--ss-muted, #5a6676); }
+
 
 /* ---- Research talk: deck-specific rules -------------------------------------------
    Page 1280 × 720, margins 64, 12 columns of 74 px with 24 px gutters (column k starts at 64 + 98k).
@@ -177,38 +325,10 @@ body.overview .slide { display: block; transform-origin: top left; transform: sc
 .talk .cover-by { position: absolute; left: 64px; right: 64px; bottom: 56px; padding-top: 18px; border-top: 1px solid var(--ss-rule); display: flex; justify-content: space-between; font: 400 19px/1.4 var(--ss-font-sans); }
 .talk .cover-by span:last-child { color: var(--ss-muted); }
 
-/* Explore: the threshold widget owns .w-plot, .w-controls and .w-status; this page only places and
-   tunes them. The plot keeps the widget's 700 × 360 viewBox aspect (here 1.15×), so the overlay registers.
-   Widget internals this page relies on (assets/runtime/widgets.js): dots use --ss-cat-1 below and
-   --ss-cat-2 at or above the threshold; the second <line> is an unlabelled vertical axis, hidden here. */
-.talk #research-threshold { --ss-cat-1: var(--ss-context); --ss-cat-2: var(--ss-accent); }
-.talk .widget { position: absolute; left: 64px; top: 176px; width: 1152px; height: 470px; display: grid;
-  grid-template-columns: 805px 1fr; grid-template-rows: 414px 1fr; column-gap: 40px; }
-.talk .w-plot { grid-column: 1; grid-row: 1; }
-.talk .w-plot > svg { width: 100%; height: 100%; display: block; }
-.talk .w-plot line:nth-of-type(2) { display: none; }
-.talk .w-controls { grid-column: 2; grid-row: 1; align-self: start; display: grid; gap: 14px; padding-top: 4px; }
-.talk .w-controls label { display: grid; row-gap: 12px; font: 600 18px/1.3 var(--ss-font-sans); }
-.talk .w-controls output { display: none; }   /* the readout prints the threshold as 0.50, like every other page */
-.talk .w-controls input[type=range] { width: 100%; margin: 0; accent-color: var(--ss-accent); }
-.talk .w-controls button { justify-self: start; font: 500 16px/1.2 var(--ss-font-sans); color: var(--ss-ink); background: none; border: 1px solid var(--ss-rule); border-radius: 6px; padding: 8px 12px; cursor: pointer; }
-/* .w-status sits in .sr-only (player.css): announced, not shown, because the readout states the same counts in words.
-   The wrapper is parked on blank paper below the plot, so its unclipped text box covers nothing. */
-.talk .widget .sr-only { left: 0; top: 440px; white-space: nowrap; }
-/* In static export the readout is this page's selected-state view, so the widget's generic summary steps aside. */
-body[data-export="true"] .talk .w-export-summary { display: none !important; }
-.talk .ro-static { position: absolute; left: 909px; top: 186px; width: 307px; font: 400 17px/1.45 var(--ss-font-sans); color: var(--ss-muted); }
-.talk .w-axis { position: absolute; left: 64px; top: 176px; width: 805px; height: 414px; pointer-events: none; }
-.talk .readout { position: absolute; left: 909px; top: 300px; width: 307px; }
-.talk .readout .ro-t { font: 400 18px/1.4 var(--ss-font-sans); margin-bottom: 10px; }
-.talk .readout .ro-t b { font: 400 34px/1 var(--ss-font-display); color: var(--ss-accent); margin-left: 4px; font-variant-numeric: tabular-nums lining-nums; }
-.talk .readout table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
-.talk .readout thead th { font: 600 16px/1.3 var(--ss-font-sans); color: var(--ss-muted); text-align: left; padding: 0 0 8px; }
-.talk .readout tbody th { font: 600 16px/1.3 var(--ss-font-sans); text-align: left; padding: 14px 8px 12px 0; border-top: 1px solid var(--ss-rule); vertical-align: top; }
-.talk .readout tbody td { padding: 10px 0 12px; border-top: 1px solid var(--ss-rule); font: 400 16px/1.25 var(--ss-font-sans); color: var(--ss-muted); vertical-align: top; }
-.talk .readout td b { display: block; font: 400 34px/1.05 var(--ss-font-display); color: var(--ss-ink); font-variant-numeric: tabular-nums lining-nums; }
-.talk .readout td.sent b { color: var(--ss-accent); }
-.talk .readout .ro-rates { margin-top: 12px; font: 400 18px/1.4 var(--ss-font-sans); border-top: 1px solid var(--ss-rule); padding-top: 12px; }
+/* Explore: the threshold widget (assets/runtime/widgets.js) draws the plot, its axis and the four counts;
+   its layout comes from assets/interactions/study.extra.css. The deck only sets its numbers in the claim face. */
+.talk .w-kpi b { font: 400 40px/1 var(--ss-font-display); letter-spacing: -.01em; }
+.talk .w-kpi span { font-size: 17px; color: var(--ss-muted); }
 
 /* Compare: a table for reading; tabular figures, hairlines, the current rule in bold. */
 .talk .tbl { position: absolute; left: 64px; top: 196px; width: 1152px; border-collapse: collapse; font: 400 22px/1.3 var(--ss-font-sans); font-variant-numeric: tabular-nums lining-nums; }
@@ -264,16 +384,7 @@ body[data-export="true"] .talk .w-export-summary { display: none !important; }
 <figure class="st-fig" data-region="primary"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1152 430" width="1152" height="430" role="img" aria-labelledby="accuracy-fig-title accuracy-fig-desc" id="accuracy-fig" class="ss-fig" direction="ltr" style="overflow:visible;direction:ltr;font-family:var(--ss-font-sans,&quot;Inter&quot;,&quot;Helvetica Neue&quot;,&quot;Segoe UI&quot;,&quot;Hiragino Sans&quot;,&quot;Noto Sans JP&quot;,&quot;Yu Gothic&quot;,system-ui,sans-serif);"><title id="accuracy-fig-title">Accuracy of the leak score at threshold 0.50 with 95% intervals</title><desc id="accuracy-fig-desc">Sensitivity 77% (57%–90%), positive predictive value 68%; the 2025 job records give 67%.</desc><g class="ss-axis"><line x1="309.68" x2="309.68" y1="40" y2="390" stroke-width="1.4" class="ss-zero" style="stroke:var(--ss-ink,#17202b);"/><line x1="309.68" x2="309.68" y1="390" y2="395" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="309.68" y="415.58" font-size="17" text-anchor="middle" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">0%</text><line x1="435.28" x2="435.28" y1="40" y2="390" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><line x1="435.28" x2="435.28" y1="390" y2="395" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="435.28" y="415.58" font-size="17" text-anchor="middle" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">20%</text><line x1="560.88" x2="560.88" y1="40" y2="390" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><line x1="560.88" x2="560.88" y1="390" y2="395" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="560.88" y="415.58" font-size="17" text-anchor="middle" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">40%</text><line x1="686.48" x2="686.48" y1="40" y2="390" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><line x1="686.48" x2="686.48" y1="390" y2="395" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="686.48" y="415.58" font-size="17" text-anchor="middle" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">60%</text><line x1="812.07" x2="812.07" y1="40" y2="390" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><line x1="812.07" x2="812.07" y1="390" y2="395" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="812.07" y="415.58" font-size="17" text-anchor="middle" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">80%</text><line x1="937.67" x2="937.67" y1="40" y2="390" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><line x1="937.67" x2="937.67" y1="390" y2="395" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="937.67" y="415.58" font-size="17" text-anchor="middle" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">100%</text></g><line x1="309.68" x2="937.67" y1="390" y2="390" stroke-width="1.2" style="stroke:var(--ss-ink,#17202b);"/><text x="1150" y="26" font-size="17" text-anchor="end" font-weight="700" style="fill:var(--ss-muted,#5a6676);">Count and estimate (95% CI)</text><text x="4" y="26" font-size="17" font-weight="700" style="fill:var(--ss-muted,#5a6676);">At threshold 0.50</text><g class="ss-interval"><line x1="664.87" x2="874.1" y1="80.38" y2="80.38" stroke-width="2.4" stroke-linecap="round" style="stroke:var(--ss-highlight,#2457c5);"/><rect x="789.41" y="74.85" width="11.07" height="11.07" stroke-width="2" style="fill:var(--ss-highlight,#2457c5);stroke:var(--ss-highlight,#2457c5);"/></g><text x="295.68" y="87.22" font-size="19" text-anchor="end" font-weight="700" style="fill:var(--ss-ink,#17202b);">Sensitivity: leaks found</text><text x="1150" y="86.5" font-size="17" text-anchor="end" font-variant-numeric="tabular-nums" style="white-space:pre;fill:var(--ss-ink,#17202b);">17 of 22   77%  (57–90)</text><g class="ss-interval"><line x1="728.54" x2="874.99" y1="170.13" y2="170.13" stroke-width="2.4" stroke-linecap="round" style="stroke:var(--ss-muted,#5a6676);"/><rect x="811.56" y="163.63" width="13" height="13" stroke-width="2" style="fill:var(--ss-muted,#5a6676);stroke:var(--ss-muted,#5a6676);"/></g><text x="295.68" y="176.97" font-size="19" text-anchor="end" style="fill:var(--ss-ink,#17202b);">Specificity: no-leak sites not dug</text><text x="1150" y="176.25" font-size="17" text-anchor="end" font-variant-numeric="tabular-nums" style="white-space:pre;fill:var(--ss-ink,#17202b);">34 of 42   81%  (67–90)</text><g class="ss-interval"><line x1="613.69" x2="829.63" y1="259.87" y2="259.87" stroke-width="2.4" stroke-linecap="round" style="stroke:var(--ss-muted,#5a6676);"/><rect x="731.01" y="254.17" width="11.4" height="11.4" stroke-width="2" style="fill:var(--ss-muted,#5a6676);stroke:var(--ss-muted,#5a6676);"/></g><text x="295.68" y="266.71" font-size="19" text-anchor="end" style="fill:var(--ss-ink,#17202b);">PPV: digs that found a leak</text><text x="1150" y="265.99" font-size="17" text-anchor="end" font-variant-numeric="tabular-nums" style="white-space:pre;fill:var(--ss-ink,#17202b);">17 of 25   68%  (48–83)</text><g class="ss-interval"><line x1="769.96" x2="902.49" y1="349.62" y2="349.62" stroke-width="2.4" stroke-linecap="round" style="stroke:var(--ss-muted,#5a6676);"/><rect x="850.79" y="343.24" width="12.75" height="12.75" stroke-width="2" style="fill:var(--ss-muted,#5a6676);stroke:var(--ss-muted,#5a6676);"/></g><text x="295.68" y="356.46" font-size="19" text-anchor="end" style="fill:var(--ss-ink,#17202b);">NPV: undug sites with no leak</text><text x="1150" y="355.74" font-size="17" text-anchor="end" font-variant-numeric="tabular-nums" style="white-space:pre;fill:var(--ss-ink,#17202b);">34 of 39   87%  (73–94)</text><g><path d="M732.1964448441927 268.87179487179486l-6 10h12z" style="fill:var(--ss-ink,#17202b);"/><text x="732.2" y="295.71" font-size="16" text-anchor="middle" style="fill:var(--ss-ink,#17202b);">2025 job records 67%</text></g></svg></figure>
 <p class="st-source" data-region="source"><span>Eastfield blind survey, 2–27 March 2026: 64 flagged sites, 22 leaks. Wilson score intervals; area under the ROC curve 0.87.</span><span>Interval plot, fictional data</span></p></section>
 <section class="slide st cs-laboratory talk" id="explore" role="group" aria-roledescription="slide" aria-label="Between 0.30 and 0.60, each 0.05 step down finds one more leak and adds 2 to 5 dry digs" aria-hidden="true"><h1 class="st-head" data-region="title">Between 0.30 and 0.60, each 0.05 step down finds one more leak and adds 2 to 5 dry digs</h1>
-<div class="widget" data-interactive="" id="research-threshold" data-region="primary"><div class="w-plot"></div><div class="w-controls"></div><div class="sr-only" data-qa-text-clip="screen-reader-only status"><output aria-live="polite" class="w-status"></output></div></div>
-<svg class="w-axis" viewBox="0 0 700 360" aria-hidden="true"><g><line x1="55" x2="55" y1="300" y2="304.5" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="55" y="322" font-size="13.91" text-anchor="middle" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">0.0</text></g><g><line x1="116" x2="116" y1="300" y2="304.5" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="116" y="322" font-size="13.91" text-anchor="middle" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">0.1</text></g><g><line x1="177" x2="177" y1="300" y2="304.5" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="177" y="322" font-size="13.91" text-anchor="middle" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">0.2</text></g><g><line x1="238" x2="238" y1="300" y2="304.5" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="238" y="322" font-size="13.91" text-anchor="middle" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">0.3</text></g><g><line x1="299" x2="299" y1="300" y2="304.5" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="299" y="322" font-size="13.91" text-anchor="middle" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">0.4</text></g><g><line x1="360" x2="360" y1="300" y2="304.5" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="360" y="322" font-size="13.91" text-anchor="middle" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">0.5</text></g><g><line x1="421" x2="421" y1="300" y2="304.5" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="421" y="322" font-size="13.91" text-anchor="middle" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">0.6</text></g><g><line x1="482" x2="482" y1="300" y2="304.5" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="482" y="322" font-size="13.91" text-anchor="middle" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">0.7</text></g><g><line x1="543" x2="543" y1="300" y2="304.5" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="543" y="322" font-size="13.91" text-anchor="middle" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">0.8</text></g><g><line x1="604" x2="604" y1="300" y2="304.5" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="604" y="322" font-size="13.91" text-anchor="middle" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">0.9</text></g><g><line x1="665" x2="665" y1="300" y2="304.5" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="665" y="322" font-size="13.91" text-anchor="middle" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">1.0</text></g><text x="665" y="348" font-size="13.91" text-anchor="end" style="fill:var(--ss-muted,#5a6676);">Leak score</text><circle cx="64" cy="20" r="7" style="fill:var(--ss-accent,#2457c5);"/><text x="78" y="25.01" font-size="13.91" style="fill:var(--ss-ink,#17202b);">Crew sent (score at or above the threshold)</text><circle cx="444" cy="20" r="7" style="fill:var(--ss-context,#c3cad4);"/><text x="458" y="25.01" font-size="13.91" style="fill:var(--ss-ink,#17202b);">Not sent</text></svg>
-<p class="ro-static" data-static="show">Static view of an interactive page. In the HTML deck the threshold can be moved and every count recomputes.</p>
-<div class="readout" id="explore-readout" data-region="support">
-  <p class="ro-t">At threshold <b data-k="t">0.50</b></p>
-  <table><thead><tr><td></td><th scope="col">Crew sent</th><th scope="col">Not sent</th></tr></thead>
-  <tbody><tr><th scope="row">Leak</th><td class="sent"><b data-k="tp">17</b>found</td><td><b data-k="fn">5</b>missed</td></tr>
-  <tr><th scope="row">No leak</th><td class="sent"><b data-k="fp">8</b>dry digs</td><td><b data-k="tn">34</b>left alone</td></tr></tbody></table>
-  <p class="ro-rates"><b data-k="sens">77%</b> of leaks found<br><b data-k="dry">32%</b> of digs dry</p>
-</div>
+<div class="widget" data-interactive="" id="research-threshold" data-region="primary"><div class="w-plot"></div><div class="w-controls"></div><output aria-live="polite" class="w-status"></output></div>
 <p class="st-source" data-region="source"><span>Eastfield blind survey, 2–27 March 2026: 64 flagged sites, 22 leaks. Counts recomputed from the same scores.</span><span>Interactive threshold, fictional data</span></p></section>
 <section class="slide st cs-laboratory talk" id="compare" role="group" aria-roledescription="slide" aria-label="Finding all 22 leaks would take a threshold of 0.15 and 36 dry digs, 4.5 times today&#39;s 8" aria-hidden="true"><h1 class="st-head" data-region="title">Finding all 22 leaks would take a threshold of 0.15 and 36 dry digs, 4.5 times today’s 8</h1>
 <table class="tbl" data-region="primary"><thead><tr><th scope="col">Threshold</th><th scope="col">Crews sent</th><th scope="col">Leaks found<br>of 22</th><th scope="col">Leaks missed</th><th scope="col">Dry digs</th><th scope="col">Share of digs<br>that were dry</th></tr></thead>
@@ -303,7 +414,7 @@ body[data-export="true"] .talk .w-export-summary { display: none !important; }
   <section><h2>Three districts, two seasons</h2><div class="vis"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 368 176" width="368" height="176" role="img" aria-labelledby="coverage-fig-title coverage-fig-desc" id="coverage-fig" class="ss-fig" direction="ltr" style="overflow:visible;direction:ltr;font-family:var(--ss-font-sans,&quot;Inter&quot;,&quot;Helvetica Neue&quot;,&quot;Segoe UI&quot;,&quot;Hiragino Sans&quot;,&quot;Noto Sans JP&quot;,&quot;Yu Gothic&quot;,system-ui,sans-serif);"><title id="coverage-fig-title">Sampling plan: three districts by two seasons</title><desc id="coverage-fig-desc">Evidence exists for Eastfield in winter only (this study, 64 sites). The plan samples about 32 flagged sites in each of the six cells.</desc><text x="179" y="16" font-size="16" text-anchor="middle" font-weight="600" style="fill:var(--ss-muted,#5a6676);">Winter</text><text x="301" y="16" font-size="16" text-anchor="middle" font-weight="600" style="fill:var(--ss-muted,#5a6676);">Summer</text><g><text x="0" y="54.76" font-size="16" font-weight="600" style="fill:var(--ss-ink,#17202b);">Eastfield</text><g><rect x="118" y="26" width="119" height="46" rx="3" stroke-width="1.4" style="fill:var(--ss-surface,#f3f5f8);stroke:var(--ss-ink,#17202b);"/><text x="177.5" y="54.76" font-size="16" text-anchor="middle" style="fill:var(--ss-ink,#17202b);">this study, 64</text></g><g><rect x="246" y="26" width="119" height="46" rx="3" fill="none" stroke-width="1.2" stroke-dasharray="4 3" style="stroke:var(--ss-muted,#5a6676);"/><text x="305.5" y="54.76" font-size="16" text-anchor="middle" style="fill:var(--ss-muted,#5a6676);">32 sites</text></g></g><g><text x="0" y="106.76" font-size="16" font-weight="600" style="fill:var(--ss-ink,#17202b);">Brackwater</text><g><rect x="118" y="78" width="119" height="46" rx="3" fill="none" stroke-width="1.2" stroke-dasharray="4 3" style="stroke:var(--ss-muted,#5a6676);"/><text x="177.5" y="106.76" font-size="16" text-anchor="middle" style="fill:var(--ss-muted,#5a6676);">32 sites</text></g><g><rect x="246" y="78" width="119" height="46" rx="3" fill="none" stroke-width="1.2" stroke-dasharray="4 3" style="stroke:var(--ss-muted,#5a6676);"/><text x="305.5" y="106.76" font-size="16" text-anchor="middle" style="fill:var(--ss-muted,#5a6676);">32 sites</text></g></g><g><text x="0" y="158.76" font-size="16" font-weight="600" style="fill:var(--ss-ink,#17202b);">Linton Vale</text><g><rect x="118" y="130" width="119" height="46" rx="3" fill="none" stroke-width="1.2" stroke-dasharray="4 3" style="stroke:var(--ss-muted,#5a6676);"/><text x="177.5" y="158.76" font-size="16" text-anchor="middle" style="fill:var(--ss-muted,#5a6676);">32 sites</text></g><g><rect x="246" y="130" width="119" height="46" rx="3" fill="none" stroke-width="1.2" stroke-dasharray="4 3" style="stroke:var(--ss-muted,#5a6676);"/><text x="305.5" y="158.76" font-size="16" text-anchor="middle" style="fill:var(--ss-muted,#5a6676);">32 sites</text></g></g></svg></div>
     <p>Eastfield in March fills one cell of six. Dig a sample of quiet sites too: the survey can miss leaks.</p></section>
 </div>
-<p class="st-source" data-region="source"><span>Eastfield blind survey, 2–27 March 2026: 64 flagged sites, 22 leaks. Intervals and sample size by the Wilson method.</span><span>Next study, fictional data</span></p></section></main><nav class="studio-controls" aria-label="Slide"><button id="studio-prev" type="button" aria-label="Previous" >←</button><span id="studio-position" class="studio-position"></span><button id="studio-next" type="button" aria-label="Next" >→</button><select id="studio-jump" aria-label="Slide"><option value="0">1. Where should the crews dig?</option><option value="1">2. In 2025 one excavation in three found no leak, and the 2,850 alerts below 0.50 were never checked</option><option value="2">3. All 64 flagged sites were surveyed blind to the score; excavation confirmed 22 leaks</option><option value="3">4. Today&#39;s threshold of 0.50 sends crews to 17 of the 22 leaks and to 8 dry holes</option><option value="4">5. The score found 77% of leaks at 0.50, but with 22 leaks the 95% interval runs from 57% to 90%</option><option value="5">6. Between 0.30 and 0.60, each 0.05 step down finds one more leak and adds 2 to 5 dry digs</option><option value="6">7. Finding all 22 leaks would take a threshold of 0.15 and 36 dry digs, 4.5 times today&#39;s 8</option><option value="7">8. If a missed leak costs as much as 1, 3 or 6 dry digs, the best threshold is 0.60, 0.45 or 0.30</option><option value="8">9. Three limits keep this study from setting the threshold on its own</option><option value="9">10. Before anyone moves the threshold, the next study must price a missed leak and confirm about 66 leaks across the network</option></select><button id="studio-overview" type="button" aria-label="Overview" >Overview</button><button id="studio-notes-btn" type="button" aria-label="Notes" aria-expanded="false" aria-controls="studio-notes">Notes</button><button id="studio-presenter" type="button" aria-label="Presenter view" >Presenter view</button><button id="studio-reset" type="button" aria-label="Reset" >Reset</button><button id="studio-full" type="button" aria-label="Fullscreen" >Fullscreen</button><button id="studio-help-btn" type="button" aria-label="Keyboard shortcuts" aria-expanded="false">?</button></nav><aside id="studio-notes" class="studio-notes" aria-label="Notes"></aside><div id="studio-announcer" class="sr-only studio-announcer" aria-live="polite"></div><script type="application/json" id="slide-studio-meta">{"version":4,"width":1280,"height":720,"title":"Where should the crews dig? Leak score validation, Eastfield 2026","language":"en","direction":"ltr","labels":{"prev":"Previous","next":"Next","jump":"Slide","overview":"Overview","notes":"Notes","reset":"Reset","full":"Fullscreen","presenter":"Presenter view","help":"Keyboard shortcuts","blank":"Black screen","goto":"Go to slide"},"transition":"fade","readingMode":"live","sample":true,"mode":"audience","copyRules":[{"id":"ja-stage-direction","level":"error","pattern":"(?:学会|口頭|研究)?発表(?:時|中)(?:に|で|は)?[ 　]*(?:切[り]?替[え]?|切替|クリック|再生|操作)|ここで(?:クリック|切[り]?替[え]?|動画を再生)|(?:要差し替え|後で修正|仮置きのまま)"},{"id":"en-stage-direction","level":"error","pattern":"\\b(?:switch|click|play|toggle) (?:here|during (?:the )?(?:conference|presentation|talk))\\b|\\b(?:replace this (?:text|title|image)|insert (?:your )?(?:title|content) here|speaker cue:)","flags":"i"},{"id":"placeholder","level":"error","pattern":"\\b(?:Lorem ipsum|TODO|FIXME|TBD)\\b|(?:ここにタイトル|ここに本文|テキストを入力)","flags":"i"},{"id":"ja-empty-claim","level":"warning","pattern":"(?:さらなる価値提供|革新的なソリューション|未来を切り拓く|シームレスな体験|圧倒的な価値)"},{"id":"en-empty-claim","level":"warning","pattern":"\\b(?:unlock (?:the )?(?:full )?potential|revolutionary solution|seamless experience|game-changing|transform the future)\\b","flags":"i"},{"id":"ja-export-production-cue","level":"error","pattern":"配布用メモ[：:]|(?:印刷[・／/]PDF|印刷・PDF|PDF・印刷)(?:では|時は)[^。\\n]{0,60}(?:表示が残|固定され|操作用)|(?:投影時|発表時)の操作用"},{"id":"en-export-production-cue","level":"error","pattern":"\\b(?:presenter-only cue|production note|export-only instruction)\\s*:","flags":"i"},{"id":"ja-performed-sincerity","level":"warning","pattern":"正直に(?:言います|お知らせ|お伝え)|本当の価値|価値を紡ぐ"},{"id":"ja-status-label","level":"error","pattern":"(?:登壇用|発表用|社内用|作業用|提出用)(?:ドラフト|下書き)"}],"slides":[{"id":"question","title":"Where should the crews dig?","notes":"The decision is a line on a score. Today crews dig wherever the night-noise score reaches 0.50. This talk asks whether that is the right line, and what we would need to know to move it. Everything here comes from one month in one district; the numbers are small on purpose and I will show their uncertainty.","sources":[{"file":"examples/research/data.json","status":"illustrative"}],"exportPolicy":"final","copyWaivers":[],"readingMode":"live","spaceIntent":""},{"id":"stakes","title":"In 2025 one excavation in three found no leak, and the 2,850 alerts below 0.50 were never checked","notes":"Job records only see one side of the rule. Above 0.50 we learn the outcome because we dig: 462 of 1,412 digs were dry. Below 0.50 we learn nothing, because we never look. That is why the records cannot tell us whether 0.50 is right, and why we ran a study that looked everywhere.","sources":[{"file":"examples/research/data.json","status":"illustrative"}],"exportPolicy":"final","copyWaivers":[],"readingMode":"live","spaceIntent":""},{"id":"data","title":"All 64 flagged sites were surveyed blind to the score; excavation confirmed 22 leaks","notes":"Population: every site the model flagged in Eastfield in the window, so the study sees low scores as well as high ones. The survey team used a correlator and a ground microphone and never saw the score. Excavation followed wherever they heard leak noise. Quiet sites were not dug; I come back to that as a limit.","sources":[{"file":"examples/research/data.json","status":"illustrative"}],"exportPolicy":"final","copyWaivers":[],"readingMode":"live","spaceIntent":""},{"id":"method","title":"Today's threshold of 0.50 sends crews to 17 of the 22 leaks and to 8 dry holes","notes":"First the observations: one dot per site, placed by its score, split by what the survey and excavation found. Leaks sit mostly to the right, but the two groups overlap between about 0.2 and 0.7. [Next] Then today's rule: everything at 0.50 or above gets a crew. Four counts fall out of that one line: 17 found, 5 missed, 8 dry, 34 correctly left alone.","sources":[{"file":"examples/research/data.json","status":"illustrative"}],"exportPolicy":"final","copyWaivers":[],"readingMode":"live","spaceIntent":""},{"id":"result","title":"The score found 77% of leaks at 0.50, but with 22 leaks the 95% interval runs from 57% to 90%","notes":"Four rates from the same two-by-two table. The squares are sized by how many sites each rate rests on. The sensitivity interval is wide because it rests on 22 leaks. One check that the sample behaves like the network: 68% of study digs found a leak, against 67% in the 2025 job records.","sources":[{"file":"examples/research/data.json","status":"illustrative"}],"exportPolicy":"final","copyWaivers":[],"readingMode":"live","spaceIntent":""},{"id":"explore","title":"Between 0.30 and 0.60, each 0.05 step down finds one more leak and adds 2 to 5 dry digs","notes":"Move the threshold and watch the two right-hand cells. Going down from 0.60 to 0.30, each step picks up exactly one more leak, and two to five more dry digs. Going up, dry digs vanish quickly but leaks go with them. The static handout keeps today's 0.50; the next page has the other thresholds as a table.","sources":[{"file":"examples/research/data.json","status":"illustrative"}],"exportPolicy":"final","copyWaivers":[],"readingMode":"live","spaceIntent":""},{"id":"compare","title":"Finding all 22 leaks would take a threshold of 0.15 and 36 dry digs, 4.5 times today's 8","notes":"The static version of the previous page. Read the dry-digs column against the leaks-found column: from 0.50 down to 0.15 we gain 5 leaks for 28 extra dry digs. Whether that is worth it is not a statistical question; it is the next page.","sources":[{"file":"examples/research/data.json","status":"illustrative"}],"exportPolicy":"final","copyWaivers":[],"readingMode":"live","spaceIntent":""},{"id":"value","title":"If a missed leak costs as much as 1, 3 or 6 dry digs, the best threshold is 0.60, 0.45 or 0.30","notes":"Put a price on each kind of error and the threshold choice becomes arithmetic. If a missed leak is worth one dry dig, 0.60 is cheapest; at three, 0.45; at six, 0.30. The flows matter here: the leaks the score misses are the quiet ones, a median 0.3 cubic metres an hour. So R may be low, but we have not measured it.","sources":[{"file":"examples/research/data.json","status":"illustrative"}],"exportPolicy":"final","copyWaivers":[],"readingMode":"live","spaceIntent":""},{"id":"limits","title":"Three limits keep this study from setting the threshold on its own","notes":"Each limit has a size. The first is statistical and the next study can buy it down. The second is about where the result applies. The third is about the reference standard itself: excavating a sample of quiet sites would tell us how many leaks the survey misses.","sources":[{"file":"examples/research/data.json","status":"illustrative"}],"exportPolicy":"final","copyWaivers":[],"readingMode":"live","spaceIntent":""},{"id":"next","title":"Before anyone moves the threshold, the next study must price a missed leak and confirm about 66 leaks across the network","notes":"The order matters. Without R, a more precise study still cannot choose a threshold. With R and about 66 confirmed leaks from more than one district and season, the choice becomes a calculation we can defend to the regulator and to the crews.","sources":[{"file":"examples/research/data.json","status":"illustrative"}],"exportPolicy":"final","copyWaivers":[],"readingMode":"live","spaceIntent":""}]}</script><script>/* Slide Studio player — deterministic presentation states.
+<p class="st-source" data-region="source"><span>Eastfield blind survey, 2–27 March 2026: 64 flagged sites, 22 leaks. Intervals and sample size by the Wilson method.</span><span>Next study, fictional data</span></p></section></main><nav class="studio-controls" aria-label="Slide"><button id="studio-prev" type="button" aria-label="Previous" >←</button><span id="studio-position" class="studio-position"></span><button id="studio-next" type="button" aria-label="Next" >→</button><select id="studio-jump" aria-label="Slide"><option value="0">1. Where should the crews dig?</option><option value="1">2. In 2025 one excavation in three found no leak, and the 2,850 alerts below 0.50 were never checked</option><option value="2">3. All 64 flagged sites were surveyed blind to the score; excavation confirmed 22 leaks</option><option value="3">4. Today&#39;s threshold of 0.50 sends crews to 17 of the 22 leaks and to 8 dry holes</option><option value="4">5. The score found 77% of leaks at 0.50, but with 22 leaks the 95% interval runs from 57% to 90%</option><option value="5">6. Between 0.30 and 0.60, each 0.05 step down finds one more leak and adds 2 to 5 dry digs</option><option value="6">7. Finding all 22 leaks would take a threshold of 0.15 and 36 dry digs, 4.5 times today&#39;s 8</option><option value="7">8. If a missed leak costs as much as 1, 3 or 6 dry digs, the best threshold is 0.60, 0.45 or 0.30</option><option value="8">9. Three limits keep this study from setting the threshold on its own</option><option value="9">10. Before anyone moves the threshold, the next study must price a missed leak and confirm about 66 leaks across the network</option></select><button id="studio-overview" type="button" aria-label="Overview" >Overview</button><button id="studio-notes-btn" type="button" aria-label="Notes" aria-expanded="false" aria-controls="studio-notes">Notes</button><button id="studio-presenter" type="button" aria-label="Presenter view" >Presenter view</button><button id="studio-reset" type="button" aria-label="Reset" >Reset</button><button id="studio-full" type="button" aria-label="Fullscreen" >Fullscreen</button><button id="studio-help-btn" type="button" aria-label="Keyboard shortcuts" aria-expanded="false">?</button></nav><aside id="studio-notes" class="studio-notes" aria-label="Notes"></aside><div id="studio-announcer" class="sr-only studio-announcer" aria-live="polite"></div><script type="application/json" id="slide-studio-meta">{"version":4,"width":1280,"height":720,"title":"Where should the crews dig? Leak score validation, Eastfield 2026","language":"en","direction":"ltr","labels":{"prev":"Previous","next":"Next","jump":"Slide","overview":"Overview","notes":"Notes","reset":"Reset","full":"Fullscreen","presenter":"Presenter view","help":"Keyboard shortcuts","blank":"Black screen","goto":"Go to slide"},"transition":"fade","readingMode":"live","sample":true,"mode":"audience","copyRules":[{"id":"ja-stage-direction","level":"error","pattern":"(?:学会|口頭|研究)?発表(?:時|中)(?:に|で|は)?[ 　]*(?:切[り]?替[え]?|切替|クリック|再生|操作)|ここで(?:クリック|切[り]?替[え]?|動画を再生)|(?:要差し替え|後で修正|仮置きのまま)"},{"id":"en-stage-direction","level":"error","pattern":"\\b(?:switch|click|play|toggle) (?:here|during (?:the )?(?:conference|presentation|talk))\\b|\\b(?:replace this (?:text|title|image)|insert (?:your )?(?:title|content) here|speaker cue:)","flags":"i"},{"id":"placeholder","level":"error","pattern":"\\b(?:Lorem ipsum|TODO|FIXME|TBD)\\b|(?:ここにタイトル|ここに本文|テキストを入力)","flags":"i"},{"id":"ja-empty-claim","level":"warning","pattern":"(?:さらなる価値提供|革新的なソリューション|未来を切り拓く|シームレスな体験|圧倒的な価値)"},{"id":"en-empty-claim","level":"warning","pattern":"\\b(?:unlock (?:the )?(?:full )?potential|revolutionary solution|seamless experience|game-changing|transform the future)\\b","flags":"i"},{"id":"ja-export-production-cue","level":"error","pattern":"配布用メモ[：:]|(?:印刷[・／/]PDF|印刷・PDF|PDF・印刷)(?:では|時は)[^。\\n]{0,60}(?:表示が残|固定され|操作用)|(?:投影時|発表時)の操作用"},{"id":"en-export-production-cue","level":"error","pattern":"\\b(?:presenter-only cue|production note|export-only instruction)\\s*:","flags":"i"},{"id":"ja-performed-sincerity","level":"warning","pattern":"正直に(?:言います|お知らせ|お伝え)|本当の価値|価値を紡ぐ"},{"id":"ja-status-label","level":"error","pattern":"(?:登壇用|発表用|社内用|作業用|提出用)(?:ドラフト|下書き)"}],"slides":[{"id":"question","title":"Where should the crews dig?","notes":"The decision is a line on a score. Today crews dig wherever the night-noise score reaches 0.50. This talk asks whether that is the right line, and what we would need to know to move it. Everything here comes from one month in one district; the numbers are small on purpose and I will show their uncertainty.","sources":[{"file":"examples/research/data.json","status":"illustrative"}],"exportPolicy":"final","copyWaivers":[],"readingMode":"live","spaceIntent":""},{"id":"stakes","title":"In 2025 one excavation in three found no leak, and the 2,850 alerts below 0.50 were never checked","notes":"Job records only see one side of the rule. Above 0.50 we learn the outcome because we dig: 462 of 1,412 digs were dry. Below 0.50 we learn nothing, because we never look. That is why the records cannot tell us whether 0.50 is right, and why we ran a study that looked everywhere.","sources":[{"file":"examples/research/data.json","status":"illustrative"}],"exportPolicy":"final","copyWaivers":[],"readingMode":"live","spaceIntent":""},{"id":"data","title":"All 64 flagged sites were surveyed blind to the score; excavation confirmed 22 leaks","notes":"Population: every site the model flagged in Eastfield in the window, so the study sees low scores as well as high ones. The survey team used a correlator and a ground microphone and never saw the score. Excavation followed wherever they heard leak noise. Quiet sites were not dug; I come back to that as a limit.","sources":[{"file":"examples/research/data.json","status":"illustrative"}],"exportPolicy":"final","copyWaivers":[],"readingMode":"live","spaceIntent":""},{"id":"method","title":"Today's threshold of 0.50 sends crews to 17 of the 22 leaks and to 8 dry holes","notes":"First the observations: one dot per site, placed by its score, split by what the survey and excavation found. Leaks sit mostly to the right, but the two groups overlap between about 0.2 and 0.7. [Next] Then today's rule: everything at 0.50 or above gets a crew. Four counts fall out of that one line: 17 found, 5 missed, 8 dry, 34 correctly left alone.","sources":[{"file":"examples/research/data.json","status":"illustrative"}],"exportPolicy":"final","copyWaivers":[],"readingMode":"live","spaceIntent":""},{"id":"result","title":"The score found 77% of leaks at 0.50, but with 22 leaks the 95% interval runs from 57% to 90%","notes":"Four rates from the same two-by-two table. The squares are sized by how many sites each rate rests on. The sensitivity interval is wide because it rests on 22 leaks. One check that the sample behaves like the network: 68% of study digs found a leak, against 67% in the 2025 job records.","sources":[{"file":"examples/research/data.json","status":"illustrative"}],"exportPolicy":"final","copyWaivers":[],"readingMode":"live","spaceIntent":""},{"id":"explore","title":"Between 0.30 and 0.60, each 0.05 step down finds one more leak and adds 2 to 5 dry digs","notes":"Move the threshold and watch dots change side of the line: leaks turn from missed to found, and no-leak sites from left alone to dry digs. Going down from 0.60 to 0.30, each step picks up exactly one more leak, and two to five more dry digs. Going up, dry digs vanish quickly but leaks go with them. The static handout keeps today's 0.50; the next page has the other thresholds as a table.","sources":[{"file":"examples/research/data.json","status":"illustrative"}],"exportPolicy":"final","copyWaivers":[],"readingMode":"live","spaceIntent":""},{"id":"compare","title":"Finding all 22 leaks would take a threshold of 0.15 and 36 dry digs, 4.5 times today's 8","notes":"The static version of the previous page. Read the dry-digs column against the leaks-found column: from 0.50 down to 0.15 we gain 5 leaks for 28 extra dry digs. Whether that is worth it is not a statistical question; it is the next page.","sources":[{"file":"examples/research/data.json","status":"illustrative"}],"exportPolicy":"final","copyWaivers":[],"readingMode":"live","spaceIntent":""},{"id":"value","title":"If a missed leak costs as much as 1, 3 or 6 dry digs, the best threshold is 0.60, 0.45 or 0.30","notes":"Put a price on each kind of error and the threshold choice becomes arithmetic. If a missed leak is worth one dry dig, 0.60 is cheapest; at three, 0.45; at six, 0.30. The flows matter here: the leaks the score misses are the quiet ones, a median 0.3 cubic metres an hour. So R may be low, but we have not measured it.","sources":[{"file":"examples/research/data.json","status":"illustrative"}],"exportPolicy":"final","copyWaivers":[],"readingMode":"live","spaceIntent":""},{"id":"limits","title":"Three limits keep this study from setting the threshold on its own","notes":"Each limit has a size. The first is statistical and the next study can buy it down. The second is about where the result applies. The third is about the reference standard itself: excavating a sample of quiet sites would tell us how many leaks the survey misses.","sources":[{"file":"examples/research/data.json","status":"illustrative"}],"exportPolicy":"final","copyWaivers":[],"readingMode":"live","spaceIntent":""},{"id":"next","title":"Before anyone moves the threshold, the next study must price a missed leak and confirm about 66 leaks across the network","notes":"The order matters. Without R, a more precise study still cannot choose a threshold. With R and about 66 confirmed leaks from more than one district and season, the choice becomes a calculation we can defend to the regulator and to the crews.","sources":[{"file":"examples/research/data.json","status":"illustrative"}],"exportPolicy":"final","copyWaivers":[],"readingMode":"live","spaceIntent":""}]}</script><script>/* Slide Studio player — deterministic presentation states.
  *
  * Contract
  * - A slide's state is (slide index, build step). Every route (button, key,
@@ -1110,13 +1221,17 @@ function linear([d0, d1], [r0, r1]) {
 /** Horizontal axis: tick labels under `y`, optional grid lines, crowded labels thinned. */
 function axisX(x, { y, values, format = String, grid, size = 16, family, zeroLine = false } = {}) {
   let out = '', right = -Infinity;
+  const r0 = Math.min(...(x.range || [-Infinity]));
   for (const v of values) {
     const px = x(v);
     if (grid) out += line(px, grid[0], px, grid[1], { stroke: zeroLine && v === 0 ? C.ink : C.grid, width: zeroLine && v === 0 ? 1.4 : 1 });
     const label = typeof v === 'object' ? v.label : format(v), w = textWidth(label, size, 400, family);
-    if (px - w / 2 < right + 10) continue;
-    out += text(px, y + 8, label, { size, fill: C.muted, anchor: 'middle', valign: 'top', num: true });
-    right = px + w / 2;
+    // A label that would reach into the y axis's labels (which end 10 px left of the plot) starts at its tick.
+    const anchor = px - w / 2 < r0 - 8 ? 'start' : 'middle';
+    const left = anchor === 'start' ? px : px - w / 2;
+    if (left < right + 10) continue;
+    out += text(px, y + 8, label, { size, fill: C.muted, anchor, valign: 'top', num: true });
+    right = left + w;
   }
   return out;
 }
@@ -1188,6 +1303,12 @@ function mount(config, defaultAssets) {
   const readout = document.createElement('div');
   readout.className = 'w-readout';
   panel.after(summary, readout);
+  // The rail: one column beside the plot holding the controls, the settings shown in a static export,
+  // the readout, the status sentence and reset. The plot keeps the widget's full height whatever the rail holds.
+  const rail = root.querySelector('.w-rail') || document.createElement('div');
+  rail.className = 'w-rail';
+  if (!rail.parentNode) root.append(rail);
+  rail.append(panel, summary, readout, status);
 
   const spec = (key, defaults) => {
     const own = config.controls?.[key];
@@ -1304,8 +1425,8 @@ function mount(config, defaultAssets) {
     wrap: (s, width, size = 16, weight = 400) => wrapText(s, width, size, weight, w.font()),
   };
   const view = make(w) || {};
-  // Reset sits in its own row of the widget (after the status), so a long status never runs under it.
-  const resetButton = button(ui.reset, () => reset(), { cls: 'w-reset', container: root, hideStatic: true });
+  // Reset closes the rail, after the status sentence.
+  const resetButton = button(ui.reset, () => reset(), { cls: 'w-reset', container: rail, hideStatic: true });
   resetButton.dataset.wReset = '';
 
   function render() {
@@ -1432,7 +1553,7 @@ KINDS.parameter = w => {
       out += axisX(x, { y: b.b, values: xt, format: fx });
       out += line(b.l, b.b, b.r, b.b, { stroke: C.ink, width: 1.4 });
       out += yTitle(b, ax.y?.title) + xTitle(b, ax.x?.title);
-      for (const band of d.bands || []) out += rect(b.l, y(band.to), b.w, y(band.from) - y(band.to), { fill: C.surface }) +
+      for (const band of d.bands || []) out += path(`M${r2(b.l)} ${r2(y(band.to))}H${r2(b.r)}V${r2(y(band.from))}H${r2(b.l)}Z`, { fill: C.surface, stroke: 'none', width: 0 }) +
         (band.label ? text(b.l + 10, y(band.to) + 8, band.label, { size: 16, fill: C.muted, valign: 'top' }) : '');
       // Sample the curve; dosing jumps at each dose instead of ramping.
       const pts = [];
@@ -1455,8 +1576,7 @@ KINDS.parameter = w => {
       const exit = pts.find(([, v]) => v > yd[1]);
       if (exit) {
         const top = Math.max(...pts.map(([, v]) => v)), note = fill(w.text.offScale || '↑ off scale, up to {v}', { v: w.fmt(top, ax.y?.digits ?? 1) }, w.locale);
-        const ex = clamp(x(exit[0]) + 8, b.l, b.r - w.tw(note, 16, 650));
-        out += text(ex, b.t + 6, note, { size: 16, weight: 650, fill: C.negative, valign: 'top', halo: C.paper });
+        out += text(b.r, b.t - 18, note, { size: 16, weight: 650, fill: C.negative, anchor: 'end', valign: 'bottom' });
       }
       const values = Object.fromEntries(keys.map(key => [key, w.fmt(p[key], (w.config.controls?.[key]?.digits ?? model.params[key].digits) || 0)]));
       if (d.model === 'dosing') {
@@ -1469,9 +1589,9 @@ KINDS.parameter = w => {
         const lastDose = Math.ceil(p.horizon / p.interval - 1e-9) - 1, tp = lastDose * p.interval, tt = (lastDose + 1) * p.interval - 1e-6;
         if (tp >= xd[0] && tt <= xd[1] + 1e-6) {
           const cp = model.at(p, tp), ct = model.at(p, tt);
-          out += circle(x(tp), y(cp), 5.5, { fill: C.paper, stroke: cp > (d.window?.[1] ?? Infinity) ? C.negative : C.accent, width: 2.6 });
-          out += circle(x(tt), y(ct), 5.5, { fill: C.paper, stroke: C.accent, width: 2.6 });
-          if (w.text.peakLabel) out += text(x(tp), Math.max(b.t + 4, y(cp) - 12), fill(w.text.peakLabel, { v: w.fmt(cp, dg) }, w.locale), { size: 16, anchor: 'middle', valign: 'bottom', weight: 650, fill: cp > (d.window?.[1] ?? Infinity) ? C.negative : C.ink, halo: C.paper });
+          if (cp <= yd[1]) out += circle(x(tp), y(cp), 5.5, { fill: C.paper, stroke: cp > (d.window?.[1] ?? Infinity) ? C.negative : C.accent, width: 2.6 });
+          if (ct <= yd[1]) out += circle(x(tt), y(ct), 5.5, { fill: C.paper, stroke: C.accent, width: 2.6 });
+          if (w.text.peakLabel && cp <= yd[1]) out += text(x(tp), Math.max(b.t + 4, y(cp) - 12), fill(w.text.peakLabel, { v: w.fmt(cp, dg) }, w.locale), { size: 16, anchor: 'middle', valign: 'bottom', weight: 650, fill: cp > (d.window?.[1] ?? Infinity) ? C.negative : C.ink, halo: C.paper });
         }
       } else if (d.model === 'decay') values.end = w.fmt(model.at(p, xd[1]), 1);
       else if (d.model === 'logistic') values.half = w.fmt(Math.log(p.capacity / p.start - 1) / p.rate, 1);
@@ -1531,8 +1651,12 @@ KINDS.threshold = w => {
         out += text(b.l - 20, ly + 12, countLine(n), { size: 18, anchor: 'end', valign: 'middle', fill: C.muted });
         const left = row.cls ? fill(t.fn || '{fn} missed', { fn }, w.locale) : fill(t.tn || '{tn} cleared', { tn }, w.locale);
         const right = row.cls ? fill(t.tp || '{tp} caught', { tp }, w.locale) : fill(t.fp || '{fp} false alarms', { fp }, w.locale);
-        out += text(b.l + 4, row.y0 + 4, left, { size: 18, weight: 650, valign: 'top', fill: row.cls && fn ? C.negative : C.muted });
-        out += text(b.r - 4, row.y0 + 4, right, { size: 18, weight: 650, valign: 'top', anchor: 'end', fill: C.ink });
+        const lstyle = { size: 18, weight: 650, valign: 'top', fill: row.cls && fn ? C.negative : C.muted }, rstyle = { size: 18, weight: 650, valign: 'top', fill: C.ink };
+        // A count that does not fit on its side of the line moves across it, with an arrow pointing back.
+        if (b.l + 4 + w.tw(left, 18, 650) <= bx - 10) out += text(b.l + 4, row.y0 + 4, left, lstyle);
+        else out += text(bx + 10, row.y0 + 4, '← ' + left, lstyle);
+        if (b.r - 4 - w.tw(right, 18, 650) >= bx + 10) out += text(b.r - 4, row.y0 + 4, right, { ...rstyle, anchor: 'end' });
+        else out += text(bx - 10, row.y0 + 4, right + ' →', { ...rstyle, anchor: 'end' });
       }
       // Axis and the threshold line with its rule in words.
       const tickVals = ax.x?.ticks || ticks(domain[0], domain[1], 10);
@@ -1545,7 +1669,8 @@ KINDS.threshold = w => {
       w.draw(svgRoot(W, H, out, t.figure || 'Scored cases by true outcome, split at the threshold'));
       const pos = tp + fn, neg = fp + tn, total = pos + neg;
       const vals = { threshold: w.fmt(th, w.config.controls?.threshold?.digits ?? 2), tp, fp, fn, tn, positives: pos, negatives: neg, total, flagged: tp + fp,
-        sensitivity: w.fmt(pos ? (100 * tp) / pos : 0, 0), specificity: w.fmt(neg ? (100 * tn) / neg : 0, 0), ppv: w.fmt(tp + fp ? (100 * tp) / (tp + fp) : 0, 0) };
+        sensitivity: w.fmt(pos ? (100 * tp) / pos : 0, 0), specificity: w.fmt(neg ? (100 * tn) / neg : 0, 0), ppv: w.fmt(tp + fp ? (100 * tp) / (tp + fp) : 0, 0),
+        falseShare: tp + fp ? w.fmt((100 * fp) / (tp + fp), 0) : '–' };
       return { status: w.fill(t.status || 'Synthetic labels · TP {tp}, FP {fp}, FN {fn}, TN {tn}', vals), values: vals };
     },
   };
@@ -1568,13 +1693,16 @@ function lineChart(w, S, { W, H, cursor, refs, margin } = {}) {
   const [y0, y1] = ax.y?.min !== undefined && ax.y?.max !== undefined ? yd : niceDomain(yd[0], yd[1], 5);
   const xd = [ax.x?.min ?? S.xs[0], ax.x?.max ?? S.xs[S.xs.length - 1]];
   const endW = Math.max(0, ...S.lines.map(l => (l.name ? w.tw(l.name, 17, 650) : 0)));
-  const b = box(W, H, margin || { l: 64, r: endW ? endW + 22 : 18, t: 74, b: 62 });
+  const lastTick = ax.x?.ticks?.length ? ax.x.ticks[ax.x.ticks.length - 1] : null;
+  const tickHalf = lastTick && typeof lastTick === 'object' ? w.tw(lastTick.label, 16) / 2 + 4 : 18;
+  const b = box(W, H, margin || { l: 64, r: endW ? Math.max(endW + 22, tickHalf) : Math.max(18, tickHalf), t: 74, b: 62 });
   const x = linear(xd, [b.l, b.r]), y = linear([y0, y1], [b.b, b.t]);
   const dg = ax.y?.digits ?? (y1 - y0 <= 2 ? 2 : 0);
   let out = axisY(y, { x: b.l, values: ax.y?.ticks || ticks(y0, y1, 5), format: v => w.fmt(v, ax.y?.tickDigits ?? (y1 - y0 <= 2 ? 1 : 0)), grid: [b.l, b.r], zeroLine: y0 < 0 });
   const xt = ax.x?.ticks ? ax.x.ticks.map(tk => (typeof tk === 'object' ? { value: tk.value, label: tk.label } : { value: tk, label: w.fmt(tk, ax.x?.digits ?? 0) }))
     : ticks(xd[0], xd[1], 8).map(v => ({ value: v, label: w.fmt(v, ax.x?.digits ?? (xd[1] - xd[0] <= 2 ? 1 : 0)) }));
-  out += axisX(v => x(v.value), { y: b.b, values: xt });
+  const xv = v => x(v.value); xv.range = x.range;
+  out += axisX(xv, { y: b.b, values: xt });
   out += line(b.l, b.b, b.r, b.b, { stroke: C.ink, width: 1.4 });
   out += yTitle(b, ax.y?.title) + xTitle(b, ax.x?.title, b.b + 36);
   out += refLines(refs, y, b);
@@ -1586,8 +1714,8 @@ function lineChart(w, S, { W, H, cursor, refs, margin } = {}) {
     if (l.name) ends.push({ y: y(l.values[last]), name: l.name, col });
   });
   const ey = spread(ends.map(e => e.y), 22, b.t, b.b);
-  ends.forEach((e, k) => { out += text(b.r + 10, ey[k], e.name, { size: 17, weight: 650, fill: e.col, valign: 'middle' }); });
-  return { out, x, y, b, dg };
+  const endLabels = ends.map((e, k) => text(b.r + 10, ey[k], e.name, { size: 17, weight: 650, fill: e.col, valign: 'middle' })).join('');
+  return { out, endLabels, x, y, b, dg };
 }
 KINDS.scrubber = w => {
   const S = seriesData(w.data), n = S.xs.length, labelOf = i => (S.labels ? S.labels[i] : `${i + 1} / ${n}`);
@@ -1596,9 +1724,10 @@ KINDS.scrubber = w => {
     render(s) {
       const i = clamp(Math.round(Number(s.time) || 0), 0, n - 1);
       const { width: W, height: H } = w.size();
-      const { out: chart, x, y, b, dg } = lineChart(w, S, { W, H, refs: w.data.refs });
-      let out = chart;
+      const { out: chart, endLabels, x, y, b, dg } = lineChart(w, S, { W, H, refs: w.data.refs });
       const cx = x(S.xs[i]);
+      // Near the right end the cursor's own labels name the lines; the end labels would crowd them.
+      let out = chart + (cx < b.r - 120 ? endLabels : '');
       out += line(cx, b.t - 30, cx, b.b, { stroke: C.ink, width: 1.6 });
       const head = labelOf(i), hw = w.tw(head, 17, 700);
       out += text(clamp(cx, b.l + hw / 2, b.r - hw / 2), b.t - 36, head, { size: 17, weight: 700, anchor: 'middle', valign: 'bottom' });
@@ -1668,19 +1797,24 @@ KINDS.comparison = w => {
       frame.style.width = fw + 'px'; frame.style.height = fh + 'px';
       before.style.clipPath = `inset(0 ${100 - split}% 0 0)`;
       divider.style.left = split + '%';
+      // A tag names a side only while that side is wide enough to hold it.
+      const tagL = frame.querySelector('.w-tag--left'), tagR = frame.querySelector('.w-tag--right');
+      if (tagL) tagL.style.visibility = (split / 100) * fw >= tagL.offsetWidth + 20 ? '' : 'hidden';
+      if (tagR) tagR.style.visibility = (1 - split / 100) * fw >= tagR.offsetWidth + 20 ? '' : 'hidden';
       let marks = '';
       regions.forEach((r, i) => {
         const X = r.x * fw, Y = r.y * fh, RW = r.w * fw, RH = r.h * fh, below = r.label === 'below';
         marks += rect(X, Y, RW, RH, { fill: 'none', stroke: '#ffffff', width: 2.5 }) + rect(X, Y, RW, RH, { fill: 'none', stroke: '#111111', width: 1 });
-        const caption = measured ? `${r.name} · L* ${w.fmt(measured[i], 0)}` : r.name;
+        const caption = measured ? `${r.name}: L* ${w.fmt(measured[i], 0)}` : r.name;
         marks += text(X + RW / 2, below ? Y + RH + 8 : Y - 8, caption, { size: 16, weight: 650, anchor: 'middle', valign: below ? 'top' : 'bottom', fill: '#111111', halo: '#ffffff' });
       });
       overlay.setAttribute('viewBox', `0 0 ${fw} ${fh}`);
       overlay.innerHTML = marks;
       const vals = { split, hidden: 100 - split };
       regions.forEach((r, i) => { vals['name' + i] = r.name; vals['L' + i] = measured ? w.fmt(measured[i], 0) : '…'; });
-      if (measured && measured.length > 1) vals.dL = w.fmt(Math.abs(measured[0] - measured[1]), 1);
-      if (measured && measured.length > 3) vals.dL2 = w.fmt(Math.abs(measured[2] - measured[3]), 1);
+      // Every pairwise difference in L*: {d01}, {d02}, {d12}, …
+      if (measured) for (let i = 0; i < measured.length; i++) for (let j = i + 1; j < measured.length; j++) vals[`d${i}${j}`] = w.fmt(Math.abs(measured[i] - measured[j]), 0);
+      if (vals.d01) vals.dL = vals.d01;
       const status = regions.length && !measured ? w.ui.measuring : w.fill(t.status || 'Same photograph and registration; grayscale is a declared display transformation.', vals);
       return { status, values: vals };
     },
@@ -1721,9 +1855,11 @@ KINDS.hotspots = w => {
         const ang = Math.atan2(z[1] - a[1], z[0] - a[0]), tip = [z[0] - Math.cos(ang) * (sw * 0.9), z[1] - Math.sin(ang) * (sw * 0.9)];
         const col = tone(f.tone, C.muted);
         out += line(a[0], a[1], tip[0], tip[1], { stroke: col, width: sw }) + arrowHead(z[0], z[1], ang, sw * 1.15, col);
-        const lx = far[0] + v[0] * 10, ly = far[1] + v[1] * 10;
-        out += text(lx, ly, w.wrap(f.label, f.labelWidth || 220, 17, 650), { size: 17, weight: 650, fill: col === C.muted ? C.ink : col,
-          anchor: v[0] > 0 ? 'start' : v[0] < 0 ? 'end' : 'middle', valign: v[1] > 0 ? 'top' : v[1] < 0 ? 'bottom' : 'middle', lh: 1.25 });
+        // The label sits beside the shaft: right of a vertical arrow, above a horizontal one.
+        const mid = [(start[0] + far[0]) / 2, (start[1] + far[1]) / 2], lines = w.wrap(f.label, f.labelWidth || 220, 17, 650);
+        out += v[0] === 0
+          ? text(mid[0] + sw / 2 + 12, mid[1], lines, { size: 17, weight: 650, fill: col === C.muted ? C.ink : col, valign: 'middle', lh: 1.25 })
+          : text(far[0] + v[0] * 10, far[1], lines, { size: 17, weight: 650, fill: col === C.muted ? C.ink : col, anchor: v[0] > 0 ? 'start' : 'end', valign: 'middle', lh: 1.25 });
       }
       for (const l of links) {
         const [ax, ay] = pos[l.from], [bx, by] = pos[l.to];
@@ -1737,12 +1873,14 @@ KINDS.hotspots = w => {
         const endPt = [p2[0] - Math.cos(ang) * 3, p2[1] - Math.sin(ang) * 3];
         out += polyline([...pts.slice(0, -1), [endPt[0] - Math.cos(ang) * 8, endPt[1] - Math.sin(ang) * 8]], { stroke: tone(l.tone, C.muted), width: 2.4, join: 'miter' }) + arrowHead(endPt[0], endPt[1], ang, 11, tone(l.tone, C.muted));
         if (l.label) {
-          const corner = pts.length === 3 ? pts[1] : [(pts[0][0] + pts[1][0]) / 2, (pts[0][1] + pts[1][1]) / 2];
-          const right = corner[0] > W / 2, low = corner[1] > H / 2;
-          const lines = w.wrap(l.label, 170, 16, 400);
-          out += pts.length === 3
-            ? text(corner[0] + (right ? -12 : 12), corner[1] + (low ? -12 : 12), lines, { size: 16, fill: C.muted, anchor: right ? 'end' : 'start', valign: low ? 'bottom' : 'top' })
-            : text(corner[0], corner[1] - 12, lines, { size: 16, fill: C.muted, anchor: 'middle', valign: 'bottom' });
+          const lines = w.wrap(l.label, l.labelWidth || 150, 16, 400);
+          if (pts.length === 3) {
+            // Beside the vertical run, on the outside of the loop.
+            const vert = Math.abs(pts[0][0] - pts[1][0]) < 1 ? [pts[0], pts[1]] : [pts[1], pts[2]];
+            // Inside the loop, where the drawing leaves room.
+            const vx = vert[0][0], vy = (vert[0][1] + vert[1][1]) / 2, rightSide = vx > W * (d.cx ?? 0.47);
+            out += text(vx + (rightSide ? -12 : 12), vy, lines, { size: 16, fill: C.muted, anchor: rightSide ? 'end' : 'start', valign: 'middle' });
+          } else out += text((pts[0][0] + pts[1][0]) / 2, pts[0][1] - 12, lines, { size: 16, fill: C.muted, anchor: 'middle', valign: 'bottom' });
         }
       }
       for (const p of parts) {
@@ -1766,7 +1904,7 @@ const DEFAULT_SECTIONS = [
 ];
 KINDS.tabs = w => {
   const sections = w.data.sections || DEFAULT_SECTIONS;
-  w.radios('tab', w.spec('tab', { label: 'Read a section', options: sections.map(s => [s.id, s.name]), cls: 'w-toc' }));
+  w.radios('tab', w.spec('tab', { label: 'Read a section', options: sections.map(s => [s.id, s.name]), cls: 'w-toc', showLegend: true }));
   return {
     render(s) {
       const i = Math.max(0, sections.findIndex(x => x.id === s.tab)), sec = sections[i];
@@ -1774,7 +1912,7 @@ KINDS.tabs = w => {
       const facts = (sec.facts || []).map(f => `<div class="w-kpi"><b>${esc(f.value)}</b><span>${esc(f.label)}</span></div>`).join('');
       w.draw(`<article class="w-reading"><h2>${esc(sec.title || sec.name)}</h2><div class="w-reading-body">${body}</div>${facts ? `<div class="w-facts">${facts}</div>` : ''}</article>`);
       const vals = { name: sec.name, index: i + 1, count: sections.length };
-      return { status: w.fill(w.text.status || 'Use sections when optional detail would distract from the main explanation.', vals), values: vals };
+      return { status: sec.status ?? w.fill(w.text.status || 'Use sections when optional detail would distract from the main explanation.', vals), values: vals };
     },
   };
 };
@@ -1795,7 +1933,8 @@ KINDS.layers = w => {
       w.draw(visible.length ? svgRoot(size[0], size[1], visible.map(l => tag('g', { 'data-layer': l.id }, l.svg)).join(''), w.text.figure || 'Layered figure')
         : `<p class="w-empty">${esc(w.ui.allHidden)}</p>`);
       const notes = visible.map(l => l.note).filter(Boolean);
-      const vals = { shown: visible.map(l => l.name).join(w.locale.startsWith('ja') ? '・' : ', ') || '—', count: visible.length, notes: notes.join(' ') };
+      const listed = order.map(id => layers.find(l => l.id === id)).filter(l => s[l.id]);
+      const vals = { shown: listed.map(l => l.name).join(w.locale.startsWith('ja') ? '・' : ', ') || '—', count: visible.length, notes: notes.join(w.locale.startsWith('ja') ? '' : ' ') };
       return { status: w.fill(w.text.status || 'Toggle layers without deleting their source geometry.', vals), values: vals };
     },
   };
@@ -1891,7 +2030,8 @@ KINDS.brushing = w => {
       w.draw(svgRoot(W, H, out, t.figure || 'Scatter plot with a selected range'));
       const vals = { k: picked.length, n: pts.length, others: rest.length, low: w.ax(lo, ax.x, own ? 0 : 2), high: w.ax(hi, ax.x, own ? 0 : 2),
         median: w.fmt(mSel, dg), rest: w.fmt(mRest, dg), ratio: isNum(mSel / mRest) ? w.fmt(mSel / mRest, 1) : '–' };
-      return { status: w.fill(t.status || 'Selected {k} / {n} observations. Range changes both selection and count.', vals), values: vals };
+      const template = !picked.length && t.statusNone ? t.statusNone : !rest.length && t.statusAll ? t.statusAll : t.status;
+      return { status: w.fill(template || 'Selected {k} / {n} observations. Range changes both selection and count.', vals), values: vals };
     },
   };
 };
@@ -2185,7 +2325,8 @@ KINDS.decision = w => {
 KINDS.graph = w => {
   const d = w.data.nodes ? w.data : {
     nodes: ['A', 'B', 'C', 'D'].map((name, i) => ({ id: name, name, x: i, y: 0 })), origin: 'A',
-    edges: [{ from: 'A', to: 'B' }, { from: 'C', to: 'D' }, { from: 'B', to: 'C', toggle: 'bridge' }, { from: 'A', to: 'D', toggle: 'direct', bend: -1 }],
+    // The original fixture is directed: links are followed from → to only (edges default to two-way).
+    edges: [{ from: 'A', to: 'B', oneway: true }, { from: 'C', to: 'D', oneway: true }, { from: 'B', to: 'C', toggle: 'bridge', oneway: true }, { from: 'A', to: 'D', toggle: 'direct', bend: -1, oneway: true }],
     toggles: [{ key: 'bridge', label: 'Enable bridge' }, { key: 'direct', label: 'Enable direct edge' }],
   };
   const t = w.text, index = Object.fromEntries(d.nodes.map((n, i) => [n.id, i])), origin = index[d.origin ?? d.nodes[0].id];
@@ -2226,7 +2367,7 @@ KINDS.graph = w => {
         const dpath = e.bend ? `M${r2(x1)} ${r2(y1)}Q${r2((x1 + x2) / 2)} ${r2((y1 + y2) / 2 + e.bend * 90)} ${r2(x2)} ${r2(y2)}` : `M${r2(x1)} ${r2(y1)}L${r2(x2)} ${r2(y2)}`;
         out += path(dpath, { stroke: !isOpen ? C.context : used ? C.ink : C.muted, width: isOpen ? 4 : 2.5, dash: isOpen ? null : '7 6' });
         if (e.label && (isOpen ? e.showLabel !== false : true)) {
-          const mx = (x1 + x2) / 2, my = (y1 + y2) / 2 + (e.bend ? e.bend * 45 : 0), txt = isOpen ? e.label : (e.closedLabel || e.label);
+          const f = e.labelAt ?? 0.5, mx = x1 + (x2 - x1) * f, my = y1 + (y2 - y1) * f + (e.bend ? e.bend * 45 : 0), txt = isOpen ? e.label : (e.closedLabel || e.label);
           out += text(mx + (e.labelDx || 0), my + (e.labelDy ?? -12), txt, { size: 16, weight: isOpen ? 400 : 650, fill: isOpen ? C.muted : C.negative, anchor: 'middle', valign: 'bottom', halo: C.paper });
         }
       }
@@ -2287,7 +2428,7 @@ KINDS.magnifier = w => {
   w.slider('zoom', w.spec('zoom', { label: 'Zoom', min: 1, max: 3, step: 0.1, digits: 1, format: '{v}×' }));
   w.slider('x', w.spec('x', { label: 'Horizontal focus (%)', min: 0, max: 100, step: 1, format: '{v}%' }));
   w.slider('y', w.spec('y', { label: 'Vertical focus (%)', min: 0, max: 100, step: 1, format: '{v}%' }));
-  w.plot.innerHTML = `<div class="w-magnifier"><img src="${esc(w.assets.photo)}" alt="${esc(t.alt || 'Coffee photograph: user-selected crop')}"></div><svg class="w-inset" aria-hidden="true"></svg>`;
+  w.plot.innerHTML = `<div class="w-magnifier"><img src="${esc(w.assets.photo)}" alt="${esc(t.alt || 'Coffee photograph: user-selected crop')}"><svg class="w-inset" aria-hidden="true"></svg></div>`;
   const frame = w.plot.querySelector('.w-magnifier'), img = frame.querySelector('img'), inset = w.plot.querySelector('.w-inset');
   w.on(img, 'load', () => w.render());
   return {
@@ -2383,10 +2524,11 @@ KINDS.audio = w => {
       const { width: W, height: H } = w.size(), h = H - 64;
       let out = '';
       if (wav) {
-        const x = wav.samples, n = x.length, b = box(W, h, { l: 64, r: 16, t: 40, b: 50 });
+        const x = wav.samples, n = x.length, b = box(W, h, { l: 64, r: 30, t: 40, b: 50 });
         const topH = b.h * 0.36, bt = b.t + topH + 70, bb = b.b;
         // Whole clip: min/max envelope per pixel column, with the playback position.
-        const xs = linear([0, stats.seconds], [b.l, b.r]), amp = Math.max(0.05, ...[1, 0.5, 0.25, 0.1, 0.05].filter(a => a >= stats.peakDb && false)), A = d.fullScale ? 1 : Math.min(1, 10 ** (stats.peakDb / 20) * 1.6);
+        // Vertical scale: full scale when asked, else the peak with headroom (the level is stated in words).
+        const xs = linear([0, stats.seconds], [b.l, b.r]), A = d.fullScale ? 1 : Math.min(1, 10 ** (stats.peakDb / 20) * 1.6);
         const yTop = linear([-A, A], [b.t + topH, b.t]);
         out += text(b.l, b.t - 14, t.wholeTitle || 'Whole clip', { size: 16, fill: C.muted, valign: 'bottom' });
         const cols = Math.round(b.w), per = n / cols;
@@ -2435,6 +2577,17 @@ function clipBelow(points, limit) { // keep the part of a polygon with z <= limi
   }
   return out;
 }
+/** Connected pieces per face (faces that share a vertex position within the same group). */
+function meshPieces(mesh) {
+  const parent = new Map(), find = k => { while (parent.get(k) !== k) { parent.set(k, parent.get(parent.get(k))); k = parent.get(k); } return k; };
+  const keyOf = (g, i) => g + '|' + mesh.vertices[i].map(c => Math.round(c * 1000)).join(',');
+  for (const f of mesh.faces) {
+    const ks = f.indices.map(i => keyOf(f.group, i));
+    for (const k of ks) if (!parent.has(k)) parent.set(k, k);
+    for (let j = 1; j < ks.length; j++) { const a = find(ks[0]), b = find(ks[j]); if (a !== b) parent.set(a, b); }
+  }
+  return mesh.faces.map(f => find(keyOf(f.group, f.indices[0])));
+}
 function meshBounds(mesh) {
   const min = [Infinity, Infinity, Infinity], max = [-Infinity, -Infinity, -Infinity], groups = {};
   for (const f of mesh.faces) {
@@ -2449,7 +2602,7 @@ function meshBounds(mesh) {
 }
 function meshWidget(w) {
   const t = w.text, kind = w.config.kind, d = w.data;
-  let mesh = StudioMesh.parseOBJ(w.assets.obj), info = meshBounds(mesh);
+  let mesh = StudioMesh.parseOBJ(w.assets.obj), info = meshBounds(mesh), pieces = meshPieces(mesh);
   w.plot.innerHTML = `<canvas tabindex="0" role="img" aria-label="${esc(t.canvasLabel || 'Interactive triangle mesh. Drag to rotate, or use yaw and pitch sliders.')}"></canvas><svg class="w-mesh-labels" aria-hidden="true"></svg>`;
   const canvas = w.plot.querySelector('canvas'), labels = w.plot.querySelector('.w-mesh-labels');
   w.slider('yaw', w.spec('yaw', { label: 'Yaw (degrees)', min: -180, max: 180, step: 1, format: '{v}°' }));
@@ -2467,7 +2620,7 @@ function meshWidget(w) {
         if (!f) return;
         if (f.size > 8 * 1024 * 1024) throw Error(t.tooLarge || 'File exceeds 8 MiB');
         const m = /\.obj$/i.test(f.name) ? StudioMesh.parseOBJ(await f.text()) : StudioMesh.parseSTL(await f.arrayBuffer());
-        mesh = m; info = meshBounds(mesh); w.state.filename = f.name; w.render();
+        mesh = m; info = meshBounds(mesh); pieces = meshPieces(mesh); w.state.filename = f.name; w.render();
       } catch (err) { w.status.textContent = err.message; }
     });
   }
@@ -2504,18 +2657,20 @@ function meshWidget(w) {
         const xx = x * ca - y * sa, yy = x * sa + y * ca;
         return [cxp + xx * scale, cyp + (yy * cb - z * sb) * scale, yy * sb + z * cb];
       };
-      const colorOf = g => { const p = partOf(g), i = groups.indexOf(g); return rgbOf(p?.tone === 'accent' ? tok.accent : p?.tone === 'context' ? tok.context : p?.tone === 'ink' ? tok.ink : tok.cat[(p?.color ?? i) % 8]); };
+      // Part colour: a role (accent, ink, muted, context …) or a categorical slot (cat-1 … cat-8).
+      const colorOf = g => { const p = partOf(g), i = groups.indexOf(g), m = /^cat-(\d)$/.exec(p?.tone || '');
+        return rgbOf(m ? tok.cat[(Number(m[1]) - 1) % 8] : tok[p?.tone] || tok.cat[i % 8]); };
       const limit = min[2] + (max[2] - min[2]) * cut, polys = [];
-      for (const f of mesh.faces) {
+      mesh.faces.forEach((f, fi) => {
         let pts = f.indices.map(i => mesh.vertices[i]);
         if (cut < 1) pts = clipBelow(pts, limit);
-        if (pts.length < 3) continue;
+        if (pts.length < 3) return;
         const p = pts.map(v => project(v, f.group));
         const a = [p[1][0] - p[0][0], p[1][1] - p[0][1], p[1][2] - p[0][2]], b = [p[2][0] - p[0][0], p[2][1] - p[0][1], p[2][2] - p[0][2]];
         const nrm = [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]], len = Math.hypot(...nrm) || 1;
         const shade = 0.62 + 0.38 * Math.abs((nrm[0] * 0.3 - nrm[1] * 0.55 + nrm[2] * 0.78) / len);
-        polys.push({ p, depth: p.reduce((acc, v) => acc + v[2], 0) / p.length, rgb: colorOf(f.group).map(c => Math.round(c * shade)) });
-      }
+        polys.push({ p, g: f.group, piece: pieces[fi], depth: p.reduce((acc, v) => acc + v[2], 0) / p.length, rgb: colorOf(f.group).map(c => Math.round(c * shade)) });
+      });
       polys.sort((a, b) => a.depth - b.depth);
       for (const f of polys) {
         ctx.beginPath();
@@ -2525,21 +2680,55 @@ function meshWidget(w) {
         ctx.lineWidth = 0.6; ctx.fill(); ctx.stroke();
       }
       s.triangles = mesh.faces.length; s.drawn = polys.length;
-      // Direct labels: part name and its measured size, leader to the part's centre.
+      // Direct labels: part name and its measured size, with a leader to a point where the part itself
+      // is visible. A part hidden behind others (or above the cut) gets a dashed leader and a muted label.
       let svg = '';
       if (named.length) {
+        for (const f of polys) {
+          const xs = f.p.map(v => v[0]), ys = f.p.map(v => v[1]);
+          f.box = [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)];
+          f.area = Math.abs(f.p.reduce((acc, v, i) => { const u = f.p[(i + 1) % f.p.length]; return acc + v[0] * u[1] - u[0] * v[1]; }, 0)) / 2;
+        }
+        const inside = (pt, p) => { let c = false; for (let i = 0, j = p.length - 1; i < p.length; j = i++) if ((p[i][1] > pt[1]) !== (p[j][1] > pt[1]) && pt[0] < ((p[j][0] - p[i][0]) * (pt[1] - p[i][1])) / (p[j][1] - p[i][1]) + p[i][0]) c = !c; return c; };
+        const topAt = pt => { for (let k = polys.length - 1; k >= 0; k--) { const f = polys[k], b = f.box; if (pt[0] >= b[0] && pt[0] <= b[2] && pt[1] >= b[1] && pt[1] <= b[3] && inside(pt, f.p)) return f; } return null; };
+        // Sample points inside a face: its centre, and points towards each corner and each edge.
+        const samples = f => { const c = [mean(f.p.map(v => v[0])), mean(f.p.map(v => v[1]))], out = [c];
+          f.p.forEach((v, i) => { const u = f.p[(i + 1) % f.p.length]; out.push([c[0] + (v[0] - c[0]) * 0.7, c[1] + (v[1] - c[1]) * 0.7], [c[0] + ((v[0] + u[0]) / 2 - c[0]) * 0.7, c[1] + ((v[1] + u[1]) / 2 - c[1]) * 0.7]); });
+          return out; };
+        const testable = polys.length <= 20000;
         const items = named.map(g => {
           const gb = info.groups[g], mid = gb.min.map((v, k) => (v + gb.max[k]) / 2), dims = gb.max.map((v, k) => v - gb.min[k]);
-          const anchor = project(cut < 1 ? [mid[0], mid[1], Math.min(mid[2], limit)] : mid, g);
-          const hidden = cut < 1 && gb.min[2] > limit;
+          const own = polys.filter(f => f.g === g);
+          // Visible sample points per connected piece (largest faces first, at most 200 faces tested).
+          const seen = new Map();
+          if (testable) for (const f of [...own].sort((a, b) => b.area - a.area).slice(0, 200)) {
+            if (f.area < 2) continue;
+            for (const pt of samples(f)) if (topAt(pt)?.g === g) { if (!seen.has(f.piece)) seen.set(f.piece, []); seen.get(f.piece).push({ pt, wgt: f.area }); }
+          }
+          let anchor, hidden = cut < 1 && gb.min[2] > limit;
+          const best = [...seen.values()].sort((a, b) => sum(b.map(s => s.wgt)) - sum(a.map(s => s.wgt)))[0];
+          if (best && !hidden) {
+            // The visible point nearest the weighted centre of what shows of the most visible piece.
+            const W0 = sum(best.map(s => s.wgt)), cx = sum(best.map(s => s.pt[0] * s.wgt)) / W0, cy = sum(best.map(s => s.pt[1] * s.wgt)) / W0;
+            anchor = best.reduce((a, s) => (Math.hypot(s.pt[0] - cx, s.pt[1] - cy) < Math.hypot(a[0] - cx, a[1] - cy) ? s.pt : a), best[0].pt);
+          } else {
+            // Not visible: point at where the part is (the front half of its front-most piece).
+            const byPiece = new Map();
+            for (const f of own) { if (!byPiece.has(f.piece)) byPiece.set(f.piece, []); byPiece.get(f.piece).push(f); }
+            const nearest = [...byPiece.values()].sort((a, b) => mean(b.map(f => f.depth)) - mean(a.map(f => f.depth)))[0] || [];
+            const front = [...nearest].sort((a, b) => b.depth - a.depth).slice(0, Math.max(1, Math.ceil(nearest.length / 2)));
+            anchor = front.length ? [mean(front.map(f => mean(f.p.map(v => v[0])))), mean(front.map(f => mean(f.p.map(v => v[1]))))]
+              : project(cut < 1 ? [mid[0], mid[1], Math.min(mid[2], limit)] : mid, g);
+            hidden = hidden || testable;
+          }
           return { g, anchor, hidden, name: partOf(g).name, sub: partOf(g).note ?? fill(t.dims || '{a} × {b} × {c} mm', { a: fmt(dims[0], 0, w.locale), b: fmt(dims[1], 0, w.locale), c: fmt(dims[2], 1, w.locale).replace(/\.0$/, '') }, w.locale) };
         }).sort((a, b) => a.anchor[1] - b.anchor[1]);
-        const lx = W - labelRoom + 24, ys = spread(items.map(it => it.anchor[1]), 56, 40, H - 40);
+        const lx = W - labelRoom + 24, ys = spread(items.map(it => it.anchor[1]), 62, 44, H - 44);
         items.forEach((it, k) => {
           const col = it.hidden ? C.muted : C.ink;
           svg += path(`M${r2(lx - 8)} ${r2(ys[k])}L${r2(lx - 26)} ${r2(ys[k])}L${r2(it.anchor[0])} ${r2(it.anchor[1])}`, { stroke: col, width: 1.2, dash: it.hidden ? '3 3' : null });
           svg += circle(it.anchor[0], it.anchor[1], 3.5, { fill: col, stroke: C.paper, width: 1.5 });
-          svg += text(lx, ys[k] - 2, it.name, { size: 17, weight: 650, fill: col, valign: 'bottom' }) + text(lx, ys[k] + 2, it.sub, { size: 16, fill: C.muted, valign: 'top' });
+          svg += text(lx, ys[k] - 5, it.name, { size: 17, weight: 650, fill: col, valign: 'bottom' }) + text(lx, ys[k] + 5, it.sub, { size: 16, fill: C.muted, valign: 'top', num: true });
         });
       }
       if (kind === 'cad-section' && cut < 1) {
@@ -2562,7 +2751,7 @@ function meshWidget(w) {
       const template = s.filename ? t.statusFile : t.status;
       return { status: template ? w.fill(template, vals) : fallback, values: vals };
     },
-    reset() { mesh = StudioMesh.parseOBJ(w.assets.obj); info = meshBounds(mesh); },
+    reset() { mesh = StudioMesh.parseOBJ(w.assets.obj); info = meshBounds(mesh); pieces = meshPieces(mesh); },
   };
 }
 KINDS['cad-orbit'] = KINDS['cad-explode'] = KINDS['cad-section'] = KINDS['cad-import'] = meshWidget;
@@ -2570,6 +2759,7 @@ KINDS['cad-orbit'] = KINDS['cad-explode'] = KINDS['cad-section'] = KINDS['cad-im
 /* ---------- ink: annotate the evidence while speaking ---------- */
 KINDS.ink = w => {
   const t = w.text, d = w.data, hasChart = !!(d.lines || d.series);
+  // The canvas lies over the chart for drawing but lets hits through; the plot itself takes the pointer.
   w.plot.innerHTML = `<div class="w-ink-chart"></div><canvas class="w-ink" tabindex="0" role="img" aria-label="${esc(t.canvasLabel || 'Annotation canvas. Choose a preset annotation for a keyboard alternative.')}"></canvas>`;
   const chart = w.plot.querySelector('.w-ink-chart'), cv = w.plot.querySelector('canvas');
   let geom = null;
@@ -2586,17 +2776,17 @@ KINDS.ink = w => {
   w.button(t.clear || 'Clear annotations', () => { w.state.paths = []; w.render(); });
   let drawing = false;
   const point = e => { const r = cv.getBoundingClientRect(), { width: W, height: H } = w.size(); return [r2(((e.clientX - r.left) * W) / r.width), r2(((e.clientY - r.top) * H) / r.height)]; };
-  w.on(cv, 'pointerdown', e => { drawing = true; cv.setPointerCapture(e.pointerId); w.state.paths.push([point(e)]); w.render(); });
-  w.on(cv, 'pointermove', e => { if (drawing) { w.state.paths.at(-1).push(point(e)); w.render(); } });
-  w.on(cv, 'pointerup', () => { drawing = false; });
-  w.on(cv, 'pointercancel', () => { drawing = false; });
+  w.on(w.plot, 'pointerdown', e => { drawing = true; w.plot.setPointerCapture(e.pointerId); w.state.paths.push([point(e)]); w.render(); });
+  w.on(w.plot, 'pointermove', e => { if (drawing) { w.state.paths.at(-1).push(point(e)); w.render(); } });
+  w.on(w.plot, 'pointerup', () => { drawing = false; });
+  w.on(w.plot, 'pointercancel', () => { drawing = false; });
   return {
     render(s) {
       const { width: W, height: H } = w.size(), tok = literalTokens(w.root), dpr = Math.min(2, window.devicePixelRatio || 1);
       if (hasChart) {
         const S = seriesData(d), g = lineChart(w, S, { W, H, refs: d.refs });
         geom = g;
-        let out = g.out;
+        let out = g.out + g.endLabels;
         for (const m of d.marks || []) {
           const mx = g.x(S.xs[m.at]);
           out += line(mx, g.b.t - 8, mx, g.b.b, { stroke: C.ink, width: 1.4, dash: '4 4' }) + text(mx + 8, g.b.t - 6, m.label, { size: 16, weight: 650, valign: 'top', halo: C.paper });
@@ -2607,7 +2797,7 @@ KINDS.ink = w => {
       const ctx = cv.getContext('2d');
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
       if (!hasChart) { ctx.strokeStyle = tok.rule; ctx.lineWidth = 1; ctx.strokeRect(0.5, 0.5, W - 1, H - 1); }
-      ctx.strokeStyle = d.inkTone === 'negative' ? tok.negative : tok.accent; ctx.lineWidth = 4; ctx.lineCap = ctx.lineJoin = 'round';
+      ctx.strokeStyle = tok[d.inkTone] || tok.accent; ctx.lineWidth = 4; ctx.lineCap = ctx.lineJoin = 'round';
       for (const p of s.paths) { ctx.beginPath(); p.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y))); ctx.stroke(); }
       const vals = { marks: s.paths.length };
       return { status: w.fill(t.status || 'Pointer drawing has a keyboard-accessible preset and reset. Annotations are session-local.', vals), values: vals };
@@ -2618,19 +2808,5 @@ KINDS.ink = w => {
 window.mountStudioWidgets = (configs, assets) => configs.map(c => mount(c, assets));
 })();
 
-mountStudioWidgets([{"id":"research-threshold","kind":"threshold","initial":{"threshold":0.5},"data":{"values":[0.06,0.07,0.09,0.11,0.12,0.14,0.16,0.17,0.17,0.18,0.19,0.21,0.22,0.23,0.24,0.26,0.26,0.27,0.28,0.29,0.31,0.32,0.33,0.33,0.34,0.34,0.36,0.37,0.38,0.38,0.39,0.41,0.42,0.43,0.44,0.44,0.46,0.47,0.48,0.51,0.53,0.54,0.56,0.57,0.59,0.61,0.63,0.64,0.66,0.68,0.69,0.71,0.72,0.74,0.76,0.78,0.79,0.81,0.83,0.84,0.86,0.88,0.91,0.93],"labels":[0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,1,0,0,1,0,0,1,0,1,0,1,1,1,0,1,0,1,1,0,1,1,1,1,1,1,1,1]}}],{});
-
-(() => {
-  const root = document.getElementById('research-threshold'), out = document.getElementById('explore-readout');
-  if (!root || !out) return;
-  const pct = v => Number.isFinite(v) ? Math.round(v * 100) + '%' : '–';
-  const set = (key, text) => { const el = out.querySelector('[data-k="' + key + '"]'); if (el) el.textContent = text; };
-  const render = () => {
-    let s; try { s = JSON.parse(root.dataset.state || '{}'); } catch { return; }
-    const c = s.counts; if (!c) return;
-    set('t', Number(s.threshold).toFixed(2)); set('tp', c.tp); set('fn', c.fn); set('fp', c.fp); set('tn', c.tn);
-    set('sens', pct(c.tp / (c.tp + c.fn))); set('dry', pct(c.fp / (c.tp + c.fp)));
-  };
-  new MutationObserver(render).observe(root, { attributes: true, attributeFilter: ['data-state'] });
-  render();
-})();</script></body></html>
+mountStudioWidgets([{"id":"research-threshold","kind":"threshold","initial":{"threshold":0.5},"data":{"values":[0.06,0.07,0.09,0.11,0.12,0.14,0.16,0.17,0.17,0.18,0.19,0.21,0.22,0.23,0.24,0.26,0.26,0.27,0.28,0.29,0.31,0.32,0.33,0.33,0.34,0.34,0.36,0.37,0.38,0.38,0.39,0.41,0.42,0.43,0.44,0.44,0.46,0.47,0.48,0.51,0.53,0.54,0.56,0.57,0.59,0.61,0.63,0.64,0.66,0.68,0.69,0.71,0.72,0.74,0.76,0.78,0.79,0.81,0.83,0.84,0.86,0.88,0.91,0.93],"labels":[0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,1,0,0,1,0,0,1,0,1,0,1,1,1,0,1,0,1,1,0,1,1,1,1,1,1,1,1],"domain":[0,1]},"controls":{"threshold":{"label":"Threshold (leak score)","min":0.05,"max":0.95,"step":0.05,"digits":2}},"axes":{"x":{"title":"Leak score","ticks":[0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1],"digits":1}},"text":{"positive":"Leak","negative":"No leak","rowCount":"{n} sites","tp":"{tp} found","fn":"{fn} missed","fp":"{fp} dry digs","tn":"{tn} left alone","rule":"Crew sent at {threshold} or above","reset":"Reset to 0.50","status":"At {threshold}: crews go to {flagged} of {total} sites, find {tp} of {positives} leaks and dig {fp} dry holes.","readout":[{"value":"{sensitivity}%","label":"of leaks found"},{"value":"{falseShare}%","label":"of digs dry"}],"figure":"Leak scores of the surveyed sites by survey result, with the threshold"}}],{});
+</script></body></html>

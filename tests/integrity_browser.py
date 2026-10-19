@@ -104,6 +104,17 @@ def run():
             text=PdfReader(str(pdf_out)).pages[0].extract_text()
             expect('18:00' in text and '1,234' in text and not any(0xE000<=ord(c)<=0xF8FF for c in text),repr(text))
         test('PDF export keeps figures and punctuation searchable when a font maps alternates to private use',searchable_pdf)
+        # CJK fonts that share one glyph between a radical and its ideograph make Chromium write ⽉/⻑
+        # into the text layer; the export rewrites those entries so 月 and 長 can be searched.
+        source.write_text(build('<h1 lang="ja">月次報告の作り方を見直す</h1><p lang="ja" style="font-family:\'Noto Sans CJK JP\',IPAPGothic,sans-serif">店長の時間を店に戻す。西宮店、長期、方針、見込み。</p>'))
+        ja_pdf=folder/'ja.pdf'
+        ja=subprocess.run([sys.executable,str(ROOT/'scripts/export.py'),str(source),str(ja_pdf),'--force'],capture_output=True,text=True)
+        def searchable_ja():
+            expect(ja.returncode==0,ja.stdout[-600:]+ja.stderr[-600:])
+            from pypdf import PdfReader
+            text=''.join(p.extract_text() for p in PdfReader(str(ja_pdf)).pages)
+            expect(all(w in text for w in ['月次','方','見直','店長','西宮']) and not any(0x2E80<=ord(c)<=0x2FDF for c in text),repr(text))
+        test('PDF export writes ideographs, not radical code points, so Japanese text can be searched',searchable_ja)
         source.write_text(build('<p style="background:#fff;color:#fff">Essential information.</p>'));args.out=str(folder/'broken-contrast');bad=render(args)
         test('severe rendered contrast failure reaches the QA exit gate',lambda:expect(not bad['passed'] and any(x['integrityBlocking'] for x in bad['results'])))
         if os.environ.get('SLIDE_STUDIO_INLINE')!='1':

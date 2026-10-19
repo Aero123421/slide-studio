@@ -295,6 +295,7 @@ const NO_END = new Set([...'（(［[｛{「『【〔〈《〘〖‘“$＄¥￥�
 
 const CJK_RE = /[　-ヿ㐀-鿿가-힯＀-￯]/;
 const HIRAGANA_ONLY = /^[ぁ-ゟー]+$/u;
+const PHRASE_END = /[、。，．,.：:；;？?！!）)］\]｝}」』】〕〉》…‥・]$/u;
 const segmenter = typeof Intl !== 'undefined' && Intl.Segmenter ? new Intl.Segmenter('ja', { granularity: 'word' }) : null;
 
 /**
@@ -312,8 +313,9 @@ function tokenize(line, merge = true) {
       const prev = raw[raw.length - 1];
       if (prev && glue) { raw[raw.length - 1] += segment; glue = /[\u00A0\u202F\u2007]$/.test(segment); continue; }
       if (prev && /^[\u00A0\u202F\u2007]+$/.test(segment)) { raw[raw.length - 1] += segment; glue = true; continue; }
-      // Particles and okurigana stay with what precedes them (年度|に, 6%|まで, Python|で).
-      if (prev && HIRAGANA_ONLY.test(segment) && !/\s$/.test(prev) && !NO_END.has([...prev].at(-1))) raw[raw.length - 1] += segment;
+      // Particles and okurigana stay with what precedes them (年度|に, 6%|まで, Python|で),
+      // but never with punctuation: after 、 or 。 a new phrase starts (…を、|そのまま).
+      if (prev && HIRAGANA_ONLY.test(segment) && !/\s$/.test(prev) && !NO_END.has([...prev].at(-1)) && !PHRASE_END.test(prev)) raw[raw.length - 1] += segment;
       else if (prev && /^\s+$/.test(segment)) raw[raw.length - 1] += segment;
       else raw.push(segment);
     }

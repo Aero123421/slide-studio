@@ -40,6 +40,7 @@ Static: The export shows the starting threshold (${start}) with all four counts.
     controls: { threshold: { label: 'Alert threshold (score)', min: 1, max: scoreRange[1], step: 1, digits: 0, format: '{v} or above' } },
     axes: { x: { title: 'Early-warning score at triage', ticks: Array.from({ length: scoreRange[1] - scoreRange[0] + 1 }, (_, i) => scoreRange[0] + i), digits: 0 } },
     text: {
+      reset: 'Reset',
       positive: 'Sepsis', negative: 'No sepsis', rowCount: '{n} patients',
       tp: '{tp} caught', fn: '{fn} missed', fp: '{fp} false alarms', tn: '{tn} not alerted',
       rule: 'Alert at {threshold} or above',

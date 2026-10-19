@@ -57,6 +57,7 @@ Static: The export keeps the starting order (lowest share first). Sort by referr
       ],
     },
     text: {
+      reset: 'Reset',
       reverse: 'Reverse order', ascending: 'lowest first', descending: 'highest first',
       status: 'Sorted by {column}, {direction}: {first} ({firstValue}) to {last} ({lastValue}).',
       figure: 'Waiting times by clinic',

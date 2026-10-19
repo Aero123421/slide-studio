@@ -32,11 +32,11 @@ const [before, after] = lanes;
 const dur = m => m < 60 ? `${m} min` : `${Math.floor(m / 60)} h${m % 60 ? ` ${m % 60} min` : ''}`;
 const long = m => { const h = Math.round(m / 60), d = Math.floor(h / 24); return m < 60 ? `${m} minutes` : `${d ? `${d} day${d > 1 ? 's' : ''} ` : ''}${h % 24} hours`; };
 
-// Geometry in the SVG's own coordinates (1152 × 404, drawn 1:1 at x 64, y 216).
+// Geometry in the SVG's own coordinates (1152 × 404, drawn 1:1 at x 64, y 202: the axis labels' caps sit on y 208).
 // Lane names sit in columns 1–2; the shared axis of days runs across columns 3–12.
 const W = 1152, H = 404, DAYS = 5, AX = C(3) - 64;
 const x = linear([0, DAYS * 1440], [AX, W]);
-const fill = { team: 'var(--ln-grey)', customer: 'var(--ln-rule)', carrier: 'var(--ln-context)', auto: 'var(--ln-green)' };
+const fill = { team: 'var(--ln-grey)', customer: 'var(--ln-rule)', carrier: 'var(--ln-mark)', auto: 'var(--ln-green)' };
 const BAR_Y = [96, 300], BAR = 30, THIN = 10;
 
 const axis = g({},
@@ -46,8 +46,9 @@ const axis = g({},
 function lane(l, top) {
   const parts = [textLines([l.name], { x: 0, y: top + BAR / 2 - 4, cls: 'ln-t-head' }), textLines([l.when], { x: 0, y: top + BAR / 2 + 20, cls: 'ln-t-grey' })];
   for (const p of l.phases) {
-    const h = p.after ? THIN : BAR, y0 = top + (BAR - h) / 2, w = Math.max(2, x(p.end) - x(p.start));
-    parts.push(el('rect', { x: x(p.start), y: y0, width: w, height: h, fill: fill[p.kind] }));
+    // a 2 px paper gap separates touching phases (1 px trimmed from each side of an inner edge)
+    const h = p.after ? THIN : BAR, y0 = top + (BAR - h) / 2, x0 = x(p.start) + (p.start ? 1 : 0), w = Math.max(2, x(p.end) - 1 - x0);
+    parts.push(el('rect', { x: x0, y: y0, width: w, height: h, fill: fill[p.kind] }));
   }
   const rx = x(l.refund);   // the refund: a tick through the lane
   parts.push(el('line', { x1: rx, x2: rx, y1: top - 14, y2: top + BAR + 14, stroke: l === after ? 'var(--ln-green)' : 'var(--ln-ink)', 'stroke-width': 2 }));
@@ -81,6 +82,6 @@ export default {
   exportPolicy: 'final',
   className: 'tpl-launch ln-before-after',
   content: `<h2 class="ln-at ln-head" data-region="title" style="left:${C(1)}px;top:64px;width:${span(1, 11)}px">The same return: refunded after ${long(before.refund)} in 1.x, after ${long(after.refund)} in 2.0</h2>
-<figure class="ln-at" data-region="primary" style="left:${C(1)}px;top:216px;width:${W}px;height:${H}px">${chart}</figure>
+<figure class="ln-at" data-region="primary" style="left:${C(1)}px;top:202px;width:${W}px;height:${H}px">${chart}</figure>
 <p class="ln-at ln-note" data-region="source" style="left:${C(1)}px;top:645px;width:${span(1, 12)}px">The same item returned for the same reason in July (1.x) and September 2026 (2.0 beta), request to refund. Dark grey: waiting on your team. Sample data.</p>`,
 };

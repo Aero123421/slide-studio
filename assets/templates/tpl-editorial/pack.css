@@ -10,7 +10,7 @@
 .tpl-editorial{
   --ed-paper:#F5F1EA;--ed-ink:#1B1815;--ed-grey:#6A635A;--ed-grey-on-tint:#544D45;--ed-rule:#D3CABD;--ed-tint:#DED5C8;--ed-rust:#A0461F;
   --ed-dark:#1E1A17;--ed-dark-ink:#EFE8DD;--ed-dark-grey:#A99F92;--ed-dark-rust:#D9895F;
-  --ed-serif:"Charter","Bitstream Charter","Iowan Old Style",Georgia,serif;
+  --ed-serif:"Charter","Bitstream Charter","Iowan Old Style",Georgia,Caladea,serif;
   --ed-sans:"Inter","Helvetica Neue",Arial,sans-serif;
   /* figure-engine tokens */
   --ss-paper:var(--ed-paper);--ss-surface:var(--ed-tint);--ss-ink:var(--ed-ink);--ss-muted:var(--ed-grey);

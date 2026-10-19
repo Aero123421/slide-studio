@@ -61,7 +61,7 @@ export function cheapestRuns(maxMonths = STRIP_MAX) {
 const runs = cheapestRuns();
 
 // ── Figure: bars (initial + monthly × n) and the cheapest-plan strip, one coordinate system ──
-const W = 1152, X0 = 300, rowH = 78, barH = 40, barsTop = 52, stripTop = 352;
+const W = 1152, X0 = 300, rowH = 78, barH = 40, barsTop = 34, stripTop = 352;
 const x = linear([0, SCALE_MAX], [X0, X0 + BAR_MAX]);       // 万円 → px
 const mx = linear([0, STRIP_MAX], [X0, X0 + BAR_MAX]);      // か月 → px
 const yRow = i => barsTop + i * rowH;
@@ -69,11 +69,12 @@ const initial = snapshots[36];
 const runLabel = r => (r.from === 0 ? `${fmt(r.to)}か月まで` : r.to === STRIP_MAX ? `${fmt(r.from)}か月から` : `${fmt(r.from)}〜${fmt(r.to)}か月`);
 
 function figure() {
-  const parts = [axis(x, { orient: 'top', at: barsTop - 22, grid: [barsTop - 14, yRow(offers.length - 1) + barH + 10], size: 16, count: 4, format: v => (v === SCALE_MAX ? `${v}万円` : String(v)) })];
+  const barsBottom = yRow(offers.length - 1) + 8 + barH;
+  const parts = [axis(x, { orient: 'bottom', at: barsBottom + 14, grid: [barsTop - 30, barsBottom + 6], size: 16, count: 4, format: v => (v === SCALE_MAX ? `${v}万円` : String(v)) })];
   // Direct key over the first row: which part of a bar is which.
   const a = initial.rows[0];
-  parts.push(textLines(['初期費用'], { x: x(0) + 6, y: barsTop - 8, size: 16, fill: 'var(--ss-muted)', weight: 600 }));
-  parts.push(textLines([`月額×${initial.months}か月`], { x: x(a.initial) + 8, y: barsTop - 8, size: 16, fill: 'var(--ss-muted)', weight: 600, attrs: { id: 'monthly-key' } }));
+  parts.push(textLines(['初期費用'], { x: x(0) + 6, y: barsTop - 8, size: 17, fill: 'var(--ss-muted)', weight: 600 }));
+  parts.push(textLines([`月額×${initial.months}か月`], { x: x(a.initial) + 8, y: barsTop - 8, size: 17, fill: 'var(--ss-muted)', weight: 600, attrs: { id: 'monthly-key' } }));
   initial.rows.forEach((r, i) => {
     const y = yRow(i) + 8, win = initial.winners.includes(r.id);
     parts.push(g({ id: `row-${r.id}`, class: `period-row${win ? ' is-min' : ''}` },
@@ -81,22 +82,23 @@ function figure() {
       textLines([planNames[r.id]], { x: 0, y: y + 40, size: 18, fill: 'var(--ss-muted)' }),
       el('rect', { id: `bar-${r.id}`, class: 'period-monthly', x: x(0), y, width: r.total / SCALE_MAX * BAR_MAX, height: barH }),
       el('rect', { class: 'period-initial', x: x(0), y, width: r.initial / SCALE_MAX * BAR_MAX, height: barH }),
-      `<text class="period-value" y="${y + barH / 2 + 8}"><tspan id="value-${r.id}" x="${x(r.total) + 12}">${r.total}</tspan><tspan class="period-unit" dx="4">万円</tspan></text>`));
+      `<text class="period-value" y="${y + barH / 2 + 8}"><tspan id="value-${r.id}" x="${x(r.total) + 12}">${r.total}</tspan><tspan class="period-unit" dx="2">万円</tspan></text>`));
   });
-  // Strip: which plan is cheapest for each length of use; the marker shows the selected horizon.
+  // Strip: which plan is cheapest for each length of use; ticks sit on the computed crossovers.
   parts.push(textLines(['もっとも安い案'], { x: 0, y: stripTop + 20, size: 22, fill: 'var(--ss-ink)', weight: 700 }));
   parts.push(textLines(['使う期間ごと'], { x: 0, y: stripTop + 46, size: 18, fill: 'var(--ss-muted)' }));
   for (const r of runs) {
     const on = initial.months > r.from && initial.months <= r.to;
     parts.push(g({ class: `period-run${on ? ' is-on' : ''}`, 'data-from': r.from, 'data-to': r.to },
       el('rect', { x: mx(r.from) + 1, y: stripTop, width: mx(r.to) - mx(r.from) - 2, height: 48 }),
-      textLines([`${r.id}案`], { x: mx(r.from) + 12, y: stripTop + 31, size: 20, weight: 700 }),
-      textLines([runLabel(r)], { x: mx(r.from) + 60, y: stripTop + 31, size: 16 })));
+      textLines([`${r.id}案`], { x: (mx(r.from) + mx(r.to)) / 2, y: stripTop + 31, size: 20, anchor: 'middle', weight: 700 })));
   }
-  parts.push(axis(mx, { orient: 'bottom', at: stripTop + 56, size: 16, tickValues: [0, 12, 24, 36, 48, 60], format: v => (v === STRIP_MAX ? `${v}か月` : String(v)) }));
+  const bounds = [0, ...runs.slice(1).map(r => r.from), STRIP_MAX];
+  parts.push(axis(mx, { orient: 'bottom', at: stripTop + 56, size: 16, tickValues: bounds, format: v => `${fmt(v)}か月` }));
   parts.push(g({ id: 'period-marker', transform: `translate(${mx(initial.months)} 0)` },
-    el('path', { d: `M0 ${stripTop - 12}V${stripTop + 60}`, stroke: 'var(--ss-ink)', 'stroke-width': 2.5 }),
-    el('path', { d: `M-7 ${stripTop - 20}H7L0 ${stripTop - 11}Z`, fill: 'var(--ss-ink)' })));
+    textLines([`${initial.months}か月`], { x: 0, y: stripTop - 30, size: 17, anchor: 'middle', fill: 'var(--ss-ink)', weight: 700, attrs: { id: 'period-marker-label' } }),
+    el('path', { d: `M-7 ${stripTop - 22}H7L0 ${stripTop - 12}Z`, fill: 'var(--ss-ink)' }),
+    el('path', { d: `M0 ${stripTop - 12}V${stripTop + 60}`, stroke: 'var(--ss-ink)', 'stroke-width': 2.5 })));
   return svgRoot({ id: 'period-fig', width: W, height: 440, title: '3案の総額と、期間ごとにもっとも安い案',
     desc: `同じゼロ起点で、総額＝初期費用＋月額×期間。${runs.map(r => `${runLabel(r)}は${r.id}案`).join('、')}がもっとも安い。` }, ...parts);
 }
@@ -135,7 +137,7 @@ body[data-export="true"] .period .periods { visibility: hidden !important; }
 `;
 
 export default {
-  title: '受発注システム3案の総額比較', language: 'ja', mode: 'workshop', readingMode: 'live', css,
+  title: '受発注システム3案の総額比較', language: 'ja', mode: 'workshop', readingMode: 'read', css,
   slides: [{
     id: 'period-comparison', title: '期間ごとの総額比較', study: true, className: 'st cs-wa-ai period',
     content: `<h1 class="st-head" id="period-title" data-region="title">${h(initial.title)}</h1>
@@ -164,6 +166,7 @@ export default {
       $('#row-' + r.id).classList.toggle('is-min', s.winners.includes(r.id));
     }
     $('#monthly-key').textContent = '月額×' + months + 'か月';
+    $('#period-marker-label').textContent = months + 'か月';
     $('#period-marker').setAttribute('transform', 'translate(' + (STRIP.x0 + months * STRIP.px) + ' 0)');
     for (const run of document.querySelectorAll('.period-run')) run.classList.toggle('is-on', months > +run.dataset.from && months <= +run.dataset.to);
     for (const b of buttons) b.setAttribute('aria-pressed', String(+b.dataset.months === s.months));

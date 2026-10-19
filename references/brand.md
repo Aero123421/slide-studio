@@ -87,7 +87,15 @@ the deck and preview with `--allow-draft`; do not evade the status gate.
 
 Brand image paths resolve from the deck project. Copy approved kit assets there or
 adjust paths deliberately. `brand.mjs css` writes reusable CSS; `brand.mjs proof`
-creates six contrasting HTML proof pages. The shipped example kit is fictional.
+renders the kit onto six contrasting pages of one fictional board paper: a type-led
+opening, an evidence page with a figure-engine chart, a paired comparison on one
+scale, a schematic with its arithmetic, a dense reference table and a close set on
+the accent. Grid, type sizes and colors come from the tokens alone (columns from
+canvas, margin and gutter; display and lead sizes from the heading and body sizes;
+the figure engine's `--ss-*` roles from the six colors), so the same story re-proofs
+any kit. The accent colors text only where it reaches 4.5:1 on the background, and
+headlines stay clear of a logo placed in the top band. Read the result as a stress
+test, not a template to fill. The shipped example kit is fictional.
 
 ## Produce a reusable native PowerPoint template
 

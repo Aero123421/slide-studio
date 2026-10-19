@@ -17,15 +17,15 @@
 
 /* ── Quiet statement: one decision, set to be read slowly ──────────────────────── */
 .cmp-quiet .qs-statement { position: absolute; left: 64px; top: 152px; width: 1060px; font: 500 56px/1.16 var(--ss-font-display); letter-spacing: -.02em; color: var(--ss-ink); }
-.cmp-quiet .qs-rule { position: absolute; left: 64px; top: 520px; width: 368px; height: 1px; background: var(--ss-rule); border: 0; margin: 0; }
-.cmp-quiet .qs-support { position: absolute; left: 64px; top: 544px; width: 860px; font: 400 22px/1.45 var(--ss-font-sans); color: var(--ss-ink); font-variant-numeric: tabular-nums lining-nums; }
-.cmp-quiet .qs-attrib { position: absolute; left: 64px; bottom: 48px; font: 400 18px/1.3 var(--ss-font-sans); color: var(--ss-muted); }
+.cmp-quiet .qs-rule { position: absolute; left: 64px; top: 566px; width: 368px; height: 1px; background: var(--ss-rule); border: 0; margin: 0; }
+.cmp-quiet .qs-support { position: absolute; left: 64px; top: 586px; width: 860px; font: 400 22px/1.45 var(--ss-font-sans); color: var(--ss-ink); font-variant-numeric: tabular-nums lining-nums; }
+.cmp-quiet .qs-attrib { position: absolute; left: 64px; top: 624px; font: 400 18px/1.4 var(--ss-font-sans); color: var(--ss-muted); }
 
 /* ── Atmospheric color: a chapter set in the color it describes (indigo) ────────── */
 .st.cmp-indigo { background: var(--ss-accent); color: var(--ss-paper); }
 .cmp-indigo .ai-chapter { position: absolute; left: 64px; top: 52px; font: 500 18px/1.5 var(--ss-font-sans); color: var(--ss-seq-2); letter-spacing: .04em; }
 .st.cmp-indigo .ai-head { position: absolute; left: 64px; top: 104px; width: 760px; font: 700 50px/1.38 var(--ss-font-display); letter-spacing: .02em; color: var(--ss-paper); }
-.st.cmp-indigo .ai-lead { position: absolute; left: 64px; top: 262px; width: 680px; font: 400 21px/1.75 var(--ss-font-sans); color: var(--ss-paper); word-break: keep-all; overflow-wrap: anywhere; }
+.st.cmp-indigo .ai-lead { position: absolute; left: 64px; top: 262px; width: 680px; font: 400 21px/1.75 var(--ss-font-sans); color: var(--ss-paper); word-break: keep-all; overflow-wrap: anywhere; text-wrap: pretty; }
 .cmp-indigo .ai-note { position: absolute; right: 64px; top: 52px; font: 400 15px/1.5 var(--ss-font-sans); color: var(--ss-seq-2); text-align: right; }
 .cmp-indigo .ai-axis { position: absolute; left: 0; top: 432px; width: 1280px; height: 40px; }
 .cmp-indigo .ai-axis-title { position: absolute; left: 64px; top: 0; font: 500 16px/1.4 var(--ss-font-sans); color: var(--ss-seq-2); }
@@ -75,10 +75,12 @@
 .cmp-methods .st-fig { top: 150px; bottom: 56px; }
 
 /* ── Equation page: notation large, terms beside it, one plot ──────────────────── */
-.cmp-equation math { font-family: "STIX Two Math", "Cambria Math", "Latin Modern Math", var(--ss-font-display); color: var(--ss-ink); }
-.cmp-equation math mi:not([mathvariant]) { text-transform: none; font-style: italic; }  /* italic letters from the text face, not math-alphanumeric fallbacks */
+/* The formula is set in the lecture's display serif, which has true italics; it needs no stretchy
+   operators, so a math font is not required, and letters stay selectable plain text. */
+.cmp-equation math { font-family: var(--ss-font-display); color: var(--ss-ink); }
+.cmp-equation math mi:not([mathvariant]) { text-transform: none; font-style: italic; }
 .cmp-equation .eq-formula { position: absolute; left: 64px; top: 168px; width: 662px; }
-.cmp-equation .eq-main { display: block; font-size: 72px; line-height: 1; }
+.cmp-equation .eq-main { font-size: 72px; line-height: 1; }  /* inline math in a block wrapper: works in every MathML engine */
 .cmp-equation .eq-hot { color: var(--ss-accent); }
 .cmp-equation .eq-words { margin-top: 22px; max-width: 640px; font: 400 22px/1.45 var(--ss-font-sans); color: var(--ss-muted); }
 .cmp-equation .eq-terms { position: absolute; left: 64px; top: 372px; width: 662px; margin: 0; }
@@ -96,7 +98,7 @@
 .cmp-index .ai2-run { position: absolute; left: 64px; top: 52px; font: 400 16px/1.3 var(--ss-font-sans); color: var(--ss-muted); }
 .cmp-index .ai2-head { position: absolute; left: 64px; top: 98px; width: 368px; font: 400 42px/1.14 var(--ss-font-display); letter-spacing: -.012em; color: var(--ss-ink); text-wrap: balance; }
 .cmp-index .ai2-head em { font-style: normal; color: var(--ss-accent); }
-.cmp-index .ai2-meta { position: absolute; left: 64px; top: 520px; width: 368px; font: 400 19px/1.45 var(--ss-font-sans); color: var(--ss-ink); }
+.cmp-index .ai2-meta { position: absolute; left: 64px; top: 548px; width: 368px; font: 400 19px/1.45 var(--ss-font-sans); color: var(--ss-ink); }
 .cmp-index .ai2-meta b { font-weight: 600; }
 .cmp-index .ai2-agenda { position: absolute; left: 456px; top: 0; width: 760px; height: 720px; }
 .cmp-index .ai2-agenda::before { content: ""; position: absolute; left: 84px; top: 104px; height: 500px; width: 1px; background: var(--ss-ink); }
@@ -118,7 +120,7 @@
 .cmp-sidenote .st-head { word-break: keep-all; overflow-wrap: anywhere; }
 .cmp-sidenote .sn-fig { position: absolute; left: 64px; top: 184px; width: 760px; height: 430px; margin: 0; }
 .cmp-sidenote .sn-fig > svg { width: 100%; height: 100%; display: block; overflow: visible; }
-.cmp-sidenote .sn-note { position: absolute; left: 880px; width: 336px; padding-left: 40px; text-indent: -40px; font: 400 17px/1.75 var(--ss-font-sans); color: var(--ss-ink); word-break: keep-all; overflow-wrap: anywhere; }
+.cmp-sidenote .sn-note { position: absolute; left: 848px; width: 368px; padding-left: 40px; text-indent: -40px; font: 400 17px/1.75 var(--ss-font-sans); color: var(--ss-ink); word-break: keep-all; overflow-wrap: anywhere; }
 .cmp-sidenote .sn-note span { display: inline-block; width: 40px; text-indent: 0; color: var(--ss-muted); font-variant-numeric: tabular-nums; }
 
 /* ── Final frame: the request, its evidence, the dated next steps ──────────────── */
@@ -126,6 +128,7 @@
 .cmp-final .ff-ask { position: absolute; left: 64px; top: 100px; width: 662px; box-sizing: border-box; padding: 24px 32px 30px; border: 2px solid var(--ss-accent); }
 .cmp-final .ff-ask-label { margin-bottom: 10px; font: 700 18px/1.5 var(--ss-font-sans); color: var(--ss-accent); }
 .st.cmp-final .ff-ask-text { font: 700 36px/1.42 var(--ss-font-display); color: var(--ss-ink); word-break: keep-all; overflow-wrap: anywhere; }
+.cmp-final .ff-nw { white-space: nowrap; }
 .cmp-final .ff-result { position: absolute; left: 774px; top: 100px; width: 442px; }
 .cmp-final .ff-result-label { font: 400 17px/1.6 var(--ss-font-sans); color: var(--ss-muted); word-break: keep-all; overflow-wrap: anywhere; }
 .cmp-final .ff-num { margin: 8px 0 12px; font: 700 80px/1 var(--ss-font-display); letter-spacing: -.01em; font-variant-numeric: tabular-nums lining-nums; color: var(--ss-ink); white-space: nowrap; }

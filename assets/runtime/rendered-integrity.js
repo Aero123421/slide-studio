@@ -3,11 +3,14 @@
 (slide) => {
   const issues = [], warnings = [], unmeasured = [], crops = [];
   const ref = e => e.id || e.getAttribute('data-qa-mark') || e.classList[0] || e.tagName.toLowerCase();
+  // Visually hidden (screen-reader-only) text is read aloud but never painted.
+  const srOnly = s => (s.position === 'absolute' || s.position === 'fixed') &&
+    (/^rect\(0(px)?,?\s*0(px)?,?\s*0(px)?,?\s*0(px)?\)$/.test(s.clip) || /^inset\((50|100)%\)$/.test(s.clipPath) || (parseFloat(s.width) <= 1 && parseFloat(s.height) <= 1));
   const shown = e => {
     if (!e.getClientRects().length) return false;
     for (let p = e; p; p = p.parentElement) {
       const s = getComputedStyle(p);
-      if (s.display === 'none' || s.visibility !== 'visible' || +s.opacity === 0) return false;
+      if (s.display === 'none' || s.visibility !== 'visible' || +s.opacity === 0 || srOnly(s)) return false;
     }
     return true;
   };
@@ -45,6 +48,17 @@
     }
     return null;
   };
+  // Only something that paints can cover text: an empty, unpainted container (a rail whose
+  // children wait for a later build) is transparent to the eye and to this check.
+  const paintedColor = c => c && c !== 'none' && c !== 'transparent' && (rgba(c)?.[3] ?? 1) > 0;
+  const paints = x => {
+    if (x instanceof SVGElement && !(x instanceof SVGSVGElement)) return true;
+    if (/^(IMG|VIDEO|CANVAS|IFRAME|INPUT|SELECT|TEXTAREA|BUTTON|PROGRESS|METER|OBJECT|EMBED)$/.test(x.tagName)) return true;
+    const s = getComputedStyle(x);
+    if (s.backgroundImage !== 'none' || paintedColor(s.backgroundColor) || s.boxShadow !== 'none' || pseudoPaint(x)) return true;
+    if (['Top', 'Right', 'Bottom', 'Left'].some(k => parseFloat(s[`border${k}Width`]) > 0 && s[`border${k}Style`] !== 'none' && paintedColor(s[`border${k}Color`]))) return true;
+    return [...x.childNodes].some(c => c.nodeType === 3 && c.textContent.trim());
+  };
   const walker = document.createTreeWalker(slide, NodeFilter.SHOW_TEXT);
   let node;
   while (node = walker.nextNode()) {
@@ -56,13 +70,23 @@
     const entry = {element: ref(e), text: text.slice(0, 90)};
     // Hit testing guards against non-ancestor artwork covering a line or supplying its background.
     // Hit testing includes fully transparent elements (e.g. an inactive state at opacity 0); skip what is not painted.
+    // Text under pointer-events:none is invisible to hit testing: leave it to pixel review.
+    if (s.pointerEvents === 'none') { unmeasured.push({...entry, reason:'pointer-events:none hides this text from hit testing; review stacking and contrast in pixels.'}); continue; }
     const unexpected = rects.some(r => [.2, .5, .8].some(f => {
-      const top = document.elementsFromPoint(r.left + r.width * f, r.top + r.height * .5).find(x => shown(x));
+      const top = document.elementsFromPoint(r.left + r.width * f, r.top + r.height * .5).find(x => shown(x) && (x === e || x.contains(e) || e.contains(x) || paints(x)));
       return top && top !== e && !top.contains(e) && !e.contains(top);
     }));
     if (unexpected) warnings.push({kind:'text-occlusion', ...entry, message:'A text line intersects another painted element. Inspect stacking and the actual image.'});
+    // Text drawn over a painted sibling (a label on a bar, a caption on a shape) takes its
+    // backdrop from that sibling, not from its ancestors: leave it to pixel review.
+    const overSibling = rects.some(r => {
+      const stack = document.elementsFromPoint(r.left + r.width / 2, r.top + r.height / 2), i = stack.indexOf(e);
+      if (i < 0) return false;
+      for (const x of stack.slice(i + 1)) { if (x.contains(e)) return false; if (shown(x) && paints(x)) return true; }
+      return false;
+    });
     const fg = rgba(s.webkitTextFillColor || s.color), bg = background(e);
-    if (unexpected || e.closest('svg') || s.textShadow !== 'none' || parseFloat(s.webkitTextStrokeWidth) > 0 || !fg || !bg) {
+    if (unexpected || overSibling || e.closest('svg') || s.textShadow !== 'none' || parseFloat(s.webkitTextStrokeWidth) > 0 || !fg || !bg) {
       unmeasured.push({...entry, reason:'Contrast needs pixel review (image, SVG, overlap, effects or unresolved backdrop).'}); continue;
     }
     const contrast = ratio(over(fg, bg), bg), font = parseFloat(s.fontSize);

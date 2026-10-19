@@ -6,20 +6,22 @@ Read the part that matches the failure you see.
 
 The following are newly written synthetic fixtures. They are not a user's business records, a model leaderboard, or evidence that a new model run has already improved. The corresponding `gallery/repair-lab.html` is a workshop, not a deck to submit unchanged.
 
-| Failure | Repair operation | What must remain |
+Each pair in `assets/repair-lab/deck.mjs` is one page function drawn twice. The BEFORE switches on exactly one realistic failure, named in the page's source row, and reveals a red diagnosis mark on the first click; the AFTER is the repaired page, finished to the standard. Read the two branches of a page function side by side: their difference is the repair. `gallery/transfer-talk.html` applies the same repairs to a three-page measurement report, and `gallery/period-comparison.html` keeps a period selector's headline, condition, totals and marks on one calculated snapshot.
+
+| Failure (BEFORE) | Repair operation (AFTER) | What must remain |
 |---|---|---|
-| A change from 500 to 650 is called "+30 currency units" | Compute amount and relative change separately; bind title and chart to the same values | +150 amount; +30%, unit, period, source |
-| Paired plot uses before−after, summary uses after−before | Choose one subtraction order and regenerate both | Outlier, missing pair count, correct sample SD |
-| A line crosses a missing measurement without distinction | Break it or explicitly encode an analytically justified interpolation | Known observations; missing is not zero |
-| Alternatives are arranged A → B → C | Draw conditional branches from the shared source | Conditions, endpoints, outcome exclusivity |
-| A colored legend describes black marks | Bind series labels and mark fills to one encoding map | Readability without color alone |
-| A sweeping title is qualified only in a small footnote | Put proposed/estimated/scope beside the claim itself | Conditions and useful specificity |
-| A factual explanation becomes a slogan | Write the direct observation first; make a stylistic choice only after meaning works | Audience-appropriate voice; no invented contrast |
-| Tiny text and three panels occupy the top half | Allocate real evidence/body area first; remove duplicate containers | Necessary detail, legible labels, purposeful negative space |
-| A real comparison is split to meet a brevity quota | Keep a readable aligned table; move only separate optional discussion | Same units, periods, rows, missing/unknown entries |
-| Every image sits in a tiny rounded card | Match frame/crop to the subject and its annotation | Evidence integrity, rights, actual focal point |
-| A source word changes scripts unexpectedly | Fix or verify the source; then check the rendered font | Intentional names and multilingual quotations |
-| A page includes "PDF keeps this view" | Show the selected condition; move export behavior into a runbook | Static meaning; visible assumptions |
+| A 500 → 650 change is headlined as "30百万円": the rate, written with the amount's unit | Compute amount and relative change once (`change()`); headline, rail and chart read the same object | +150 and +30% both visible, the unit, both periods, the source scope |
+| Paired bars plot old − new while the summary reports the mean of new − old | One subtraction order (`paired()`) for bars, axis title, side labels and summary | The unit that got worse, the missing pair, the n − 1 standard deviation |
+| A line joins June and August across a month that was never measured | Keep the month `null` so the line breaks; name the gap and its reason | Every observed value; missing is neither zero nor an average of neighbours |
+| Alternative outcomes are drawn as a chain 返却 → 修理 → 交換 | Declare and validate the alternatives graph (`validateGraph()`), then one conditional branch per outcome | Conditions, counts that add up, outcomes that exclude each other |
+| A three-colour legend sits over lines drawn in one ink | One encoding map: the series the claim names in the accent, the rest context grey, a name at every line end | Readability without color alone; all series on one scale |
+| A vendor estimate is headlined as fact, qualified only by a 12 px note | Put the status (estimate) and the test that will check it in the headline, and mark the estimated bar | The measured baseline and the size of the claimed saving |
+| A traveller instruction is replaced by a slogan | Write the direct instruction first; tone comes after the meaning works | Every gate, what happens to the ticket there, the consequence of losing it |
+| Four boxes of 14 px text fill the top third; the rest of the page is empty | Allocate the page to the evidence: one row per step at reading size, durations drawn as lengths | Every step, its explanation and duration; the total and the slowest step |
+| A comparison is split into cards and trimmed to fit | One aligned table with every field, units in the header, the unknown kept as 確認中 | Same units, date and rows; the open question |
+| A photograph is a thumbnail in a rounded card | Crop to the subject at ≤ 1.3× native size; attach each note with a leader | Evidence integrity, rights, the actual focal point |
+| An untranslated source word (Hindi दर, "rate") stays in a Japanese headline | Fix the text at its source, then check the rendered font | Intentional names and multilingual quotations (プネ／Pune) |
+| The page prints "配布用メモ：印刷・PDFでは…" for the audience | Show the condition the numbers depend on; move export behaviour to notes or a runbook | Horizon, formula and exclusions |
 
 ### Worked copy choices
 
@@ -27,15 +29,15 @@ The following are newly written synthetic fixtures. They are not a user's busine
 
 Weak: 「安さの正体が違う。選ぶのは、未来の使い方です。」
 
-Better when the source supports it: 「初期費用はA案、3年間の総額はB案が低い。」
+Better when the source supports it: 「初期費用はB案、3年間の総額はC案が低い。」
 
-Then show the actual costs and excluded items. This is not an invitation to invent A/B advantages. Without comparable costs, say what information is still missing.
+Then show the actual costs and excluded items (`period-comparison` does, for 12, 36 and 60 months). This is not an invitation to invent advantages for one plan. Without comparable costs, say what information is still missing.
 
 **Scientific result**
 
 Weak: 「小さな差が、大きな可能性を開く。」
 
-Better for a synthetic paired study: 「5試料中4試料で、条件Bの温度が低い。」
+Better for a synthetic paired study: 「5台中4台で、新プレートの温度上昇が小さかった。」
 
 Do not replace it with "effective" or "significant" unless the analysis supports it. The natural title may be shorter if the plot already carries the count and scope.
 
@@ -45,9 +47,9 @@ A poetic opening is not automatically a defect. A later page should point to the
 
 **Public instruction**
 
-Weak: "Unlock your smooth journey in three effortless steps."
+Weak: "Unlock your smooth journey in three effortless steps." (「3つのステップで、乗り換えをもっとスムーズに。」)
 
-Better: "Keep the ticket until you leave the final gate."
+Better: "Keep the ticket until you leave the final gate." (「きっぷは、最後の改札を出るまで捨てずに持っておく」)
 
 Directness serves the task. A brief friendly sentence can remain; avoid infantilizing adults or turning every instruction into a marketing promise.
 
@@ -63,7 +65,7 @@ Use this clinic when an otherwise plausible slide feels wrong. Each repair inclu
 
 **Seen:** a control caption says “switch for the conference presentation.”
 **Interpretation:** the phrase addresses the operator, not the audience.
-**Repair:** label the visible states “Condition A / Condition B”; move the timing and backup action into `notes` or `runbook.md`. Keep current condition and units visible.
+**Repair:** label the visible states with what they are (“12 months / 36 months”, “old plate / new plate”); move the timing and backup action into `notes` or `runbook.md`. Keep current condition and units visible.
 **Check:** render after scripts initialize; build a public copy with `--strip-notes`. A teaching slide quoting that exact bad label may use a narrow, documented waiver.
 
 ### 2. A headline sounds impressive but has no finding

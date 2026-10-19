@@ -42,7 +42,7 @@ export default {
   id: ID,
   language: 'ja',
   title: 'Logic model: from resources to measured changes for children',
-  notes: 'Purpose: 1年間の事業を「使った資源→行ったこと→直接の結果→子どもに起きた変化」の順に並べ、成果の数字がどこから来たか、どう測ったかを1枚で示す。\nModify: K（各ページと共通の数値）と stages の項目・測り方を差し替える。各段階は3項目まで。\nInvariant: 事業費は予算ページ、参加者数は1・2ページと同じ値にする。アウトカムには必ず測り方（調査名・時期・人数）を添える。線は想定する流れであり、変化がすべて事業の効果だとは言わない。\nStatic: 静的ページ。',
+  notes: 'Purpose: 1年間の事業を「使った資源→行ったこと→直接の結果→子どもに起きた変化」の順に並べ、成果の数字がどこから来たか、どう測ったかを1枚で示す。\nModify: K（各ページと共通の数値）と stages の項目・測り方を差し替える。各段階は3項目まで。見出しの改行は <br> で文や句の切れ目に入れる。\nInvariant: 事業費は予算ページ、参加者数は1・2ページと同じ値にする。アウトカムには必ず測り方（調査名・時期・人数）を添える。線は想定する流れであり、変化がすべて事業の効果だとは言わない。\nStatic: 静的ページ。',
   sources: [],
   exportPolicy: 'final',
   className: 'tpl-impact-report ir-logic',

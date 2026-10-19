@@ -10,7 +10,7 @@ const shades = [
   { name: '甕覗', kana: 'かめのぞき', dips: 1, hex: '#c8dfe3' },
   { name: '水浅葱', kana: 'みずあさぎ', dips: 3, hex: '#9ec5cc' },
   { name: '浅葱', kana: 'あさぎ', dips: 6, hex: '#5f9fb1' },
-  { name: '縹', kana: 'はなだ', dips: 10, hex: '#3d7aa0' },
+  { name: '縹', kana: 'はなだ', dips: 10, hex: '#367096' },
   { name: '藍', kana: 'あい', dips: 15, hex: '#264c78', page: true }, // = the page field (wa-ai accent)
   { name: '紺', kana: 'こん', dips: 22, hex: '#1c3456' },
   { name: '褐色', kana: 'かちいろ', dips: 30, hex: '#131d30' },
@@ -60,12 +60,12 @@ export default {
   title: 'Atmospheric color: a chapter page set in the color it describes',
   className: 'st cs-wa-ai cmp-indigo',
   notes: 'Purpose: Open a chapter whose subject is a color (a dye, a material, a sky, a brand pigment) by setting the page in that color, so the atmosphere carries information instead of mood alone.\nModify: Replace `shades` with your own sequence (name, reading, the quantity that produces it, literal color). The field is the one shade the chapter is about (`page: true`), and its band in the ruler runs into the field. Keep headline and lead on the flat field; rewrite the lead around the numbers in the data.\nInvariant: Text sits only on uniform color: the flat field, or a single band whose label color is chosen by measured contrast against that band — never on the average of a changing background. Band widths are proportional to the quantity on the axis; no gradient wash, glow or blurred shapes. The literal dye colors are data, the only hard-coded colors in the study.\nStatic: Already static.',
-  sources: [],
+  sources: [{ type: 'original-example', file: 'assets/compositions/atmospheric-color.mjs' }],
   exportPolicy: 'final',
   content: `<p class="ai-chapter" data-region="support">藍染め講座　第2章　色を重ねる</p>
 <p class="ai-note" data-region="source">架空の工房記録 · 木綿、発酵建ての藍甕</p>
 <h1 class="ai-head" data-region="title">藍の濃さは、<br>甕に浸した回数で決まる</h1>
-<p class="ai-lead" data-region="support">${ja(`布を甕に沈めて引き上げると、空気に触れた藍が緑から青へ変わる。浸しては干す、を繰り返すほど色は深くなる。${shades[0].name}から${mid.name}までは${mid.dips}回、そこから${last.name}までにさらに${last.dips - mid.dips}回かかる。`)}</p>
+<p class="ai-lead" data-region="support">${ja(`布を甕に沈めて引き上げると、空気に触れた藍が緑から青へ変わる。これを重ねるほど色は深くなり、${shades[0].name}から${mid.name}までは${mid.dips}回、そこから${last.name}まではさらに${last.dips - mid.dips}回かかる。`)}</p>
 <div class="ai-axis" data-region="primary" aria-hidden="true">${ticks}</div>
 <div role="img" aria-label="浸した回数と色の対応：${shades.map(s => `${s.name}${s.dips}回`).join('、')}以上">
 ${bands}

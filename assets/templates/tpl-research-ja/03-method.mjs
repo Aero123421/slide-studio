@@ -107,17 +107,21 @@ const pipeline = [
 // zoom: three registered panels of the same 50×50 patch
 const s = 3.44, P = N * s, zy = 218, zx = [0, 196, 392];   // panels on cols 1, 3, 5; 2-column span
 function panel(x0, kind) {
-  const out = [`<g shape-rendering="crispEdges">`, el('rect', { x: x0, y: zy, width: P, height: P, fill: '#fff' })];
-  for (let j = 0; j < N; j++) for (let i = 0; i < N; i++) {
-    const k = idx(i, j); let fill = null, op = null;
-    if (kind === 'prob') { if (prob[k] > 0.04) { fill = 'var(--rj-ink)'; op = prob[k].toFixed(2); } }
-    else {
-      const m = kind === 'single' ? single : twoLevel;
-      if (m[k]) fill = kind === 'single' ? 'var(--rj-ink)' : 'var(--rj-accent)';
-      else if (truth[k]) fill = 'var(--rj-rule)';
-    }
-    if (fill) out.push(el('rect', { x: x0 + i * s, y: zy + j * s, width: s, height: s, fill, 'fill-opacity': op }));
+  const out = ['<g shape-rendering="crispEdges">', el('rect', { x: x0, y: zy, width: P, height: P, fill: '#fff' })];
+  // paint of pixel k: probability as ink opacity in 0.1 steps; thresholded panels as kept / dropped
+  const paint = k => kind === 'prob' ? (prob[k] >= 0.1 ? Math.round(prob[k] * 10) / 10 : null)
+    : (kind === 'single' ? single : twoLevel)[k] ? 'kept' : truth[k] ? 'lost' : null;
+  const fills = { kept: kind === 'single' ? 'var(--rj-ink)' : 'var(--rj-accent)', lost: 'var(--rj-rule)' };
+  const runs = { };
+  for (let j = 0; j < N; j++) for (let i = 0; i < N;) {    // one rect per run of equal paint, grouped by paint
+    const a = paint(idx(i, j)); let k = i + 1;
+    while (k < N && paint(idx(k, j)) === a) k++;
+    if (a !== null) (runs[a] ||= []).push(`<rect x="${(x0 + i * s).toFixed(1)}" y="${(zy + j * s).toFixed(1)}" width="${((k - i) * s).toFixed(1)}" height="${s}"/>`);
+    i = k;
   }
+  for (const [a, rects] of Object.entries(runs)) out.push(kind === 'prob'
+    ? el('g', { fill: 'var(--rj-ink)', 'fill-opacity': a }, rects.join(''))
+    : el('g', { fill: fills[a] }, rects.join('')));
   out.push(el('rect', { x: x0 + 0.5, y: zy + 0.5, width: P - 1, height: P - 1, fill: 'none', stroke: 'var(--rj-base2)' }), '</g>');
   return out.join('');
 }

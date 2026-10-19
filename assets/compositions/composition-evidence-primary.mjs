@@ -42,8 +42,8 @@ export function figure(theme = 'css') {
   // header: what each column is
   parts.push(textLines(['Corridor'], { x: 0, y: 20, size: 16, fill: t.c('muted'), weight: 600 }));
   parts.push(textLines(['Lane'], { x: laneX, y: 20, size: 16, anchor: 'end', fill: t.c('muted'), weight: 600 }));
-  parts.push(textLines(['Change in median peak journey time, minutes'], { x: x(-8), y: 20, size: 16, fill: t.c('muted'), weight: 600 }));
-  parts.push(textLines(['Change'], { x: W, y: 20, size: 16, anchor: 'end', fill: t.c('muted'), weight: 600 }));
+  parts.push(textLines(['Change in median peak journey time'], { x: x(-8), y: 20, size: 16, fill: t.c('muted'), weight: 600 }));
+  parts.push(textLines(['Minutes'], { x: W, y: 20, size: 16, anchor: 'end', fill: t.c('muted'), weight: 600 }));
   // grid, zero line and ticks
   for (const v of ticks) {
     parts.push(el('line', { x1: x(v), x2: x(v), y1: plotTop, y2: plotBottom, stroke: v === 0 ? t.c('ink') : t.c('grid'), 'stroke-width': v === 0 ? 1.6 : 1 }));
@@ -79,12 +79,12 @@ export default {
   notes: 'Purpose: Use when one exhibit carries the argument and the words only point at it: a result with uncertainty, a trend, a ranking. The evidence is the optical primary; the headline states what it shows; the rail adds only what the chart cannot say (one summary number and the limit of the claim).\nModify: Replace `corridors` (estimate, interval, the explanatory variable) and `minLane`; the sort, the break between groups, the headline range, the rail number and the named exceptions recompute. Keep the rail to one number and one or two sentences; if it needs more, the claim is not ready.\nInvariant: 3 : 1 split of the 1152 px measure (828 px evidence, 48 px gap, 276 px rail); the figure is drawn at its region size so labels are true 16–18 px; intervals stay on the same row as their estimates; rows that do not support the claim are shown in context grey, not removed.\nStatic: Already static. For a talk, a build can reveal the short-lane rows after the claim, but the final state must show all rows.',
   sources: [{ type: 'original-example', file: `assets/compositions/${ID}.mjs` }],
   exportPolicy: 'final',
-  content: `<h1 class="st-head" data-region="title">Peak bus trips are ${fewest}–${most} minutes faster where the new lane runs longer than ${minLane} km</h1>
+  content: `<h1 class="st-head" data-region="title">Peak bus trips are ${fewest}–${most}&nbsp;minutes faster where the new lane runs longer than ${minLane}&nbsp;km</h1>
 <figure class="st-fig" data-region="primary">${figure()}</figure>
 <div class="st-rail" data-region="support">
-  <div class="st-kpi"><b class="st-accent">${fmt(avg, { digits: 1 })} min</b><span>Average change on the ${words[long.length]} corridors with lanes over ${minLane} km.</span></div>
+  <div class="st-kpi"><b class="st-accent">${fmt(avg, { digits: 1 })}&nbsp;min</b><span>Average change on the ${words[long.length]} corridors with lanes over ${minLane}&nbsp;km.</span></div>
   <hr class="st-rule">
-  <p class="st-text">${andList(short.map(c => c.name))} lanes are ${andList(short.map(c => fmt(c.laneKm, { digits: 1 })))} km long. ${short.length === 2 ? 'Both' : 'All'} end before the junction queue, and their intervals include no change.</p>
+  <p class="st-text">${andList(short.map(c => c.name))} lanes are ${andList(short.map(c => fmt(c.laneKm, { digits: 1 })))}&nbsp;km long. ${short.length === 2 ? 'Both' : 'All'} end before the junction queue, and their intervals include no change.</p>
 </div>
 <p class="st-source" data-region="source"><span>Illustrative data · bus location records, weekday departures 07:30–09:00, October 2024 against October 2025</span><span>Evidence primary · dot and 90% interval</span></p>`,
 };

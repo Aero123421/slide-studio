@@ -65,9 +65,12 @@ export function figure(theme = 'css') {
       textLines([v === 0 ? '0' : signed(v)], { x: xc(v), y: BASE + 12, size: 16, anchor: 'middle', valign: 'top', fill: t.c('muted'), attrs: { 'font-variant-numeric': 'tabular-nums' } }))),
     textLines(['change in reading age, months'], { x: x0(1), y: top + 4, size: 16, valign: 'top', fill: t.c('muted') }),
     ...dots.map(d => el('circle', { cx: d.cx, cy: d.cy, r, fill: d.c < 0 ? t.c('ink') : t.c('context') })),
-    el('line', { x1: xc(medianGain), x2: xc(medianGain), y1: stackTop - 44, y2: BASE + 1, stroke: t.c('accent'), 'stroke-width': 3 }),
-    textLines([`median ${signed(medianGain)}`], { x: xc(medianGain) - 10, y: stackTop - 30, size: 17, anchor: 'end', fill: t.c('accent'), weight: 700 }),
+    el('rect', { x: xc(medianGain) - 1.5, y: stackTop - 44, width: 3, height: BASE + 1 - (stackTop - 44), fill: t.c('accent') }), // median: a 3 px bar (a vertical <line> has a zero-width box)
+    textLines([`median ${signed(medianGain)} months`], { x: xc(medianGain) - 10, y: stackTop - 30, size: 17, anchor: 'end', fill: t.c('accent'), weight: 700 }),
     textLines([`over ${monthsBetween} months of school`], { x: xc(medianGain) - 10, y: stackTop - 9, size: 16, anchor: 'end', fill: t.c('muted') }),
+    // the pupils whose reading age fell: same ink as their dashed lines on the left
+    ...(() => { const fell = dots.filter(d => d.c < 0); if (!fell.length) return []; const top = Math.min(...fell.map(d => d.cy)) - r;
+      return [textLines([`${fell.length} fell`], { x: fell[0].cx, y: top - 10, size: 16, anchor: 'middle', fill: t.c('ink'), weight: 650 })]; })(),
   ];
   // 3 · completeness: every pupil in the class, retested or not
   const cell = 44, cg = 8, cols = 7;

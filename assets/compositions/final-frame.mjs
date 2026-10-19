@@ -41,12 +41,12 @@ export default {
   title: 'Useful final frame: the decision asked for, its evidence and the next dated steps',
   className: 'st cs-manufacturing-plant cmp-final',
   notes: 'Purpose: End a decision deck on what the audience must do and what happens next, instead of a thank-you page. The last frame stays on screen during discussion, so it carries the request, the one number that justifies it and the dated steps after a yes.\nModify: Replace `trial`, `rollout`, `decision` and `next`. The request sentence, the saved hours and the weekdays recompute. Keep the next steps to three rows (date, action, owner by team or role) and point to where the evidence lives in the deck, not to an e-mail address or phone number.\nInvariant: One framed request (the only accent on the page, and a box that stands for the decision itself); one result number with its basis in words; a short table of dated steps with owners; no contact details, no closing animation, no slogan.\nStatic: Already static.',
-  sources: [],
+  sources: [{ type: 'original-example', file: 'assets/compositions/final-frame.mjs' }],
   exportPolicy: 'final',
   content: `<p class="ff-run" data-region="support">第2工場　段取り替え時間の短縮</p>
 <section class="ff-ask" data-region="title">
   <p class="ff-ask-label">ご判断のお願い　${day(decision.date)}の${decision.meeting}</p>
-  <h1 class="ff-ask-text">${ja(`新しい段取り手順を、${rollout.lines.join('・')}号ラインにも展開することを承認してください`)}</h1>
+  <h1 class="ff-ask-text">${ja('新しい段取り手順を、')}<wbr><span class="ff-nw">${rollout.lines.join('・')}号ライン</span>${ja('にも展開することを承認してください')}</h1>
 </section>
 <div class="ff-result" data-region="primary">
   <p class="ff-result-label">${ja(`${trial.line}の試行（${trial.weeks}週間、${trial.changeovers}回の平均）`)}</p>

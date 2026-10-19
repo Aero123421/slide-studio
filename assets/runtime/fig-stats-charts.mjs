@@ -274,6 +274,8 @@ export function scatterPlot(o) {
 /**
  * Heatmap. rows, cols, values[r][c]. scale: 'sequential' | 'diverging' (center
  * at `center`, default 0). Cell labels use contrast-checked text colors.
+ * Missing values (null) draw a pale cell with `missingLabel` ('–'); missing:'blank'
+ * leaves them empty, as in a cohort triangle.
  */
 export function heatmap(o) {
   const ctx = setup(o);
@@ -300,12 +302,13 @@ export function heatmap(o) {
     parts.push(textLines([String(r)], { x: box.x - 12, y: box.y + ri * (ch + gap) + ch / 2, size: labelSize, anchor: 'end', valign: 'middle', fill: t.c('ink') }));
     o.cols.forEach((c, ci) => {
       const v = o.values[ri][ci], k = idx(v);
+      if (k == null && o.missing === 'blank') return; // e.g. the empty half of a cohort triangle
       const fill = k == null ? t.c('surface') : div ? t.div(k) : t.seq(k);
       const hl = o.highlight && o.highlight(ri, ci, v);
       parts.push(el('rect', { x: box.x + ci * (cw + gap), y: box.y + ri * (ch + gap), width: cw, height: ch, rx: 2, fill, stroke: hl ? t.c('ink') : null, 'stroke-width': hl ? 2.5 : null, ...buildAttrs(build, { i: ri * o.cols.length + ci, s: ri, motion: 'reveal' }) }));
       if (o.cellLabels !== false && cw > measureText(vf(v ?? 0), Math.max(15, size - 2)) + 6 && ch > size) {
         const on = k == null ? t.c('muted') : onPalette(t, div ? 'div' : 'seq', k);
-        parts.push(textLines([isNum(v) ? vf(v) : '–'], { x: box.x + ci * (cw + gap) + cw / 2, y: box.y + ri * (ch + gap) + ch / 2, size: Math.max(15, size - 2), anchor: 'middle', valign: 'middle', fill: on, weight: hl ? 700 : 500, attrs: { 'font-variant-numeric': 'tabular-nums' } }));
+        parts.push(textLines([isNum(v) ? vf(v) : (o.missingLabel ?? '–')], { x: box.x + ci * (cw + gap) + cw / 2, y: box.y + ri * (ch + gap) + ch / 2, size: Math.max(15, size - 2), anchor: 'middle', valign: 'middle', fill: on, weight: hl ? 700 : 500, attrs: { 'font-variant-numeric': 'tabular-nums' } }));
       }
     });
   });
@@ -363,79 +366,133 @@ export function confusionMatrix(o) {
  * AUC is computed by the trapezoid rule and printed in each curve's label.
  * operating: {curve, threshold, label} marks the point used in production.
  */
+// A curve from tens of thousands of scores has one vertex per distinct score; keep a vertex
+// only when it moves at least 1/1000 of the unit square, so the path stays drawable.
+function thinCurve(pts, kx, ky, eps = 0.001) {
+  if (pts.length <= 1500) return pts;
+  const out = [pts[0]];
+  for (let i = 1; i < pts.length; i++) {
+    const a = out[out.length - 1], b = pts[i];
+    if (i === pts.length - 1 || Math.abs(b[kx] - a[kx]) >= eps || Math.abs(b[ky] - a[ky]) >= eps) out.push(b);
+  }
+  return out;
+}
+const wilson = (k, nn, z = 1.96) => {
+  if (!nn) return [0, 1];
+  const p = k / nn, d = 1 + (z * z) / nn, c = (p + (z * z) / (2 * nn)) / d, h = (z * Math.sqrt((p * (1 - p)) / nn + (z * z) / (4 * nn * nn))) / d;
+  return [Math.max(0, c - h), Math.min(1, c + h)];
+};
+// Operating points: {curve?, threshold | <xKey> value, label?, dx?, dy?, width?}, one or several.
+function operatingPoints(o, curves, kx, ky, fmtLabel) {
+  const ops = o.operating ? (Array.isArray(o.operating) ? o.operating : [o.operating]) : [];
+  return ops.map(op => {
+    const c = curves.find(q => q.name === op.curve) || curves[0];
+    const cand = c.pts.filter(q => Number.isFinite(q.threshold));
+    const key = isNum(op[kx]) ? kx : 'threshold', want = isNum(op[kx]) ? op[kx] : op.threshold;
+    const p = cand.reduce((best, q) => (Math.abs(q[key] - want) < Math.abs(best[key] - want) ? q : best), cand[0]);
+    return { op, p, text: op.label ?? fmtLabel(op, p) };
+  });
+}
+
 export function rocCurve(o) {
   const ctx = setup(o, { width: 720, height: 560 });
   const { t, size, labelSize, build } = ctx;
-  const curves = o.curves.map((c, k) => { const pts = rocPoints(c.scores, c.labels); return { ...c, k, pts, auc: auc(pts.map(p => [p.fpr, p.tpr])) }; });
+  const curves = o.curves.map((c, k) => { const all = rocPoints(c.scores, c.labels); return { ...c, k, pts: all, path: thinCurve(all, 'fpr', 'tpr'), auc: auc(all.map(p => [p.fpr, p.tpr])) }; });
   const fr = frame(o, ctx, { xDomain: [0, 1], yDomain: [0, 1], xTicks: 5, yTicks: 5, xFormat: v => pct(v), yFormat: v => pct(v), xLabel: o.xLabel ?? 'False positive rate', yLabel: o.yLabel ?? 'True positive rate', square: true, rightPad: 220 });
   const { x, y, parts, box } = fr;
   parts.push(el('line', { x1: x(0), y1: y(0), x2: x(1), y2: y(1), stroke: t.c('muted'), 'stroke-width': 1.2, 'stroke-dasharray': '4 5' }));
   parts.push(textLines([o.chanceLabel ?? 'Chance'], { x: x(0.78), y: y(0.78) + 16, size: Math.max(15, size - 2), fill: t.c('muted'), anchor: 'middle', attrs: { transform: `rotate(-45 ${n(x(0.78))} ${n(y(0.78) + 16)})` } }));
   const colorOf = c => (o.highlight != null ? (isHighlighted(o.highlight, c, 'name') ? t.c('highlight') : t.c('context')) : t.cat(c.k));
-  for (const c of curves) parts.push(el('path', { d: pathFromPoints(c.pts.map(p => [x(p.fpr), y(p.tpr)]), { curve: 'step' }), fill: 'none', stroke: colorOf(c), 'stroke-width': 3.2, 'stroke-linejoin': 'round', pathLength: build ? 1 : null, ...buildAttrs(build, { s: c.k, motion: 'draw' }) }));
+  for (const c of curves) parts.push(el('path', { d: pathFromPoints(c.path.map(p => [x(p.fpr), y(p.tpr)]), { curve: 'step' }), fill: 'none', stroke: colorOf(c), 'stroke-width': 3.2, 'stroke-linejoin': 'round', pathLength: build ? 1 : null, ...buildAttrs(build, { s: c.k, motion: 'draw' }) }));
   const placed = spreadLabels(curves.map(c => ({ id: c.k, y: y(c.pts[Math.floor(c.pts.length * 0.25)].tpr), h: labelSize * 2.6 })), { min: box.y, max: box.y + box.h });
   for (const p of placed) {
     const c = curves[p.id];
     parts.push(textLines([c.name], { x: box.x + box.w + 18, y: p.y - 10, size: labelSize, valign: 'middle', fill: o.highlight != null && !isHighlighted(o.highlight, c, 'name') ? t.c('muted') : colorOf(c), weight: 700 }));
     parts.push(textLines([`AUC ${fmt(c.auc, { digits: 3 })}`], { x: box.x + box.w + 18, y: p.y + 12, size: size - 1, valign: 'middle', fill: t.c('muted'), attrs: { 'font-variant-numeric': 'tabular-nums' } }));
   }
-  if (o.operating) {
-    const c = curves.find(q => q.name === o.operating.curve) || curves[0];
-    const p = c.pts.reduce((best, q) => (Math.abs(q.threshold - o.operating.threshold) < Math.abs(best.threshold - o.operating.threshold) ? q : best), c.pts[1]);
-    parts.push(callout({ x: x(p.fpr), y: y(p.tpr), text: o.operating.label ?? `Threshold ${o.operating.threshold}: TPR ${pct(p.tpr)}, FPR ${pct(p.fpr)}`, dx: o.operating.dx ?? 60, dy: o.operating.dy ?? 70, width: 210, theme: t, size: size - 1, marker: 'ring' }));
-  }
+  for (const { op, p, text } of operatingPoints(o, curves, 'fpr', 'tpr', (op, q) => `Threshold ${fmt(q.threshold, { digits: 2 })}: TPR ${pct(q.tpr)}, FPR ${pct(q.fpr)}`))
+    parts.push(callout({ x: x(p.fpr), y: y(p.tpr), text, dx: op.dx ?? 60, dy: op.dy ?? 70, width: op.width ?? 210, theme: t, size: size - 1, marker: 'ring' }));
   return finish(o, ctx, parts, null, { x, y, box, curves });
 }
 
-/** Precision–recall curves with the positive-rate baseline. curves: [{name, scores, labels}]. */
+/**
+ * Precision–recall curves with the positive-rate baseline. curves: [{name, scores, labels}].
+ * operating: {curve?, threshold | recall, label?} (or an array) rings the point in use.
+ */
 export function prCurve(o) {
   const ctx = setup(o, { width: 720, height: 560 });
   const { t, size, labelSize, build } = ctx;
-  const curves = o.curves.map((c, k) => { const pts = prPoints(c.scores, c.labels); return { ...c, k, pts, ap: auc(pts.map(p => [p.recall, p.precision])), base: c.labels.filter(Boolean).length / c.labels.length }; });
+  const curves = o.curves.map((c, k) => { const all = prPoints(c.scores, c.labels); return { ...c, k, pts: all, path: thinCurve(all, 'recall', 'precision'), ap: auc(all.map(p => [p.recall, p.precision])), base: c.labels.filter(Boolean).length / c.labels.length }; });
   const fr = frame(o, ctx, { xDomain: [0, 1], yDomain: [0, 1], xTicks: 5, yTicks: 5, xFormat: v => pct(v), yFormat: v => pct(v), xLabel: o.xLabel ?? 'Recall', yLabel: o.yLabel ?? 'Precision', square: true, rightPad: 220 });
   const { x, y, parts, box } = fr;
   const base = curves[0].base;
   parts.push(refLine({ orient: 'h', at: y(base), from: box.x, to: box.x + box.w, label: `${o.baseLabel ?? 'Positive rate'} ${pct(base)}`, theme: t, size: Math.max(15, size - 2), color: t.c('muted'), weight: 500 }));
   const colorOf = c => (o.highlight != null ? (isHighlighted(o.highlight, c, 'name') ? t.c('highlight') : t.c('context')) : t.cat(c.k));
-  for (const c of curves) parts.push(el('path', { d: pathFromPoints(c.pts.map(p => [x(p.recall), y(p.precision)]), { curve: 'step-after' }), fill: 'none', stroke: colorOf(c), 'stroke-width': 3.2, 'stroke-linejoin': 'round', pathLength: build ? 1 : null, ...buildAttrs(build, { s: c.k, motion: 'draw' }) }));
+  for (const c of curves) parts.push(el('path', { d: pathFromPoints(c.path.map(p => [x(p.recall), y(p.precision)]), { curve: 'step-after' }), fill: 'none', stroke: colorOf(c), 'stroke-width': 3.2, 'stroke-linejoin': 'round', pathLength: build ? 1 : null, ...buildAttrs(build, { s: c.k, motion: 'draw' }) }));
   const placed = spreadLabels(curves.map(c => ({ id: c.k, y: y(c.pts[Math.floor(c.pts.length * 0.6)].precision), h: labelSize * 2.6 })), { min: box.y, max: box.y + box.h });
   for (const p of placed) {
     const c = curves[p.id];
     parts.push(textLines([c.name], { x: box.x + box.w + 18, y: p.y - 10, size: labelSize, valign: 'middle', fill: o.highlight != null && !isHighlighted(o.highlight, c, 'name') ? t.c('muted') : colorOf(c), weight: 700 }));
     parts.push(textLines([`AP ${fmt(c.ap, { digits: 3 })}`], { x: box.x + box.w + 18, y: p.y + 12, size: size - 1, valign: 'middle', fill: t.c('muted') }));
   }
-  return finish(o, ctx, parts, null, { x, y, box });
+  for (const { op, p, text } of operatingPoints(o, curves, 'recall', 'precision', (op, q) => `Threshold ${fmt(q.threshold, { digits: 2 })}: recall ${pct(q.recall)}, precision ${pct(q.precision)}`))
+    parts.push(callout({ x: x(p.recall), y: y(p.precision), text, dx: op.dx ?? 60, dy: op.dy ?? -70, width: op.width ?? 210, theme: t, size: size - 1, marker: 'ring' }));
+  return finish(o, ctx, parts, null, { x, y, box, curves });
 }
 
 /**
  * Reliability diagram: mean predicted probability vs observed frequency, with
  * the count per bin underneath (so sparse bins are visible, not hidden).
+ * One model: probs, labels (or bins). Several (before/after): series:[{name, probs, labels}];
+ * the highlighted (default: last) takes the accent, the others context grey, each named at
+ * its end. intervals:true adds Wilson 95% intervals per bin; histScale:'log' keeps sparse
+ * bins visible when one bin holds most rows (rare positives).
  */
 export function calibrationChart(o) {
   const ctx = setup(o, { width: 760, height: 600 });
-  const { t, size, build } = ctx;
-  const binsData = o.bins || calibrationBins(o.probs, o.labels, o.binCount ?? 10);
+  const { t, size, labelSize, build } = ctx;
+  const S = (o.series || [{ name: o.name, probs: o.probs, labels: o.labels, bins: o.bins }]).map((sr, k) => ({ ...sr, k, bins: sr.bins || calibrationBins(sr.probs, sr.labels, o.binCount ?? 10) }));
+  const binsData = S[Math.min(S.length - 1, o.histFrom ?? 0)].bins;
   const histH = o.histHeight ?? 80;
+  const multi = S.length > 1;
   const H0 = ctx.H; ctx.H = H0 - histH - 50;
-  const fr = frame(o, ctx, { xDomain: [0, 1], yDomain: [0, 1], xTicks: 5, yTicks: 5, xFormat: v => pct(v), yFormat: v => pct(v), xLabel: null, yLabel: o.yLabel ?? 'Observed frequency', square: false, rightPad: 30 });
+  const fr = frame(o, ctx, { xDomain: [0, 1], yDomain: [0, 1], xTicks: 5, yTicks: 5, xFormat: v => pct(v), yFormat: v => pct(v), xLabel: null, yLabel: o.yLabel ?? 'Observed frequency', square: false, rightPad: multi ? Math.max(...S.map(sr => measureText(String(sr.name ?? ''), labelSize, { weight: 700 }))) + 40 : 30 });
   ctx.H = H0;
   const { x, y, parts, box } = fr;
   parts.push(el('line', { x1: x(0), y1: y(0), x2: x(1), y2: y(1), stroke: t.c('muted'), 'stroke-width': 1.2, 'stroke-dasharray': '4 5' }));
-  const used = binsData.filter(b => b.n > 0 && isNum(b.meanPredicted));
-  // Put the diagonal's label on the side of the line away from the curve near its start.
-  const near = used.reduce((best, b) => (Math.abs(b.meanPredicted - 0.2) < Math.abs((best?.meanPredicted ?? 9) - 0.2) ? b : best), null);
+  const hl = sr => (o.highlight == null ? sr.k === S.length - 1 : isHighlighted(o.highlight, sr, 'name'));
+  const colorOf = sr => sr.color || (!multi || hl(sr) ? t.c('accent') : t.c('context'));
+  const main = S.find(hl) || S[S.length - 1];
+  const usedOf = sr => sr.bins.filter(b => b.n > 0 && isNum(b.meanPredicted));
+  // Put the diagonal's label on the side of the line away from the main curve near its start.
+  const near = usedOf(main).reduce((best, b) => (Math.abs(b.meanPredicted - 0.2) < Math.abs((best?.meanPredicted ?? 9) - 0.2) ? b : best), null);
   const below = near ? near.observed > near.meanPredicted : false, off = below ? 22 : -10;
   const ang = -Math.atan2(y(0) - y(1), x(1) - x(0)) * 180 / Math.PI;
   parts.push(textLines([o.perfectLabel ?? 'Perfectly calibrated'], { x: x(0.08), y: y(0.08) + off, size: Math.max(15, size - 2), fill: t.c('muted'), attrs: { transform: `rotate(${n(ang)} ${n(x(0.08))} ${n(y(0.08) + off)})` } }));
-  parts.push(el('path', { d: pathFromPoints(used.map(b => [x(b.meanPredicted), y(b.observed)])), fill: 'none', stroke: t.c('accent'), 'stroke-width': 3, 'stroke-linejoin': 'round', pathLength: build ? 1 : null, ...buildAttrs(build, { motion: 'draw' }) }));
-  used.forEach((b, k) => parts.push(el('circle', { cx: x(b.meanPredicted), cy: y(b.observed), r: 6, fill: t.c('accent'), stroke: t.c('paper'), 'stroke-width': 2, ...buildAttrs(build, { i: k, label: true }) })));
+  const ends = [];
+  for (const sr of [...S].sort((a, b) => Number(hl(a)) - Number(hl(b)))) {
+    const used = usedOf(sr), c = colorOf(sr), strong = !multi || hl(sr);
+    if (o.intervals) used.forEach(b => {
+      const [lo, hi] = wilson(Math.round(b.observed * b.n), b.n);
+      parts.push(el('line', { x1: x(b.meanPredicted), x2: x(b.meanPredicted), y1: y(lo), y2: y(hi), stroke: c, 'stroke-width': 1.6, 'stroke-linecap': 'round', class: 'ss-interval', ...buildAttrs(build, { s: sr.k, label: true }) }));
+    });
+    parts.push(el('path', { d: pathFromPoints(used.map(b => [x(b.meanPredicted), y(b.observed)])), fill: 'none', stroke: c, 'stroke-width': strong ? 3 : 2.2, 'stroke-linejoin': 'round', pathLength: build ? 1 : null, ...buildAttrs(build, { s: sr.k, motion: 'draw' }) }));
+    used.forEach((b, k) => parts.push(el('circle', { cx: x(b.meanPredicted), cy: y(b.observed), r: strong ? 6 : 4.5, fill: c, stroke: t.c('paper'), 'stroke-width': 2, ...buildAttrs(build, { i: k, s: sr.k, label: true }) })));
+    const last = used.at(-1);
+    if (multi && last) ends.push({ id: sr.k, y: y(last.observed), h: labelSize * 1.3, x: x(last.meanPredicted), sr, c, strong });
+  }
+  for (const p of spreadLabels(ends, { min: box.y, max: box.y + box.h })) {
+    const e = ends.find(q => q.id === p.id);
+    parts.push(textLines([String(e.sr.name ?? '')], { x: Math.max(e.x, box.x + box.w) + 14, y: p.y, size: labelSize, valign: 'middle', fill: e.strong ? e.c : t.c('muted'), weight: 700 }));
+  }
   const hy = box.y + box.h + 50, maxN = Math.max(...binsData.map(b => b.n));
+  const logScale = o.histScale === 'log', hv = v => (logScale ? Math.log10(1 + v) : v);
   binsData.forEach(b => {
-    const h = maxN ? (b.n / maxN) * histH : 0;
+    const h = maxN ? (hv(b.n) / hv(maxN)) * histH : 0;
     parts.push(el('rect', { x: x(b.x0) + 1.5, y: hy + histH - h, width: x(b.x1) - x(b.x0) - 3, height: h, fill: t.c('context') }));
   });
   parts.push(el('line', { x1: box.x, x2: box.x + box.w, y1: hy + histH, y2: hy + histH, stroke: t.c('ink'), 'stroke-width': 1.2 }));
-  parts.push(textLines([o.countLabel ?? 'Predictions per bin'], { x: box.x, y: hy - 6, size: Math.max(15, size - 2), valign: 'bottom', fill: t.c('muted') }));
+  parts.push(textLines([o.countLabel ?? (logScale ? 'Predictions per bin (log scale)' : 'Predictions per bin')], { x: box.x, y: hy - 6, size: Math.max(15, size - 2), valign: 'bottom', fill: t.c('muted') }));
   parts.push(textLines([o.xLabel ?? 'Mean predicted probability'], { x: box.x + box.w, y: hy + histH + 24, size: size - 1, anchor: 'end', fill: t.c('muted') }));
   return finish(o, ctx, parts, a => ({ x: x(a.at), y: y(a.y ?? a.at) }), { x, y, box, hist: { y: hy, height: histH, maxN, bins: binsData } });
 }
@@ -499,6 +556,10 @@ export function learningCurve(o) {
  * reference: null value (0 for differences, 1 for ratios; log scale with xLog).
  * favors: [leftText, rightText] under the axis. summary: {label, estimate, low, high} as a diamond.
  * columnText: (row) → right-hand text, default "est [low, high]".
+ * marker: 'square' (default) | 'circle' | 'diamond' (or per row); highlightBold:false keeps
+ * highlighted labels regular; xTickValues / xFormat set the axis ticks.
+ * columns: extra table columns between the labels and the plot, [{title, value}] where
+ * value is a row key ('n') or (row) → text, e.g. [{title:'n', value:'n'}, {title:'Events', value:r => …}].
  */
 export function forestPlot(o) {
   const ctx = setup(o);
@@ -511,33 +572,44 @@ export function forestPlot(o) {
   const cw = Math.max(...rows.map(r => measureText(colText(r), size - 1)), o.summary ? measureText(colText(o.summary), size - 1, { weight: 700 }) : 0) + 26;
   const nRows = rows.length + (o.summary ? 1.4 : 0);
   ctx.H = o.height ?? Math.max(200, nRows * (o.rowHeight ?? 44) + 90 + (o.favors ? 26 : 0));
-  const box = plotBox(ctx.W, ctx.H, { left: lw, right: cw, top: size + 22, bottom: 40 + (o.xLabel ? 26 : 0) + (o.favors ? 28 : 0) });
+  const cols = (o.columns || []).map(c => ({ title: c.title ?? '', text: r => { const v = typeof c.value === 'function' ? c.value(r) : r?.[c.value ?? c.key]; return v == null ? '' : typeof v !== 'number' ? String(v) : c.format ? fmt(v, c.format) : Number.isInteger(v) ? fmt(v, { digits: 0, locale: ctx.locale }) : vf(v); } }));
+  const colW = cols.map(c => Math.max(measureText(c.title, size - 1, { weight: 700 }), ...rows.map(r => measureText(c.text(r), size - 1)), o.summary ? measureText(c.text(o.summary), size - 1, { weight: 700 }) : 0) + 26);
+  const box = plotBox(ctx.W, ctx.H, { left: lw + sum(colW), right: cw, top: size + 22, bottom: 40 + (o.xLabel ? 26 : 0) + (o.favors ? 28 : 0) });
+  const colX = cols.map((c, i) => lw + sum(colW.slice(0, i + 1)) - 14);
   const dom = o.domain || (o.xLog ? [Math.min(...all) * 0.9, Math.max(...all) * 1.1] : niceDomain(extent(all), 6));
   const x = o.xLog ? log(dom, [box.x, box.x + box.w]) : linear(dom, [box.x, box.x + box.w]);
   const rowsAll = o.summary ? [...rows.map(r => r.label), '__sep', o.summary.label] : rows.map(r => r.label);
   const yb = band(rowsAll, [box.y, box.y + box.h], { inner: 0.2, outer: 0.05 });
-  const parts = [axis(x, { orient: 'bottom', at: box.y + box.h, grid: [box.y, box.y + box.h], theme: t, size: size - 1, format: o.xLog ? (v => fmt(v, { digits: decimalsOf(v, 2) })) : tf(o, x, 6), count: 6, tickSize: 5 })];
+  const parts = [axis(x, { orient: 'bottom', at: box.y + box.h, grid: [box.y, box.y + box.h], theme: t, size: size - 1, format: o.xFormat || (o.xLog ? (v => fmt(v, { digits: decimalsOf(v, 2) })) : tf(o, x, 6)), count: 6, tickValues: o.xTickValues, tickSize: 5 })];
   parts.push(el('line', { x1: box.x, x2: box.x + box.w, y1: box.y + box.h, y2: box.y + box.h, stroke: t.c('ink'), 'stroke-width': 1.2 }));
   if (o.reference != null) parts.push(el('line', { x1: x(o.reference), x2: x(o.reference), y1: box.y - 8, y2: box.y + box.h, stroke: t.c('ink'), 'stroke-width': 1.6 }));
   parts.push(textLines([o.columnTitle ?? 'Estimate [95% CI]'], { x: ctx.W - 2, y: box.y - 14, size: size - 1, anchor: 'end', fill: t.c('muted'), weight: 700 }));
   if (o.labelTitle) parts.push(textLines([o.labelTitle], { x: 4, y: box.y - 14, size: size - 1, fill: t.c('muted'), weight: 700 }));
+  cols.forEach((c, i) => parts.push(textLines([c.title], { x: colX[i], y: box.y - 14, size: size - 1, anchor: 'end', fill: t.c('muted'), weight: 700 })));
+  const cells = (r, cy, bold) => cols.forEach((c, i) => parts.push(textLines([c.text(r)], { x: colX[i], y: cy, size: size - 1, anchor: 'end', valign: 'middle', fill: t.c('ink'), weight: bold ? 700 : null, attrs: { 'font-variant-numeric': 'tabular-nums' } })));
   const maxW = Math.max(...rows.map(r => r.weight ?? 1));
   rows.forEach((r, k) => {
     const cy = yb.center(r.label), hl = o.highlight == null || isHighlighted(o.highlight, r);
     const c = hl ? (o.highlight != null ? t.c('highlight') : t.c('ink')) : t.c('muted');
     const s = 6 + 7 * Math.sqrt((r.weight ?? maxW) / maxW);
     const crossesRef = o.reference != null && r.low <= o.reference && r.high >= o.reference;
+    const mf = crossesRef && o.hollowIfCrossing ? t.c('paper') : c, ex = x(r.estimate), shape = r.marker || o.marker || 'square';
+    const mark = shape === 'circle' ? el('circle', { cx: ex, cy, r: s / 2 + 0.5, fill: mf, stroke: c, 'stroke-width': 2 })
+      : shape === 'diamond' ? el('path', { d: `M${n(ex)} ${n(cy - s * 0.7)}L${n(ex + s * 0.7)} ${n(cy)}L${n(ex)} ${n(cy + s * 0.7)}L${n(ex - s * 0.7)} ${n(cy)}Z`, fill: mf, stroke: c, 'stroke-width': 2 })
+      : el('rect', { x: ex - s / 2, y: cy - s / 2, width: s, height: s, fill: mf, stroke: c, 'stroke-width': 2 });
     parts.push(g({ class: 'ss-interval', ...buildAttrs(build, { i: k, motion: 'reveal' }) },
-      el('line', { x1: x(r.low), x2: x(r.high), y1: cy, y2: cy, stroke: c, 'stroke-width': 2.4, 'stroke-linecap': 'round' }),
-      el('rect', { x: x(r.estimate) - s / 2, y: cy - s / 2, width: s, height: s, fill: crossesRef && o.hollowIfCrossing ? t.c('paper') : c, stroke: c, 'stroke-width': 2 })));
-    parts.push(textLines([r.label], { x: box.x - 14, y: cy, size: labelSize, anchor: 'end', valign: 'middle', fill: t.c('ink'), weight: hl && o.highlight != null ? 700 : null }));
+      el('line', { x1: x(r.low), x2: x(r.high), y1: cy, y2: cy, stroke: c, 'stroke-width': 2.4, 'stroke-linecap': 'round' }), mark));
+    const bold = hl && o.highlight != null && o.highlightBold !== false;
+    parts.push(textLines([r.label], { x: lw - 14, y: cy, size: labelSize, anchor: 'end', valign: 'middle', fill: t.c('ink'), weight: bold ? 700 : null }));
+    cells(r, cy, bold);
     parts.push(textLines([colText(r)], { x: ctx.W - 2, y: cy, size: size - 1, anchor: 'end', valign: 'middle', fill: t.c('ink'), attrs: { 'font-variant-numeric': 'tabular-nums' } }));
   });
   if (o.summary) {
     const s = o.summary, cy = yb.center(s.label), h = yb.bw * 0.42;
     parts.push(el('line', { x1: 0, x2: ctx.W, y1: yb('__sep') + yb.bw / 2, y2: yb('__sep') + yb.bw / 2, stroke: t.c('rule') }));
     parts.push(el('path', { d: `M${n(x(s.low))} ${n(cy)}L${n(x(s.estimate))} ${n(cy - h)}L${n(x(s.high))} ${n(cy)}L${n(x(s.estimate))} ${n(cy + h)}Z`, fill: t.c('accent'), ...buildAttrs(build, { i: rows.length, motion: 'reveal' }) }));
-    parts.push(textLines([s.label], { x: box.x - 14, y: cy, size: labelSize, anchor: 'end', valign: 'middle', fill: t.c('ink'), weight: 700 }));
+    parts.push(textLines([s.label], { x: lw - 14, y: cy, size: labelSize, anchor: 'end', valign: 'middle', fill: t.c('ink'), weight: 700 }));
+    cells(s, cy, true);
     parts.push(textLines([colText(s)], { x: ctx.W - 2, y: cy, size: size - 1, anchor: 'end', valign: 'middle', fill: t.c('ink'), weight: 700, attrs: { 'font-variant-numeric': 'tabular-nums' } }));
   }
   if (o.favors) {

@@ -23,7 +23,7 @@ const links = [
 ];
 const fresh = links.filter(l => l.isNew);
 
-// Geometry in the SVG's own coordinates (1152 × 420, drawn 1:1 at x 64, y 200). Steps start on column 3.
+// Geometry in the SVG's own coordinates (1152 × 420, drawn 1:1 at x 64, y 189: the step names' caps sit on y 208). Steps start on column 3.
 const W = 1152, H = 420, X0 = C(3) - 64, PITCH = (W - X0) / steps.length, LINE = 54, ROW0 = 118, ROWH = 54;
 const sx = s => X0 + PITCH * steps.indexOf(s);
 const ry = s => ROW0 + ROWH * systems.indexOf(s);
@@ -65,7 +65,7 @@ export default {
   exportPolicy: 'final',
   className: 'tpl-launch ln-integrations',
   content: `<h2 class="ln-at ln-head" data-region="title" style="left:${C(1)}px;top:64px;width:${span(1, 10)}px">New in 2.0: the carrier’s first scan goes straight to your payment provider</h2>
-<figure class="ln-at" data-region="primary" style="left:${C(1)}px;top:200px;width:${W}px;height:${H}px">${chart}</figure>
+<figure class="ln-at" data-region="primary" style="left:${C(1)}px;top:189px;width:${W}px;height:${H}px">${chart}</figure>
 <p class="ln-at ln-note" data-region="source" style="left:${C(1)}px;top:645px;width:${span(1, 8)}px">All six connect from Settings, Connections; none needs code.</p>
 <p class="ln-at ln-label ln-key" style="left:${C(9)}px;top:642.9px;width:${span(9, 12)}px"><i class="ln-new"></i>New in 2.0<i></i>Connected since 1.x</p>`,
 };

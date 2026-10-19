@@ -30,12 +30,12 @@ export default {
   id: ID,
   language: 'ja',
   title: 'Annual report opener: the year in one sentence and four figures',
-  notes: 'Purpose: 表紙を兼ねて、どの団体の何年度の報告かと、この一年の変化を平易な一文と4つの数字で伝える。\nModify: org、districts（地域別ページと同じ表）、prev（前年度）、sessions、stay、exam を差し替える。文中の増分と4つの数字は計算で出る。\nInvariant: 数字は4つまで。どの数字にも「何を数えたか」を添える。率は分母を書く。一文は事実を言い、標語にしない。\nStatic: 静的ページ。',
+  notes: 'Purpose: 表紙を兼ねて、どの団体の何年度の報告かと、この一年の変化を平易な一文と4つの数字で伝える。\nModify: org、districts（地域別ページと同じ表）、prev（前年度）、sessions、stay、exam を差し替える。文中の増分と4つの数字は計算で出る。見出しの改行は <br> で文や句の切れ目に入れる。\nInvariant: 数字は4つまで。どの数字にも「何を数えたか」を添える。率は分母を書く。一文は事実を言い、標語にしない。\nStatic: 静的ページ。',
   sources: [],
   exportPolicy: 'final',
   className: 'tpl-impact-report ir-open',
   content: `<p class="ir-org" data-region="support">${org.name}<span>${org.report}（${org.period}）</span></p>
-<h1 class="ir-say" data-region="title">教室を${rooms - prev.rooms}か所増やし、前の年より${kids - prev.kids}人多い子どもが、<span class="ir-nw">放課後の学びを</span>続けた一年でした。</h1>
+<h1 class="ir-say" data-region="title">教室を${rooms - prev.rooms}か所増やし、前の年より${kids - prev.kids}人多い子どもが、<br>放課後の学びを続けた一年でした。</h1>
 <div class="ir-figs" data-region="primary">${figs.map(f => `<div><p class="ir-n">${f.v}<small>${f.unit}</small></p><p class="ir-n-l">${f.label}</p><p class="ir-n-d">${f.def}</p></div>`).join('')}</div>
 <div class="ir-foot" data-region="source"><p>数値は2026年3月31日時点。参加した子どもは地区別の実績（2ページ）の合計</p><p>ゆうがた教室　${org.report}<b>1</b></p></div>`,
 };

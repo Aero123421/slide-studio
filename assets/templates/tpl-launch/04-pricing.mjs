@@ -32,7 +32,7 @@ export default {
   exportPolicy: 'final',
   className: 'tpl-launch ln-pricing',
   content: `<h2 class="ln-at ln-head" data-region="title" style="left:${C(1)}px;top:64px;width:${span(1, 10)}px">Most teams need ${pick.name}: ${pick.included.toLocaleString('en-GB')} returns a month for ${eur(pick.price)}</h2>
-<table class="ln-at ln-table" data-region="primary" style="left:${C(1)}px;top:192px;width:${span(1, 12)}px">
+<table class="ln-at ln-table" data-region="primary" style="left:${C(1)}px;top:208px;width:${span(1, 12)}px">
 <colgroup>${widths.map(w => `<col style="width:${w}px">`).join('')}</colgroup>
 <thead><tr><td style="border-top:0"></td>${plans.map(p => `<th scope="col"${p.pick ? ' class="ln-pick"' : ''}><span class="ln-plan">${p.name}${p.pick ? '<span class="sr-only"> (recommended)</span>' : ''}</span><span class="ln-for">${p.for}</span></th>`).join('')}</tr></thead>
 <tbody>

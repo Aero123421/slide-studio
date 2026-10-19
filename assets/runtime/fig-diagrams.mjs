@@ -195,7 +195,8 @@ export function flowDiagram(o) {
     }
     // 3. coordinates. Each gutter between layers is at least wide enough for the
     //    labels of edges that cross it, so edge labels never sit on a node.
-    const gap = o.gap ?? (lr ? 70 : 54), cross = o.crossGap ?? (lr ? 30 : 44);
+    const gap = o.gap ?? (lr ? 70 : 54);
+    let cross = o.crossGap ?? (lr ? 30 : 44);
     const along = L => Math.max(...L.map(nd => (lr ? nd.w : nd.h)));
     const spans = layers.map(along);
     const usableAlong = (lr ? ctx.W - laneLabelW : ctx.H) - 8;
@@ -246,9 +247,16 @@ export function flowDiagram(o) {
       const spacing = (p, q) => cross + (groupOf.get(p.id) !== groupOf.get(q.id) && (groupOf.has(p.id) || groupOf.has(q.id)) ? groupGap : 0);
       // keep group members contiguous within a layer
       if (groupOf.size) for (const L of layers) L.sort((a, b) => (groupOf.get(a.id) ?? -1) - (groupOf.get(b.id) ?? -1) || pos.get(a.id) - pos.get(b.id));
+      // A crowded layer squeezes the spacing (down to 12) for every layer before giving up.
+      if (o.crossGap == null) for (const L of layers) {
+        if (L.length < 2) continue;
+        const fixed = sum(L.map(ext)) + sum(L.slice(1).map((q, i) => spacing(L[i], q) - cross));
+        const fit = (crossSize - 8 - fixed) / (L.length - 1);
+        if (fit < cross) cross = Math.max(12, fit);
+      }
       for (const L of layers) {
         const total = sum(L.map(ext)) + sum(L.slice(1).map((q, i) => spacing(L[i], q)));
-        if (total > crossSize - 8) throw Error(`${o.id}: a layer with ${L.length} nodes does not fit; widen the figure or change direction.`);
+        if (total > crossSize - 8) throw Error(`${o.id}: a layer with ${L.length} nodes needs ${Math.round(total)} px but has ${Math.round(crossSize - 8)}; shorten labels, drop sub-lines, enlarge the figure or change direction.`);
         let v = (crossSize - total) / 2;
         L.forEach((nd, i) => { if (i) v += spacing(L[i - 1], nd); setC(nd, v + ext(nd) / 2); v += ext(nd); });
       }
@@ -336,6 +344,8 @@ export function flowDiagram(o) {
   const stepOf = new Map(order.map((idv, i) => [idv, i]));
   const edgeParts = [], labelParts = [];
   const maxBottom = Math.max(...nodes.map(nd => nd.y + nd.h)), maxRight = Math.max(...nodes.map(nd => nd.x + nd.w));
+  const { plan, off } = manual ? { plan: new Map(), off: new Map() } : portPlan(nodes, byId, forward.filter(e => !back.has(e.k)), lr, o);
+  const edgeTop = [];
   let backSlot = 0;
   for (const e of edges) {
     const a = byId.get(e.from), b = byId.get(e.to);
@@ -360,7 +370,9 @@ export function flowDiagram(o) {
     } else {
       const fromSide = e.fromSide || (manual ? autoSide(a, b) : lr ? 'right' : 'bottom');
       const toSide = e.toSide || (manual ? autoSide(b, a) : lr ? 'left' : 'top');
-      const p = sidePort(a, fromSide), q = sidePort(b, toSide, 3);
+      const pl = plan.get(e.k), shiftC = (pt, d) => (!d ? pt : lr ? [pt[0], pt[1] + d] : [pt[0] + d, pt[1]]);
+      const p = shiftC(sidePort(a, fromSide), off.get(`${e.k}:from`)), q = shiftC(sidePort(b, toSide, 3), off.get(`${e.k}:to`));
+      const busIn = !!pl?.bus.startsWith('in:'), busOut = !!pl?.bus.startsWith('out:');
       if (route === 'straight' || (Math.abs(p[1] - q[1]) < 2 && (fromSide === 'right' || fromSide === 'left')) || (Math.abs(p[0] - q[0]) < 2 && (fromSide === 'top' || fromSide === 'bottom'))) {
         const pa = route === 'straight' && manual ? boxPort(a, b.x + b.w / 2, b.y + b.h / 2) : p;
         const pb = route === 'straight' && manual ? boxPort(b, a.x + a.w / 2, a.y + a.h / 2, 3) : q;
@@ -375,24 +387,25 @@ export function flowDiagram(o) {
       } else {
         const horiz = fromSide === 'right' || fromSide === 'left';
         if (horiz && (toSide === 'left' || toSide === 'right')) {
-          const mx = e.via ?? (p[0] + q[0]) / 2; pts = [p, [mx, p[1]], [mx, q[1]], q];
+          const mx = e.via ?? pl?.pos ?? (p[0] + q[0]) / 2; pts = [p, [mx, p[1]], [mx, q[1]], q];
           // Label in the gutter: on the target's row, so a branch label sits next to the branch it names.
-          if (!isNum(e.labelPos)) mid = [mx, Math.abs(q[1] - p[1]) > size * 1.6 ? q[1] : (p[1] + q[1]) / 2];
+          // On a shared trunk, the label goes on the edge's own stretch (before a merge, after a split).
+          if (!isNum(e.labelPos)) mid = busIn ? [(p[0] + mx) / 2, p[1]] : busOut ? [(mx + q[0]) / 2, q[1]] : [mx, Math.abs(q[1] - p[1]) > size * 1.6 ? q[1] : (p[1] + q[1]) / 2];
         } else if (!horiz && (toSide === 'top' || toSide === 'bottom')) {
-          const my = e.via ?? (p[1] + q[1]) / 2; pts = [p, [p[0], my], [q[0], my], q];
-          if (!isNum(e.labelPos)) mid = [Math.abs(q[0] - p[0]) > 60 ? q[0] : (p[0] + q[0]) / 2, my];
+          const my = e.via ?? pl?.pos ?? (p[1] + q[1]) / 2; pts = [p, [p[0], my], [q[0], my], q];
+          if (!isNum(e.labelPos)) mid = busIn ? [p[0], (p[1] + my) / 2] : busOut ? [q[0], (my + q[1]) / 2] : [Math.abs(q[0] - p[0]) > 60 ? q[0] : (p[0] + q[0]) / 2, my];
         }
         else if (horiz) pts = [p, [q[0], p[1]], q];
         else pts = [p, [p[0], q[1]], q];
       }
       if (pts) {
-        edgeParts.push(el('path', { d: roundedPolyline(pts, 12), ...st, pathLength: build ? 1 : null, ...buildAttrs(build, { i: stepOf.get(e.to) ?? 0, motion: 'draw' }) }));
+        (e.emphasis ? edgeTop : edgeParts).push(el('path', { d: roundedPolyline(pts, 12), ...st, pathLength: build ? 1 : null, ...buildAttrs(build, { i: stepOf.get(e.to) ?? 0, motion: 'draw' }) }));
         if (!mid) mid = longestSegmentMid(pts, e.labelPos);
       }
     }
     if (e.label) labelParts.push(g({ ...buildAttrs(build, { i: stepOf.get(e.to) ?? 0, label: true }) }, edgeLabel(e.label, mid[0], mid[1], ctx, { color: e.emphasis ? t.c('accent') : null })));
   }
-  parts.push(g({ class: 'ss-edges' }, edgeParts));
+  parts.push(g({ class: 'ss-edges' }, [...edgeParts, ...edgeTop]));
   nodes.forEach(nd => parts.push(drawNode(nd, ctx, buildAttrs(build, { i: stepOf.get(nd.id) ?? 0, motion: 'settle' }))));
   parts.push(g({ class: 'ss-edge-labels' }, labelParts));
   if (back.size && !manual) {
@@ -403,6 +416,66 @@ export function flowDiagram(o) {
   ctx.nodes = Object.fromEntries(nodes.map(nd => [nd.id, { x: nd.x, y: nd.y, w: nd.w, h: nd.h }]));
   return root(o, ctx, markers(ctx), parts);
 }
+/**
+ * Ports and trunks for layered (auto) layouts. Several edges into one node side merge on
+ * a shared trunk just before the node, so they end in one arrowhead; several out of one
+ * side split from a trunk just after it. Other edges that share a side get their own
+ * ports, spread along the side and ordered by the far end to avoid crossings. Vertical
+ * runs that would overlap in one gutter move to separate tracks 12 px apart.
+ */
+function portPlan(nodes, byId, forward, lr, o) {
+  const plan = new Map(), off = new Map();
+  const A0 = nd => (lr ? nd.x : nd.y), A1 = nd => (lr ? nd.x + nd.w : nd.y + nd.h);
+  const Cc = nd => (lr ? nd.y + nd.h / 2 : nd.x + nd.w / 2), Clen = nd => (lr ? nd.h : nd.w);
+  const cand = forward.filter(e => (e.route || o.route || 'ortho') === 'ortho' && !e.fromSide && !e.toSide && e.via == null && A0(byId.get(e.to)) > A1(byId.get(e.from)));
+  const inN = new Map(), outN = new Map();
+  for (const e of cand) { inN.set(e.to, (inN.get(e.to) || 0) + 1); outN.set(e.from, (outN.get(e.from) || 0) + 1); }
+  const busOf = e => (inN.get(e.to) > 1 && outN.get(e.from) === 1 ? `in:${e.to}` : outN.get(e.from) > 1 && inN.get(e.to) === 1 ? `out:${e.from}` : `e:${e.k}`);
+  // ports: arrivals on each node side, one per trunk or per own edge, ordered by the far end
+  const sides = new Map();
+  for (const e of cand) {
+    const bus = busOf(e);
+    for (const [end, ndId, far] of [['from', e.from, e.to], ['to', e.to, e.from]]) {
+      const key = `${end}\u0000${ndId}`;
+      if (!sides.has(key)) sides.set(key, { nd: byId.get(ndId), end, arr: new Map() });
+      const own = (end === 'to' && bus === `in:${ndId}`) || (end === 'from' && bus === `out:${ndId}`) ? bus : `e:${e.k}`;
+      const m = sides.get(key).arr;
+      if (!m.has(own)) m.set(own, { cs: [], ks: [] });
+      m.get(own).cs.push(Cc(byId.get(far))); m.get(own).ks.push(e.k);
+    }
+  }
+  for (const { nd, end, arr } of sides.values()) {
+    const list = [...arr.values()].map(v => ({ ...v, c: sum(v.cs) / v.cs.length })).sort((p, q) => p.c - q.c);
+    const step = list.length > 1 ? Math.min(o.portGap ?? 22, (Clen(nd) * 0.8) / (list.length - 1)) : 0;
+    list.forEach((v, i) => { for (const k of v.ks) off.set(`${k}:${end}`, (i - (list.length - 1) / 2) * step); });
+  }
+  // trunk positions in the gutter before (merge) or after (split) the shared node
+  const before = nd => { const v = nodes.filter(m => A1(m) <= A0(nd) + 0.5).map(A1); return v.length ? Math.max(...v) : A0(nd) - 60; };
+  const after = nd => { const v = nodes.filter(m => A0(m) >= A1(nd) - 0.5).map(A0); return v.length ? Math.min(...v) : A1(nd) + 60; };
+  const clamp = (v, lo, hi) => Math.max(Math.min(lo, hi), Math.min(hi, v));
+  const runs = new Map();
+  for (const e of cand) {
+    const bus = busOf(e), a = byId.get(e.from), b = byId.get(e.to);
+    let pos, dir;
+    if (bus.startsWith('in:')) { const g0 = before(b), g1 = A0(b) - 3; pos = g1 - clamp((g1 - g0) * 0.3, 22, (g1 - g0) / 2); dir = -1; }
+    else if (bus.startsWith('out:')) { const g0 = A1(a), g1 = after(a); pos = g0 + clamp((g1 - g0) * 0.3, 18, (g1 - g0) / 2); dir = 1; }
+    else { pos = (A1(a) + A0(b) - 3) / 2; dir = 0; }
+    plan.set(e.k, { bus, pos });
+    const pc = Cc(a) + (off.get(`${e.k}:from`) || 0), qc = Cc(b) + (off.get(`${e.k}:to`) || 0);
+    const r = runs.get(bus) || { pos, dir, c0: Infinity, c1: -Infinity, ks: [] };
+    r.c0 = Math.min(r.c0, pc, qc); r.c1 = Math.max(r.c1, pc, qc); r.ks.push(e.k); runs.set(bus, r);
+  }
+  const list = [...runs.values()].filter(r => r.c1 - r.c0 > 1).sort((p, q) => p.pos - q.pos || p.c0 - q.c0);
+  list.forEach((r, i) => {
+    const clash = tr => list.slice(0, i).some(w => w.track === tr && Math.abs(w.pos - r.pos) < 6 && !(w.c1 + 8 < r.c0 || r.c1 + 8 < w.c0));
+    let tr = 0; while (clash(tr)) tr++;
+    r.track = tr;
+    const shift = r.dir ? r.dir * tr * 12 : (tr % 2 ? 1 : -1) * Math.ceil(tr / 2) * 12;
+    for (const k of r.ks) plan.get(k).pos = r.pos + shift;
+  });
+  return { plan, off };
+}
+
 function autoSide(a, b) {
   const dx = b.x + b.w / 2 - (a.x + a.w / 2), dy = b.y + b.h / 2 - (a.y + a.h / 2);
   return Math.abs(dx) * (a.h / a.w) >= Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : dy > 0 ? 'bottom' : 'top';
@@ -610,51 +683,79 @@ export function networkDiagram(o) {
 // ---------------------------------------------------------------- matrices & cycles
 
 /**
- * 2×2 / quadrant chart. x and y: {title, low, high}; quadrants: [tl, tr, bl, br]
- * as {title, body?}; items: [{label, x, y}] in 0..1 (positions are judgments —
- * say so in desc). highlightQuadrant: 0..3.
+ * 2×2 / quadrant chart. x and y: {title, low, high, domain?, split?, ticks?, format?, splitLabel?};
+ * quadrants: [tl, tr, bl, br] as {title, body?}; items: [{label, x, y, highlight?}].
+ * Without a domain, positions are judgments in 0..1 split at the middle (say so in desc).
+ * With domain:[a,b], positions are in data units, split sits at `split` (a threshold such
+ * as 1.5 億円), and ticks (array or true) label the axis. highlightQuadrant: 0..3.
  */
 export function quadrantChart(o) {
   const ctx = setup(o, { width: 900, height: 600 });
   const { t, size, build } = ctx;
   const small = Math.max(15, size - 3);
-  const m = { left: 54, right: 12, top: 12, bottom: 54 };
+  const ax = o.x || {}, ay = o.y || {};
+  const dom = a => (Array.isArray(a.domain) && a.domain[1] !== a.domain[0] ? a.domain : [0, 1]);
+  const [x0d, x1d] = dom(ax), [y0d, y1d] = dom(ay);
+  const tickVals = (a, [d0, d1]) => (Array.isArray(a.ticks) ? a.ticks : a.ticks ? niceTicks(d0, d1, a.tickCount ?? 5) : []);
+  const fmtTick = (a, v) => (typeof a.format === 'function' ? a.format(v) : `${a.prefix ?? ''}${(+v.toFixed(6)).toLocaleString(o.locale || 'en-US')}${a.suffix ?? ''}`);
+  const xt = tickVals(ax, [x0d, x1d]), yt = tickVals(ay, [y0d, y1d]);
+  const yTickW = yt.length ? Math.max(...yt.map(v => measureText(fmtTick(ay, v), small))) + 10 : 0;
+  const xTickH = xt.length ? small + 10 : 0;
+  const m = { left: 54 + yTickW, right: 12, top: 12, bottom: 54 + xTickH };
   const bx = m.left, by = m.top, bw = ctx.W - m.left - m.right, bh = ctx.H - m.top - m.bottom;
+  const X = v => bx + 24 + ((v - x0d) / (x1d - x0d)) * (bw - 48), Y = v => by + bh - 24 - ((v - y0d) / (y1d - y0d)) * (bh - 48);
+  const sx = Math.max(bx + 40, Math.min(bx + bw - 40, X(isNum(ax.split) ? ax.split : (x0d + x1d) / 2)));
+  const sy = Math.max(by + 40, Math.min(by + bh - 40, Y(isNum(ay.split) ? ay.split : (y0d + y1d) / 2)));
   const parts = [], occupied = [];
   const qs = o.quadrants || [];
   // One field divided by two hairlines; a highlighted quadrant gets a light accent tint.
   parts.push(el('rect', { x: bx, y: by, width: bw, height: bh, fill: t.c('surface') }));
-  [[0, 0], [1, 0], [0, 1], [1, 1]].forEach(([qx, qy], i) => {
-    const x0 = bx + (qx * bw) / 2, y0 = by + (qy * bh) / 2;
-    if (o.highlightQuadrant === i) parts.push(el('rect', { x: x0, y: y0, width: bw / 2, height: bh / 2, fill: t.c('accent'), 'fill-opacity': 0.1 }));
+  const rects = [[bx, by, sx - bx, sy - by], [sx, by, bx + bw - sx, sy - by], [bx, sy, sx - bx, by + bh - sy], [sx, sy, bx + bw - sx, by + bh - sy]];
+  rects.forEach(([qx0, qy0, qw, qh], i) => {
+    if (o.highlightQuadrant === i) parts.push(el('rect', { x: qx0, y: qy0, width: qw, height: qh, fill: t.c('accent'), 'fill-opacity': 0.1 }));
     const q = qs[i];
     if (!q) return;
-    // Quadrant names sit in the outer corner, away from the centre where items cluster.
-    const right = qx === 1, bottom = qy === 1, inner = bw / 2 - 40;
+    // Quadrant names sit in the outer corner, away from the split where items cluster.
+    const right = i % 2 === 1, bottom = i >= 2, inner = Math.max(80, qw - 40);
     const title = wrapText(q.title, inner, size, { weight: 700 }), body = q.body ? wrapText(q.body, inner, small) : [];
     const blockH = title.length * size * 1.25 + (body.length ? 4 + body.length * small * 1.3 : 0);
-    const tx = right ? x0 + bw / 2 - 18 : x0 + 18, ty = bottom ? y0 + bh / 2 - 16 - blockH : y0 + 16;
+    const tx = right ? qx0 + qw - 18 : qx0 + 18, ty = bottom ? qy0 + qh - 16 - blockH : qy0 + 16;
     const anchor = right ? 'end' : 'start';
     parts.push(textLines(title, { x: tx, y: ty, size, valign: 'top', anchor, fill: o.highlightQuadrant === i ? t.c('accent') : t.c('ink'), weight: 700 }));
     if (body.length) parts.push(textLines(body, { x: tx, y: ty + title.length * size * 1.25 + 4, size: small, valign: 'top', anchor, fill: t.c('muted'), lineHeight: 1.3 }));
     const w = Math.max(blockWidth(title, size, { weight: 700 }), blockWidth(body, small));
     occupied.push({ x: right ? tx - w : tx, y: ty, w, h: blockH });
   });
-  parts.push(el('line', { x1: bx + bw / 2, x2: bx + bw / 2, y1: by, y2: by + bh, stroke: t.c('paper'), 'stroke-width': 3 }));
-  parts.push(el('line', { x1: bx, x2: bx + bw, y1: by + bh / 2, y2: by + bh / 2, stroke: t.c('paper'), 'stroke-width': 3 }));
-  const ax = o.x || {}, ay = o.y || {};
-  parts.push(el('line', { x1: bx, x2: bx + bw, y1: by + bh + 14, y2: by + bh + 14, stroke: t.c('ink'), 'stroke-width': 1.5, 'marker-end': `url(#${ctx.id}-arr-ink)` }));
-  parts.push(el('line', { x1: bx - 14, x2: bx - 14, y1: by + bh, y2: by, stroke: t.c('ink'), 'stroke-width': 1.5, 'marker-end': `url(#${ctx.id}-arr-ink)` }));
-  if (ax.low) parts.push(textLines([ax.low], { x: bx, y: by + bh + 26, size: small, valign: 'top', fill: t.c('muted') }));
-  if (ax.high) parts.push(textLines([ax.high], { x: bx + bw - 16, y: by + bh + 26, size: small, anchor: 'end', valign: 'top', fill: t.c('muted') }));
-  if (ax.title) parts.push(textLines([ax.title], { x: bx + bw / 2, y: by + bh + 26, size: size - 1, anchor: 'middle', valign: 'top', fill: t.c('ink'), weight: 700 }));
-  const ayx = bx - 26;
+  parts.push(el('line', { x1: sx, x2: sx, y1: by, y2: by + bh, stroke: t.c('paper'), 'stroke-width': 3 }));
+  parts.push(el('line', { x1: bx, x2: bx + bw, y1: sy, y2: sy, stroke: t.c('paper'), 'stroke-width': 3 }));
+  // ticks in data units
+  xt.forEach(v => {
+    const px = X(v);
+    if (px < bx - 1 || px > bx + bw + 1) return;
+    parts.push(el('line', { x1: px, x2: px, y1: by + bh, y2: by + bh + 5, stroke: t.c('rule') }));
+    parts.push(textLines([fmtTick(ax, v)], { x: px, y: by + bh + 8, size: small, anchor: 'middle', valign: 'top', fill: t.c('muted'), attrs: { 'font-variant-numeric': 'tabular-nums' } }));
+  });
+  yt.forEach(v => {
+    const py = Y(v);
+    if (py < by - 1 || py > by + bh + 1) return;
+    parts.push(el('line', { x1: bx - 5, x2: bx, y1: py, y2: py, stroke: t.c('rule') }));
+    parts.push(textLines([fmtTick(ay, v)], { x: bx - 8, y: py, size: small, anchor: 'end', valign: 'middle', fill: t.c('muted'), attrs: { 'font-variant-numeric': 'tabular-nums' } }));
+  });
+  if (ax.splitLabel) parts.push(textLines([ax.splitLabel], { x: sx, y: by + 6, size: small, anchor: 'middle', valign: 'top', fill: t.c('muted'), weight: 600 }));
+  if (ay.splitLabel) parts.push(textLines([ay.splitLabel], { x: bx + bw - 6, y: sy - 6, size: small, anchor: 'end', valign: 'bottom', fill: t.c('muted'), weight: 600 }));
+  const axY = by + bh + 14 + xTickH, axX = bx - 14 - yTickW;
+  parts.push(el('line', { x1: bx, x2: bx + bw, y1: axY, y2: axY, stroke: t.c('ink'), 'stroke-width': 1.5, 'marker-end': `url(#${ctx.id}-arr-ink)` }));
+  parts.push(el('line', { x1: axX, x2: axX, y1: by + bh, y2: by, stroke: t.c('ink'), 'stroke-width': 1.5, 'marker-end': `url(#${ctx.id}-arr-ink)` }));
+  if (ax.low) parts.push(textLines([ax.low], { x: bx, y: axY + 12, size: small, valign: 'top', fill: t.c('muted') }));
+  if (ax.high) parts.push(textLines([ax.high], { x: bx + bw - 16, y: axY + 12, size: small, anchor: 'end', valign: 'top', fill: t.c('muted') }));
+  if (ax.title) parts.push(textLines([ax.title], { x: bx + bw / 2, y: axY + 12, size: size - 1, anchor: 'middle', valign: 'top', fill: t.c('ink'), weight: 700 }));
+  const ayx = axX - 12;
   if (ay.title) parts.push(textLines([ay.title], { x: ayx, y: by + bh / 2, size: size - 1, anchor: 'middle', valign: 'middle', fill: t.c('ink'), weight: 700, attrs: { transform: `rotate(-90 ${n(ayx)} ${n(by + bh / 2)})` } }));
   if (ay.low) parts.push(textLines([ay.low], { x: ayx, y: by + bh, size: small, anchor: 'start', valign: 'middle', fill: t.c('muted'), attrs: { transform: `rotate(-90 ${n(ayx)} ${n(by + bh)})` } }));
   if (ay.high) parts.push(textLines([ay.high], { x: ayx, y: by + 16, size: small, anchor: 'end', valign: 'middle', fill: t.c('muted'), attrs: { transform: `rotate(-90 ${n(ayx)} ${n(by + 16)})` } }));
   // Items: place each label on the first side (right, left, above, below) that collides
   // with no quadrant text, no other label and no point, and stays inside the field.
-  const items = (o.items || []).map(it => ({ it, px: bx + 24 + it.x * (bw - 48), py: by + bh - 24 - it.y * (bh - 48) }));
+  const items = (o.items || []).map(it => ({ it, px: X(it.x), py: Y(it.y) }));
   for (const { px, py } of items) occupied.push({ x: px - 11, y: py - 11, w: 22, h: 22 });
   const hit = (a, b) => a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h;
   const labelSize = Math.max(15, size - 2);
@@ -675,6 +776,16 @@ export function quadrantChart(o) {
       textLines([it.label], { x: lx, y: b.y + h / 2, size: labelSize, anchor, valign: 'middle', fill: hl ? t.c('accent') : t.c('ink'), weight: hl ? 700 : 600 })));
   });
   return root(o, ctx, markers(ctx), parts);
+}
+
+/** Nice round tick values covering [a, b]. */
+function niceTicks(a, b, count = 5) {
+  const span = Math.abs(b - a) || 1, raw = span / Math.max(1, count);
+  const p = 10 ** Math.floor(Math.log10(raw)), f = raw / p;
+  const step = (f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10) * p;
+  const lo = Math.ceil(Math.min(a, b) / step - 1e-9) * step, out = [];
+  for (let v = lo; v <= Math.max(a, b) + 1e-9; v += step) out.push(+v.toFixed(10));
+  return out;
 }
 
 /** Cycle diagram: steps arranged on a circle with arrows between consecutive steps. */

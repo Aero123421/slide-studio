@@ -11,7 +11,7 @@ const splits = [
   { name: 'Test', from: '2026-01-05', to: '2026-06-29', pumpWeeks: TEST.pumps * TEST.weeks, failures: TEST.failures, use: 'evaluate once, for this report' },
 ];
 const guards = ['2025-06-23', '2025-12-29']; // the week dropped before each boundary
-const guardText = 'The week before each boundary is dropped, so the run-up to one failure never lands on both sides of a split. Scores use only readings stored before Monday 06:00, and the test labels were opened once, for this report.';
+const guardText = 'The week before each boundary is dropped, so the run-up to one failure never sits on both sides of a split; scores use only readings stored before Monday 06:00.';
 
 // ---- derived
 const DAY = 864e5, d = s => new Date(`${s}T00:00:00Z`);
@@ -57,7 +57,8 @@ export default {
   content: `<p class="ml-run"><span>${report.model} pump-failure model — evaluation report</span><span>1</span></p>
 <h1 class="ml-head" data-region="title">Tested on the ${TEST.weeks} weeks after training, where 1 in ${oneIn} pump-weeks ended in a failure</h1>
 <p class="ml-lead" data-region="support">Every Monday ${report.model} scores each of the ${num(report.pumps)} lift-station pumps: ${report.question}</p>
-<figure class="ml-fig" style="left:64px;top:232px" data-region="primary">${fig}</figure>
+<figure class="ml-fig" style="left:64px;top:234px" data-region="primary">${fig}</figure>
+<p class="ml-cap" style="left:64px;top:364px;width:1054px" data-region="source"><b>Figure 1.</b> Illustrative data: one score per pump each Monday, ${fmtDate(splits[0].from)} to ${fmtDate(test.to)}; the white gaps are the guard weeks.</p>
 <table class="ml-table ml-splits" data-region="primary">
 <thead><tr><th>Split</th><th>Weekly scores</th><th class="r">Pump-weeks</th><th class="r">Failures</th><th class="r">Failure rate</th><th>Used to</th></tr></thead>
 <tbody>${splits.map(s => `<tr><td>${s.name}</td><td>${span(s)} <span class="mute">(${weeks(s)} weeks)</span></td><td class="r num">${num(s.pumpWeeks)}</td><td class="r num">${num(s.failures)}</td><td class="r num">${pct(rate(s))}</td><td>${s.use}</td></tr>`).join('')}</tbody>

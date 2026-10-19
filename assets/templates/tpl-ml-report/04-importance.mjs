@@ -63,5 +63,5 @@ export default {
   content: `<p class="ml-run"><span>PF-7 v3 pump-failure model — evaluation report</span><span>4</span></p>
 <h1 class="ml-head" data-region="title">${cap(first.short)} and ${second.short} carry most of the signal; ${list(nothing.map(r => r.short))} add nothing</h1>
 <figure class="ml-fig" style="left:64px;top:196px" data-region="primary">${fig}</figure>
-<p class="ml-cap" style="left:64px;top:620px;width:858px"><b>Figure 4.</b> How far average precision (${AP.toFixed(2)} on the test set) falls when one input is shuffled across pump-weeks; mean of ${REPEATS} shuffles with a 95% interval. Hollow grey marks include zero.</p>`,
+<p class="ml-cap" style="left:64px;top:620px;width:858px" data-region="source"><b>Figure 4.</b> Illustrative data: how far average precision (${AP.toFixed(2)} on the test set) falls when one input is shuffled; mean of ${REPEATS} shuffles with a 95% interval. Hollow grey marks include zero.</p>`,
 };

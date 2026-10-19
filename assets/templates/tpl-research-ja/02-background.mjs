@@ -1,7 +1,7 @@
 // Template: 学会発表（日本語） · 背景（なぜラベルが足りないか＋タスクの図）. Synthetic example content; replace data and copy.
 // The patch (a) and the mask (b) are rasterised from ONE crack geometry, pixel by pixel, so the
 // mask is exactly what an annotator would have to paint. It is a schematic, and the page says so.
-import { el, esc, fmt } from '../../runtime/figure.mjs';
+import { el, fmt } from '../../runtime/figure.mjs';
 
 const ID = 'tpl-research-ja-background';
 const cost = {
@@ -65,24 +65,25 @@ const n0 = v => fmt(v, { locale: 'ja', digits: 0 });
 // ---- drawing: runs of equal quantised grey become one rect (keeps the SVG small)
 const W = 662, H = 404, P = N * px, gap = W - 2 * P, top = 34;
 const levels = 40, toHex = v => { const k = Math.round(v * 255).toString(16).padStart(2, '0'); return `#${k}${k}${k}`; };
-function patch(x0) {
-  const out = [];
-  for (let j = 0; j < N; j++) {
-    let i = 0;
-    while (i < N) {
-      const q = Math.round(grey[j][i] * (levels - 1));
-      let k = i + 1;
-      while (k < N && Math.round(grey[j][k] * (levels - 1)) === q) k++;
-      out.push(el('rect', { x: x0 + i * px, y: top + j * px, width: (k - i) * px, height: px, fill: toHex(q / (levels - 1)) }));
-      i = k;
-    }
+// runs of equal quantised grey become one rect, grouped by grey (keeps the SVG small)
+function runs(value, x0) {
+  const groups = {};
+  for (let j = 0; j < N; j++) for (let i = 0; i < N;) {
+    const q = value(i, j); let k = i + 1;
+    while (k < N && value(k, j) === q) k++;
+    if (q !== null) (groups[q] ||= []).push(`<rect x="${x0 + i * px}" y="${top + j * px}" width="${(k - i) * px}" height="${px}"/>`);
+    i = k;
   }
-  return out.join('');
+  return groups;
+}
+function patch(x0) {
+  const g = runs((i, j) => Math.round(grey[j][i] * (levels - 1)), x0);
+  return Object.entries(g).map(([q, r]) => `<g fill="${toHex(q / (levels - 1))}">${r.join('')}</g>`).join('');
 }
 function maskPanel(x0) {
   const out = [el('rect', { x: x0, y: top, width: P, height: P, fill: '#ffffff' })];
-  for (let k = 1; k < N; k++) out.push(el('path', { d: `M${x0 + k * px} ${top}V${top + P}M${x0} ${top + k * px}H${x0 + P}`, stroke: 'var(--rj-grid)', 'stroke-width': 1 }));
-  for (let j = 0; j < N; j++) for (let i = 0; i < N; i++) if (mask[j][i]) out.push(el('rect', { x: x0 + i * px, y: top + j * px, width: px, height: px, fill: 'var(--rj-ink)' }));
+  out.push(el('path', { d: Array.from({ length: N - 1 }, (_, k) => `M${x0 + (k + 1) * px} ${top}V${top + P}M${x0} ${top + (k + 1) * px}H${x0 + P}`).join(''), stroke: 'var(--rj-grid)', 'stroke-width': 1 }));
+  out.push(el('g', { fill: 'var(--rj-ink)' }, (runs((i, j) => (mask[j][i] ? 1 : null), x0)[1] || []).join('')));
   out.push(el('rect', { x: x0 + 0.5, y: top + 0.5, width: P - 1, height: P - 1, fill: 'none', stroke: 'var(--rj-base2)', 'stroke-width': 1 }));
   return out.join('');
 }

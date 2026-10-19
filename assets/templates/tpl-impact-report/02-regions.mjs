@@ -71,11 +71,11 @@ export default {
   id: ID,
   language: 'ja',
   title: 'Results by district: share of eligible children reached',
-  notes: 'Purpose: 地区ごとに「支援が必要な子どものうち、どれだけに届いているか」を比べ、次の教室をどこに開くかの根拠を示す。\nModify: districts の教室数・参加者数・対象者数を差し替える。割合、並び順、市全体の値、強調する地区（割合が最も低い地区）は自動で決まる。note には強調した地区の事情を一文で書く。\nInvariant: 割合の分母（対象の子ども）を必ず表に出す。参加者の合計は1ページ目の486人と一致させる。地図は使わない（位置関係を捏造しない）。\nStatic: 静的ページ。',
+  notes: 'Purpose: 地区ごとに「支援が必要な子どものうち、どれだけに届いているか」を比べ、次の教室をどこに開くかの根拠を示す。\nModify: districts の教室数・参加者数・対象者数を差し替える。割合、並び順、市全体の値、強調する地区（割合が最も低い地区）は自動で決まる。note には強調した地区の事情を一文で書く。見出しの改行は <br> で文や句の切れ目に入れる。\nInvariant: 割合の分母（対象の子ども）を必ず表に出す。参加者の合計は1ページ目の486人と一致させる。地図は使わない（位置関係を捏造しない）。\nStatic: 静的ページ。',
   sources: [],
   exportPolicy: 'final',
   className: 'tpl-impact-report ir-regions',
-  content: `<h1 class="ir-h" data-region="title">${low.name}地区では、支援を必要とする子どもの<span class="ir-nw">${oneIn}人に1人</span>にしか届いていない</h1>
+  content: `<h1 class="ir-h" data-region="title">${low.name}地区では、<br>支援を必要とする子どもの<span class="ir-nw">${oneIn}人に1人</span>にしか届いていない</h1>
 <figure class="ir-fig" style="left:64px;top:200px;width:${W}px;height:${H}px" data-region="primary">${svg}</figure>
 <div class="ir-foot" data-region="source"><p>対象の子ども：就学援助を受けている市内の小中学生（2025年5月1日現在、市教育委員会）。参加した子どもは年度内の実人数</p><p>ゆうがた教室　2025年度 活動報告<b>2</b></p></div>`,
 };

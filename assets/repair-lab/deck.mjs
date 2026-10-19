@@ -20,7 +20,7 @@ import { quantity, change, paired, totalCost, segments } from '../runtime/quant.
 import { validateGraph } from '../runtime/semantic-graph.mjs';
 import {
   waterfallChart, lineChart, flowDiagram, columnChart, barChart, stackedBarChart, slopeChart,
-  svgRoot, el, g, textLines, wrapText, linear, band, axis, barPath, legend, fmt, sum, extent, niceDomain,
+  svgRoot, el, textLines, wrapText, linear, band, axis, barPath, legend, fmt, sum, extent, niceDomain,
 } from '../runtime/figure.mjs';
 import { offers, planNames, cheapestRuns } from './period.mjs';
 
@@ -55,7 +55,7 @@ export const css = `${frame}\n${waAi}\n
 .lab .lab-fault { position: relative; }
 .lab .lab-ring { position: absolute; inset: -5px -9px; border: 2.5px solid var(--ss-negative); border-radius: 10px; pointer-events: none; }
 .lab .lab-note { position: absolute; z-index: 2; margin: 0; padding: 10px 16px 12px; background: var(--ss-paper); border: 2px solid var(--ss-negative); border-radius: 8px;
-  font: 600 18px/1.6 var(--ss-font-sans); color: var(--ss-negative); pointer-events: none; }
+  font: 600 18px/1.6 var(--ss-font-sans); color: var(--ss-negative); }
 .lab .lab-note span { display: block; font-weight: 400; color: var(--ss-ink); }
 .lab svg .lab-svg-ring { fill: none; stroke: var(--ss-negative); stroke-width: 2.5; }
 .lab .lab-wf { --ss-positive: var(--ss-ink); }   /* waterfall: delta bars take the accent, their labels stay ink */
@@ -71,7 +71,7 @@ export const css = `${frame}\n${waAi}\n
 
 /* The flawed card pattern some BEFORE pages show (not used on AFTER pages). */
 .lab .lab-cards { position: absolute; left: 64px; right: 64px; top: 188px; display: flex; gap: 18px; }
-.lab .lab-card { flex: 1; padding: 16px 18px; background: var(--ss-paper); border: 1px solid var(--ss-rule); border-radius: 14px; box-shadow: 0 6px 18px rgb(24 42 62 / .10); }
+.lab .lab-card { flex: 1; padding: 16px 18px; background: var(--ss-paper); border: 1px solid var(--ss-rule); border-radius: 14px; }
 .lab .lab-card h3 { margin: 0 0 6px; font-size: 17px; }
 .lab .lab-card p { margin: 0; font-size: 14px; line-height: 1.6; color: var(--ss-muted); }
 
@@ -104,8 +104,9 @@ const svgRing = (x, y, w, h, r = 12) => el('rect', { x, y, width: w, height: h, 
 
 const labSlides = [];
 /**
- * Register a pair. `page(v)` returns the page for v = 'before' | 'after'.
- * `failure` names the one failure; `repair` names the operation that fixes it.
+ * Register a pair. `page(v, tag)` returns the page for v = 'before' | 'after'; `tag` is the
+ * lab line for the right half of the source row. `failure` names the one failure, `repair`
+ * the operation that fixes it, `lesson` the notes an agent reads (failure, repair, what must remain).
  */
 function pair(id, { failure, repair, page, lesson, className = '', readingMode, copyWaivers }) {
   const base = { study: true, className: `st cs-wa-ai lab ${className}`.trim(), exportPolicy: 'final', ...(readingMode ? { readingMode } : {}) };
@@ -244,6 +245,7 @@ const turbidityGap = { month: 7, reason: '増水で採水を中止' };
 const turbidityLimit = 10;                                 // 度・浄水場が取水を絞る目安（架空の運用基準）
 const turbidityPoints = turbidity.map((y, i) => ({ x: i + 1, y }));
 const overLimit = turbidityPoints.filter(p => p.y != null && p.y > turbidityLimit).map(p => `${p.x}月`);
+const observedRuns = segments(turbidityPoints).map(r => `${r[0].x}〜${r.at(-1).x}月`);   // stretches actually measured
 if (turbidity[turbidityGap.month - 1] !== null) throw Error('the gap month must be null in the data');
 
 pair('missing-is-not-a-line', {
@@ -251,22 +253,22 @@ pair('missing-is-not-a-line', {
   repair: '欠測の月で線を切り、理由を書き添える',
   lesson: {
     failure: 'June and August are joined by a straight line, so the unmeasured flood month reads as an observed transition.',
-    repair: 'keep July as null: the engine breaks the line (segments()), and a band names the gap and its reason.',
+    repair: 'keep July as null: lineChart breaks the line there (segments() in quant.mjs gives the same observed stretches for the description), and a band names the gap and its reason.',
     keep: 'every observed value, the threshold, the reason for the gap; missing is neither zero nor an average of neighbours.',
   },
   page: (v, tag) => {
-    const kept = v === 'before' ? segments(turbidityPoints).flat() : turbidityPoints;  // BEFORE drops the gap → the line bridges it
+    const kept = v === 'before' ? turbidityPoints.filter(p => p.y != null) : turbidityPoints;  // BEFORE: missing month filtered out, so one line bridges it
     const chart = lineChart({
-      id: `turbidity-${v}`, width: 1152, height: 482, fontSize: 17, locale: 'ja', xType: 'linear',
+      id: `turbidity-${v}`, width: 1152, height: 482, fontSize: 19, locale: 'ja', xType: 'linear',
       title: '中川橋の濁度（月1回の採水、2025年）',
-      desc: `濁度は${overLimit.join('と')}に${turbidityLimit}度を超えた。${turbidityGap.month}月は${turbidityGap.reason}のため欠測。`,
+      desc: `濁度は${overLimit.join('と')}に${turbidityLimit}度を超えた。観測は${observedRuns.join('と')}で、${turbidityGap.month}月は${turbidityGap.reason}のため欠測。`,
       series: [{ name: '中川橋', points: kept.map(p => [p.x, p.y]) }],
       xTicks: 12, xFormat: m => `${m}月`, xDomain: [1, 12], yDomain: [0, 15], yTicks: 3, unit: '濁度（度）',
       markers: 'all', endLabels: false, format: { digits: 1 },
       refLines: [{ y: turbidityLimit, label: `取水を絞る目安 ${turbidityLimit}度`, labelPos: 'start' }],
       bands: v === 'after' ? [{ from: turbidityGap.month - 0.42, to: turbidityGap.month + 0.42 }] : [],
       extra: ({ x, y }) => v === 'after'
-        ? textLines(['欠測', turbidityGap.reason], { x: x(turbidityGap.month), y: y(7.2), size: 17, anchor: 'middle', fill: 'var(--ss-ink)', weight: 600, lineHeight: 1.35 })
+        ? textLines(['欠測', turbidityGap.reason], { x: x(turbidityGap.month), y: y(7.2), size: 19, anchor: 'middle', fill: 'var(--ss-ink)', weight: 600, lineHeight: 1.35 })
         : svgRing(x(6) - 22, y(13.5), x(8) - x(6) + 44, y(10.4) - y(13.5)),
     });
     return labPage({
@@ -317,7 +319,7 @@ pair('conditional-outcomes', {
     const nodes = [
       { id: 'in', label: '返品受付', sub: `9月 ${num(returns.received)}件`, kind: 'terminal' },
       { id: 'inspect', label: '全数検査', kind: 'decision' },
-      ...returns.outcomes.map(o => ({ id: o.id, label: o.label, sub: `${o.count}件（${num(share(o) * 100)}%）\n発送まで平均${o.days}日` })),
+      ...returns.outcomes.map(o => ({ id: o.id, label: o.label, sub: `${o.count}件（${num(share(o) * 100)}%）\n発送まで平均${o.days}日`, emphasis: o === returns.outcomes[0] })),
     ];
     const edges = v === 'before'
       ? [{ from: 'in', to: 'inspect' }, { from: 'inspect', to: 'back' }, ...chainEdges.map(e => ({ from: e.from, to: e.to }))]
@@ -351,7 +353,7 @@ const queues = [                                           // 平均待ち時間
   { name: '北支所', values: [16, 17, 16, 18, 17, 22, 25, 27, 29, 31, 33, 34] },
   { name: '南支所', values: [12, 13, 12, 12, 14, 13, 12, 13, 13, 12, 13, 12] },
 ];
-const queueChange = { week: '8/11', text: '8/11から窓口を3席から2席に' };
+const queueChange = { week: '8/11', text: '8/11、窓口を3席から2席に減らす' };
 const north = queues.find(q => q.name === '北支所');
 const othersRange = extent(queues.filter(q => q !== north).flatMap(q => q.values));
 
@@ -366,15 +368,15 @@ pair('encoding-map', {
   page: (v, tag) => {
     const legendItems = queues.map((q, i) => ({ label: q.name, color: `var(--ss-cat-${i + 1})` }));
     const chart = lineChart({
-      id: `queues-${v}`, width: 1152, height: 482, fontSize: 17, locale: 'ja',
+      id: `queues-${v}`, width: 1152, height: 482, fontSize: 19, locale: 'ja',
       title: '窓口別の平均待ち時間（分、週ごと）',
       desc: `北支所だけが8月から伸び、${north.values.at(-1)}分。本庁舎と南支所は${othersRange[0]}〜${othersRange[1]}分。`,
       x: weeks, unit: '平均待ち時間（分）', yDomain: [0, 40], yTicks: 4, xEvery: 1,
       series: v === 'before' ? queues.map(q => ({ ...q, color: 'var(--ss-ink)' })) : queues,
       highlight: v === 'after' ? north.name : null, endLabels: v === 'after', markers: v === 'after' ? 'last' : 'none',
       format: { digits: 0, suffix: '分' },
-      annotate: v === 'after' ? [{ series: north.name, at: queueChange.week, text: queueChange.text, dx: -40, dy: -70, size: 17, width: 320 }] : [],
-      after: v === 'before'
+      annotate: v === 'after' ? [{ series: north.name, at: queueChange.week, text: queueChange.text, dx: -40, dy: -70, size: 19, width: 340 }] : [],
+      after: v === 'before'                                  // the template's legend, top right; the ring encloses it
         ? legend(legendItems, { x: 760, y: 14, size: 17, gap: 28 }) + svgRing(744, -6, 392, 40)
         : '',
     });
@@ -413,7 +415,7 @@ pair('proposal-scope', {
   page: (v, tag) => {
     const rows = v === 'before' ? ['現在', '新システム'] : ['現在（2026年上期の実績）', '新システム（ベンダー試算）'];
     const chart = stackedBarChart({
-      id: `close-${v}`, width: 1152, height: 330, fontSize: 18, locale: 'ja', labelWidth: 260,
+      id: `close-${v}`, width: 1152, height: 330, fontSize: 19, locale: 'ja', labelWidth: 260,
       title: '月次決算にかかる営業日（工程別）',
       desc: `現在${num(closeNow, 1)}営業日、新システムは試算で${num(closeEst, 1)}営業日。変わるのは${changedTasks.join('と')}。`,
       categories: rows, series: closeTasks.map(t => ({ name: t.name, values: [t.now, t.est] })),
@@ -462,7 +464,7 @@ function journeyStrip(id, { width = 1152, height = 400 } = {}) {
     parts.push(textLines([s.result], { x: x(i), y: 286, size: 26, anchor: 'middle', fill: c, weight: 700 }));
   });
   parts.push(textLines([`途中で捨てると、${journey[last].station}で${journey[0].station}からの運賃をもう一度払うことになる。`], { x: width / 2, y: 372, size: 21, anchor: 'middle', fill: 'var(--ss-muted)' }));
-  return svgRoot({ id, width, height, title: 'きっぷの扱い：乗車から降車まで', desc: journey.map(s => `${s.station}で${s.act}と${s.result}`).join('。') }, ...parts);
+  return svgRoot({ id, width, height, title: 'きっぷの扱い：乗車から降車まで', desc: journey.map(s => `${s.station}：${s.act}。${s.result}`).join('。') + '。' }, ...parts);
 }
 
 pair('literal-before-clever', {
@@ -515,7 +517,6 @@ function stepTimeline(id, { width = 1152, height = 470 } = {}) {
 pair('small-top-heavy', {
   failure: '小さな枠4つが上に詰まり、下半分が空いている',
   repair: '日数を長さで描き、説明を読める大きさにする',
-  readingMode: 'live',
   lesson: {
     failure: 'four boxed steps with 14 px text sit in the top third; the lower half of the page is empty.',
     repair: 'allocate the page to the evidence: one row per step at reading size, durations drawn as lengths on a shared day axis.',
@@ -615,7 +616,7 @@ pair('image-evidence', {
     head: '抽出がうまくいったかは、まずクレマの色とむらで見る',
     quiet: 'この一杯は色がそろっていて、適正な抽出の例',
     body: v === 'before'
-      ? `<div style="position:absolute;left:64px;top:206px">${fault(`<img src="${photo.src}" alt="エスプレッソのカップ" style="display:block;width:270px;height:180px;object-fit:cover;border-radius:18px;box-shadow:0 10px 26px rgb(24 42 62 / .22)">`)}</div>
+      ? `<div style="position:absolute;left:64px;top:206px">${fault(`<img src="${photo.src}" alt="エスプレッソのカップ" style="display:block;width:270px;height:180px;object-fit:cover;border-radius:18px">`)}</div>
 <ul class="st-text" data-region="primary" style="position:absolute;left:380px;top:206px;width:520px;margin:0;padding-left:1.2em">${cremaNotes.map(n => `<li>${n.title}：${n.text}</li>`).join('')}</ul>
 ${note('写真が小さなカードに収まっている。', '説明が写真のどこを指すのか、読み取れない。', 'left:64px;top:420px;width:420px')}`
       : `<figure class="st-fig" data-region="primary" style="bottom:56px">${cremaFigure(`crema-${v}`)}</figure>`,
@@ -668,14 +669,14 @@ const planTotals = offers.map(o => ({ ...o, total: totalCost({ ...o, months: hor
 const cheapestPlan = [...planTotals].sort((a, b) => a.total - b.total)[0];
 const runnerUp = [...planTotals].sort((a, b) => a.total - b.total)[1];
 const shortWinner = cheapestRuns()[0];                     // 短い期間でもっとも安い案と、その境目（か月）
-const exportMemo = '配布用メモ：印刷・PDFでは36か月表示が残ります。';
+const exportMemo = `配布用メモ：印刷・PDFでは${horizon}か月表示が残ります。`;   // the operator note the BEFORE page leaks
 
 pair('export-note', {
   failure: '出力のための操作メモが、スライドの本文に出ている',
   repair: '表示している条件を書き、操作メモは台本に移す',
   copyWaivers: [
     { rule: 'ja-export-production-cue', quote: '配布用メモ：', reason: 'Repair-lab BEFORE page quoting the production note it teaches readers to remove.' },
-    { rule: 'ja-export-production-cue', quote: '印刷・PDFでは36か月表示が残', reason: 'Repair-lab BEFORE page quoting the production note it teaches readers to remove.' },
+    { rule: 'ja-export-production-cue', quote: `印刷・PDFでは${horizon}か月表示が残`, reason: 'Repair-lab BEFORE page quoting the production note it teaches readers to remove.' },
   ],
   lesson: {
     failure: 'an operator note about printing and PDF export is set on the canvas where the audience reads it; the comparison condition is missing.',
@@ -720,20 +721,28 @@ const protocol = [
   { step: '新プレートで同じ条件を測る', detail: '順序は6台とも「従来→新」で同じ' },
 ];
 
-/** Side view of one module on its cooling plate. Cell and sensor positions come from `rig`. */
-function moduleSection(id, { width = 700, height = 470 } = {}) {
-  const cellW = 40, gap = 6, x0 = 40, cellTop = 150, cellH = 170, plateY = cellTop + cellH + 4, plateH = 46;
-  const cx = i => x0 + i * (cellW + gap), right = cx(rig.cells - 1) + cellW;
-  const parts = [];
-  for (let i = 0; i < rig.cells; i++) parts.push(el('rect', { x: cx(i), y: cellTop, width: cellW, height: cellH, rx: 4, fill: 'var(--ss-surface)', stroke: 'var(--ss-muted)', 'stroke-width': 1.5 }));
-  for (const i of rig.thermocouples) parts.push(el('circle', { cx: cx(i) + cellW / 2, cy: cellTop + 34, r: 7, fill: 'var(--ss-accent)' }));
-  parts.push(el('rect', { x: x0 - 14, y: plateY, width: right - x0 + 28, height: plateH, rx: 4, fill: 'var(--ss-ink)' }));
-  for (let k = 0; k < 6; k++) parts.push(el('circle', { cx: x0 + 26 + k * ((right - x0 - 52) / 5), cy: plateY + plateH / 2, r: 9, fill: 'var(--ss-paper)' }));
-  const leader = (x1, y1, x2, y2) => el('path', { d: `M${x1} ${y1}V${y2}H${x2}`, fill: 'none', stroke: 'var(--ss-muted)', 'stroke-width': 1.3 });
-  parts.push(leader(cx(rig.thermocouples[0]) + cellW / 2, cellTop + 26, x0, 100), textLines([`熱電対 ${rig.thermocouples.length}点（最高値を記録）`], { x: x0, y: 92, size: 20, fill: 'var(--ss-accent)', weight: 700 }));
-  parts.push(textLines([`セル ${rig.cells}本`], { x: x0, y: 40, size: 20, fill: 'var(--ss-ink)', weight: 700 }), leader(cx(0) + 8, cellTop, x0, 48));
-  parts.push(textLines(['冷却プレート（ここを交換して比べる）'], { x: x0 - 14, y: plateY + plateH + 40, size: 20, fill: 'var(--ss-ink)', weight: 700 }));
-  parts.push(textLines([`流路を流れる${rig.coolant}`], { x: x0 - 14, y: plateY + plateH + 72, size: 19, fill: 'var(--ss-muted)' }));
+/** Side view of one module on its cooling plate, labelled on the right. Cell and sensor positions come from `rig`. */
+function moduleSection(id, { width = 700, height = 450 } = {}) {
+  const cellW = 34, gap = 6, x0 = 14, cellTop = 96, cellH = 200, plateH = 48, plateY = cellTop + cellH + 4;
+  const cx = i => x0 + i * (cellW + gap), right = cx(rig.cells - 1) + cellW, labelX = right + 52;
+  const sensorY = cellTop + 30, lastSensor = cx(rig.thermocouples.at(-1)) + cellW / 2;
+  const parts = [
+    // cells, with a bracket that counts them
+    ...Array.from({ length: rig.cells }, (_, i) => el('rect', { x: cx(i), y: cellTop, width: cellW, height: cellH, rx: 4, fill: 'var(--ss-surface)', stroke: 'var(--ss-muted)', 'stroke-width': 1.5 })),
+    el('path', { d: `M${x0} ${cellTop - 14}V${cellTop - 24}H${right}V${cellTop - 14}`, fill: 'none', stroke: 'var(--ss-muted)', 'stroke-width': 1.5 }),
+    textLines([`セル ${rig.cells}本`], { x: (x0 + right) / 2, y: cellTop - 40, size: 22, anchor: 'middle', fill: 'var(--ss-ink)', weight: 700 }),
+    // thermocouples on the cells they sit on
+    ...rig.thermocouples.map(i => el('circle', { cx: cx(i) + cellW / 2, cy: sensorY, r: 7, fill: 'var(--ss-accent)' })),
+    el('path', { d: `M${lastSensor + 9} ${sensorY}H${labelX - 10}`, fill: 'none', stroke: 'var(--ss-accent)', 'stroke-width': 1.5 }),
+    textLines([`熱電対 ${rig.thermocouples.length}点`], { x: labelX, y: sensorY, size: 22, valign: 'middle', fill: 'var(--ss-accent)', weight: 700 }),
+    textLines(['最高値を記録'], { x: labelX, y: sensorY + 34, size: 22, valign: 'middle', fill: 'var(--ss-muted)' }),
+    // the plate that is swapped, with its coolant channels
+    el('rect', { x: x0 - 8, y: plateY, width: right - x0 + 16, height: plateH, rx: 4, fill: 'var(--ss-ink)' }),
+    ...Array.from({ length: 6 }, (_, k) => el('circle', { cx: x0 + 28 + k * ((right - x0 - 56) / 5), cy: plateY + plateH / 2, r: 9, fill: 'var(--ss-paper)' })),
+    el('path', { d: `M${right + 12} ${plateY + plateH / 2}H${labelX - 10}`, fill: 'none', stroke: 'var(--ss-ink)', 'stroke-width': 1.5 }),
+    textLines(['冷却プレート'], { x: labelX, y: plateY + plateH / 2 - 14, size: 22, valign: 'middle', fill: 'var(--ss-ink)', weight: 700 }),
+    textLines(['交換して比べる', rig.coolant], { x: labelX, y: plateY + plateH / 2 + 16, size: 22, valign: 'top', fill: 'var(--ss-muted)', lineHeight: 1.45 }),
+  ];
   return svgRoot({ id, width, height, title: '電池モジュールと冷却プレートの断面（模式図）', desc: `${rig.cells}本のセルが冷却プレートの上に並び、${rig.thermocouples.length}点の熱電対で温度を測る。` }, ...parts);
 }
 
@@ -742,7 +751,7 @@ const sampleNeed = (() => {                                // 平均差を検出
   return { n, planned: n + 2 };                            // 欠測に備えて2台を足す
 })();
 const nextSteps = [
-  { limit: '測定の順序が6台とも「従来 → 新」', why: '2回目のほうが温度が低く出る癖があっても、プレートの差と区別できない', change: '半数の台は「新 → 従来」の順で測る' },
+  { limit: '測る順序が全台「従来→新」', why: '2回目のほうが温度が低く出る癖があっても、プレートの差と区別できない', change: '半数の台は「新 → 従来」の順で測る' },
   { limit: `${missingIds.join('・')}が欠測（熱電対の断線）`, why: `差を${cooling.n}台だけで計算している`, change: '各セルに予備の熱電対を2点付ける' },
   { limit: `台数が${modules.length}台`, why: `差のばらつき（標準偏差${num(cooling.sampleSD, 1)}℃）に対して少ない`, change: `${sampleNeed.planned}台に増やす（必要な${sampleNeed.n}台＋予備2台）` },
 ];
@@ -754,28 +763,31 @@ export const talk = {
 .talk .talk-steps { position: absolute; left: 812px; right: 64px; top: 196px; margin: 0; padding: 0; list-style: none; counter-reset: step; }
 .talk .talk-steps li { position: relative; padding: 0 0 22px 48px; margin-bottom: 22px; border-bottom: 1px solid var(--ss-rule); counter-increment: step; }
 .talk .talk-steps li::before { content: counter(step); position: absolute; left: 0; top: 0; font: 700 26px/1.3 var(--ss-font-sans); color: var(--ss-accent); }
-.talk .talk-steps b { display: block; font-size: 22px; line-height: 1.45; }
-.talk .talk-steps span { display: block; margin-top: 4px; font-size: 19px; line-height: 1.6; color: var(--ss-muted); }
-.talk .lab-table { font-size: 21px; }
+.talk .talk-steps b { display: block; font-size: 24px; line-height: 1.45; }
+.talk .talk-steps span { display: block; margin-top: 4px; font-size: 22px; line-height: 1.55; color: var(--ss-muted); }
+.talk .st-kpi span, .talk .st-text, .talk .lab-under { font-size: 22px; line-height: 1.55; }
+.talk .lab-table { font-size: 22px; line-height: 1.55; }
+.talk .lab-table td { padding: 22px 28px 22px 0; }
 .talk .lab-table td:first-child { width: 330px; font-weight: 700; }
+.talk .lab-table td:nth-child(2) { width: 430px; }
 `,
   slides: [
     talkSlide('protocol', '何を比べたか', '', labPage({
       head: `${modules.length}台のモジュールを、従来プレートと新プレートの両方で測った`,
       quiet: `比べるのは温度上昇（最高セル温度 − 室温）。${rig.discharge}、${rig.room}でそろえた`,
-      body: `<figure class="st-fig" data-region="primary" style="right:auto;width:700px;top:190px;bottom:60px">${moduleSection('rig-section')}</figure>
+      body: `<figure class="st-fig" data-region="primary" style="right:auto;width:700px;top:200px;bottom:70px">${moduleSection('rig-section')}</figure>
 <ol class="talk-steps" data-region="support">${protocol.map(p => `<li><b>${p.step}</b><span>${p.detail}</span></li>`).join('')}</ol>`,
       source: `${SYNTH}・試験室B、2026年9月。図は模式図で、寸法は実物と異なる`,
     }), 'Protocol before interpretation: what was compared, on which units, under which fixed conditions, in which order. The fixed order is stated here because page 3 lists it as a limitation.'),
     talkSlide('paired-result', '結果：5台の差', 'st--rail', labPage({
       head: `${cooling.n}台中${cooling.below}台で、新プレートの温度上昇が小さかった`,
-      quiet: `平均の差は${num(cooling.mean, 1)}℃（新 − 従来）。${worse.map(r => r.id).join('・')}は大きく、${missingIds.join('・')}は欠測`,
+      quiet: `平均の差は${num(cooling.mean, 1)}℃（新 − 従来）。${worse.map(r => `${r.id}は${num(r.difference, 1)}℃大きく`).join('、')}、${missingIds.join('・')}は欠測`,
       body: `<figure class="st-fig" data-region="primary">${slopeChart({
-        id: 'cooling-slope', width: 800, height: 482, fontSize: 19, locale: 'ja', format: { digits: 1 },
+        id: 'cooling-slope', width: 800, height: 482, fontSize: 22, locale: 'ja', format: { digits: 1 },
         title: 'モジュール別の温度上昇（℃）、従来プレートと新プレート',
         desc: `${cooling.n}台のうち${cooling.below}台で新プレートの温度上昇が小さい。${worse.map(r => r.id).join('・')}は大きくなった。`,
         data: cooling.rows.map(r => ({ label: r.id, a: r.before, b: r.after, color: r.difference > 0 ? 'var(--ss-negative)' : 'var(--ss-accent)' })),
-        aLabel: '従来プレート', bLabel: '新プレート', highlight: () => true,
+        aLabel: '従来プレート（℃）', bLabel: '新プレート（℃）', highlight: () => true,
       })}</figure>
 <div class="st-rail" data-region="support">
   <div class="st-kpi"><b class="is-accent">${num(cooling.mean, 1)}<small>℃</small></b><span>平均の差（新 − 従来、${cooling.n}台）</span></div>
@@ -792,7 +804,8 @@ export const talk = {
       body: `<table class="lab-table" data-region="primary">
   <thead><tr><th>今回の制約</th><th>なぜ問題か</th><th>次の測定で変えること</th></tr></thead>
   <tbody>${nextSteps.map(s => `<tr><td>${s.limit}</td><td>${s.why}</td><td>${s.change}</td></tr>`).join('')}</tbody>
-</table>`,
+</table>
+<p class="lab-under" style="top:584px"><b>採用の基準</b>　${sampleNeed.planned}台の平均の差が0℃を下回り、その95%信頼区間も0を含まなければ、新プレートを採用する</p>`,
       source: `${SYNTH}・必要台数は平均の差${num(Math.abs(cooling.mean), 1)}℃、標準偏差${num(cooling.sampleSD, 1)}℃から正規近似で計算（検出力80%、両側5%）`,
     }), 'Limitations sit next to the concrete change that addresses each one. The sample size is computed from the observed mean and SD, not typed; it is a planning estimate, not a promise.'),
   ],

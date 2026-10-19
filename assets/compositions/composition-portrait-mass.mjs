@@ -1,7 +1,7 @@
 // Composition study · Portrait mass — a tall drawing (a peat core and the survey post beside it)
 // takes the right five columns at full height; a column of type balances it on the left, its
 // headline level with the 1956 surface and its last line level with the clay. Drawn from `core`.
-import { svgRoot, el, g, textLines, linear, spreadLabels, theme as makeTheme, fmt } from '../runtime/figure.mjs';
+import { svgRoot, el, textLines, linear, spreadLabels, theme as makeTheme, fmt } from '../runtime/figure.mjs';
 
 const ID = 'composition-portrait-mass';
 // Hollin Moss, core HM-3 taken beside the 1956 survey post (illustrative).

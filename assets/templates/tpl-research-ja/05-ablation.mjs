@@ -71,7 +71,7 @@ out.push(rule(yy, true));
 // shared axis for the interval column: reference at 0 (= 提案法)
 const ticks = [-15, -10, -5, 0];
 out.splice(1, 0, ...ticks.map(v => el('line', { x1: x(v), x2: x(v), y1: plotTop, y2: plotBottom, stroke: v === 0 ? 'var(--rj-accent)' : 'var(--rj-grid)', 'stroke-width': v === 0 ? 1.5 : 1 })));
-out.push(...ticks.map(v => textLines([v === 0 ? '0' : fmt(v)], { x: x(v), y: yy + 8, size: 15, anchor: 'middle', valign: 'top', fill: v === 0 ? 'var(--rj-accent)' : 'var(--rj-muted)', attrs: { 'font-variant-numeric': 'tabular-nums' } })));
+out.push(...ticks.map(v => textLines([v === 0 ? '0' : fmt(v)], { x: x(v), y: yy + 8, size: 16, anchor: 'middle', valign: 'top', fill: v === 0 ? 'var(--rj-accent)' : 'var(--rj-muted)', attrs: { 'font-variant-numeric': 'tabular-nums' } })));
 const H = yy + 30;
 const table = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-labelledby="${ID}-t ${ID}-d">
 <title id="${ID}-t">構成要素を外したときのIoUの差と途切れの数（ラベル${labeled}枚）</title>

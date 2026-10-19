@@ -23,7 +23,7 @@ const durations = [ // measured from the start of customer impact
 ];
 const lessons = [
   { lead: 'The page named the symptom.', text: 'The alert fired on checkout errors; nothing watched the cache hit ratio, so the first 14 minutes went to the gateway and the replica.' },
-  { lead: 'Pausing reporting only halved the pain.', text: 'p99 dropped from 2.0 s to 1.6 s at 18:24 because every request still missed the cache.' },
+  { lead: 'Pausing reporting was not enough.', text: 'p99 fell from 2.0 s to 1.6 s at 18:24, but every request still missed the cache, so it stayed above 1.0 s until 18:44.' },
   { lead: 'No runbook for a cold cache.', text: 'The warm-up script was written during the incident and ran at 18:38.' },
 ];
 
@@ -58,7 +58,7 @@ const rows = events.map((e, i) => {
 const brackets = durations.map((d, k) => {
   const x = AX - 20 - k * 16, y0 = Y(at('impact')), y1 = Y(at(d.to)), m = span(at('impact'), at(d.to));
   return `<path d="M${x + 6} ${y0}H${x}V${y1}H${x + 6}" fill="none" stroke="${INK}" stroke-width="1.25"/>`
-    + `<text x="${LABEL_R - k * 16 + 8 * 0}" y="${y1 - 3}" text-anchor="end" style="font:600 22px var(--ar-display);fill:var(--ar-ink)" class="t-num">${m}${NB}min</text>`
+    + `<text x="${LABEL_R - k * 16}" y="${y1 - 3}" text-anchor="end" style="font:600 22px var(--ar-display);fill:var(--ar-ink)" class="t-num">${m}${NB}min</text>`
     + `<text x="${LABEL_R - k * 16}" y="${y1 + 18}" text-anchor="end" class="t-axis">${d.label}</text>`;
 }).join('');
 const W = 1152;
@@ -81,5 +81,5 @@ export default {
 <h1 class="ar-head" data-region="title">Detected in ${detect} minutes, mitigated in ${mitigate}, because no runbook covered a cold cache</h1>
 <figure class="ar-fig" style="left:64px;top:196px" data-region="primary">${fig}</figure>
 <aside class="ar-rail" data-region="support"><h2>Why mitigation took ${mitigate} minutes</h2>${lessons.map(l => `<p><b>${l.lead}</b> ${l.text.replace(/(\d) (s|min)\b/g, `$1${NB}$2`)}</p>`).join('')}</aside>
-<p class="ar-src" data-region="source"><span>All times UTC, from the alert history and the incident channel. Durations are measured from the start of customer impact at ${at('impact')}.</span></p>`,
+<p class="ar-src" data-region="source"><span>Illustrative data. All times UTC, from the alert history and the incident channel. Durations are measured from the start of customer impact at ${at('impact')}.</span></p>`,
 };

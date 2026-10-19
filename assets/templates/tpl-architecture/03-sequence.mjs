@@ -66,7 +66,7 @@ const arrows = messages.map(m => {
 }).join('');
 const tx = X(trace.timeout);
 const notes = `<line x1="${tx}" y1="${TOP - 34}" x2="${tx}" y2="${bottom}" stroke="${INK}" stroke-width="2"/>
-<text x="${tx + 10}" y="${TOP - 22}" class="t-strong">Gateway timeout</text><text x="${tx + 10}" y="${TOP - 2}" class="t-strong t-num">${sec(trace.timeout)}</text>
+<text x="${tx + 10}" y="${TOP - 22}" class="t-strong t-num">Timeout ${sec(trace.timeout)}</text>
 <text x="${X(0) + 12}" y="${rowY.shopper - 10}" class="t-note"><tspan class="t-name" style="font-size:16px">POST /checkout</tspan></text>
 <text x="${tx - 10}" y="${rowY.shopper - 10}" text-anchor="end" class="t-note">${messages.at(-1).label}</text>
 <text x="${X(26) + 10}" y="${rowY.cache + 6}" class="t-note t-red">miss after ${ms(span('cache').end - span('cache').start)}</text>
@@ -92,5 +92,5 @@ export default {
   content: `<p class="ar-run"><span>Incident review — checkout timeouts, 6 Oct 2026</span><span>3</span></p>
 <h1 class="ar-head" data-region="title">A single replica query took ${sec(replicaMs)} of the gateway’s ${sec(trace.timeout)} budget</h1>
 <figure class="ar-fig" style="left:64px;top:178px" data-region="primary">${fig}</figure>
-<p class="ar-src" data-region="source"><span>Trace <span class="ar-id">${trace.id}</span>, ${trace.at}, one of the failed checkouts. With a cache hit the same request finishes in ${ms(trace.hitTotal)}.</span></p>`,
+<p class="ar-src" data-region="source"><span>Illustrative data. Trace ${trace.id}, ${trace.at}, one of the failed checkouts. With a cache hit the same request finishes in ${ms(trace.hitTotal)}.</span></p>`,
 };

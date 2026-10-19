@@ -103,7 +103,7 @@ export default {
   title: 'Methods figure: a sample’s path in order, mapped onto true time',
   className: 'st st--tall cs-clinical-trial cmp-methods',
   notes: 'Purpose: Show a technical procedure (a sample-handling protocol, an assay, a build pipeline) so it can be read in the order it happens and checked against its time limits, with the object’s identity and quantities visible at every step.\nModify: Replace `steps` (name, start and end in minutes, the object state and two short lines of conditions) and the object dimensions. Columns stay evenly spaced for reading; the numbered bars recompute on the true time axis. Draw the object to scale in each state; label quantities on the drawing (volumes, layers) rather than in a legend.\nInvariant: One sequence, numbered, left to right; units on every quantity; the same object (T1 and its vials P1–P4, B1) carries through; no pictograms; the time axis is true, so long waits look long; the accent marks only the step and the margin the headline is about.\nStatic: Already static. A build could add the time axis after the steps, but the final page must show both.',
-  sources: [],
+  sources: [{ type: 'original-example', file: 'assets/compositions/methods-figure.mjs' }],
   exportPolicy: 'final',
   content: `<h1 class="st-head">Plasma reaches −80 °C <em>${frozenAt} minutes</em> after the draw, with ${spare} minutes to spare</h1>
 <figure class="st-fig" data-region="primary">${figure()}</figure>

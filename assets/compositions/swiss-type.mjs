@@ -36,7 +36,7 @@ export default {
   exportPolicy: 'final',
   content: `<p class="sw-route" data-region="support"><span class="sw-bullet" aria-label="Tram ${route.number}">${route.number}</span>Tram ${route.number}, ${route.name}</p>
 <p class="sw-date" data-region="support">From ${change.from}</p>
-<h1 class="sw-display" data-region="title">${lines.map(l => `<span style="margin-left:-${l.inset}em">${l.text}</span>`).join('')}</h1>
+<h1 class="sw-display" data-region="title" data-qa-overlap="Display leading 1.02: the line boxes overlap by design; the glyphs do not touch.">${lines.map(l => `<span style="margin-left:-${l.inset}em">${l.text}</span>`).join('')}</h1>
 <div class="sw-times" data-region="primary">
   <p class="sw-head">Departures from ${route.stop}, 8:00 to 8:59</p>
   <p class="sw-row sw-old"><span class="sw-label">Until ${change.until}</span>${minutes(before, 'sw-min')}</p>

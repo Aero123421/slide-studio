@@ -90,7 +90,7 @@ export default {
   title: 'Technical dark: code and an instrument trace on one disciplined dark page',
   className: 'st cs-terminal-dark cmp-techdark',
   notes: 'Purpose: Review an engineering cause and its measured effect together: the trace that shows what happened and the code that made it happen. A dark page suits code and instruments read in a dim room; it is not a mood.\nModify: Replace `samples` and `events` with your own readings and timestamps (the brackets, the headline numbers and the trace recolour themselves), and `code` with the excerpt under review, marking the one changed line with − and its replacement with +. Keep the log to the four or five moments the reader needs.\nInvariant: Flat dark paper; text in ink, never pure white; one amber meaning per page (the cause: the removed line, the storm segment of the trace and the headline phrase); the fix carries a + sign as well as green; code and timestamps in mono without syntax colouring; the surface tint is used only for the code block and the failover window.\nStatic: Already static.',
-  sources: [],
+  sources: [{ type: 'original-example', file: 'assets/compositions/technical-dark.mjs' }],
   exportPolicy: 'final',
   content: `<h1 class="st-head">A <em>fixed 100 ms retry</em> turned a ${failoverSeconds}-second database failover into a ${outageMinutes}-minute outage</h1>
 <figure class="st-fig td-fig" data-region="primary">${figure()}</figure>

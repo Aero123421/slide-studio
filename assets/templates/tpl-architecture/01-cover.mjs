@@ -47,5 +47,6 @@ export default {
 <h1 class="ar-title" data-region="title">${incident.title}</h1>
 <p class="ar-summary" data-region="support">${summary}</p>
 <section class="ar-impact" data-region="primary"><h2>Impact</h2><dl>${rows.map(r => `<div><dt>${r.v}${r.u ? `<small${r.u === '%' ? ' class="pct"' : ''}>${r.u}</small>` : ''}</dt><dd>${r.d}</dd></div>`).join('')}</dl></section>
-<dl class="ar-meta" data-region="source"><div><dt>Date</dt><dd>${incident.date}</dd></div><div><dt>Severity</dt><dd>${incident.severity}</dd></div><div><dt>Resolved</dt><dd>${incident.resolved}</dd></div><div><dt>Reviewed</dt><dd>${incident.review}</dd></div></dl>`,
+<p class="ar-src" data-region="source"><span>Illustrative data: a fictional incident with synthetic measurements.</span></p>
+<dl class="ar-meta" data-region="support"><div><dt>Date</dt><dd>${incident.date}</dd></div><div><dt>Severity</dt><dd>${incident.severity}</dd></div><div><dt>Resolved</dt><dd>${incident.resolved}</dd></div><div><dt>Reviewed</dt><dd>${incident.review}</dd></div></dl>`,
 };

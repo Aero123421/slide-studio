@@ -35,7 +35,8 @@ const deckCSS = String.raw`
 .talk .st-head { font-weight: 400; font-size: 40px; line-height: 1.13; letter-spacing: -.012em; max-width: 1110px; }
 .talk .st-dek { top: 152px; font-size: 20px; color: var(--ss-muted); }
 .talk .st-kpi b { font-weight: 400; }
-.talk .st-kpi span { font-size: 19px; line-height: 1.42; color: var(--ss-ink); }
+.talk .st-kpi span { font-size: 20px; line-height: 1.4; color: var(--ss-ink); }
+.talk .st-text { font-size: 20px; line-height: 1.45; }
 .talk .st-kpi span em { font-style: normal; color: var(--ss-muted); }
 .talk .num { font-variant-numeric: tabular-nums lining-nums; }
 
@@ -62,8 +63,12 @@ const deckCSS = String.raw`
 .talk .w-controls output { display: none; }   /* the readout prints the threshold as 0.50, like every other page */
 .talk .w-controls input[type=range] { width: 100%; margin: 0; accent-color: var(--ss-accent); }
 .talk .w-controls button { justify-self: start; font: 500 16px/1.2 var(--ss-font-sans); color: var(--ss-ink); background: none; border: 1px solid var(--ss-rule); border-radius: 6px; padding: 8px 12px; cursor: pointer; }
-.talk .w-status { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }   /* announced, not shown: the readout says the same in words */
-.talk .w-export-summary { grid-column: 2 !important; grid-row: 1 !important; }
+/* .w-status sits in .sr-only (player.css): announced, not shown, because the readout states the same counts in words.
+   The wrapper is parked on blank paper below the plot, so its unclipped text box covers nothing. */
+.talk .widget .sr-only { left: 0; top: 440px; white-space: nowrap; }
+/* In static export the readout is this page's selected-state view, so the widget's generic summary steps aside. */
+body[data-export="true"] .talk .w-export-summary { display: none !important; }
+.talk .ro-static { position: absolute; left: 909px; top: 186px; width: 307px; font: 400 17px/1.45 var(--ss-font-sans); color: var(--ss-muted); }
 .talk .w-axis { position: absolute; left: 64px; top: 176px; width: 805px; height: 414px; pointer-events: none; }
 .talk .readout { position: absolute; left: 909px; top: 300px; width: 307px; }
 .talk .readout .ro-t { font: 400 18px/1.4 var(--ss-font-sans); margin-bottom: 10px; }
@@ -92,17 +97,17 @@ const deckCSS = String.raw`
 .talk .limits li:last-child { border-bottom: 1px solid var(--ss-rule); }
 .talk .limits b { font: 400 54px/1 var(--ss-font-display); letter-spacing: -.02em; font-variant-numeric: lining-nums; }
 .talk .limits h2 { font: 600 22px/1.3 var(--ss-font-sans); margin: 4px 0 6px; }
-.talk .limits p { font: 400 20px/1.45 var(--ss-font-sans); color: var(--ss-ink); max-width: 820px; }
+.talk .limits p { font: 400 21px/1.45 var(--ss-font-sans); color: var(--ss-ink); max-width: 820px; }
 
 /* Next study: three decisions as columns of four grid columns each; a figure slot of equal height in each. */
-.talk .next { position: absolute; left: 64px; top: 196px; width: 1152px; display: grid; grid-template-columns: repeat(3, 1fr); column-gap: 24px; }
-.talk .next section { border-top: 2px solid var(--ss-ink); padding-top: 16px; display: grid; grid-template-rows: auto 190px auto; }
+.talk .next { position: absolute; left: 64px; top: 196px; width: 1152px; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: auto 190px auto; column-gap: 24px; }
+.talk .next section { grid-row: span 3; display: grid; grid-template-rows: subgrid; border-top: 1px solid var(--ss-rule); padding-top: 16px; }   /* rows shared across columns */
 .talk .next h2 { font: 600 22px/1.3 var(--ss-font-sans); margin: 0 0 12px; }
 .talk .next .vis { align-self: center; }
 .talk .next .vis svg { display: block; width: 368px; height: 176px; overflow: visible; }
 .talk .next .swing { font: 400 60px/1 var(--ss-font-display); letter-spacing: -.02em; color: var(--ss-accent); font-variant-numeric: lining-nums; }
 .talk .next .swing + span { display: block; margin-top: 12px; font: 400 17px/1.4 var(--ss-font-sans); color: var(--ss-muted); }
-.talk .next p { margin-top: 14px; font: 400 20px/1.45 var(--ss-font-sans); }
+.talk .next p { margin-top: 14px; font: 400 21px/1.45 var(--ss-font-sans); }
 `;
 
 // ------------------------------------------------------------------ data
@@ -129,7 +134,7 @@ const t2 = t => t.toFixed(2);                                     // thresholds:
 const pc = p => fmt(p * 100, { digits: 0 }) + '%';                // shares: whole percent
 const count = v => fmt(v, { digits: 0 });                         // counts: 1,412
 const WORDS = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
-const SOURCE_STUDY = `${h(study.district)} blind survey, ${h(study.window)} · ${sites.length} flagged sites, ${nLeak} leaks`;
+const SOURCE_STUDY = `${h(study.district)} blind survey, ${h(study.window)}: ${sites.length} flagged sites, ${nLeak} leaks.`;
 
 // Page 2 · 2025 job records: digs happen only at 0.50 and above.
 const dug = sum(ops.bands.map(b => b.dug ?? 0)), dry = sum(ops.bands.map(b => b.dry ?? 0));
@@ -336,7 +341,7 @@ function valueFigure() {
 
 /** Page 10, middle column: the sensitivity interval narrows with the square root of confirmed leaks. */
 function precisionFigure() {
-  const W = 368, H = 176, box = { x: 44, y: 12, w: 316, h: 124 };
+  const W = 368, H = 176, box = { x: 44, y: 12, w: 316, h: 110 };
   const x = linear([0, 150], [box.x, box.x + box.w]), y = linear([0, 30], [box.y + box.h, box.y]);
   const at = n => [x(n), y(halfWidth(n) * 100)];
   const mark = (n, text, fill, dx) => g({}, el('circle', { cx: at(n)[0], cy: at(n)[1], r: 6, fill, stroke: t.c('paper'), 'stroke-width': 2 }),
@@ -404,7 +409,7 @@ export default {
       content: `<h1 class="cover-title" data-region="title">Where should the crews dig?</h1>
 <p class="cover-lead" data-region="support">Testing the night-noise leak score against blind acoustic surveys at all ${sites.length} sites it flagged in ${h(study.district)}, <span class="nowrap">${h(study.window)}</span></p>
 <figure class="cover-rug" data-region="support">${coverRug()}</figure>
-<p class="cover-by" data-region="source"><span><b>Mara Ellison</b> · Network Analytics, Northmoor Water</span><span>Water Loss Research Day · 12 November 2026</span></p>`,
+<p class="cover-by" data-region="source"><span><b>Mara Ellison</b>, Network Analytics, Northmoor Water</span><span>Water Loss Research Day, 12 November 2026</span></p>`,
       notes: `The decision is a line on a score. Today crews dig wherever the night-noise score reaches ${t2(T0)}. This talk asks whether that is the right line, and what we would need to know to move it. Everything here comes from one month in one district; the numbers are small on purpose and I will show their uncertainty.`,
       sources,
     },
@@ -416,9 +421,9 @@ export default {
 <div class="st-rail" data-region="support">
   <div class="st-kpi"><b class="st-accent num">${pc(dry / dug)}</b><span>of ${count(dug)} excavations found no leak: ${count(dry)} dry holes at £${count(ops.dryDigCost)} each, £${fmt(dry * ops.dryDigCost / 1e6, { digits: 2 })} million.</span></div>
   <hr class="st-rule">
-  <div class="st-kpi"><b class="num">${count(undug)}</b><span>alerts scored below ${t2(T0)}. No crew was sent, so the records cannot say how many were leaks.</span></div>
+  <div class="st-kpi"><b class="num">${count(undug)}</b><span>alerts below ${t2(T0)} got no crew, so no record says how many of them were leaks.</span></div>
 </div>
-${source(h(ops.source), 'Alerts by score band')}`,
+${source(`${h(ops.source)}.`, 'Alerts by score band')}`,
       notes: `Job records only see one side of the rule. Above ${t2(T0)} we learn the outcome because we dig: ${count(dry)} of ${count(dug)} digs were dry. Below ${t2(T0)} we learn nothing, because we never look. That is why the records cannot tell us whether ${t2(T0)} is right, and why we ran a study that looked everywhere.`,
       sources,
     },
@@ -432,7 +437,7 @@ ${source(h(ops.source), 'Alerts by score band')}`,
   <hr class="st-rule">
   <div class="st-kpi"><b class="num">${nNone}</b><span>reference no-leaks: ${quiet.length} quiet sites and ${dryHoles.length} dry excavations.</span></div>
 </div>
-${source(`${SOURCE_STUDY} · score frozen at 06:00 on each survey day`, 'Study flow')}`,
+${source(`${SOURCE_STUDY} Scores frozen at 06:00 on each survey day.`, 'Study flow')}`,
       notes: `Population: every site the model flagged in ${study.district} in the window, so the study sees low scores as well as high ones. The survey team used a correlator and a ground microphone and never saw the score. Excavation followed wherever they heard leak noise. Quiet sites were not dug; I come back to that as a limit.`,
       sources,
     },
@@ -441,7 +446,7 @@ ${source(`${SOURCE_STUDY} · score frozen at 06:00 on each survey day`, 'Study f
       title: `Today's threshold of ${t2(T0)} sends crews to ${now.tp} of the ${nLeak} leaks and to ${now.fp} dry holes`,
       content: `<h1 class="st-head" data-region="title">Today’s threshold of ${t2(T0)} sends crews to <em>${now.tp}</em> of the ${nLeak} leaks and to ${now.fp} dry holes</h1>
 <figure class="st-fig" data-region="primary">${ruleFigure()}</figure>
-${source(`${SOURCE_STUDY} · one dot per site`, 'Strip plot by reference label')}`,
+${source(`${SOURCE_STUDY} One dot per site.`, 'Strip plot by reference label')}`,
       notes: `First the observations: one dot per site, placed by its score, split by what the survey and excavation found. Leaks sit mostly to the right, but the two groups overlap between about 0.2 and 0.7. [Next] Then today's rule: everything at ${t2(T0)} or above gets a crew. Four counts fall out of that one line: ${now.tp} found, ${now.fn} missed, ${now.fp} dry, ${now.tn} correctly left alone.`,
       sources,
     },
@@ -450,7 +455,7 @@ ${source(`${SOURCE_STUDY} · one dot per site`, 'Strip plot by reference label')
       title: `The score found ${pc(sens.p)} of leaks at ${t2(T0)}, but with ${nLeak} leaks the 95% interval runs from ${pc(sens.lo)} to ${pc(sens.hi)}`,
       content: `<h1 class="st-head" data-region="title">The score found <em>${pc(sens.p)}</em> of leaks at ${t2(T0)}, but with ${nLeak} leaks the 95% interval runs from ${pc(sens.lo)} to ${pc(sens.hi)}</h1>
 <figure class="st-fig" data-region="primary">${accuracyFigure()}</figure>
-${source(`${SOURCE_STUDY} · Wilson score intervals · area under the ROC curve ${fmt(AUC, { digits: 2 })}`, 'Interval plot')}`,
+${source(`${SOURCE_STUDY} Wilson score intervals; area under the ROC curve ${fmt(AUC, { digits: 2 })}.`, 'Interval plot')}`,
       notes: `Four rates from the same two-by-two table. The squares are sized by how many sites each rate rests on. The sensitivity interval is wide because it rests on ${nLeak} leaks. One check that the sample behaves like the network: ${pc(ppv.p)} of study digs found a leak, against ${pc(recordsPPV)} in the 2025 job records.`,
       sources,
     },
@@ -458,8 +463,9 @@ ${source(`${SOURCE_STUDY} · Wilson score intervals · area under the ROC curve 
       id: 'explore', className: cls(),
       title: `Between 0.30 and 0.60, each 0.05 step down finds one more leak and adds ${stepDry[0]} to ${stepDry[1]} dry digs`,
       content: `<h1 class="st-head" data-region="title">Between 0.30 and 0.60, each 0.05 step down finds one more leak and adds ${stepDry[0]} to ${stepDry[1]} dry digs</h1>
-<div class="widget" data-interactive="" id="research-threshold" data-region="primary"><div class="w-plot"></div><div class="w-controls"></div><output aria-live="polite" class="w-status"></output></div>
+<div class="widget" data-interactive="" id="research-threshold" data-region="primary"><div class="w-plot"></div><div class="w-controls"></div><div class="sr-only" data-qa-text-clip="screen-reader-only status"><output aria-live="polite" class="w-status"></output></div></div>
 ${widgetAxis()}
+<p class="ro-static" data-static="show">Static view of an interactive page. In the HTML deck the threshold can be moved and every count recomputes.</p>
 <div class="readout" id="explore-readout" data-region="support">
   <p class="ro-t">At threshold <b data-k="t">${t2(T0)}</b></p>
   <table><thead><tr><td></td><th scope="col">Crew sent</th><th scope="col">Not sent</th></tr></thead>
@@ -467,7 +473,7 @@ ${widgetAxis()}
   <tr><th scope="row">No leak</th><td class="sent"><b data-k="fp">${now.fp}</b>dry digs</td><td><b data-k="tn">${now.tn}</b>left alone</td></tr></tbody></table>
   <p class="ro-rates"><b data-k="sens">${pc(sens.p)}</b> of leaks found<br><b data-k="dry">${pc(now.fp / now.digs)}</b> of digs dry</p>
 </div>
-${source(`${SOURCE_STUDY} · counts recomputed from the same ${sites.length} scores`, 'Interactive threshold')}`,
+${source(`${SOURCE_STUDY} Counts recomputed from the same scores.`, 'Interactive threshold')}`,
       notes: `Move the threshold and watch the two right-hand cells. Going down from 0.60 to 0.30, each step picks up exactly one more leak, and two to five more dry digs. Going up, dry digs vanish quickly but leaks go with them. The static handout keeps today's ${t2(T0)}; the next page has the other thresholds as a table.`,
       sources,
       widgets: [{ id: 'research-threshold', kind: 'threshold', initial: { threshold: T0 }, data: { values: scores, labels: leaks } }],
@@ -478,7 +484,7 @@ ${source(`${SOURCE_STUDY} · counts recomputed from the same ${sites.length} sco
       content: `<h1 class="st-head" data-region="title">Finding all ${nLeak} leaks would take a threshold of ${t2(findAll.t)} and ${findAll.fp} dry digs, ${fmt(findAll.fp / now.fp, { digits: 1 })} times today’s ${now.fp}</h1>
 <table class="tbl" data-region="primary"><thead><tr><th scope="col">Threshold</th><th scope="col">Crews sent</th><th scope="col">Leaks found<br>of ${nLeak}</th><th scope="col">Leaks missed</th><th scope="col">Dry digs</th><th scope="col">Share of digs<br>that were dry</th></tr></thead>
 <tbody>${compareRows.map(c => `<tr class="${c.t === T0 ? 'today' : c === compareRows[0] ? 'focus' : ''}"><th scope="row">${t2(c.t)}${c.t === T0 ? '<span>today</span>' : ''}</th><td>${c.digs}</td><td${c.fn === 0 ? ' class="key"' : ''}>${c.tp}</td><td>${c.fn}</td><td${c.fn === 0 ? ' class="key"' : ''}>${c.fp}</td><td>${c.digs ? pc(c.fp / c.digs) : '–'}</td></tr>`).join('')}</tbody></table>
-${source(`${SOURCE_STUDY} · counts per ${sites.length} flagged sites`, 'Threshold comparison')}`,
+${source(`${SOURCE_STUDY} Counts per ${sites.length} flagged sites.`, 'Threshold comparison')}`,
       notes: `The static version of the previous page. Read the dry-digs column against the leaks-found column: from ${t2(T0)} down to ${t2(findAll.t)} we gain ${findAll.tp - now.tp} leaks for ${findAll.fp - now.fp} extra dry digs. Whether that is worth it is not a statistical question; it is the next page.`,
       sources,
     },
@@ -492,7 +498,7 @@ ${source(`${SOURCE_STUDY} · counts per ${sites.length} flagged sites`, 'Thresho
   <hr class="st-rule">
   <p class="st-text">What one missed leak is worth in dry digs, R, sets the threshold. This study did not measure it.</p>
 </div>
-${source(`${SOURCE_STUDY} · cost = dry digs + R × missed leaks`, 'Cost curves')}`,
+${source(`${SOURCE_STUDY} Cost = dry digs + R × missed leaks.`, 'Cost curves')}`,
       notes: `Put a price on each kind of error and the threshold choice becomes arithmetic. If a missed leak is worth one dry dig, ${t2(best[0].t)} is cheapest; at three, ${t2(best[1].t)}; at six, ${t2(best[2].t)}. The flows matter here: the leaks the score misses are the quiet ones, a median ${fmt(missedFlow, { digits: 1 })} cubic metres an hour. So R may be low, but we have not measured it.`,
       sources,
     },
@@ -519,9 +525,9 @@ ${source(SOURCE_STUDY, 'Study limits')}`,
   <section><h2>Confirm about ${leaksNeeded} leaks</h2><div class="vis">${precisionFigure()}</div>
     <p>That narrows sensitivity from ±${fmt(halfWidth(nLeak) * 100, { digits: 0 })} to ±${fmt(TARGET * 100, { digits: 0 })} points: about ${count(sitesNeeded)} flagged sites at ${h(study.district)}’s leak rate of ${pc(nLeak / sites.length)}.</p></section>
   <section><h2>Three districts, two seasons</h2><div class="vis">${coverageFigure()}</div>
-    <p>${h(study.district)} in March is one cell of six. Excavate a sample of quiet sites as well, to count the leaks the survey misses.</p></section>
+    <p>${h(study.district)} in March fills one cell of six. Dig a sample of quiet sites too: the survey can miss leaks.</p></section>
 </div>
-${source(`${SOURCE_STUDY} · intervals and sample size by the Wilson method`, 'Next study')}`,
+${source(`${SOURCE_STUDY} Intervals and sample size by the Wilson method.`, 'Next study')}`,
       notes: `The order matters. Without R, a more precise study still cannot choose a threshold. With R and about ${leaksNeeded} confirmed leaks from more than one district and season, the choice becomes a calculation we can defend to the regulator and to the crews.`,
       sources,
     },

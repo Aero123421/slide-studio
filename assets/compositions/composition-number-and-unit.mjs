@@ -23,7 +23,7 @@ const reachedRating = homes.filter(v => v >= rated.value).length;
 const d1 = v => fmt(v, { digits: 1 });
 
 export function figure(theme = 'css') {
-  const t = makeTheme(theme), W = 1152, H = 330;
+  const t = makeTheme(theme), W = 1152, H = 298;
   const base = H - 64; // axis line
   const x = linear([1.5, 4.4], [0, W]);
   const r = 5.6, mid = base - 104; // beeswarm around a centre line: every home at its exact value
@@ -44,11 +44,12 @@ export function figure(theme = 'css') {
   parts.push(el('line', { x1: mx, x2: mx, y1: stackTop - 54, y2: base, stroke: t.c('accent'), 'stroke-width': 3 }));
   parts.push(textLines([`Median ${d1(median)}`], { x: mx - 12, y: stackTop - 40, size: 18, anchor: 'end', fill: t.c('accent'), weight: 700 }));
   parts.push(textLines([`middle half of homes ${d1(q1)}–${d1(q3)}`], { x: mx - 12, y: stackTop - 18, size: 16, anchor: 'end', fill: t.c('muted') }));
-  // the datasheet number: same unit, different scope
-  const rx = x(rated.value);
-  parts.push(el('line', { x1: rx, x2: rx, y1: 0, y2: base, stroke: t.c('ink'), 'stroke-width': 1.6, 'stroke-dasharray': '6 6' }));
-  parts.push(textLines([`Datasheet ${d1(rated.value)}`], { x: rx - 14, y: 6, size: 18, anchor: 'end', valign: 'top', fill: t.c('ink'), weight: 700 }));
-  parts.push(textLines(['one test point: 7 °C outside,', '35 °C flow water, heating only.', `${reachedRating === 0 ? 'No' : reachedRating} home${reachedRating === 1 ? '' : 's'} reached it over the winter.`], { x: rx - 14, y: 36, size: 17, anchor: 'end', valign: 'top', lineHeight: 1.35, fill: t.c('muted') }));
+  // the datasheet number: same unit, different scope. Its label rises into the free space level with
+  // the hero's scope line, so the two numbers are read with their two scopes side by side.
+  const rx = x(rated.value), noteTop = -104;
+  parts.push(el('line', { x1: rx, x2: rx, y1: noteTop - 6, y2: base, stroke: t.c('ink'), 'stroke-width': 1.6, 'stroke-dasharray': '6 6' }));
+  parts.push(textLines([`Datasheet ${d1(rated.value)}`], { x: rx - 14, y: noteTop, size: 18, anchor: 'end', valign: 'top', fill: t.c('ink'), weight: 700 }));
+  parts.push(textLines(['one test point: 7 °C outside,', '35 °C flow water, heating only.', `${reachedRating === 0 ? 'No home' : reachedRating === 1 ? 'One home' : `${reachedRating} homes`} reached it all winter.`], { x: rx - 14, y: noteTop + 30, size: 17, anchor: 'end', valign: 'top', lineHeight: 1.35, fill: t.c('muted') }));
   return svgRoot({ id: `${ID}-fig`, width: W, height: H, theme: t,
     title: 'Seasonal performance of 214 heat pumps, one dot per home, with the median and the datasheet rating',
     desc: `Median ${d1(median)}, middle half of homes ${d1(q1)} to ${d1(q3)}. The datasheet rating of ${d1(rated.value)} is measured at ${rated.at}; ${reachedRating} of ${homes.length} homes reached it over the winter.` },

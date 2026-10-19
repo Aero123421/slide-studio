@@ -1,9 +1,8 @@
 // Template: 学会発表（日本語） · 表紙. Synthetic example content; replace data and copy.
-// Type-led cover: the title is the whole page. Authors carry superscript affiliation numbers;
+// Type-led cover: the title leads, the specimen locates it. Authors carry superscript affiliation numbers;
 // ○ before a name marks the presenter (the Japanese conference convention).
 // The specimen on the right is the same 50×50-pixel patch as the background page (same geometry,
 // same texture function), so the cover shows the subject itself at pixel scale, not a decoration.
-import { el } from '../../runtime/figure.mjs';
 
 const ID = 'tpl-research-ja-cover';
 const talk = {
@@ -44,13 +43,14 @@ function value(i, j) {
   return Math.max(0, Math.min(1, ground - cover * (0.18 + 0.16 * Math.min(best.w, 3))));
 }
 const levels = 40, hex = v => { const k = Math.round(v * 255).toString(16).padStart(2, '0'); return `#${k}${k}${k}`; };
-const runs = [];
+const groups = {};                                         // runs of equal grey → one rect, grouped by grey
 for (let j = 0; j < N; j++) for (let i = 0; i < N;) {
   const q = Math.round(value(i, j) * (levels - 1)); let k = i + 1;
   while (k < N && Math.round(value(k, j) * (levels - 1)) === q) k++;
-  runs.push(el('rect', { x: i * px, y: j * px, width: (k - i) * px, height: px, fill: hex(q / (levels - 1)) }));
+  (groups[q] ||= []).push(`<rect x="${i * px}" y="${j * px}" width="${(k - i) * px}" height="${px}"/>`);
   i = k;
 }
+const runs = Object.entries(groups).map(([q, r]) => `<g fill="${hex(q / (levels - 1))}">${r.join('')}</g>`);
 const S = N * px;
 const specimen = `<svg width="${S}" height="${S}" viewBox="0 0 ${S} ${S}" shape-rendering="crispEdges" role="img" aria-labelledby="${ID}-t"><title id="${ID}-t">点検画像の一部（${N}×${N}画素の模式図）。枝分かれしたひび割れが幅3画素から1画素へ細くなる</title>${runs.join('')}</svg>`;
 const weekday = ['日', '月', '火', '水', '木', '金', '土'][new Date(Date.UTC(talk.date.y, talk.date.m - 1, talk.date.d)).getUTCDay()];

@@ -19,8 +19,6 @@
   word-break:auto-phrase;line-break:strict;font-kerning:normal;font-feature-settings:"cv08" 1; /* Inter: serifed I so IoU never reads loU */
 }
 .tpl-research-ja .nw{white-space:nowrap}
-.tpl-research-ja .num{font-variant-numeric:tabular-nums lining-nums}
-.tpl-research-ja .acc{color:var(--rj-accent)}
 
 /* Headline: one claim, ≤ 2 lines, flush left on column 1; its last line sits on y=148, 36 px above the evidence */
 .tpl-research-ja .rj-h{position:absolute;left:64px;bottom:572px;width:1152px;margin:0;
@@ -36,13 +34,9 @@
 
 /* SVG text roles (figures are drawn at 1:1, so these are true pixel sizes) */
 .tpl-research-ja .s-lab{font:400 16px var(--rj-text);fill:var(--rj-ink2)}
-.tpl-research-ja .s-labk{font:400 17px var(--rj-text);fill:var(--rj-ink)}
 .tpl-research-ja .s-strong{font:600 17px var(--rj-text);fill:var(--rj-ink)}
 .tpl-research-ja .s-panel{font:600 18px var(--rj-head);fill:var(--rj-ink);font-feature-settings:"palt" 1,"cv08" 1}
-.tpl-research-ja .s-axis{font:400 15px var(--rj-text);fill:var(--rj-muted);font-variant-numeric:tabular-nums}
 .tpl-research-ja .s-acc{fill:var(--rj-accent)}
-.tpl-research-ja .s-mute{fill:var(--rj-muted)}
-.tpl-research-ja .s-num{font-variant-numeric:tabular-nums}
 
 /* 01 cover — type-led, flush left: venue (top) → title → people (foot) */
 .tpl-research-ja .rj-venue{position:absolute;left:64px;top:60px;margin:0;font:400 18px/1.5 var(--rj-text);color:var(--rj-ink2)}

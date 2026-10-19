@@ -71,16 +71,16 @@ const compare = el('g', { class: 'rj-compare' },
   textLines([`提案法の${focusN}枚 ${f1(ours)}`, `教師あり学習の${match.n}枚 ${f1(match.v)}`], { x: note.x, y: note.y - 30, size: 17, lineHeight: 1.45, fill: 'var(--rj-ink)', attrs: { 'font-variant-numeric': 'tabular-nums' } }),
   textLines([`ラベルは${kanji}で同じ水準`], { x: note.x, y: note.y + 22, size: 17, weight: 600, fill: 'var(--rj-ink)' }));
 const xAxis = labels.map(n => el('line', { x1: xp(String(n)), x2: xp(String(n)), y1: box.y + box.h, y2: box.y + box.h + 5, stroke: 'var(--rj-ink)' })
-  + textLines([String(n)], { x: xp(String(n)), y: box.y + box.h + 12, size: 15, anchor: 'middle', valign: 'top', fill: 'var(--rj-muted)', attrs: { 'font-variant-numeric': 'tabular-nums' } })).join('');
+  + textLines([String(n)], { x: xp(String(n)), y: box.y + box.h + 12, size: 16, anchor: 'middle', valign: 'top', fill: 'var(--rj-muted)', attrs: { 'font-variant-numeric': 'tabular-nums' } })).join('');
 const chart = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-labelledby="${ID}-t ${ID}-d">
 <title id="${ID}-t">ラベル付き画像の枚数と、ひび割れのIoU</title>
 <desc id="${ID}-d">ラベル付き画像を${labels.join('、')}枚と変えたときのIoU（%）。どの枚数でも提案法が最も高い。${focusN}枚の提案法は${f1(ours)}%で、教師あり学習の${match.n}枚（${f1(match.v)}%）とほぼ同じ。全ラベル${fmt(full.n)}枚での学習は${f1(full.mean)}%。縦線は${runs}回の試行の95%信頼区間。</desc>
 <defs>${arrowMarker(AR, 'var(--rj-ink)', { size: 8 })}</defs>
-${axis(y, { orient: 'left', at: box.x, grid: [box.x, lastX + 18], tickValues: [40, 50, 60, 70], size: 15, theme: 'css' })}
-${textLines(['IoU（%）'], { x: 0, y: 6, size: 15, valign: 'top', fill: 'var(--rj-muted)' })}
+${axis(y, { orient: 'left', at: box.x, grid: [box.x, lastX + 18], tickValues: [40, 50, 60, 70], size: 16, theme: 'css' })}
+${textLines(['IoU（%）'], { x: 0, y: 4, size: 16, valign: 'top', fill: 'var(--rj-muted)' })}
 <line x1="${box.x}" x2="${lastX + 18}" y1="${box.y + box.h}" y2="${box.y + box.h}" stroke="var(--rj-ink)" stroke-width="1.2"/>
 ${xAxis}
-${textLines(['ラベル付き画像の枚数（目盛は2倍ごと）'], { x: lastX + 18, y: H - 4, size: 15, anchor: 'end', fill: 'var(--rj-muted)' })}
+${textLines(['ラベル付き画像の枚数（目盛は2倍ごと）'], { x: lastX + 18, y: H - 4, size: 16, anchor: 'end', fill: 'var(--rj-muted)' })}
 ${ref}
 ${series}
 ${compare}

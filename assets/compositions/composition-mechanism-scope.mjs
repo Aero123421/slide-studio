@@ -1,7 +1,7 @@
 // Composition study · Mechanism and scope — the left two thirds draw how the fix works (a timing
 // diagram computed from `expiry`); the right third draws where it has been shown to work (the
 // tested envelope) with the real workload plotted against it. Structure and scope share one page.
-import { svgRoot, el, g, textLines, linear, log, theme as makeTheme, fmt } from '../runtime/figure.mjs';
+import { svgRoot, el, textLines, linear, log, theme as makeTheme, fmt } from '../runtime/figure.mjs';
 
 const ID = 'composition-mechanism-scope';
 // One hot key expiring under load, from the load-test traces (illustrative).

@@ -77,7 +77,7 @@ const panel = (P, i) => {
     textLines([`${rb.pred.toFixed(2)} → ${pc(rb.obs)}`], { x: nx, y: ny, size: 16, weight: 600, fill: 'var(--ml-ink)', halo: 'var(--ml-paper)' }));
   return out.join('');
 };
-const fig = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-labelledby="${ID}-t ${ID}-d" font-family="var(--ml-sans)">
+const fig = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-labelledby="${ID}-t ${ID}-d" style="font-family:var(--ml-sans)">
 <title id="${ID}-t">Reliability diagrams for raw and calibrated scores, test set, with pump-weeks per score bin</title>
 <desc id="${ID}-d">${panels.map(P => `${P.title}: ${P.bins.filter(b => b.n).map(b => `bin ${b.x0.toFixed(1)}–${b.x1.toFixed(1)}, ${b.n} pump-weeks, mean score ${b.pred.toFixed(3)}, observed ${pc(b.obs, 1)}`).join('; ')}. Expected calibration error ${(100 * P.ece).toFixed(1)} points, Brier score ${P.brier.toFixed(4)}`).join('. ')}.</desc>
 ${panels.map(panel).join('')}
@@ -96,7 +96,7 @@ export default {
   content: `<p class="ml-run"><span>PF-7 v3 pump-failure model — evaluation report</span><span>5</span></p>
 <h1 class="ml-head" data-region="title">${rb.pred.toFixed(2) === cb.pred.toFixed(2) ? `A score of ${rb.pred.toFixed(2)} meant a ${pc(rb.obs)} risk of failure before calibration and means ${pc(cb.obs)} after it` : `A raw score of ${rb.pred.toFixed(2)} meant a ${pc(rb.obs)} risk of failure; a calibrated ${cb.pred.toFixed(2)} means ${pc(cb.obs)}`}</h1>
 <figure class="ml-fig" style="left:64px;top:200px" data-region="primary">${fig}</figure>
-<p class="ml-cap" style="left:64px;top:614px;width:858px"><b>Figure 5.</b> Test set in ten equal-width score bins. Whiskers: 95% Wilson intervals. Bars: pump-weeks per bin, on a log scale.</p>
+<p class="ml-cap" style="left:64px;top:614px;width:858px" data-region="source"><b>Figure 5.</b> Illustrative data: test set in ten equal-width score bins. Whiskers: 95% Wilson intervals. Bars: pump-weeks per bin, on a log scale.</p>
 <aside class="ml-rail ml-facts" style="left:946px;top:206px;width:270px" data-region="support"><h2>Before and after</h2>
 <p><b class="num">${(100 * raw.ece).toFixed(1)} → ${(100 * cal.ece).toFixed(1)}</b> points of expected calibration error</p>
 <p><b class="num">${raw.brier.toFixed(3)} → ${cal.brier.toFixed(3)}</b> Brier score; lower is better</p>

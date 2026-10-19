@@ -89,7 +89,8 @@ At 1280×720: headline 36–44 px (statement pages up to 64+), body 20–24 px, 
 16–18 px, sources 15 px. Live projection needs ≥ 18 px for anything the audience
 must read; a reference plate may go to 15 px. Use real weights (no faux bold), a
 display face for claims and a text face for everything else, tabular figures for
-numbers in tables and axes.
+numbers in tables and axes — on the numeric cells only: Inter's `tnum` also widens
+hyphens and dashes in running text ("Pre - heat").
 
 Line height: display 1.1–1.2 in Latin scripts, 1.3–1.4 in CJK; body 1.45–1.6
 (CJK 1.6–1.75). No negative tracking in CJK. Letterspacing is for small caps and
@@ -99,6 +100,11 @@ short labels, never simulated with spaces.
 mixed decks; `direction:'rtl'` where needed. Japanese: natural phrasing, no
 English eyebrows, break between phrases (the figure engine wraps CJK by phrase
 and applies kinsoku), never split a number from its unit; full-width punctuation.
+In HTML, `word-break: auto-phrase` (set by the page grammar) breaks Japanese
+between phrases in Chromium only; Safari ignores it, so put `<br>` (or `<wbr>` with
+`word-break: keep-all`) at the phrase boundary of each headline and move it when the
+headline changes. Latin glyphs come first in a Japanese stack (`"Inter", …, "Hiragino
+Sans", …`): a Japanese font sets Latin digits in its own, often monospaced, forms.
 Chinese: choose the script and regional forms. Korean: check word wrapping.
 Arabic/Hebrew: logical properties, `dir` on mixed runs, `<bdi>` for codes and
 numbers; mirror reading flow, not charts or physical objects. Devanagari and other
@@ -110,6 +116,12 @@ coordinates to fit. Format numbers with the target locale (`fmt(v, {locale})`).
 (the color systems include Japanese fallbacks). Check actual glyphs and, for PDF,
 the actual embedded faces (see [Verification](verification-and-delivery.md)).
 `fontcheck.py FONT --text "…"` checks a specific font file's coverage.
+Rendered previews show the fonts of the machine that rendered them: a Linux
+container without Charter, Georgia or Hiragino falls back (the stacks end in Caladea
+and IPAPGothic), so judge spacing, not letterforms, from such frames. Chromium ignores
+Type 1 (`.pfb`) fonts even when `fc-list` shows them.
+Equations: write MathML and keep `<math>` inline inside a block wrapper; `display:
+block` on `<math>` only lays out when its content is a single `<mrow>`.
 
 ## 5. Color with stable meaning
 

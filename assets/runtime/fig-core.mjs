@@ -18,7 +18,7 @@
 
 export const FONT = {
   sans: '"Inter","Helvetica Neue","Segoe UI","Hiragino Sans","Noto Sans JP","Yu Gothic",system-ui,sans-serif',
-  serif: '"Iowan Old Style","Charter","Bitstream Charter",Georgia,"Hiragino Mincho ProN","Noto Serif JP","Yu Mincho",serif',
+  serif: '"Iowan Old Style","Charter","Bitstream Charter",Georgia,Caladea,"Hiragino Mincho ProN","Noto Serif JP","Yu Mincho",serif',
   mono: '"JetBrains Mono","SFMono-Regular",Menlo,Consolas,"DejaVu Sans Mono",monospace',
 };
 
@@ -43,12 +43,16 @@ const VAR = {
 /**
  * Resolve a theme. `'css'` (default) emits `var(--ss-*, fallback)`; an object
  * (partial DEFAULT_THEME shape, or a color-system JSON) emits literal values.
+ * `{css: true, system}` emits CSS variables whose fallbacks (and `t.values`, for
+ * computed ramps) come from that color system.
  * Returned helpers: t.c(role), t.cat(i), t.seq(i), t.div(i), t.font(kind).
  */
 export function theme(input = 'css') {
   if (input && input.__theme) return input;
-  const literal = input && typeof input === 'object';
-  const base = literal ? { ...DEFAULT_THEME, ...fromColorSystem(input) } : DEFAULT_THEME;
+  const cssWithSystem = !!(input && typeof input === 'object' && input.css === true);
+  const literal = !!(input && typeof input === 'object') && !cssWithSystem;
+  const source = cssWithSystem ? input.system : literal ? input : null;
+  const base = source ? { ...DEFAULT_THEME, ...fromColorSystem(source) } : DEFAULT_THEME;
   const wrap = (name, value) => (literal ? value : `var(${name},${value})`);
   const pick = (list, i) => list[((i % list.length) + list.length) % list.length];
   const ramp = (list, i, name) => {
@@ -296,21 +300,28 @@ const segmenter = typeof Intl !== 'undefined' && Intl.Segmenter ? new Intl.Segme
  * Japanese/Chinese: dictionary word segments, with trailing kana particles
  * attached (条件を / 変えると、) so lines break between phrases, then kinsoku.
  */
-function tokenize(line) {
+function tokenize(line, merge = true) {
   const text = String(line);
   let raw;
   if (segmenter && CJK_RE.test(text)) {
     raw = [];
     for (const { segment } of segmenter.segment(text)) {
       const prev = raw[raw.length - 1];
-      if (prev && HIRAGANA_ONLY.test(segment) && !/\s$/.test(prev) && !NO_END.has([...prev].at(-1)) && CJK_RE.test(prev)) raw[raw.length - 1] += segment;
+      // Particles and okurigana stay with what precedes them (年度|に, 6%|まで, Python|で).
+      if (prev && HIRAGANA_ONLY.test(segment) && !/\s$/.test(prev) && !NO_END.has([...prev].at(-1))) raw[raw.length - 1] += segment;
       else if (prev && /^\s+$/.test(segment)) raw[raw.length - 1] += segment;
       else raw.push(segment);
     }
-    // A lone ideograph or short alphanumeric (途|切れ, B|案, 1|件) belongs with the following word.
-    for (let i = raw.length - 2; i >= 0; i--) {
+    if (merge) for (let i = raw.length - 2; i >= 0; i--) {
       const cur = raw[i], next = raw[i + 1];
-      if ((/^[㐀-鿿]$/u.test(cur) || /^[A-Za-z0-9]{1,3}$/.test(cur)) && /^[ぁ-ヿ㐀-鿿]/u.test(next)) { raw[i] = cur + next; raw.splice(i + 1, 1); }
+      const join =
+        // a lone ideograph or short alphanumeric belongs with the next word (途|切れ, B|案, 約|2倍, 第|3回)
+        ((/^[㐀-鿿]$/u.test(cur) || /^[A-Za-z0-9]{1,3}$/.test(cur)) && /^[ぁ-ヿ㐀-鿿0-9０-９]/u.test(next)) ||
+        // a number keeps its counter or unit (2029|年度, 270|億円, 12.6|%)
+        (/^[0-9０-９][0-9０-９.,，．]*$/u.test(cur) && /^[㐀-鿿ぁ-ヿ%％]/u.test(next)) ||
+        // kanji compounds stay whole up to 8 characters (営業|利益|率 → 営業利益率)
+        (/^[㐀-鿿々〆]+$/u.test(cur) && /^[㐀-鿿々]/u.test(next) && (cur + next).match(/^[㐀-鿿々〆]+/u)[0].length <= 8);
+      if (join) { raw[i] = cur + next; raw.splice(i + 1, 1); }
     }
   } else {
     // Words break at ordinary spaces only: no-break spaces (U+00A0, U+202F, U+2007) keep "15 min" together.
@@ -331,7 +342,9 @@ export function wrapText(text, maxWidth, size = 16, opts = {}) {
   const lines = [];
   for (const para of String(text ?? '').split('\n')) {
     let line = '';
-    const tokens = tokenize(para).flatMap(tok => (CJK_RE.test(tok) && measureText(tok, size, opts) > maxWidth ? [...tok] : [tok]));
+    // A merged token wider than the line falls back to its word segments, then to characters.
+    const fits = tok => measureText(tok, size, opts) <= maxWidth;
+    const tokens = tokenize(para).flatMap(tok => (!CJK_RE.test(tok) || fits(tok) ? [tok] : tokenize(tok, false).flatMap(sub => (fits(sub) ? [sub] : [...sub]))));
     for (const tok of tokens) {
       const trial = line + tok;
       if (line && measureText(trial.trimEnd(), size, opts) > maxWidth && !NO_START.has([...tok][0])) {
@@ -348,7 +361,9 @@ export function wrapText(text, maxWidth, size = 16, opts = {}) {
 export function wrapBalanced(text, maxWidth, size = 16, opts = {}) {
   const base = wrapText(text, maxWidth, size, opts);
   if (base.length < 2) return base;
-  let lo = maxWidth * 0.4, hi = maxWidth, best = base;
+  // Never narrower than the widest phrase that fits, so balancing cannot split a word (受け付ける).
+  const widest = Math.max(0, ...String(text ?? '').split('\n').flatMap(p => tokenize(p)).map(tok => measureText(tok.trim(), size, opts)).filter(w => w <= maxWidth));
+  let lo = Math.max(maxWidth * 0.4, widest), hi = maxWidth, best = base;
   for (let i = 0; i < 14; i++) {
     const mid = (lo + hi) / 2, trial = wrapText(text, mid, size, opts);
     if (trial.length <= base.length) { best = trial; hi = mid; } else lo = mid;

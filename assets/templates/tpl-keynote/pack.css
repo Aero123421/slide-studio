@@ -18,7 +18,7 @@
   --ss-paper:#0D0D0E;--ss-surface:#181817;--ss-ink:#F4F2ED;--ss-muted:#9C9A94;--ss-rule:#3A3936;--ss-grid:#262624;
   --ss-accent:#F5A623;--ss-on-accent:#0D0D0E;--ss-highlight:#F5A623;--ss-context:#5E5D59;
   --ss-positive:#8FCB9B;--ss-negative:#F08A73;
-  --ss-font-sans:var(--kn-text);--ss-font-serif:"Charter","Bitstream Charter","Iowan Old Style",Georgia,serif;
+  --ss-font-sans:var(--kn-text);--ss-font-serif:"Charter","Bitstream Charter","Iowan Old Style",Georgia,Caladea,serif;
   --ss-font-mono:"JetBrains Mono","SFMono-Regular",Menlo,Consolas,monospace;
   --ss-cat-1:#F5A623;--ss-cat-2:#F4F2ED;--ss-cat-3:#9C9A94;--ss-cat-4:#5E5D59;--ss-cat-5:#C98A1C;--ss-cat-6:#D8D5CE;
   --ss-seq-1:#2A2213;--ss-seq-2:#4A3714;--ss-seq-3:#6E4F15;--ss-seq-4:#956A17;--ss-seq-5:#BE861B;--ss-seq-6:#F5A623;--ss-seq-7:#FFD27A;
@@ -39,7 +39,6 @@
 .tpl-keynote .kn-label{font:500 20px/1.35 var(--kn-text);margin-top:-6.2px}
 .tpl-keynote .kn-note{font:400 16px/1.4 var(--kn-text);color:var(--kn-grey);margin-top:-5.4px}
 .tpl-keynote .kn-grey{color:var(--kn-grey)}
-.tpl-keynote .kn-nums{font-variant-numeric:tabular-nums}
 
 /* Charts: SVG text inherits these unless a role class says otherwise. */
 .tpl-keynote .kn-fig text{font-family:var(--kn-text);font-kerning:normal}

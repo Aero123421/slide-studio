@@ -20,7 +20,7 @@ const rows = (() => {
 
 const shadow = { weeks: 8, from: '5 Oct 2026', stopPrecision: 0.15 }; // the run this card asks for
 const card = {
-  use: ['Rank pumps every Monday for a planned inspection that week. A planner decides on every alert.'],
+  use: ['Rank pumps every Monday for a planned inspection that week.', 'A planner decides on every alert; the model acts on nothing.'],
   scope: ['Any automatic action on a pump or a work order.', 'Predicting when a pump will fail; the output is a 7-day risk.', 'Dry-pit and booster pumps: none were in the training data.'],
   limits: ['Labels come from work orders, so a failure fixed without one counts as healthy: recall is probably overstated.', 'The test covers January to June. Summer storm surges, when pumps clog most, are not in it.', 'Pumps installed in 2026 have under eight weeks of history and tend to score low.'],
 };
@@ -53,7 +53,7 @@ export default {
   study: true,
   id: ID,
   title: 'Model card: intended use, limits, metrics and monitoring',
-  notes: 'Purpose: Close the report with what the model may and may not be used for, how good it is in the units the decision needs, what is known to be weak, and how the shadow run will be watched and stopped.\nModify: Edit shadow and card (use, scope, limits) in plain sentences; replace the shared block (identical on pages 02–05) — every metric in the table is computed from it.\nInvariant: Limits carry the same weight as intended use; every metric names its denominator; the stop rule is a number, not a judgement.\nStatic: Static page; no builds.',
+  notes: 'Purpose: Close the report with what the model may and may not be used for, how good it is in the units the decision needs, what is known to be weak, and how the shadow run will be watched and stopped.\nModify: Edit shadow and card (use, scope, limits) in plain sentences. The shared test-set block is repeated on pages 02–06; replace it identically on all five — every metric in the table is computed from it.\nInvariant: Limits carry the same weight as intended use; every metric names its denominator; the stop rule is a number, not a judgement.\nStatic: Static page; no builds.',
   sources: [],
   exportPolicy: 'final',
   className: 'tpl-ml-report ml-modelcard',
@@ -63,6 +63,6 @@ export default {
 <section><h2>Intended use</h2>${para(card.use)}<h2>Out of scope</h2>${para(card.scope)}<h2>Known limits</h2>${para(card.limits)}</section>
 <section><h2>Metrics on the test set</h2>
 <table class="ml-metrics"><tbody>${metrics.map(m => `<tr><th>${m[0]}</th><td class="num">${m[1]}</td><td>${m[2]}</td></tr>`).join('')}</tbody></table>
-<h2>Monitoring in the shadow run</h2>${para(monitoring)}<p class="ml-when">From ${shadow.from}, ${shadow.weeks} weeks, all ${TEST.pumps.toLocaleString('en-US')} pumps; threshold p ≥ ${TEST.threshold}.</p></section>
+<h2>Monitoring in the shadow run</h2>${para(monitoring)}<p class="ml-when">From ${shadow.from} for ${shadow.weeks} weeks at p ≥ ${TEST.threshold}. Illustrative data.</p></section>
 </div>`,
 };

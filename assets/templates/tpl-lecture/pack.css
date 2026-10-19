@@ -21,7 +21,6 @@
   word-break:auto-phrase;line-break:strict;font-kerning:normal;
 }
 .tpl-lecture .nw{white-space:nowrap}
-.tpl-lecture .num{font-variant-numeric:tabular-nums lining-nums}
 .tpl-lecture .ai{color:var(--lx-ai)}
 .tpl-lecture .shu{color:var(--lx-shu)}
 
@@ -34,8 +33,6 @@
 .tpl-lecture .lx-foot b{font-weight:600;color:var(--lx-ink2);font-variant-numeric:tabular-nums}
 .tpl-lecture .lx-fig{position:absolute;margin:0}
 .tpl-lecture .lx-fig svg{display:block;overflow:visible}
-.tpl-lecture .lx-p{position:absolute;margin:0;font:400 24px/1.7 var(--lx-text);color:var(--lx-ink);text-wrap:pretty}
-.tpl-lecture .lx-p b{font-weight:600}
 
 /* SVG text roles (drawn 1:1) */
 .tpl-lecture .s-lab{font:400 20px var(--lx-text);fill:var(--lx-ink2)}

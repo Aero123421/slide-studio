@@ -1,7 +1,7 @@
 // Composition study · Exception rail — the qualification sits on the row it qualifies. Each note
 // in the right-hand rail is set at the height of its store's bar and tied to it by a leader, so
 // the reader meets the reason exactly where the odd number is. All values come from `stores`.
-import { svgRoot, el, g, textLines, linear, band, measureText, wrapText, theme as makeTheme, fmt } from '../runtime/figure.mjs';
+import { svgRoot, el, textLines, linear, band, measureText, wrapText, theme as makeTheme, fmt } from '../runtime/figure.mjs';
 
 const ID = 'composition-exception-rail';
 // 上期（4〜9月）の売上、百万円。営業日数つき。`why` がある店は前年と条件が違う（架空のデータ）

@@ -105,7 +105,7 @@ export default {
   id: ID,
   language: 'ja',
   title: 'Issue tree: where the required profit improvement can come from',
-  notes: 'Purpose: 「6%に届くか」という大きな問いを、検証できる問いと数値の仮説に分け、どこに改善余地が集まっているかを示す。\nModify: plan（売上・利益・前提）と tree（論点・問い・仮説・効果）を差し替える。合計、必要額、棒の長さ、接続線は自動で計算される。focus: true の論点が強調色になる。\nInvariant: 線は分解を表し、順序ではない。各問いは「はい／いいえ」で答えられる形にし、仮説には必ず数値を入れる。効果の単位と年度は全ページでそろえる（2029年度・億円）。\nStatic: 静的ページ。',
+  notes: 'Purpose: 「6%に届くか」という大きな問いを、検証できる問いと数値の仮説に分け、どこに改善余地が集まっているかを示す。\nModify: plan（売上・利益・前提）と tree（論点・問い・仮説・効果）を差し替える。合計、必要額、棒の長さ、接続線は自動で計算される。focus: true の論点が強調色になる。見出しの改行は <br> で文や句の切れ目に入れる。\nInvariant: 線は分解を表し、順序ではない。各問いは「はい／いいえ」で答えられる形にし、仮説には必ず数値を入れる。効果の単位と年度は全ページでそろえる（2029年度・億円）。\nStatic: 静的ページ。',
   sources: [],
   exportPolicy: 'final',
   className: 'tpl-strategy st-tree',

@@ -31,7 +31,7 @@ export function figure(theme = 'css') {
     id: 'composition-monochrome-data-fig', theme, width: 800, height: 474, fontSize: 17,
     title: 'Annual boardings by mode, 2019–2026, indexed to 2019 = 100',
     desc: `${others.map(s => s.name).join(', ')} are at or above their 2019 level in 2026; ${focus.toLowerCase()} is at ${fmt(rail.index.at(-1), { digits: 0 })}, ${short}% short.`,
-    x: years, xEvery: 1, yDomain: [20, 130], yTicks: 6, unit: 'Boardings, 2019 = 100',
+    x: years, xEvery: 1, yDomain: [20, 120], yTicks: 5, unit: 'Boardings, 2019 = 100',
     series: indexed.map(s => ({ name: s.name, values: s.index, dash: s.dash, color: ink })),
     highlight: focus, strokeWidth: 4.5, format: { digits: 0 },
     // The common baseline: a solid ink line at 100, labelled in the empty space above it.
@@ -49,7 +49,7 @@ export default {
   title: 'Monochrome data: line weight and position instead of color',
   className: 'st st--rail cs-mono-print cmp-mono',
   notes: 'Purpose: Show several series on one page that will be printed or photocopied in black and white, so that nothing depends on hue. The one series the page is about is the heaviest line; the others are thin, each with its own dash, and every line is labelled at its end.\nModify: Replace `boardings` (one entry per series, raw values) and `focus`; the index, the end labels, the table and the headline recompute. Give each context series a different dash (solid, dashed, dotted) and keep at most four lines; more than four belongs in small multiples or a table.\nInvariant: One common baseline (the 2019 = 100 reference line, drawn in ink); the focus line about three times the weight of the others; direct end labels instead of a legend; the table repeats the end values in absolute units with signed changes; no colour anywhere, including the accent.\nStatic: Already static.',
-  sources: [],
+  sources: [{ type: 'original-example', file: 'assets/compositions/monochrome-data.mjs' }],
   exportPolicy: 'final',
   content: `<h1 class="st-head">${cap(list(recovered))} are back above ${years[0]}; ${focus.toLowerCase()} is still ${short}% short</h1>
 <figure class="st-fig" data-region="primary">${figure()}</figure>

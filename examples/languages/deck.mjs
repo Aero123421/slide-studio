@@ -49,9 +49,15 @@ const growth = (ebookYear / yearTotal(loans.ebook, lastYear - 1) - 1) * 100;   /
 const AXIS_MAX = 200000;                            // same headroom on every page, whatever the unit
 
 // ---------------------------------------------------------------- 3 · typographic helpers
-const nb = s => `<span class="nb">${s}</span>`;     // never break a number from its unit
+// Never break a number from its unit, a date, or "E-Books" after its "E-": no-break spaces and
+// hyphens in spaced scripts; a nowrap span in Chinese, Japanese and Korean, where no space marks the unit.
+const CJK = /[\u3040-\u30ff\u3400-\u9fff\uac00-\ud7af]/;
+const nb = s => (CJK.test(s) ? `<span class="nb">${s}</span>` : s.replace(/ (?![^<]*>)/g, '\u00A0').replace(/-(?![^<]*>)/g, '\u2011'));
 const bdi = s => `<bdi>${s}</bdi>`;                 // isolate an inserted identifier from the text direction
-const plain = s => s.replace(/<[^>]+>/g, '').replace(/&shy;/g, '');
+const plain = s => s.replace(/<[^>]+>/g, '').replace(/&shy;/g, '').replace(/\|/g, '');
+// Chinese and Japanese copy marks where a line may break with "|"; with word-break: keep-all
+// the browser breaks only there, so words (纸质书, 借阅量) and number+unit never split.
+const phrases = s => s.replace(/\|/g, '<wbr>');
 const cap = s => s.charAt(0).toLocaleUpperCase() + s.slice(1);
 // French sets a no-break space before ; ! ? (narrow) and before a colon (full width).
 const frenchSpacing = s => s.replace(/\s*([;!?])/g, ' $1').replace(/\s+:(?=\s)/g, ' :');
@@ -68,8 +74,12 @@ function facts(L) {
   const percent = new Intl.NumberFormat(loc, { style: 'percent' }).formatToParts(1)
     .filter(p => p.type !== 'integer').map(p => p.value).join('');
   const plural = (n, forms) => forms[new Intl.PluralRules(loc).select(n)] ?? forms.other;
-  const list = items => new Intl.ListFormat(loc, { style: 'long', type: 'conjunction' }).formatToParts(items)
-    .map(p => (p.type === 'element' ? bdi(p.value) : p.value)).join('');
+  // "B04, B09 and B12" in the reader's own list grammar; the last pair ("and B12") never splits.
+  const list = items => {
+    const parts = new Intl.ListFormat(loc, { style: 'long', type: 'conjunction' }).formatToParts(items)
+      .map(p => (p.type === 'element' ? bdi(p.value) : p.value));
+    return parts.slice(0, -2).join('') + nb(parts.slice(-2).join(''));
+  };
   const big = L.big;                                // how this language says 1,491,100
   return {
     num, plural,
@@ -99,7 +109,7 @@ const LANGS = [
     copy: f => ({
       head: `E-book loans have outnumbered print every month since ${nb(f.since)}`,
       kpi: `E-book loans in ${f.year}, ${nb(f.growth)} more than in ${f.prevYear}`,
-      note: `${cap(f.closedWord)} ${f.plural(f.closedN, { one: 'branch', other: 'branches' })} (${f.codes}) have been closed for renovation since ${nb(f.closed)}, which holds print loans down. Will e-books stay ahead when they reopen in ${nb(f.reopens)}?`,
+      note: `${cap(f.closedWord)} ${f.plural(f.closedN, { one: 'branch', other: 'branches' })} (${f.codes}) have been closed for renovation since ${nb(f.closed)}, which holds print loans down. Will ${nb('e-books')} stay ahead when they reopen in ${nb(f.reopens)}?`,
       chart: 'Library loans per month by format', axis: 'Loans per month, thousands',
       series: { ebook: 'E-books', print: 'Print books', audio: 'Audiobooks' },
       band: `${f.closedCount} branches closed`,
@@ -111,8 +121,8 @@ const LANGS = [
     id: 'ja', lang: 'ja', dir: 'ltr', numbers: 'ja', autonym: '日本語',
     big: { div: 1e4, digits: 0, unit: '万件' }, axis: { div: 1e4 },
     copy: f => ({
-      head: `電子書籍の貸出は<wbr>${nb(f.since)}以降、<wbr>毎月<wbr>紙の本を<wbr>上回っている`,
-      kpi: `${f.year}年の電子書籍の貸出数（前年比${nb(f.growth)}増）`,
+      head: phrases(`電子書籍の貸出は|${nb(f.since)}以降、|毎月|紙の本を|上回っている`),
+      kpi: `${f.year}年の電子書籍の貸出数${nb(`（前年比${f.growth}増）`)}`,
       note: `分館${f.closedCount}館（${f.codes}）が${nb(f.closed)}から改修で休館しており、紙の本の貸出を押し下げている。${nb(f.reopens)}の再開後も電子書籍が上回り続けるかは、まだ分からない。`,
       chart: '形態別の月間貸出数', axis: '月間貸出数（万件）',
       series: { ebook: '電子書籍', print: '紙の本', audio: 'オーディオブック' },
@@ -126,9 +136,9 @@ const LANGS = [
     big: { div: 1e4, digits: 0, unit: '万次' }, axis: { div: 1e4 },
     words: ['零', '一', '两', '三', '四', '五', '六', '七', '八', '九', '十'],
     copy: f => ({
-      head: `自${nb(f.since)}起，<wbr>电子书借阅量<wbr>每月都超过<wbr>纸质书`,
-      kpi: `${f.year}年电子书借阅量，比${f.prevYear}年增长${nb(f.growth)}`,
-      note: `${f.closedWord}家分馆（${f.codes}）自${nb(f.closed)}起闭馆翻修，拉低了纸质书借阅量。分馆将于${nb(f.reopens)}重新开放，届时电子书能否保持领先，仍有待观察。`,
+      head: phrases(`自${nb(f.since)}起，|电子书借阅量|每月都超过|纸质书`),
+      kpi: phrases(`${f.year}年|电子书借阅量，|${nb(`比${f.prevYear}年增长${f.growth}`)}`),
+      note: phrases(`${f.closedWord}家分馆（${f.codes}）|自${nb(f.closed)}起|闭馆翻修，|拉低了|纸质书借阅量。|分馆|将于${nb(f.reopens)}|重新开放，|届时|电子书|能否保持领先，|仍有待观察。`),
       chart: '按载体划分的每月借阅量', axis: '每月借阅量（万次）',
       series: { ebook: '电子书', print: '纸质书', audio: '有声书' },
       band: `${f.closedCount}家分馆闭馆`,
@@ -141,9 +151,9 @@ const LANGS = [
     big: { div: 1e4, digits: 0, unit: '萬次' }, axis: { div: 1e4 },
     words: ['零', '一', '兩', '三', '四', '五', '六', '七', '八', '九', '十'],
     copy: f => ({
-      head: `自${nb(f.since)}起，<wbr>電子書借閱量<wbr>每月都超越<wbr>紙本書`,
-      kpi: `${f.year}年電子書借閱量，較${f.prevYear}年成長${nb(f.growth)}`,
-      note: `${f.closedWord}座分館（${f.codes}）自${nb(f.closed)}起閉館整修，使紙本書借閱量下滑。分館預計${nb(f.reopens)}重新開放，屆時電子書能否維持領先，仍有待觀察。`,
+      head: phrases(`自${nb(f.since)}起，|電子書借閱量|每月都超越|紙本書`),
+      kpi: phrases(`${f.year}年|電子書借閱量，|${nb(`較${f.prevYear}年成長${f.growth}`)}`),
+      note: phrases(`${f.closedWord}座分館（${f.codes}）|自${nb(f.closed)}起|閉館整修，|使紙本書|借閱量下滑。|分館|預計${nb(f.reopens)}|重新開放，|屆時|電子書|能否維持領先，|仍有待觀察。`),
       chart: '各類館藏每月借閱量', axis: '每月借閱量（萬次）',
       series: { ebook: '電子書', print: '紙本書', audio: '有聲書' },
       band: `${f.closedCount}座分館閉館整修`,
@@ -157,7 +167,7 @@ const LANGS = [
     words: ['', '한', '두', '세', '네', '다섯', '여섯', '일곱', '여덟', '아홉', '열'],   // native counting words before 곳
     copy: f => ({
       head: `${nb(f.since)}부터 전자책 대출이 매달 종이책보다 많았다`,
-      kpi: `${f.year}년 전자책 대출 건수, 전년보다 ${nb(f.growth)} 증가`,
+      kpi: `${f.year}년 전자책 대출 건수, ${nb(`전년보다 ${f.growth} 증가`)}`,
       note: `분관 ${f.closedWord} 곳(${f.codes})이 ${nb(f.closed)}부터 리모델링으로 휴관해 종이책 대출이 줄었다. ${nb(f.reopens)}에 다시 문을 연 뒤에도 전자책이 앞설지는 아직 알 수 없다.`,
       chart: '자료 형태별 월별 대출 건수', axis: '월별 대출 건수(만 건)',
       series: { ebook: '전자책', print: '종이책', audio: '오디오북' },
@@ -174,7 +184,7 @@ const LANGS = [
     big: { div: 1e6, digits: 2, unit: 'مليون' }, axis: { div: 1e3 },
     copy: f => ({
       head: `منذ ${nb(f.since)}، تتفوّق إعارات الكتب الإلكترونية على المطبوعة كل شهر`,
-      kpi: `إعارات الكتب الإلكترونية في ${f.year}، بزيادة ${nb(f.growth)} عن ${f.prevYear}`,
+      kpi: `إعارات الكتب الإلكترونية في ${f.year}، ${nb(`بزيادة ${f.growth} عن ${f.prevYear}`)}`,
       note: `أُغلقت ${f.closedCount} ${f.plural(f.closedN, { one: 'فرع', two: 'فرعان', few: 'فروع', other: 'فرعًا' })} (${f.codes}) للتجديد منذ ${nb(f.closed)}، ما قلّل إعارات الكتب المطبوعة. فهل تبقى الكتب الإلكترونية في الصدارة بعد إعادة افتتاحها في ${nb(f.reopens)}؟`,
       chart: 'الإعارات الشهرية حسب نوع الكتاب', axis: 'الإعارات شهريًا (بالآلاف)',
       series: { ebook: 'الكتب الإلكترونية', print: 'الكتب المطبوعة', audio: 'الكتب الصوتية' },
@@ -188,9 +198,9 @@ const LANGS = [
     big: { div: 1e5, digits: 1, unit: 'लाख' }, axis: { div: 1e3 },
     words: ['शून्य', 'एक', 'दो', 'तीन', 'चार', 'पाँच', 'छह', 'सात', 'आठ', 'नौ', 'दस'],
     copy: f => ({
-      head: `${nb(f.since)} से हर महीने छपी किताबों से ज़्यादा ई-बुक उधार ली गई हैं`,
-      kpi: `${f.year} में उधार ली गई ई-बुक, ${f.prevYear} से ${nb(f.growth)} ज़्यादा`,
-      note: `${f.closedWord} ${f.plural(f.closedN, { one: 'शाखा', other: 'शाखाएँ' })} (${f.codes}) ${nb(f.closed)} से मरम्मत के लिए बंद हैं, इसलिए छपी किताबें कम ली गईं। ${nb(f.reopens)} में इनके दोबारा खुलने के बाद भी क्या ई-बुक आगे रहेंगी?`,
+      head: `${nb(f.since)} से हर महीने छपी किताबों से ज़्यादा ${nb('ई-बुक')} उधार ली गई हैं`,
+      kpi: `${f.year} में उधार ली गई ${nb('ई-बुक')}, ${nb(`${f.prevYear} से ${f.growth} ज़्यादा`)}`,
+      note: `${f.closedWord} ${f.plural(f.closedN, { one: 'शाखा', other: 'शाखाएँ' })} (${f.codes}) ${nb(f.closed)} से मरम्मत के लिए बंद हैं, इसलिए छपी किताबें कम ली गईं। ${nb(f.reopens)} में इनके दोबारा खुलने के बाद भी क्या ${nb('ई-बुक')} आगे रहेंगी?`,
       chart: 'हर महीने उधार ली गई किताबें, रूप के अनुसार', axis: 'हर महीने उधार ली गई किताबें (हज़ार में)',
       series: { ebook: 'ई-बुक', print: 'छपी किताबें', audio: 'ऑडियोबुक' },
       band: `${f.closedCount} शाखाएँ बंद`,
@@ -203,10 +213,10 @@ const LANGS = [
     big: { div: 1e6, digits: 2, unit: 'Mio.' }, axis: { div: 1e3 },
     words: ['null', 'eine', 'zwei', 'drei', 'vier', 'fünf', 'sechs', 'sieben', 'acht', 'neun', 'zehn'],
     copy: f => ({
-      head: `Seit ${nb(f.since)} werden jeden Monat mehr E-Books ausgeliehen als gedruckte Bücher`,
+      head: `Seit ${nb(f.since)} werden jeden Monat mehr ${nb('E-Books')} ausgeliehen als gedruckte Bücher`,
       kpi: `E-Book-Ausleihen ${f.year}, ${nb(f.growth)} mehr als ${f.prevYear}`,
       // Soft hyphens (&shy;) mark where a German editor would split the long compounds.
-      note: `${cap(f.closedWord)} Zweig&shy;stellen (${f.codes}) sind seit ${nb(f.closed)} wegen Sanierung geschlossen; das drückt die Ausleih&shy;zahlen gedruckter Bücher. Bleiben E-Books auch nach der Wieder&shy;eröffnung im ${nb(f.reopens)} vorn?`,
+      note: `${cap(f.closedWord)} Zweig&shy;stellen (${f.codes}) sind seit ${nb(f.closed)} wegen Sanierung geschlossen; das drückt die Ausleih&shy;zahlen gedruckter Bücher. Bleiben ${nb('E-Books')} auch nach der Wieder&shy;eröffnung im ${nb(f.reopens)} vorn?`,
       chart: 'Ausleihen pro Monat nach Medienart', axis: 'Ausleihen pro Monat, in Tausend',
       series: { ebook: 'E-Books', print: 'Gedruckte Bücher', audio: 'Hörbücher' },
       band: `${f.closedCount} Zweigstellen geschlossen`,
@@ -256,7 +266,7 @@ const NOTES = {
   ko: 'Korean: words are separated by spaces, so word-break: keep-all stops breaks inside words; myriad counts (11만 9100건); tilde for ranges in the source line.',
   ar: 'Arabic: right-to-left page (headline right, rail left, source mirrored) but the time axis still runs left to right — a number line, not a reading order. Arabic-Indic digits from ar-EG, plural nouns from Intl.PluralRules (٣ فروع, ١٤ فرعًا), codes isolated with <bdi>, larger size and leading, no letter-spacing.',
   hi: 'Hindi: Devanagari needs taller leading for marks above and below the headline bar and never takes letter-spacing; Indian digit grouping (1,20,000) and lakh for the big number (14.9 लाख); danda (।) ends the sentence.',
-  de: 'German: long compounds carry soft hyphens at their joints (Ausleih&shy;zahlen), so they break where an editor would; decimal comma, "19 %" with a no-break space, "Mio." for millions.',
+  de: 'German: long compounds carry soft hyphens (U+00AD) at their joints (Zweig-stellen, Ausleih-zahlen, Wieder-eröffnung), so they break where an editor would; decimal comma, "19 %" with a no-break space, "Mio." for millions, E-Books never split after the E.',
   fr: 'French: a helper inserts the no-break spaces before : ; ? (fine space before ; ! ?), typographic apostrophes, narrow no-break space as thousands separator (120 000), "1,49 million" singular by plural rule.',
   es: 'Spanish: opening ¿ for the question, decimal comma, "19 %" with a space as the RAE recommends, "y" before the last list item from Intl.ListFormat, "millones" by plural rule.',
 };
@@ -302,35 +312,39 @@ function page(L) {
 const css = `${frame}
 ${colors}
 /* ---- One page, ten languages ---- */
-.lp { --ss-font-sans: "Inter","Helvetica Neue",Arial,sans-serif; --ss-font-display: "Inter Display","Inter","Helvetica Neue",Arial,sans-serif; }
-.lp:lang(ja) { --ss-font-sans: "Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Noto Sans CJK JP","Yu Gothic UI","Yu Gothic",Meiryo,"IPAPGothic",sans-serif; }
-.lp:lang(zh-Hans) { --ss-font-sans: "PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC","Noto Sans CJK SC","WenQuanYi Zen Hei",sans-serif; }
-.lp:lang(zh-Hant) { --ss-font-sans: "PingFang TC","Microsoft JhengHei","Noto Sans TC","Noto Sans CJK TC","WenQuanYi Zen Hei",sans-serif; }
-.lp:lang(ko) { --ss-font-sans: "Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR","Noto Sans CJK KR","WenQuanYi Zen Hei",sans-serif; }
-.lp:lang(ar) { --ss-font-sans: "Geeza Pro","Noto Naskh Arabic","Segoe UI","Tahoma","DejaVu Sans",sans-serif; }
-.lp:lang(hi) { --ss-font-sans: "Kohinoor Devanagari","Devanagari Sangam MN","Noto Sans Devanagari","Nirmala UI","FreeSans",sans-serif; }
-.lp:is(:lang(ja), :lang(zh), :lang(ko), :lang(ar), :lang(hi)) { --ss-font-display: var(--ss-font-sans); }
+/* Running text: each script's own face first, so a headline's digits and letters share one weight.
+   Figures and the big number: the Latin face first, so numerals match across all ten versions. */
+.lp { --latin: "Inter","Helvetica Neue",Arial; --ss-font-sans: var(--latin),sans-serif; --ss-font-display: "Inter Display",var(--latin),sans-serif; }
+.lp:lang(ja) { --script: "Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Noto Sans CJK JP","Yu Gothic UI","Yu Gothic",Meiryo,"IPAPGothic"; }
+.lp:lang(zh-Hans) { --script: "PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC","Noto Sans CJK SC","WenQuanYi Zen Hei"; }
+.lp:lang(zh-Hant) { --script: "PingFang TC","Microsoft JhengHei","Noto Sans TC","Noto Sans CJK TC","WenQuanYi Zen Hei"; }
+.lp:lang(ko) { --script: "Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR","Noto Sans CJK KR","WenQuanYi Zen Hei"; }
+.lp:lang(ar) { --script: "Geeza Pro","Noto Naskh Arabic","Segoe UI","Tahoma","DejaVu Sans"; }
+.lp:lang(hi) { --script: "Kohinoor Devanagari","Devanagari Sangam MN","Noto Sans Devanagari","Nirmala UI","FreeSans"; }
+.lp:is(:lang(ja), :lang(zh), :lang(ko), :lang(ar), :lang(hi)) { --ss-font-sans: var(--script),sans-serif; --ss-font-display: var(--ss-font-sans); }
+.lp:is(:lang(ja), :lang(zh), :lang(ko), :lang(ar), :lang(hi)) :is(.st-fig, .st-kpi b) { --ss-font-sans: var(--latin),var(--script),sans-serif; --ss-font-display: "Inter Display",var(--ss-font-sans); }
 
-/* Type scale: Latin 40 / 19 / 18; CJK sets smaller and looser; Arabic and Devanagari larger and taller. */
+/* Type scale. Latin: headline 40, text 19, labels 18. CJK sets smaller and looser; Arabic and
+   Devanagari larger and taller, never letter-spaced. Every headline takes two lines. */
 .lp .st-head { font-size: 40px; line-height: 1.12; letter-spacing: -.015em; max-width: 1080px; }
+.lp .st-rail { justify-content: flex-start; padding-top: 35px; }   /* the big number's cap line sits on the plot's top gridline */
 .lp .st-kpi b { font-size: 56px; color: var(--ss-accent); }
 .lp .st-kpi b small { font-size: .46em; font-weight: 600; letter-spacing: 0; margin-inline-start: .2em; }
 .lp .st-kpi span { color: var(--ss-ink); }
-.lp .st-source span:last-child { color: var(--ss-ink); }
 .lp .nb { white-space: nowrap; }
 
-.lp:is(:lang(ja), :lang(zh), :lang(ko)) .st-head { font-size: 36px; line-height: 1.42; letter-spacing: 0; font-weight: 700; word-break: keep-all; }
+.lp:is(:lang(ja), :lang(zh), :lang(ko)) .st-head { font-size: 38px; line-height: 1.42; letter-spacing: 0; font-weight: 700; max-width: 720px; word-break: keep-all; }
 .lp:lang(ja) .st-head { word-break: auto-phrase; font-feature-settings: "palt" 1; letter-spacing: .02em; }
 .lp:is(:lang(ja), :lang(zh), :lang(ko)) :is(.st-text, .st-kpi span) { font-size: 18px; line-height: 1.75; line-break: strict; }
+.lp:lang(zh) :is(.st-text, .st-kpi span) { word-break: keep-all; }
 .lp:is(:lang(ja), :lang(zh)) .st-kpi b small { margin-inline-start: .06em; }
 .lp:lang(ko) { word-break: keep-all; }
 
-.lp:lang(ar) .st-head { font-size: 42px; line-height: 1.5; letter-spacing: 0; font-weight: 700; right: var(--st-x); left: auto; }
+.lp:lang(ar) .st-head { font-size: 40px; line-height: 1.4; letter-spacing: 0; font-weight: 700; right: var(--st-x); left: auto; }
 .lp:lang(ar) :is(.st-text, .st-kpi span) { font-size: 21px; line-height: 1.7; }
-.lp:lang(ar) .st-kpi b { letter-spacing: 0; }
-.lp:lang(hi) .st-head { font-size: 38px; line-height: 1.5; letter-spacing: 0; font-weight: 700; }
+.lp:lang(hi) .st-head { font-size: 40px; line-height: 1.45; letter-spacing: 0; font-weight: 700; max-width: 820px; }
 .lp:lang(hi) :is(.st-text, .st-kpi span) { font-size: 19px; line-height: 1.75; }
-.lp:lang(hi) .st-kpi b { letter-spacing: 0; }
+.lp:is(:lang(ar), :lang(hi)) .st-kpi b { letter-spacing: 0; }
 .lp:lang(de) { hyphens: manual; }
 `;
 

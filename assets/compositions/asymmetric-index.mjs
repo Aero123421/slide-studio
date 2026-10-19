@@ -38,7 +38,7 @@ export default {
   title: 'Asymmetric index: an agenda sized by the time each item gets',
   className: 'st cs-navy-classic-light cmp-index',
   notes: 'Purpose: Show the structure of a meeting, report or talk so that its proportions are visible: what most of the time (or most of the pages) is for. An index whose items are equal boxes hides that; an index set to one spine with unequal sizes shows it.\nModify: Replace `meeting` and `items` (title, minutes, optional reference; mark the one main item `lead`). Start times, the end time, the share in the headline and every height recompute. For a report, use page counts instead of minutes.\nInvariant: One alignment spine (the time column and its rule); every item starts on the spine; heights are proportional to the allocation, so a five-minute item gets one line and the main item gets room for its title, recommendation and speakers; one accent bar marks the main item on the spine; no numbered cards, no icons.\nStatic: Already static.',
-  sources: [],
+  sources: [{ type: 'original-example', file: 'assets/compositions/asymmetric-index.mjs' }],
   exportPolicy: 'final',
   content: `<p class="ai2-run" data-region="support">${meeting.council}</p>
 <h1 class="ai2-head" data-region="title">${lead.min} of tonight’s ${total} minutes go to <em>one decision</em></h1>

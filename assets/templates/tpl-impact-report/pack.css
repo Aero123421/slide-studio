@@ -9,7 +9,7 @@
   --ir-context:#cbbfae;--ir-accent:#a9492a;--ir-accent-2:#c8775a;--ir-accent-3:#ddab95;--ir-accent-4:#ecd0c1;
   --ir-mincho:"Hiragino Mincho ProN","Yu Mincho","YuMincho","Noto Serif JP","Noto Serif CJK JP","IPAMincho","IPAPGothic",serif;
   --ir-sans:"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic UI","Yu Gothic",Meiryo,"IPAPGothic","IPAGothic",sans-serif;
-  --ir-fig:"Charter","Bitstream Charter","Iowan Old Style",Georgia,serif;
+  --ir-fig:"Charter","Bitstream Charter","Iowan Old Style",Georgia,Caladea,serif;
   /* figure-engine tokens */
   --ss-paper:#f6f1e8;--ss-surface:#efe8db;--ss-ink:#2a2521;--ss-muted:#6b6057;--ss-rule:#d9cebd;--ss-grid:#e7dfd1;
   --ss-accent:#a9492a;--ss-on-accent:#ffffff;--ss-positive:#a9492a;--ss-negative:#7a3a2a;--ss-highlight:#a9492a;--ss-context:#cbbfae;

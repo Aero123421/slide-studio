@@ -84,11 +84,11 @@ export default {
   id: ID,
   language: 'ja',
   title: 'Priority matrix: effect versus ease of execution',
-  notes: 'Purpose: 論点ツリーで洗い出した打ち手を「効果」と「実行の容易さ」で並べ、どれから着手し、どれを見送るかを決める。\nModify: levers の効果（億円）・容易さ（1〜5）・ラベルの側 side を差し替える。境界 cut を変えると色分け、網掛け、右の表の合計が追従する。ラベルが境界線や図の端にかかる場合は自動で反対側に置かれる。\nInvariant: 打ち手の番号と効果は論点ツリーと同じ値にする。境界は明記した数値で引き、目分量で決めない。容易さの採点方法を注記する。\nStatic: 静的ページ。',
+  notes: 'Purpose: 論点ツリーで洗い出した打ち手を「効果」と「実行の容易さ」で並べ、どれから着手し、どれを見送るかを決める。\nModify: levers の効果（億円）・容易さ（1〜5）・ラベルの側 side を差し替える。境界 cut を変えると色分け、網掛け、右の表の合計が追従する。ラベルが境界線や図の端にかかる場合は自動で反対側に置かれる。見出しの改行は <br> で文や句の切れ目に入れる。\nInvariant: 打ち手の番号と効果は論点ツリーと同じ値にする。境界は明記した数値で引き、目分量で決めない。容易さの採点方法を注記する。\nStatic: 静的ページ。',
   sources: [],
   exportPolicy: 'final',
   className: 'tpl-strategy st-matrix',
-  content: `<h1 class="st-title" data-region="title">効果が大きく実行しやすい${first.items.length}つの打ち手で、必要な改善額の${Math.round(share * 10)}割をまかなえる</h1>
+  content: `<h1 class="st-title" data-region="title">効果が大きく実行しやすい${first.items.length}つの打ち手で、<br>必要な改善額の${Math.round(share * 10)}割をまかなえる</h1>
 <figure class="st-fig" style="left:64px;top:190px;width:${W}px;height:${H}px" data-region="primary">${svg}</figure>
 ${table}
 <div class="st-foot" data-region="source"><p>注：実行の容易さは、投資額・準備期間・社内外の調整の3項目を経営陣6名が5段階で採点した平均<br>出典：白峰パートナーズ分析</p><p>EC事業の収益改善<b>3</b></p></div>`,

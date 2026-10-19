@@ -49,12 +49,12 @@ export default {
   notes: `Purpose: Give a reading audience (a council committee, an annual report) every figure for every unit on one page, so they can look up their own station and compare it with the rest. The headline states the one pattern the table proves.\nModify: Replace \`stations\` with your records (or replace \`simulate\` with real per-call times); every column, the total row (computed from all calls, not by averaging medians) and the headline recompute. Keep one decimal for times and shares, whole numbers for counts, and units only in the header.\nInvariant: Numbers are right-aligned in tabular figures with one precision per column; rules only under the header and above the total; grouped headers name what the columns measure; the accent marks only the cells the headline is about (${below.map(r => r.name).join('・')}); no zebra stripes, no cell boxes, no icons.\nStatic: Already static.`,
   sources: [{ type: 'original-example', file: 'assets/compositions/dense-table.mjs' }],
   exportPolicy: 'final',
-  content: `<h1 class="st-head" data-region="title">${target.minutes}分以内の到着が${n0(target.share * 10)}割に届かないのは<em>${below.map(r => `${r.name}署`).join('・')}</em>。${allLarge ? '<span class="st-quiet">いずれも管轄が100 km²を超える山間部</span>' : ''}</h1>
+  content: `<h1 class="st-head" data-region="title">${target.minutes}分以内の到着が${n0(target.share * 10)}割に届かないのは<em>${below.map(r => r.name).join('・')}</em>の${below.length}署。${allLarge ? '<br><span class="st-quiet">いずれも管轄が100 km²を超える山間部</span>' : ''}</h1>
 <p class="st-dek dt-dek" data-region="support">消防署別の救急出動と、入電から現場到着までの時間。2025年度、市全体で${n0(total.calls)}件。</p>
 <table class="dt-table" data-region="primary">
   <colgroup><col class="dt-c-name"><col span="4"><col span="4"></colgroup>
   <thead>
-    <tr class="dt-group"><th scope="col"></th><th scope="colgroup" colspan="4">管轄と出動</th><th scope="colgroup" colspan="4">現場到着までの時間</th></tr>
+    <tr class="dt-group"><th scope="col"></th><th scope="colgroup" colspan="4"><span>管轄と出動</span></th><th scope="colgroup" colspan="4"><span>現場到着までの時間</span></th></tr>
     <tr class="dt-cols"><th scope="col">消防署</th><th scope="col">面積<small>km²</small></th><th scope="col">救急隊<small>隊</small></th><th scope="col">出動<small>件</small></th><th scope="col">1隊当たり<small>件</small></th><th scope="col">中央値<small>分</small></th><th scope="col">90%値<small>分</small></th><th scope="col">${target.minutes}分以内<small>%</small></th><th scope="col">前年差<small>pt</small></th></tr>
   </thead>
   <tbody>${rows.map(r => cells(r, r.within8 < target.share ? 'dt-below' : '')).join('')}</tbody>

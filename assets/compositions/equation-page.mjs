@@ -56,11 +56,11 @@ export default {
   title: 'Equation page: the notation large, every term explained beside it',
   className: 'st cs-physics-lecture cmp-equation',
   notes: 'Purpose: Teach a formula so the audience can use it: the notation large enough to read from the back, every symbol defined in words with its unit and value, one worked example, and one plot that shows what the important term does.\nModify: Replace `law`, `today` and `terms` (one row per symbol, in the order they appear in the formula). Keep the MathML real (selectable, with an aria-label in words) and keep the sentence under the formula as the plain-language fallback. Recompute the worked example and the plot from the same constants.\nInvariant: The formula is set once, large, in real math markup; the term column repeats each symbol exactly as it appears in the formula; units on every quantity; the accent marks only the term being explained (ln) and what it does on the plot (equal steps per doubling), and the headline phrase in accent names that step. Axes and curve in ink.\nStatic: Already static.',
-  sources: [],
+  sources: [{ type: 'original-example', file: 'assets/compositions/equation-page.mjs' }],
   exportPolicy: 'final',
   content: `<h1 class="st-head">Each doubling of CO₂ adds the same <em>${f1(perDoubling)} W m<sup>−2</sup></em> of forcing</h1>
 <div class="eq-formula" data-region="primary">
-  <math class="eq-main" aria-label="Delta F equals ${law.a} times the natural logarithm of C over C zero"><mrow><mi mathvariant="normal">Δ</mi><mi>F</mi><mo>=</mo><mn>${law.a}</mn><mspace width="0.22em"></mspace><mi mathvariant="normal" class="eq-hot">ln</mi><mo>&#x2061;</mo><mrow><mo stretchy="false">(</mo><mi>C</mi><mo>/</mo><msub><mi>C</mi><mn>0</mn></msub><mo stretchy="false">)</mo></mrow></mrow></math>
+  <math class="eq-main" aria-label="Delta F equals ${law.a} times the natural logarithm of C over C zero"><mrow><mi mathvariant="normal">Δ</mi><mi>F</mi><mo>=</mo><mn>${law.a}</mn><mspace width="0.22em"></mspace><mi mathvariant="normal" class="eq-hot">ln</mi><mo>&#x2061;</mo><mrow><mo stretchy="false">(</mo><mi>C</mi><mo>/</mo><msub><mi>C</mi><mn>0</mn></msub><mo stretchy="false" lspace="0" rspace="0">)</mo></mrow></mrow></math>
   <p class="eq-words">In words: the extra heating grows with the logarithm of how many times CO₂ has multiplied since 1750.</p>
 </div>
 <dl class="eq-terms" data-region="support">${terms.map(r => `<div${r.hot ? ' class="eq-hot"' : ''}><dt>${r.sym}</dt>${r.value ? `<dd>${r.text}</dd><dd class="eq-unit">${r.value}</dd>` : `<dd class="eq-span">${r.text}</dd>`}</div>`).join('')}</dl>

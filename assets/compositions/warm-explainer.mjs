@@ -14,25 +14,29 @@ const lines = 20;                                                  // flow lines
 // --- the model: cell-centred pressure, p = 1 under the shower screen, p = 0 at the basket floor
 const nx = Math.round(basket.widthMm / cell), ny = Math.round(basket.puckMm / cell);
 function solve(permeability) {
-  const k = (i, j) => permeability(i, j);
+  const N = nx * ny, k = new Float64Array(N);
+  for (let c = 0; c < N; c++) k[c] = permeability(c % nx, Math.floor(c / nx));
   const T = (a, b) => (2 * a * b) / (a + b);                       // harmonic mean between two cells
-  const p = Array.from({ length: ny }, (_, j) => new Float64Array(nx).fill(1 - (j + 0.5) / ny));
+  const tE = new Float64Array(N), tS = new Float64Array(N);         // transmissibility to the east / south neighbour
+  for (let c = 0; c < N; c++) { if (c % nx < nx - 1) tE[c] = T(k[c], k[c + 1]); if (c + nx < N) tS[c] = T(k[c], k[c + nx]); }
+  const p = new Float64Array(N);
+  for (let c = 0; c < N; c++) p[c] = 1 - (Math.floor(c / nx) + 0.5) / ny;   // start from the even-puck solution
   for (let it = 0; it < 20000; it++) {                             // successive over-relaxation
     let change = 0;
-    for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) {
-      const kc = k(i, j); let num = 0, den = 0;
-      if (i > 0) { const t = T(kc, k(i - 1, j)); num += t * p[j][i - 1]; den += t; }
-      if (i < nx - 1) { const t = T(kc, k(i + 1, j)); num += t * p[j][i + 1]; den += t; }
-      if (j > 0) { const t = T(kc, k(i, j - 1)); num += t * p[j - 1][i]; den += t; } else { num += 2 * kc; den += 2 * kc; }
-      if (j < ny - 1) { const t = T(kc, k(i, j + 1)); num += t * p[j + 1][i]; den += t; } else den += 2 * kc;
-      const next = p[j][i] + 1.9 * (num / den - p[j][i]);
-      change = Math.max(change, Math.abs(next - p[j][i])); p[j][i] = next;
+    for (let c = 0; c < N; c++) {
+      const i = c % nx; let num = 0, den = 0;
+      if (i > 0) { num += tE[c - 1] * p[c - 1]; den += tE[c - 1]; }
+      if (i < nx - 1) { num += tE[c] * p[c + 1]; den += tE[c]; }
+      if (c >= nx) { num += tS[c - nx] * p[c - nx]; den += tS[c - nx]; } else { num += 2 * k[c]; den += 2 * k[c]; } // p = 1 at the screen
+      if (c + nx < N) { num += tS[c] * p[c + nx]; den += tS[c]; } else den += 2 * k[c];                             // p = 0 at the floor
+      const next = p[c] + 1.95 * (num / den - p[c]);
+      change = Math.max(change, Math.abs(next - p[c])); p[c] = next;
     }
-    if (change < 1e-10) break;
+    if (change < 1e-9) break;
   }
   // downward flux through every horizontal face (row r = 0 is the top surface, r = ny the floor)
-  const flux = (r, i) => (r === 0 ? 2 * k(i, 0) * (1 - p[0][i]) : r === ny ? 2 * k(i, ny - 1) * p[ny - 1][i] : T(k(i, r - 1), k(i, r)) * (p[r - 1][i] - p[r][i]));
-  const total = Array.from({ length: nx }, (_, i) => flux(0, i)).reduce((s, v) => s + v, 0);
+  const flux = (r, i) => (r === 0 ? 2 * k[i] * (1 - p[i]) : r === ny ? 2 * k[(ny - 1) * nx + i] * p[(ny - 1) * nx + i] : tS[(r - 1) * nx + i] * (p[(r - 1) * nx + i] - p[r * nx + i]));
+  let total = 0; for (let i = 0; i < nx; i++) total += flux(0, i);
   // stream function on the nodes: cumulative flux from the left wall, 0 → 1
   const psi = Array.from({ length: ny + 1 }, (_, r) => { let s = 0; const row = [0]; for (let i = 0; i < nx; i++) { s += flux(r, i); row.push(s / total); } return row; });
   return { psi, total };
@@ -67,7 +71,7 @@ export function figure(themeArg = 'css') {
     const outline = `M${bx} ${screenY - wall}V${puckBot - r0}Q${bx} ${puckBot} ${bx + r0} ${puckBot}H${bx + bw - r0}Q${bx + bw} ${puckBot} ${bx + bw} ${puckBot - r0}V${screenY - wall}`;
     return g({ class: 'we-panel' },
       textLines([title], { x: px, y: 0, size: 20, weight: 700, valign: 'top', fill: t.c('ink') }),
-      el('rect', { x: bx, y: screenY, width: bw, height: puckTop - screenY, fill: t.c('surface') }),          // water in the headspace
+      el('path', { d: `M${bx} ${screenY}H${bx + bw}V${puckTop}H${bx}Z`, fill: t.c('surface') }),               // water in the headspace, between screen and puck
       el('path', { d: `M${bx} ${puckTop}H${bx + bw}V${puckBot - r0}Q${bx + bw} ${puckBot} ${bx + bw - r0} ${puckBot}H${bx + r0}Q${bx} ${puckBot} ${bx} ${puckBot - r0}Z`, fill: t.c('muted') }), // the puck
       withCrack ? el('rect', { x: X(c0), y: puckTop, width: cw * cell * s, height: cd * cell * s * exag, fill: t.c('surface') }) : '',
       flow,
@@ -100,9 +104,9 @@ export default {
   title: 'Warm explainer: a precise cutaway drawing explains the mechanism',
   className: 'st cs-food-market cmp-warm',
   notes: 'Purpose: Explain how something works to a non-specialist audience (here, barista trainees) with one exact drawing of the mechanism, in a soft palette, and plain numbers for the consequence. The drawing replaces a paragraph; it does not decorate one.\nModify: Replace the model and drawing with your mechanism (a valve, a joint, a heat exchanger), but keep two states of the same object side by side at the same scale, label only the parts the explanation needs, and put the measurable consequence (time, yield, cost) directly under each state. Compute every number in the headline from the same model or data.\nInvariant: Same scale and same drawing vocabulary in both panels (one stroke weight for the object, one for the flow); muted fills, ink outlines; the accent marks only the cause (the crack and the water that takes it), and the headline phrase in accent names that mark. State any exaggeration (here the depth is drawn ×2.5) on the page.\nStatic: Already static. For a build, show the even puck first and add the cracked puck as the second step.',
-  sources: [],
+  sources: [{ type: 'original-example', file: 'assets/compositions/warm-explainer.mjs' }],
   exportPolicy: 'final',
   content: `<h1 class="st-head">A crack ${crack.widthMm} mm wide carries <em style="white-space:nowrap">${pct}% of the water</em>, so the shot runs in ${crackedSeconds} s instead of ${shot.evenSeconds}</h1>
 <figure class="st-fig" data-region="primary">${figure()}</figure>
-<p class="st-source" data-region="source"><span>Illustrative 2-D flow model and shot log · same grind, dose and pressure; target 18–22% extracted</span><span>Cutaway, depth drawn ×2.5</span></p>`,
+<p class="st-source" data-region="source"><span>Illustrative 2-D flow model and shot log; same grind, dose and pressure; target 18–22% extracted</span><span>Each line carries the same flow · depth drawn ×2.5</span></p>`,
 };

@@ -1,21 +1,23 @@
 /* Template pack: Product launch (tpl-launch). Every selector is scoped to .tpl-launch.
-   Light and precise: warm white paper, near-black ink, greys (text, rule, fill, mark ≥ 3:1), one brand green that means
-   "Fernhook 2.0" — the name once, 2.0's path, the recommended plan, what is new, today.
+   Light and precise: warm white paper, near-black ink, three greys (text 5.6:1, hairline rule,
+   mark 3:1 for meaningful marks) and one brand green that means "Fernhook 2.0": the name once,
+   2.0's path, the recommended plan, what is new, today.
 
    Grid: 64 px margins; 12 columns of 74 px with 24 px gutters (column n starts at 64 + 98(n−1)).
-   Headline hangs at y 64 on every content page; evidence starts at y 208; sources sit on the
-   bottom line (baseline 656). Type hangs from grid lines: each role's negative margin moves
+   Headline hangs at y 64 on every content page; the first mark or cap of the evidence sits on
+   y 208 under a two-line headline (y 152 under one line); sources sit on the bottom line
+   (baseline 656). Type hangs from grid lines: each role's negative margin moves
    its first cap height to the element's `top` (Inter: ascent .97em, descent .24em, cap .73em).
-   Scale: 120 display · 44 headline/figures · 26 lead · 20 body · 18 label · 15 note. */
+   Scale: 120 display · 44 headline/figures · 26 lead · 20 body · 18 label (16 for sub-labels and axis ticks) · 15 notes only. */
 .tpl-launch{
-  --ln-paper:#FAFAF8;--ln-ink:#141414;--ln-grey:#62656A;--ln-rule:#DADAD5;--ln-context:#B9BAB5;--ln-mark:#8F918C;--ln-tint:#EFEFEB;--ln-green:#0B6B4A;
+  --ln-paper:#FAFAF8;--ln-ink:#141414;--ln-grey:#62656A;--ln-rule:#DADAD5;--ln-mark:#8F918C;--ln-green:#0B6B4A;
   --ln-display:"Inter Display","Inter","Helvetica Neue",Arial,sans-serif;
   --ln-text:"Inter","Helvetica Neue",Arial,sans-serif;
   /* figure-engine tokens */
   --ss-paper:#FAFAF8;--ss-surface:#EFEFEB;--ss-ink:#141414;--ss-muted:#62656A;--ss-rule:#DADAD5;--ss-grid:#E8E8E4;
-  --ss-accent:#0B6B4A;--ss-on-accent:#FFFFFF;--ss-highlight:#0B6B4A;--ss-context:#B9BAB5;
+  --ss-accent:#0B6B4A;--ss-on-accent:#FFFFFF;--ss-highlight:#0B6B4A;--ss-context:#8F918C;
   --ss-positive:#0B6B4A;--ss-negative:#B3261E;
-  --ss-font-sans:var(--ln-text);--ss-font-serif:"Charter","Bitstream Charter","Iowan Old Style",Georgia,serif;
+  --ss-font-sans:var(--ln-text);--ss-font-serif:"Charter","Bitstream Charter","Iowan Old Style",Georgia,Caladea,serif;
   --ss-font-mono:"JetBrains Mono","SFMono-Regular",Menlo,Consolas,monospace;
   --ss-cat-1:#0B6B4A;--ss-cat-2:#141414;--ss-cat-3:#62656A;--ss-cat-4:#B9BAB5;--ss-cat-5:#5E9C83;--ss-cat-6:#8C8F94;
   --ss-seq-1:#E6F0EB;--ss-seq-2:#C2DCCF;--ss-seq-3:#93C0AA;--ss-seq-4:#5E9C83;--ss-seq-5:#2F7D5E;--ss-seq-6:#0B6B4A;--ss-seq-7:#064632;
@@ -35,12 +37,11 @@
 .tpl-launch .ln-note{font:400 15px/1.4 var(--ln-text);color:var(--ln-grey);margin-top:-5px}
 .tpl-launch .ln-grey{color:var(--ln-grey)}
 .tpl-launch .ln-green{color:var(--ln-green)}
-.tpl-launch .ln-nums{font-variant-numeric:tabular-nums}
 .tpl-launch b,.tpl-launch strong{font-weight:600}
 
 /* Figures inside SVG */
 .tpl-launch .ln-fig text{font-family:var(--ln-text);font-kerning:normal}
-.tpl-launch .ln-fig .ln-t-axis{font-size:15px;fill:var(--ln-grey);font-variant-numeric:tabular-nums}
+.tpl-launch .ln-fig .ln-t-axis{font-size:16px;fill:var(--ln-grey);font-variant-numeric:tabular-nums}
 .tpl-launch .ln-fig .ln-t-label{font-size:18px;fill:var(--ln-ink)}
 .tpl-launch .ln-fig .ln-t-grey{font-size:18px;fill:var(--ln-grey)}
 .tpl-launch .ln-fig .ln-t-strong{font-size:18px;font-weight:600;fill:var(--ln-ink);font-variant-numeric:tabular-nums}
@@ -60,32 +61,31 @@
 .tpl-launch .ln-list li{display:grid;grid-template-columns:270px 466px 368px;column-gap:24px;padding:19px 0 21px;border-top:1px solid var(--ln-rule)}
 .tpl-launch .ln-list li:last-child{border-bottom:1px solid var(--ln-rule)}
 .tpl-launch .ln-list h3{font:600 26px/1.25 var(--ln-display);letter-spacing:-.01em;margin:0}
-.tpl-launch .ln-list .ln-plans{display:block;margin-top:6px;font:400 15px/1.4 var(--ln-text);color:var(--ln-grey)}
+.tpl-launch .ln-list .ln-plans{display:block;margin-top:6px;font:400 16px/1.4 var(--ln-text);color:var(--ln-grey)}
 .tpl-launch .ln-list p{font:400 20px/1.45 var(--ln-text);margin:0;text-wrap:pretty}
 .tpl-launch .ln-list .ln-proof{font:600 44px/1 var(--ln-display);letter-spacing:-.02em;display:block}
 .tpl-launch .ln-list .ln-proof-what{display:block;margin-top:8px;font:400 18px/1.35 var(--ln-text);color:var(--ln-grey)}
 
-/* 05 integrations: the key shares the bottom line with the note. */
-.tpl-launch .ln-key{text-align:right;white-space:nowrap}
-.tpl-launch .ln-key i{display:inline-block;width:14px;height:14px;border-radius:50%;background:var(--ln-mark);margin:0 8px 0 28px;vertical-align:-1px}
-.tpl-launch .ln-key i.ln-new{background:var(--ln-green);margin-left:0}
-
 /* 04 pricing: a reading table. Four equal blocks of three columns; hairlines only. */
 .tpl-launch .ln-table{border-collapse:collapse;table-layout:fixed;font:400 18px/1.35 var(--ln-text);font-variant-numeric:tabular-nums}
-.tpl-launch .ln-table th,.tpl-launch .ln-table td{padding:9px 24px 9px 0;text-align:left;vertical-align:baseline;border-top:1px solid var(--ln-rule)}
+.tpl-launch .ln-table th,.tpl-launch .ln-table td{padding:8px 24px 8px 0;text-align:left;vertical-align:baseline;border-top:1px solid var(--ln-rule)}
 .tpl-launch .ln-table tbody th{font-weight:400;color:var(--ln-grey)}
 .tpl-launch .ln-table thead th{border-top:0;padding:16px 24px 14px 0;vertical-align:top}
 .tpl-launch .ln-table thead .ln-plan{display:block;font:600 26px/1.2 var(--ln-display);letter-spacing:-.01em}
-.tpl-launch .ln-table thead .ln-for{display:block;margin-top:4px;font:400 15px/1.4 var(--ln-text);color:var(--ln-grey)}
+.tpl-launch .ln-table thead .ln-for{display:block;margin-top:4px;font:400 16px/1.4 var(--ln-text);color:var(--ln-grey)}
 .tpl-launch .ln-table .ln-price td{padding-top:14px;padding-bottom:12px}
 .tpl-launch .ln-table .ln-price b{font:600 44px/1 var(--ln-display);letter-spacing:-.02em}
-.tpl-launch .ln-table .ln-price small{font:400 15px/1 var(--ln-text);color:var(--ln-grey);margin-left:6px}
 .tpl-launch .ln-table .ln-no{color:var(--ln-grey)}
 .tpl-launch .ln-table tr:last-child>*{border-bottom:1px solid var(--ln-rule)}
 .tpl-launch .ln-table th:last-child,.tpl-launch .ln-table td:last-child{padding-right:0}
 /* The recommended plan: its position (the middle) and one 4 px green rule over its column — not the gutter. */
 .tpl-launch .ln-table thead .ln-pick{position:relative}
 .tpl-launch .ln-table thead .ln-pick::before{content:"";position:absolute;left:0;top:0;width:calc(100% - 24px);height:4px;background:var(--ln-green)}
+
+/* 05 integrations: the key shares the bottom line with the note. */
+.tpl-launch .ln-key{text-align:right;white-space:nowrap}
+.tpl-launch .ln-key i{display:inline-block;width:14px;height:14px;border-radius:50%;background:var(--ln-mark);margin:0 8px 0 28px;vertical-align:-1px}
+.tpl-launch .ln-key i.ln-new{background:var(--ln-green);margin-left:0}
 
 /* 06 close: three dates on one rule (today's dot in green), then how to start and what migrates. */
 .tpl-launch .ln-dates{list-style:none;padding:0;display:grid;grid-template-columns:368px 368px 368px;column-gap:24px;border-top:1.5px solid var(--ln-ink)}

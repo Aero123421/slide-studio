@@ -86,7 +86,7 @@ export default {
   id: ID,
   language: 'ja',
   title: 'Roadmap 2026–2029: phases, milestones and year-end KPIs',
-  notes: 'Purpose: 推奨案をいつ・どの順で実行し、各年度末にどの指標がどこまで動くかを1枚で約束する。\nModify: axis（期間）、phases（段階）、work（打ち手ごとの期間と節目、月番号は2026年4月＝0）、kpis（年度末の値）を差し替える。営業利益率は営業利益と売上高から計算される。\nInvariant: 打ち手の番号は論点ツリーと同じにする。節目の日付は推奨案ページの「実現の条件」と一致させ、2029年度末の値は推奨案の数値（利益率6.0%）と一致させる。\nStatic: 静的ページ。',
+  notes: 'Purpose: 推奨案をいつ・どの順で実行し、各年度末にどの指標がどこまで動くかを1枚で約束する。\nModify: axis（期間）、phases（段階）、work（打ち手ごとの期間と節目、月番号は2026年4月＝0）、kpis（年度末の値）を差し替える。営業利益率は営業利益と売上高から計算される。見出しの改行は <br> で文や句の切れ目に入れる。\nInvariant: 打ち手の番号は論点ツリーと同じにする。節目の日付は推奨案ページの「実現の条件」と一致させ、2029年度末の値は推奨案の数値（利益率6.0%）と一致させる。\nStatic: 静的ページ。',
   sources: [],
   exportPolicy: 'final',
   className: 'tpl-strategy st-roadmap',

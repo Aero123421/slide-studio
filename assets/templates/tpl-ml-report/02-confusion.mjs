@@ -56,7 +56,7 @@ export default {
   ${cell(m.tn, 'quiet weeks', `${pc(m.tn / healthy, 1)} of healthy weeks`, 'ml-quiet')}
   <div class="ml-corner"></div><div class="ml-foot num"><b>${pc(m.precision)}</b> of alerts were real failures (precision)</div>
 </div>
-<p class="ml-cap" style="left:64px;top:614px;width:662px"><b>Figure 2.</b> Test set, ${TEST.weeks} weeks from 5${NB}Jan 2026: ${num(rows.length)} pump-weeks. An alert is a calibrated failure probability of ${TEST.threshold} or more.</p>
+<p class="ml-cap" style="left:64px;top:614px;width:662px" data-region="source"><b>Figure 2.</b> Illustrative data: test set, ${TEST.weeks} weeks from 5${NB}Jan 2026, ${num(rows.length)} pump-weeks. An alert is a calibrated failure probability of ${TEST.threshold} or more.</p>
 <aside class="ml-rail" style="left:848px;top:206px;width:368px" data-region="support"><h2>What each error costs</h2>
 <p><b>A missed failure</b> is an emergency call-out with bypass pumping: about ${usd(cost.miss)}.</p>
 <p><b>A false alarm</b> is one planned inspection: about ${usd(cost.inspection)}.</p>

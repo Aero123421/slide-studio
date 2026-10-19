@@ -20,7 +20,7 @@ export default {
   className: 'st cs-civic-calm cmp-quiet',
   spaceIntent: 'Space around one sentence; the page asks the room to stop and read.',
   notes: 'Purpose: Put a commitment or decision on its own page, in the organisation’s own words, so it is read rather than skimmed. It is the page people quote afterwards.\nModify: Replace `decision.statement` with one sentence of at most about 25 words that names who, what and until when, split into lines where the sense breaks (one array entry per line). Keep the supporting line to the one fact that makes the sentence concrete (here: how many pupils, groups and teachers it means this term), computed from the data.\nInvariant: One sentence, ink on paper, no accent colour, no quotation marks and no named endorser: it is a decision of the body named at the foot, not a quotation. The statement fills about two thirds of the width at 50–56 px; the supporting line sits under a short hairline in the lower third; nothing else on the page.\nStatic: Already static. Do not reveal it word by word.',
-  sources: [],
+  sources: [{ type: 'original-example', file: 'assets/compositions/quiet-statement.mjs' }],
   exportPolicy: 'final',
   content: `<h1 class="qs-statement" data-region="title">${decision.statement.join('<br>')}</h1>
 <hr class="qs-rule" aria-hidden="true">

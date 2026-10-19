@@ -39,6 +39,10 @@ def hue_bucket(c):
     if not rgb:return None
     h,l,s=colorsys.rgb_to_hls(*rgb)
     if s<.3 or l<.12 or l>.92:return None
+    # HLS saturation is unstable for dark colors: judge hue by Lab chroma, so a navy or
+    # brown ink (#182a3e, chroma 15) reads as ink, not as a color identity.
+    L,a,b=lab(c);C=(a*a+b*b)**.5
+    if C<20 or (L<25 and C<30):return None
     return int(((h*360)+15)//30)%12
 def saturated(c):return hue_bucket(c) is not None
 def lab(c):
@@ -116,7 +120,9 @@ HTML_JS=r'''()=>{const out=[];const slides=[...document.querySelectorAll('.slide
    const own=[...el.childNodes].filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim();
    if(own&&!(el instanceof SVGElement&&el.tagName!=='text'&&el.tagName!=='tspan'))els.push({...box,kind:'text',text:el.innerText?.trim()||own,size:parseFloat(cs.fontSize)*k,color:rgb(cs.color)});
    const bg=rgb(cs.backgroundColor);if(bg&&!(el===s))els.push({...box,kind:'shape',fill:bg});
-   for(const side of ['Top','Right','Bottom','Left']){const bw=parseFloat(cs['border'+side+'Width']);const bc=rgb(cs['border'+side+'Color']);if(bw>=2&&bc&&cs['border'+side+'Style']!=='none'){const others=['Top','Right','Bottom','Left'].filter(x=>x!==side).every(x=>parseFloat(cs['border'+x+'Width'])<1);if(others){const t=bw*k;const b=side==='Top'?{x:box.x,y:box.y,w:box.w,h:t}:side==='Bottom'?{x:box.x,y:box.y+box.h-t,w:box.w,h:t}:side==='Left'?{x:box.x,y:box.y,w:t,h:box.h}:{x:box.x+box.w-t,y:box.y,w:t,h:box.h};els.push({...b,kind:'shape',fill:bc,edgeOf:{...box}})}}}
+   for(const side of ['Top','Right','Bottom','Left']){const bw=parseFloat(cs['border'+side+'Width']);const bc=rgb(cs['border'+side+'Color']);if(bw>=2&&bc&&cs['border'+side+'Style']!=='none'){const others=['Top','Right','Bottom','Left'].filter(x=>x!==side).every(x=>parseFloat(cs['border'+x+'Width'])<1);if(others&&!/^(TABLE|THEAD|TBODY|TFOOT|TR|TH|TD|COL|COLGROUP|CAPTION|HR)$/.test(el.tagName)){const t=bw*k;const b=side==='Top'?{x:box.x,y:box.y,w:box.w,h:t}:side==='Bottom'?{x:box.x,y:box.y+box.h-t,w:box.w,h:t}:side==='Left'?{x:box.x,y:box.y,w:t,h:box.h}:{x:box.x+box.w-t,y:box.y,w:t,h:box.h};
+     // A one-sided rule is a card stripe only on something that looks like a card (tinted, rounded or shadowed); on a table or a plain block it is typography.
+     const cardish=(bg&&el!==s)||parseFloat(cs.borderTopLeftRadius)>0||cs.boxShadow!=='none';els.push({...b,kind:'shape',fill:bc,...(cardish?{edgeOf:{...box}}:{})})}}}
    if(el instanceof SVGGeometryElement){const f=el.tagName==='line'?rgb(cs.stroke):(rgb(cs.fill)||rgb(cs.stroke));if(f&&['rect','line'].includes(el.tagName))els.push({...box,kind:el.tagName==='line'?'line':'shape',fill:f,svg:true})}}
   out.push({id:s.id||('slide-'+(i+1)),title:s.getAttribute('aria-label')||'',notes:s.dataset.notes||'',elements:els,style:styleSignals(s,r0,k)})}return out;
  // Style signals of the machine-made look: ornament, glow, chips, spaced caps, emoji, an accent phrase that labels nothing.
@@ -127,7 +133,8 @@ HTML_JS=r'''()=>{const out=[];const slides=[...document.querySelectorAll('.slide
   const area=r0.width*r0.height,h1=s.querySelector('h1');
   for(const el of [s,...s.querySelectorAll('*')]){
    const cs=getComputedStyle(el);if(cs.visibility==='hidden'||cs.display==='none'||+cs.opacity===0)continue;
-   const r=el.getBoundingClientRect();if(!r.width||!r.height)continue;
+   // A horizontal or vertical SVG line has a zero-width box but is still a mark.
+   const r=el.getBoundingClientRect();if((!r.width||!r.height)&&!(el instanceof SVGGeometryElement&&(r.width||r.height)))continue;
    const own=[...el.childNodes].filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim(),fs=parseFloat(cs.fontSize)*k;
    const bi=cs.backgroundImage||'none';
    if(bi!=='none'&&/gradient\(/.test(bi)){
@@ -149,7 +156,7 @@ HTML_JS=r'''()=>{const out=[];const slides=[...document.querySelectorAll('.slide
     if(/\p{Emoji_Presentation}|\uFE0F/u.test(own))st.emoji.push(own.slice(0,30));
     const rad=parseFloat(cs.borderTopLeftRadius)||0,boxed=(rgba(cs.backgroundColor)?.a||0)>.05||parseFloat(cs.borderTopWidth)>=1;
     if(boxed&&r.height*k<=44&&rad>=r.height/2-1&&own.length<=28)st.pills.push(own.slice(0,28));
-    const col=rgba(cs.color);if(fs>=140&&((col&&col.a<=.35)||+cs.opacity<=.35))st.faded.push(own.slice(0,12));
+    const col=el instanceof SVGElement?(rgba(cs.fill)||rgba(cs.color)):rgba(cs.color);if(fs>=140&&((col&&col.a<=.35)||+cs.opacity<=.35))st.faded.push(own.slice(0,12));
     if(!(h1&&h1.contains(el))&&col)st.texts.push(col.hex);}
    if(el.children.length===0){const lines=(el.innerText||'').split('\n').map(x=>x.trim()).filter(Boolean);if(lines.length>=3&&lines.every(l=>l.length===1&&/[A-Za-z]/.test(l)))st.stacked.push(lines.join(''))}
    if(h1&&h1.contains(el))continue;
@@ -171,7 +178,9 @@ def load_html(path):
             try:
                 meta=pg.evaluate('()=>{const m=document.getElementById("slide-studio-meta")||document.getElementById("slide-studio-scene");return m?JSON.parse(m.textContent):null}')
                 if meta and isinstance(meta.get('slides'),list):
-                    for s,m in zip(slides,meta['slides']):s['notes']=m.get('notes','') or s['notes'];s['title']=m.get('title') or s['title']
+                    for s,m in zip(slides,meta['slides']):
+                        s['notes']=m.get('notes','') or s['notes'];s['title']=m.get('title') or s['title']
+                        s['copyWaivers']=[w for w in (m.get('copyWaivers') or []) if isinstance(w,dict)]
             except Exception:pass
             return slides
         finally:b.close()
@@ -254,6 +263,8 @@ def review(slides,source,palette=None):
             for rid,rx,lvl in rules:
                 if rid=='ja-status-label':continue  # reported as status-on-canvas above
                 mm=rx.search(t['text'])
+                # A slide's declared copyWaivers (rule + exact quote + reason) excuse that one quote, as in QA.
+                if mm and any(w.get('rule')==rid and w.get('quote')==mm.group(0) for w in s.get('copyWaivers') or []):mm=None
                 if mm:add('error' if lvl=='error' else 'warning',f'copy:{rid}',sid,f"'{mm.group(0)}' in '{t['text'][:50]}'.",'Rewrite for the audience; see references/writing-and-editing.md.')
         if TOOL_NOTES.search(s.get('notes') or ''):
             add('error','tool-metadata-in-notes',sid,'Speaker notes contain export/tool metadata.','Delete it; notes are spoken or read by the presenter.')

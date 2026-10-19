@@ -154,8 +154,8 @@ export function barChart(o) {
   }
 
   // vertical columns
-  const labelLines = o.labelLines ?? 2;
-  const m0 = { left: 12, right: 12, top: (showValues ? size + 14 : 8) + (o.unit ? 28 : 0), bottom: labelLines * labelSize * 1.18 + 14 };
+  const labelLines = o.labelLines ?? 2, catLabels = o.labels !== false, every = Math.max(1, o.labelEvery ?? 1);
+  const m0 = { left: 12, right: 12, top: (showValues ? size + 14 : 8) + (o.unit ? 28 : 0), bottom: catLabels ? labelLines * labelSize * 1.18 + 14 : 10 };
   let yScale = linear([lo, hi], [ctx.H - m0.bottom, m0.top]);
   if (o.axis) m0.left = tickLabelWidth(yScale, { format: tickFormat(o, yScale, o.ticks ?? 5), size: size - 1, count: o.ticks ?? 5 }) + 16;
   if (lo < 0 && showValues) m0.bottom += size + 6;
@@ -178,8 +178,10 @@ export function barChart(o) {
       fill: hl ? t.c('ink') : t.c('muted'), weight: hl ? 700 : 600, cls: 'ss-value',
       attrs: { 'font-variant-numeric': 'tabular-nums', ...buildAttrs(build, { i: k, label: true }) },
     }));
-    const lab = wrapLabel(d.label, Math.max(x.step - 6, 40), labelSize - 1, labelLines);
-    parts.push(textLines(lab, { x: xx + bw / 2, y: box.y + box.h + 10 + (lo < 0 && showValues ? size + 6 : 0), size: labelSize - 1, anchor: 'middle', valign: 'top', fill: t.c('ink'), weight: hl ? 700 : null, lineHeight: 1.15, cls: 'ss-cat' }));
+    if (catLabels && (k % every === 0 || hl)) {
+      const lab = wrapLabel(d.label, Math.max(x.step * (every > 1 ? every : 1) - 6, 40), labelSize - 1, labelLines);
+      parts.push(textLines(lab, { x: xx + bw / 2, y: box.y + box.h + 10 + (lo < 0 && showValues ? size + 6 : 0), size: labelSize - 1, anchor: 'middle', valign: 'top', fill: t.c('ink'), weight: hl ? 700 : null, lineHeight: 1.15, cls: 'ss-cat' }));
+    }
   });
   parts.push(el('line', { x1: box.x - 4, x2: box.x + box.w + 4, y1: zeroY, y2: zeroY, stroke: t.c('ink'), 'stroke-width': 1.4, class: 'ss-zero' }));
   if (o.reference) parts.push(refLine({ orient: 'h', at: y(o.reference.value), from: box.x - 4, to: box.x + box.w + 4, label: o.reference.label, theme: t, size: size - 1 }));
@@ -562,8 +564,10 @@ export function bulletChart(o) {
 }
 
 /**
- * Waterfall: how deltas build a total. data: [{label, value, total?:true}].
- * A total bar shows the running sum (its own value is ignored unless `totalValue`).
+ * Waterfall: how deltas build a total. data: [{label, value, total?:true, outline?, color?, sub?}].
+ * A total bar shows the running sum; a given total value must agree with it.
+ * colors:'neutral' keeps steps grey; highlight:'Label' (or [..]) puts the driver the
+ * page is about in the accent. outline:true draws a bar as an outline (e.g. the plan).
  */
 export function waterfallChart(o) {
   const ctx = setup(o);
@@ -587,7 +591,8 @@ export function waterfallChart(o) {
   const vf = valueFormat(o, o.data.map(d => d.value ?? 0));
   const sf = valueFormat(o, o.data.map(d => d.value ?? 0), { sign: true });
   const [lo, hi] = o.domain || niceDomain([Math.min(0, ...all), Math.max(...all)], 5);
-  const m = { left: 14, right: 14, top: size + 18 + (o.unit ? 26 : 0), bottom: 2 * labelSize * 1.18 + 16 };
+  const subs = o.data.some(d => d.sub), subSize = Math.max(15, labelSize - 3);
+  const m = { left: 14, right: 14, top: size + 18 + (o.unit ? 26 : 0), bottom: 2 * labelSize * 1.18 + 16 + (subs ? subSize * 1.25 + 4 : 0) };
   const yt = linear([lo, hi], [ctx.H - m.bottom, m.top]);
   if (o.axis) m.left = tickLabelWidth(yt, { format: tickFormat(o, yt, 5), size: size - 1 }) + 16;
   const box = plotBox(ctx.W, ctx.H, m);
@@ -596,20 +601,31 @@ export function waterfallChart(o) {
   const parts = [];
   if (o.axis) parts.push(axis(y, { orient: 'left', at: box.x, grid: [box.x, box.x + box.w], theme: t, size: size - 1, format: tickFormat(o, y, 5) }));
   if (o.unit) parts.push(textLines([o.unit], { x: 4, y: 16, size: size - 1, fill: t.c('muted') }));
+  // colors: 'signed' (default) paints rises and falls; 'neutral' keeps every step grey.
+  // highlight names the driver(s) the page is about: they take the accent, the rest go grey.
+  const anyHl = o.highlight != null && o.highlight !== false;
+  const neutral = o.colors === 'neutral' || anyHl;
   steps.forEach((s, k) => {
     const up = s.to >= s.from, y0 = y(s.from), y1 = y(s.to), xx = x(s.label);
-    const fill = s.total ? t.c('ink') : up ? (o.positiveColor || t.c('positive')) : (o.negativeColor || t.c('negative'));
-    parts.push(el('rect', { x: xx, y: Math.min(y0, y1), width: x.bw, height: Math.max(1.5, Math.abs(y1 - y0)), fill, rx: 2, class: s.total ? 'ss-total' : 'ss-delta', style: build ? `transform-origin:${up ? '50% 100%' : '50% 0%'}` : null, ...(hold(k, s) ? {} : buildAttrs(build, { i: k, motion: 'grow-y' })) }));
+    const hl = anyHl && isHighlighted(o.highlight, s);
+    const signed = up ? (o.positiveColor || t.c('positive')) : (o.negativeColor || t.c('negative'));
+    const fill = s.color || (s.total ? t.c('ink') : hl ? t.c('highlight') : neutral ? t.c('context') : signed);
+    const ink = s.total || hl ? t.c('ink') : neutral ? t.c('muted') : signed;
+    const shape = s.outline ? { fill: 'none', stroke: s.color || t.c('ink'), 'stroke-width': 1.6, 'stroke-dasharray': s.outline === 'dashed' ? '5 4' : null } : { fill };
+    parts.push(el('rect', { x: xx, y: Math.min(y0, y1), width: x.bw, height: Math.max(1.5, Math.abs(y1 - y0)), ...shape, rx: 2, class: s.total ? 'ss-total' : 'ss-delta', style: build ? `transform-origin:${up ? '50% 100%' : '50% 0%'}` : null, ...(hold(k, s) ? {} : buildAttrs(build, { i: k, motion: 'grow-y' })) }));
     if (k < steps.length - 1) {
       const nx = x(steps[k + 1].label);
       parts.push(el('line', { x1: xx + x.bw, x2: nx, y1: y1, y2: y1, stroke: t.c('muted'), 'stroke-width': 1.2, 'stroke-dasharray': '3 3', ...(hold(k, s) ? {} : buildAttrs(build, { i: k, label: true })) }));
     }
     const label = s.total ? vf(s.to) : sf(s.to - s.from);
     const top = Math.min(y0, y1);
-    parts.push(textLines([label], { x: xx + x.bw / 2, y: top - 8, size, anchor: 'middle', fill: s.total ? t.c('ink') : up ? t.c('positive') : t.c('negative'), weight: 700, attrs: { 'font-variant-numeric': 'tabular-nums', ...(hold(k, s) ? {} : buildAttrs(build, { i: k, label: true })) } }));
-    parts.push(textLines(wrapLabel(s.label, x.step - 6, labelSize - 1), { x: xx + x.bw / 2, y: box.y + box.h + 10, size: labelSize - 1, anchor: 'middle', valign: 'top', fill: t.c('ink'), weight: s.total ? 700 : null, lineHeight: 1.15 }));
+    parts.push(textLines([label], { x: xx + x.bw / 2, y: top - 8, size, anchor: 'middle', fill: ink, weight: s.total || hl || !neutral ? 700 : 600, attrs: { 'font-variant-numeric': 'tabular-nums', ...(hold(k, s) ? {} : buildAttrs(build, { i: k, label: true })) } }));
+    const lab = wrapLabel(s.label, x.step - 6, labelSize - 1);
+    parts.push(textLines(lab, { x: xx + x.bw / 2, y: box.y + box.h + 10, size: labelSize - 1, anchor: 'middle', valign: 'top', fill: t.c('ink'), weight: s.total || hl ? 700 : null, lineHeight: 1.15 }));
+    if (s.sub) parts.push(textLines([s.sub], { x: xx + x.bw / 2, y: box.y + box.h + 14 + lab.length * (labelSize - 1) * 1.15, size: subSize, anchor: 'middle', valign: 'top', fill: t.c('muted') }));
   });
-  if (lo < 0) parts.push(el('line', { x1: box.x, x2: box.x + box.w, y1: y(0), y2: y(0), stroke: t.c('ink'), 'stroke-width': 1.2 }));
+  // The baseline: zero, or the bottom of the scale when every bar stands above zero.
+  parts.push(el('line', { x1: box.x - 4, x2: box.x + box.w + 4, y1: y(Math.max(lo, Math.min(0, hi))), y2: y(Math.max(lo, Math.min(0, hi))), stroke: t.c('ink'), 'stroke-width': 1.2, class: 'ss-zero' }));
   const resolve = a => { const s = steps.find(q => q.label === a.at); return s && { x: x.center(s.label), y: y(Math.max(s.from, s.to)) - size - 14 }; };
   return finish(o, ctx, parts, resolve, { x, y, box, steps });
 }
@@ -749,7 +765,7 @@ export function lineChart(o) {
   const endW = o.endLabels === false ? 16 : Math.max(...series.map(s => measureText(endLabel(s), labelSize, { weight: 700 }))) + 22;
   const yTmp = linear([d0, d1], [ctx.H - 40, 30]);
   const tf = tickFormat(o, yTmp, o.yTicks ?? 5);
-  const m = { left: tickLabelWidth(yTmp, { format: tf, size: size - 1, count: o.yTicks ?? 5 }) + 18, right: endW, top: o.unit ? 44 : 14, bottom: 40 };
+  const m = { left: tickLabelWidth(yTmp, { format: tf, size: size - 1, count: o.yTicks ?? 5, tickValues: o.yTickValues }) + 18, right: endW, top: o.unit ? 44 : 14, bottom: 40 };
   if (o.xLabel) m.bottom += 26;
   const box = plotBox(ctx.W, ctx.H, m);
   const y = linear([d0, d1], [box.y + box.h, box.y]);
@@ -759,14 +775,14 @@ export function lineChart(o) {
   const parts = [];
   for (const b of o.bands || []) {
     const bx0 = x(numericX ? b.from : xs.indexOf(b.from)), bx1 = x(numericX ? b.to : xs.indexOf(b.to));
-    parts.push(el('rect', { x: Math.min(bx0, bx1), y: box.y, width: Math.abs(bx1 - bx0), height: box.h, fill: t.c('surface') }));
-    if (b.label) parts.push(textLines([b.label], { x: Math.min(bx0, bx1) + 8, y: box.y + 6, size: size - 1, valign: 'top', fill: t.c('muted'), weight: 600 }));
+    parts.push(el('rect', { x: Math.min(bx0, bx1), y: box.y, width: Math.abs(bx1 - bx0), height: box.h, fill: b.fill || t.c('surface'), 'fill-opacity': b.opacity ?? null }));
+    if (b.label) parts.push(textLines([b.label], { x: Math.min(bx0, bx1) + 8, y: box.y + 6, size: size - 1, valign: 'top', fill: b.labelColor || t.c('muted'), weight: 600 }));
   }
-  parts.push(axis(y, { orient: 'left', at: box.x, grid: [box.x, box.x + box.w], theme: t, size: size - 1, format: tf, count: o.yTicks ?? 5, zero: d0 < 0 && d1 > 0 }));
+  parts.push(axis(y, { orient: 'left', at: box.x, grid: [box.x, box.x + box.w], theme: t, size: size - 1, format: tf, count: o.yTicks ?? 5, tickValues: o.yTickValues, zero: d0 < 0 && d1 > 0 }));
   if (o.unit) parts.push(textLines([o.unit], { x: box.x - m.left + 4, y: 4, size: size - 1, fill: t.c('muted'), valign: 'top', cls: 'ss-unit' }));
   // x labels: thin to fit
   if (numericX) {
-    parts.push(axis(x, { orient: 'bottom', at: box.y + box.h, theme: t, size: size - 1, format: o.xFormat || tickFormat({ ...o, format: o.xFormatOptions || { digits: 0 } }, x, o.xTicks ?? 6), count: o.xTicks ?? 6, tickSize: 5 }));
+    parts.push(axis(x, { orient: 'bottom', at: box.y + box.h, theme: t, size: size - 1, format: o.xFormat || tickFormat({ ...o, format: o.xFormatOptions || { digits: 0 } }, x, o.xTicks ?? 6), count: o.xTicks ?? 6, tickValues: o.xTickValues, tickSize: 5 }));
   } else {
     const every = o.xEvery ?? Math.max(1, Math.ceil(xs.length / Math.max(2, Math.floor(box.w / (Math.max(...xs.map(v => measureText(String(v), size - 1))) + 24)))));
     xs.forEach((v, i) => {
@@ -780,7 +796,7 @@ export function lineChart(o) {
   for (const r of o.refLines || []) {
     const near = side => Math.min(...series.map(s => { const pts = ptsOf(s).filter(p => isNum(p[1])); const p = side === 'end' ? pts.at(-1) : pts[0]; return p ? Math.abs(y(p[1]) - y(r.y)) : Infinity; }));
     const labelPos = r.labelPos || (near('end') >= near('start') ? 'end' : 'start');
-    parts.push(refLine({ orient: 'h', at: y(r.y), from: box.x, to: box.x + box.w, label: r.label, labelPos, theme: t, size: size - 1, color: r.color ? t.c(r.color) : t.c('muted') }));
+    parts.push(refLine({ orient: 'h', at: y(r.y), from: box.x, to: box.x + box.w, label: r.label, labelPos, theme: t, size: size - 1, color: r.color ? (r.color in { ink: 1, muted: 1, accent: 1, negative: 1, positive: 1, highlight: 1, rule: 1 } ? t.c(r.color) : r.color) : t.c('muted'), ...(r.dash !== undefined ? { dash: r.dash } : {}) }));
   }
   const hl = s => o.highlight == null || isHighlighted(o.highlight, s, 'name');
   const colorOf = (s, k) => s.color || (o.highlight != null ? (hl(s) ? (series.filter(hl).length > 1 ? t.cat(series.filter(hl).indexOf(s)) : t.c('highlight')) : t.c('context')) : t.cat(k));
@@ -797,7 +813,7 @@ export function lineChart(o) {
       for (const seg of segments(pts)) parts.push(el('path', { d: pathFromPoints([...seg, [seg.at(-1)[0], y(Math.max(d0, Math.min(0, d1)))], [seg[0][0], y(Math.max(d0, Math.min(0, d1)))]], { curve: o.curve, close: true }), fill: s.areaColor || t.seq(0), class: 'ss-area' }));
     }
     for (const seg of segments(pts)) {
-      parts.push(el('path', { d: pathFromPoints(seg, { curve: o.curve }), fill: 'none', stroke: c, 'stroke-width': strong ? (o.strokeWidth ?? 3.2) : 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round', 'stroke-dasharray': s.dash || null, pathLength: build ? 1 : null, class: 'ss-line', ...buildAttrs(build, { i: 0, s: k, motion: 'draw' }) }));
+      parts.push(el('path', { d: pathFromPoints(seg, { curve: o.curve }), fill: 'none', stroke: c, 'stroke-width': s.strokeWidth ?? (strong ? (o.strokeWidth ?? 3.2) : (o.contextStrokeWidth ?? 2)), 'stroke-linejoin': 'round', 'stroke-linecap': 'round', 'stroke-dasharray': s.dash || null, pathLength: build ? 1 : null, class: 'ss-line', ...buildAttrs(build, { i: 0, s: k, motion: 'draw' }) }));
     }
     const fin = pts.filter(p => isNum(p[1]));
     if (o.markers === 'all') for (const p of fin) parts.push(el('circle', { cx: p[0], cy: p[1], r: strong ? 4.5 : 3, fill: c, stroke: t.c('paper'), 'stroke-width': 1.5, ...buildAttrs(build, { s: k, label: true }) }));
@@ -816,7 +832,9 @@ export function lineChart(o) {
   const resolve = a => {
     const s = a.series ? series.find(q => q.name === a.series) : series[0];
     if (!s) return null;
-    const i = numericX ? null : (typeof a.at === 'number' ? a.at : xs.indexOf(a.at));
+    // `at` names an x value (2023, 'Q3'); a plain index is accepted only when no x value matches.
+    const byValue = xs.findIndex(v => String(v) === String(a.at));
+    const i = numericX ? null : byValue >= 0 ? byValue : (typeof a.at === 'number' ? a.at : -1);
     const pts = ptsOf(s);
     const p = numericX ? pts.find(q => q[0] === a.at) : pts[i];
     return p && isNum(p[1]) ? { x: x(p[0]), y: y(p[1]) } : null;
@@ -869,9 +887,11 @@ export function smallMultiples(o) {
 }
 
 /**
- * Gantt / schedule. tasks: [{label, start, end, group?, milestone?, done?}] on a
- * numeric time axis (days, weeks …). ticks: [{at, label}] (or plain numbers) define the calendar labels.
- * today: position of a "now" line.
+ * Gantt / schedule. tasks: [{label, start, end, group?, milestone?, done?, baseline?:[s,e]}]
+ * on a numeric time axis (days, weeks …). ticks: [{at, label}] (or plain numbers) define the
+ * calendar labels. today: position of a "now" line. baseline draws the approved plan as a
+ * thin grey bar under the forecast; slip:true labels each overrun (+n slipUnit).
+ * zebra:false and rounded:false give a plainer table look.
  */
 export function ganttChart(o) {
   const ctx = setup(o);
@@ -880,13 +900,14 @@ export function ganttChart(o) {
   ctx.H = o.height ?? Math.max(180, tasks.length * (o.rowHeight ?? 40) + 70);
   const labelCol = Math.max(...tasks.map(k => measureText(k.label, labelSize))) + 28;
   const groupsPre = [...new Set(tasks.map(k => k.group).filter(Boolean))];
-  const legendRow = groupsPre.length > 1 && o.legend !== false ? size + 18 : 0;
+  const legendRow = (groupsPre.length > 1 || tasks.some(k => Array.isArray(k.baseline))) && o.legend !== false ? size + 18 : 0;
   ctx.H += legendRow + (isNum(o.today) ? 26 : 0);
   const box = plotBox(ctx.W, ctx.H, { left: labelCol, right: 20, top: 40 + legendRow, bottom: 10 + (isNum(o.today) ? 26 : 0) });
   const [s0, s1] = o.domain || [Math.min(...tasks.map(k => k.start)), Math.max(...tasks.map(k => k.end ?? k.start))];
   const x = linear([s0, s1], [box.x, box.x + box.w]);
   const y = band(tasks.map(k => k.label), [box.y, box.y + box.h], { inner: 0.42, outer: 0.15 });
   const groups = [...new Set(tasks.map(k => k.group).filter(Boolean))];
+  const withBase = tasks.some(k => Array.isArray(k.baseline)), baseH = Math.max(4, Math.min(7, y.bw * 0.22));
   const parts = [];
   for (const raw of o.ticks || []) {
     const tk = isNum(raw) ? { at: raw, label: String(raw) } : raw; // plain numbers label themselves
@@ -902,9 +923,15 @@ export function ganttChart(o) {
       parts.push(el('path', { d: `M${n(mx)} ${n(my - r)}L${n(mx + r)} ${n(my)}L${n(mx)} ${n(my + r)}L${n(mx - r)} ${n(my)}Z`, fill: t.c('ink'), ...buildAttrs(build, { i: k, motion: 'settle' }) }));
       if (tk.note) parts.push(textLines([tk.note], { x: mx + r + 8, y: my, size: size - 1, valign: 'middle', fill: t.c('ink'), weight: 600 }));
     } else {
-      parts.push(el('rect', { x: x(tk.start), y: yy, width: Math.max(4, x(tk.end) - x(tk.start)), height: y.bw, rx: Math.min(6, y.bw / 2), fill, style: build ? 'transform-origin:0% 50%' : null, ...buildAttrs(build, { i: k, motion: 'grow-x' }) }));
-      if (isNum(tk.done) && tk.done > 0) parts.push(el('rect', { x: x(tk.start), y: yy + y.bw - 5, width: Math.max(2, (x(tk.end) - x(tk.start)) * Math.min(1, tk.done)), height: 5, rx: 2, fill: t.c('ink'), opacity: 0.55 }));
-      if (tk.note) parts.push(textLines([tk.note], { x: x(tk.end) + 8, y: yy + y.bw / 2, size: size - 1, valign: 'middle', fill: t.c('muted') }));
+      // With baselines, the forecast bar takes the upper part of the row and the
+      // baseline a thin grey bar beneath it, so a slip reads as the overhang.
+      const bh = withBase ? y.bw - baseH - 3 : y.bw, rx = o.rounded === false ? 0 : Math.min(6, bh / 2);
+      if (Array.isArray(tk.baseline)) parts.push(el('rect', { x: x(tk.baseline[0]), y: yy + y.bw - baseH, width: Math.max(2, x(tk.baseline[1]) - x(tk.baseline[0])), height: baseH, fill: t.c('context'), class: 'ss-baseline' }));
+      parts.push(el('rect', { x: x(tk.start), y: yy, width: Math.max(4, x(tk.end) - x(tk.start)), height: bh, rx, fill, style: build ? 'transform-origin:0% 50%' : null, ...buildAttrs(build, { i: k, motion: 'grow-x' }) }));
+      if (isNum(tk.done) && tk.done > 0) parts.push(el('rect', { x: x(tk.start), y: yy + bh - 5, width: Math.max(2, (x(tk.end) - x(tk.start)) * Math.min(1, tk.done)), height: 5, rx: o.rounded === false ? 0 : 2, fill: t.c('ink'), opacity: 0.55 }));
+      const slip = Array.isArray(tk.baseline) ? tk.end - tk.baseline[1] : 0;
+      const note = tk.note ?? (o.slip && slip > 0 ? `+${fmt(slip, { digits: 0, locale: ctx.locale })}${o.slipUnit ?? ''}` : null);
+      if (note) parts.push(textLines([note], { x: Math.max(x(tk.end), Array.isArray(tk.baseline) ? x(tk.baseline[1]) : -Infinity) + 8, y: yy + bh / 2, size: size - 1, valign: 'middle', fill: tk.note ? t.c('muted') : t.c('ink'), weight: tk.note ? null : 700 }));
     }
     parts.push(textLines([tk.label], { x: box.x - 16, y: yy + y.bw / 2, size: labelSize, anchor: 'end', valign: 'middle', fill: t.c('ink'), weight: tk.milestone ? 700 : null }));
   });
@@ -912,7 +939,8 @@ export function ganttChart(o) {
     parts.push(el('line', { x1: x(o.today), x2: x(o.today), y1: box.y - 4, y2: box.y + box.h + 6, stroke: t.c('accent'), 'stroke-width': 2 }));
     parts.push(textLines([o.todayLabel ?? 'Today'], { x: x(o.today), y: box.y + box.h + 10, size: size - 1, anchor: 'middle', valign: 'top', fill: t.c('accent'), weight: 700 }));
   }
-  if (legendRow) parts.push(legend(groups.map((gname, k) => ({ label: gname, color: t.cat(k) })), { x: box.x, y: 12, size: size - 1, theme: t }));
+  if (legendRow && groups.length > 1) parts.push(legend(groups.map((gname, k) => ({ label: gname, color: t.cat(k) })), { x: box.x, y: 12, size: size - 1, theme: t }));
+  else if (legendRow && withBase) parts.push(legend([{ label: o.forecastLabel ?? 'Forecast', color: t.cat(0) }, { label: o.baselineLabel ?? 'Baseline', color: t.c('context') }], { x: box.x, y: 12, size: size - 1, theme: t }));
   const resolve = a => { const tk = tasks.find(q => q.label === a.at); return tk && { x: x(tk.end ?? tk.start), y: y.center(tk.label) }; };
   return finish(o, ctx, parts, resolve, { x, y, box });
 }

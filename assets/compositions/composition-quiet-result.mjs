@@ -23,7 +23,7 @@ const pt = v => fmt(v, { digits: 1, sign: true, locale: 'ja' });
 
 export function figure(theme = 'css') {
   const t = makeTheme(theme), W = 960, H = 172;
-  const x = linear([-2, 3], [20, W - 20]), axisY = 104;
+  const x = linear([-2, 3], [12, W - 20]), axisY = 104;
   const parts = [];
   // the scale: percentage points, with the null line in ink
   parts.push(el('line', { x1: x(-2), x2: x(3), y1: axisY, y2: axisY, stroke: t.c('rule'), 'stroke-width': 1.2 }));
@@ -31,7 +31,7 @@ export function figure(theme = 'css') {
     parts.push(el('line', { x1: x(v), x2: x(v), y1: axisY, y2: axisY + 6, stroke: t.c('muted') }));
     parts.push(textLines([v === 0 ? '0' : fmt(v, { sign: true })], { x: x(v), y: axisY + 14, size: 16, anchor: 'middle', valign: 'top', fill: t.c('muted'), attrs: { 'font-variant-numeric': 'tabular-nums' } }));
   }
-  parts.push(textLines(['受診率の差（はがきあり − なし）、ポイント'], { x: x(-2), y: axisY + 44, size: 16, valign: 'top', fill: t.c('muted') }));
+  parts.push(textLines(['受診率の差（はがきあり − なし）、ポイント'], { x: 0, y: axisY + 44, size: 16, valign: 'top', fill: t.c('muted') }));
   parts.push(el('line', { x1: x(0), x2: x(0), y1: 30, y2: axisY, stroke: t.c('ink'), 'stroke-width': 1.4 }));
   // the effect that would have paid for the postcards
   parts.push(el('line', { x1: x(worthIt), x2: x(worthIt), y1: 10, y2: axisY, stroke: t.c('ink'), 'stroke-width': 1.4, 'stroke-dasharray': '5 5' }));

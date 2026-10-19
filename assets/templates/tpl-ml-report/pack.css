@@ -1,7 +1,7 @@
 /* tpl-ml-report · Model evaluation report in the Distill / model-card tradition.
    White paper, ink, greys, one model colour (deep blue) and grey for the baseline. Charter for claims and section heads,
    Inter for data, labels and captions. Grid: 1280×720, margins 64, 12 columns × 74 px, 24 px gutters
-   (starts 64,162,260,358,456,554,652,750,848,946,1044,1142). Scale: Headline 40 · Lead 22 · Body 20 · Label 16–17 · Caption 16 · Note 15. */
+   (starts 64,162,260,358,456,554,652,750,848,946,1044,1142). Scale: Headline 40 and section 24 (Charter) · Figure numbers 44/26 · Lead 20 · Body 18 · Label 16–17 · Caption 16 · Note 15. */
 .tpl-ml-report{
   --ml-paper:#ffffff;--ml-ink:#1b1e23;--ml-ink2:#454a52;--ml-muted:#676d76;--ml-rule:#d7dadf;--ml-grid:#edeff2;
   --ml-model:#1f5a96;--ml-model-tint:#e8eff7;--ml-model-soft:#a9c0dc;--ml-base:#9298a0;--ml-base-soft:#d0d3d8;--ml-base-ink:#666c75;
@@ -19,24 +19,19 @@
 .tpl-ml-report *{box-sizing:border-box}
 
 /* ---- furniture: one running line; every exhibit carries its own caption ---- */
-.tpl-ml-report .ml-run{position:absolute;left:64px;right:64px;top:28px;display:flex;justify-content:space-between;
+.tpl-ml-report .ml-run{position:absolute;left:64px;right:64px;top:40px;display:flex;justify-content:space-between;
   font:400 15px/20px var(--ml-sans);color:var(--ml-muted)}
-.tpl-ml-report .ml-head{position:absolute;left:64px;top:62px;width:1054px;margin:0;
+.tpl-ml-report .ml-head{position:absolute;left:64px;top:72px;width:1054px;margin:0;
   font:400 40px/1.13 var(--ml-serif);letter-spacing:-.012em;color:var(--ml-ink);text-wrap:balance}
 .tpl-ml-report .ml-fig{position:absolute;margin:0}
 .tpl-ml-report .ml-fig>svg{display:block;overflow:visible}
 .tpl-ml-report .ml-cap{position:absolute;margin:0;font:400 16px/1.45 var(--ml-sans);color:var(--ml-ink2);text-wrap:pretty}
 .tpl-ml-report .ml-cap b{font-weight:600;color:var(--ml-ink)}
 .tpl-ml-report .num{font-variant-numeric:tabular-nums}
-.tpl-ml-report .nw{white-space:nowrap}
 
 /* ---- SVG text roles ---- */
 .tpl-ml-report .v-lab{font:400 16px var(--ml-sans);fill:var(--ml-ink2)}
-.tpl-ml-report .v-strong{font:600 16px var(--ml-sans);fill:var(--ml-ink)}
 .tpl-ml-report .v-axis{font:400 16px var(--ml-sans);fill:var(--ml-muted);font-variant-numeric:tabular-nums}
-.tpl-ml-report .v-title{font:600 17px var(--ml-sans);fill:var(--ml-ink)}
-.tpl-ml-report .v-model{fill:var(--ml-model)}
-.tpl-ml-report .v-base{fill:var(--ml-base-ink)}
 
 /* ---- rail: interpretation beside an exhibit (lines and space, no boxes) ---- */
 .tpl-ml-report .ml-rail{position:absolute;margin:0}
@@ -45,21 +40,21 @@
 .tpl-ml-report .ml-rail p b{font-weight:600;color:var(--ml-ink)}
 
 /* ---- reading text and tables ---- */
-.tpl-ml-report .ml-lead{position:absolute;left:64px;top:172px;width:1054px;margin:0;font:400 20px/1.45 var(--ml-sans);color:var(--ml-ink2)}
+.tpl-ml-report .ml-lead{position:absolute;left:64px;top:182px;width:1054px;margin:0;font:400 20px/1.45 var(--ml-sans);color:var(--ml-ink2)}
 .tpl-ml-report .ml-note{position:absolute;left:64px;width:858px;margin:0;font:400 18px/1.5 var(--ml-sans);color:var(--ml-ink2);text-wrap:pretty}
 .tpl-ml-report .ml-note b{font-weight:600;color:var(--ml-ink)}
 .tpl-ml-report .ml-table{position:absolute;left:64px;width:1152px;border-collapse:collapse;font:400 18px/1.35 var(--ml-sans);color:var(--ml-ink)}
 .tpl-ml-report .ml-table th{padding:0 24px 9px 0;text-align:left;vertical-align:bottom;font:600 16px/20px var(--ml-sans);color:var(--ml-muted);border-bottom:1.5px solid var(--ml-ink)}
-.tpl-ml-report .ml-table td{padding:11px 24px 12px 0;vertical-align:baseline;border-bottom:1px solid var(--ml-rule)}
+.tpl-ml-report .ml-table td{padding:11px 24px 12px 0;vertical-align:baseline;border-bottom:1px solid var(--ml-rule);text-wrap:pretty}
 .tpl-ml-report .ml-table :is(th,td):last-child{padding-right:0}
 .tpl-ml-report .ml-table .r{text-align:right}
 .tpl-ml-report .ml-table td:first-child{font-weight:600}
 .tpl-ml-report .mute{color:var(--ml-muted)}
 
 /* 01 dataset */
-.tpl-ml-report .ml-splits{top:400px}
+.tpl-ml-report .ml-splits{top:418px}
 .tpl-ml-report .ml-splits :is(th,td):nth-child(5){padding-right:48px}
-.tpl-ml-report.ml-dataset .ml-note{top:586px}
+.tpl-ml-report.ml-dataset .ml-note{top:600px}
 
 /* 02 confusion matrix: a typographic 2×2 table; the costly cell carries the only heavy frame */
 .tpl-ml-report .ml-matrix{position:absolute;left:64px;top:206px;width:662px;display:grid;grid-template-columns:206px 1fr 1fr;
@@ -78,9 +73,10 @@
 
 /* 03 curves: the comparison table beside the figure */
 .tpl-ml-report .ml-compare{left:848px;top:236px;width:368px;table-layout:fixed}
-.tpl-ml-report .ml-compare :is(th,td){white-space:nowrap}
-.tpl-ml-report .ml-compare :is(th,td):first-child{width:160px;white-space:normal}
-.tpl-ml-report .ml-compare :is(th,td):nth-child(2){padding-right:20px}
+.tpl-ml-report .ml-compare td{white-space:nowrap}
+.tpl-ml-report .ml-compare th{text-wrap:balance}
+.tpl-ml-report .ml-compare :is(th,td):first-child{width:178px;white-space:normal}
+.tpl-ml-report .ml-compare :is(th,td):nth-child(2){width:96px;padding-right:20px}
 .tpl-ml-report .ml-compare td:first-child{font-weight:400;color:var(--ml-ink2)}
 .tpl-ml-report .ml-compare th:nth-child(2){color:var(--ml-model)}
 .tpl-ml-report .ml-compare td:nth-child(2){font-weight:600}
@@ -92,7 +88,7 @@
 .tpl-ml-report .ml-facts p b{display:block;margin-bottom:2px;font:600 26px/1.2 var(--ml-sans);letter-spacing:-.01em;color:var(--ml-ink)}
 
 /* 06 model card: a two-column reading page */
-.tpl-ml-report .ml-card{position:absolute;left:64px;top:194px;width:1152px;display:grid;grid-template-columns:564px 564px;column-gap:24px}
+.tpl-ml-report .ml-card{position:absolute;left:64px;top:202px;width:1152px;display:grid;grid-template-columns:564px 564px;column-gap:24px}
 .tpl-ml-report .ml-card h2{margin:18px 0 6px;font:400 24px/1.2 var(--ml-serif);color:var(--ml-ink)}
 .tpl-ml-report .ml-card h2:first-child{margin-top:0}
 .tpl-ml-report .ml-card p{margin:0 0 9px;font:400 18px/1.42 var(--ml-sans);color:var(--ml-ink2);text-wrap:pretty}

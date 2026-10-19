@@ -56,6 +56,9 @@ and `--ss-font-sans / -display / -serif / -mono`.
 - `theme: colorSystemJson` (or any `{paper, ink, accent, cat:[…]}` object) emits
   literal hex values instead — use it for standalone `.svg` files that must open
   in Figma, Illustrator, Keynote or PowerPoint without CSS.
+- `theme: {css: true, system: colorSystemJson}` keeps the CSS variables but takes their
+  fallbacks — and `t.values`, for colors you compute (a continuous ramp, `t.mix`) — from
+  that system, so computed colors match the page's system.
 - `themeCSS(colorSystemJson, '.my-scope')` returns the `--ss-*` declarations.
 
 ## Common options (all charts)
@@ -65,7 +68,7 @@ and `--ss-font-sans / -display / -serif / -mono`.
 | `id` | Required. Namespaces every internal ID (markers, titles). Unique per page. |
 | `title`, `desc` | Required accessible name; description of the pattern. |
 | `width`, `height` | viewBox size = rendered size on the slide. |
-| `theme` | `'css'` (default) or a literal theme / color-system object. |
+| `theme` | `'css'` (default), a literal theme / color-system object, or `{css: true, system}`. |
 | `fontSize` | Base label size (default 16; diagrams 18). Keep ≥ 15 at 1:1. |
 | `locale` | Number formatting locale (`'en'`, `'ja'`, `'de'` …). |
 | `format` | `{digits, prefix, suffix, sign, compact}` or `v => string`. One convention per figure. |
@@ -86,7 +89,7 @@ wrap, `marker: 'dot'|'ring'|'none'`, `leader: 'elbow'|'straight'|'none'`.
 | Function | Data | Notes |
 |---|---|---|
 | `barChart` | `data:[{label, value}]` | Horizontal default; `orientation:'vertical'`; `sort`, `axis`, `reference:{value,label}`, `valuesInside`, `unit` |
-| `columnChart` | same | Vertical bars with optional `axis` |
+| `columnChart` | same | Vertical bars with optional `axis`; `labels:false` for anonymous columns (24 kitchens), `labelEvery:n` to thin them (highlighted columns keep theirs) |
 | `groupedBarChart` | `categories`, `series:[{name, values}]` | Shared scale; legend row; `highlight` a series |
 | `stackedBarChart` | `categories`, `series` | `normalize` for 100%; segment labels when they fit; series named on the first bar; `unit` |
 | `divergingBarChart` | `data:[{label, value}]`, `reference` | Labels beside zero, signed values, `posLabel`/`negLabel` |
@@ -95,7 +98,7 @@ wrap, `marker: 'dot'|'ring'|'none'`, `leader: 'elbow'|'straight'|'none'`.
 | `dotPlot` | `data:[{label, values:{s: v}}]`, `series` | Cleveland dot plot; `legend:false` when the headline names the series; `valueLabels:'all'` |
 | `lollipopChart` | `data:[{label, value}]` | Lighter alternative to bars; `reference:{value,label}` threshold |
 | `bulletChart` | `data:[{label, sub, value, target, ranges}]` | Actual vs target vs qualitative ranges |
-| `waterfallChart` | `data:[{label, value, total?}]` | Running total; connectors; validated totals; `build:{…, holdFirst:true}` keeps the opening total on the page from build 0 |
+| `waterfallChart` | `data:[{label, value, total?, outline?, sub?, color?}]` | Running total; connectors; validated totals; baseline drawn; `colors:'neutral'` keeps steps grey; `highlight:'Personnel'` puts the driver the page is about in the accent; `outline:true` draws a bar (the plan) as an outline; `sub` adds a muted line under a label; `build:{…, holdFirst:true}` keeps the opening total on the page from build 0 |
 
 ### Part to whole
 | `waffleChart` | `value`/`total` or `parts` | 10×10 = 1% cells, filled from bottom-left; largest-remainder rounding; `align:'start'|'end'` |
@@ -103,10 +106,10 @@ wrap, `marker: 'dot'|'ring'|'none'`, `leader: 'elbow'|'straight'|'none'`.
 | `donutChart` | `data` (≤ 6) | Use only when the whole matters more than precise comparison |
 
 ### Time and trend
-| `lineChart` | `x`, `series:[{name, values, band?, dash?}]` | `highlight`, end labels, `bands`, `refLines`, `area`, `curve:'monotone'|'step'`, `xType:'linear'` |
+| `lineChart` | `x`, `series:[{name, values, band?, dash?}]` | `highlight`, end labels, `bands`, `refLines`, `area`, `curve:'monotone'|'step'`, `xType:'linear'`; `xTickValues`/`yTickValues` for explicit ticks (0, 6, 12, 18, 24 h); `contextStrokeWidth` (or per-series `strokeWidth`); `refLines:[{y, label, dash:null}]` for a solid line; `bands:[{from, to, label, fill, labelColor}]`; `annotate[].at` names an x value (2023), even when the categories are numbers |
 | `areaChart` | same | Filled to zero |
 | `smallMultiples` | `panels:[{title, values}]`, `x` | Shared y scale across panels |
-| `ganttChart` | `tasks:[{label, start, end, group, milestone, done}]`, `ticks` | `today` line |
+| `ganttChart` | `tasks:[{label, start, end, group, milestone, done, baseline:[s,e]}]`, `ticks` | `today` line; `baseline` draws the approved plan as a thin grey bar under the forecast and `slip:true` (+`slipUnit`) labels each overrun; `zebra:false`, `rounded:false` for a plainer table look; `forecastLabel`/`baselineLabel` |
 | `timelineChart` | `events:[{at, label, title, body}]`, `periods` | True time spacing unless `equal:true`; text blocks take the first free side/stem level (`stem`, `stemStep`, `side`) |
 | `funnelChart` | `stages:[{label, value}]` | Step conversion between stages; `alertBelow` |
 | `sankeyChart` | `nodes`, `links:[{source, target, value}]` | Layered; link width ∝ value |
@@ -118,23 +121,23 @@ wrap, `marker: 'dot'|'ring'|'none'`, `leader: 'elbow'|'straight'|'none'`.
 | `violinPlot` | `groups` | Gaussian KDE (Silverman) with IQR and median |
 | `stripPlot` | `groups` | Deterministic beeswarm |
 | `errorBarChart` | `groups:[{label, values}]` or `{mean, low, high}` | `interval:'ci95'` (t-based) `|'se'|'sd'|fn`; states its definition |
-| `forestPlot` | `rows:[{label, estimate, low, high, weight}]` | `reference`, `summary` diamond, `favors`, `xLog` |
+| `forestPlot` | `rows:[{label, estimate, low, high, weight}]` | `reference`, `summary` diamond, `favors`, `xLog`; `columns:[{title, value}]` adds table columns (n, events) between labels and plot; `marker:'square'|'circle'|'diamond'`; `highlightBold:false`; `xTickValues`, `xFormat` |
 
 ### Relationship and models
 | `scatterPlot` | `points:[{x, y, label, group}]` | `fit:'linear'` with 95% band of the mean (`fitColor`); `quadrants`; labeled points spread |
-| `heatmap` | `rows`, `cols`, `values` | `scale:'sequential'|'diverging'`, `center`; contrast-safe cell labels |
+| `heatmap` | `rows`, `cols`, `values` | `scale:'sequential'|'diverging'`, `center`; contrast-safe cell labels; `missing:'blank'` leaves null cells empty (a cohort triangle), otherwise `missingLabel` ('–') |
 | `confusionMatrix` | `labels`, `matrix[actual][predicted]` | Counts and row rates |
-| `rocCurve`, `prCurve` | `curves:[{name, scores, labels}]` | AUC / AP computed; `operating` point |
-| `calibrationChart` | `probs`, `labels` | Reliability curve + counts per bin; `extra(ctx)` gets the count-histogram geometry |
+| `rocCurve`, `prCurve` | `curves:[{name, scores, labels}]` | AUC / AP computed; `operating:{curve, threshold | fpr | recall, label}` (or an array) rings the point in use; dense curves (30k scores) are thinned to drawable paths |
+| `calibrationChart` | `probs`, `labels` or `series:[{name, probs, labels}]` | Reliability curve + counts per bin; before/after pairs as `series` (highlighted or last in the accent, each named at its end); `intervals:true` adds Wilson 95% intervals; `histScale:'log'` when rare positives put most rows in one bin; `extra(ctx)` gets the count-histogram geometry |
 | `residualPlot` | `points:[{x, residual}]` | ±2 SD band; outliers flagged |
 | `learningCurve` | `sizes`, `train`, `val` (`{mean, sd}`) | Log x by default; gap bracket |
 
 ### Diagrams
-| `flowDiagram` | `nodes:[{id, label, sub, kind, emphasis, muted}]`, `edges:[{from, to, label, style, emphasis, back}]` | Layered layout (`direction:'lr'|'tb'`), cycles as feedback arcs, `groups` (boundaries), `lanes` (swimlanes), or manual `x,y` |
+| `flowDiagram` | `nodes:[{id, label, sub, kind, emphasis, muted}]`, `edges:[{from, to, label, style, emphasis, back}]` | Layered layout (`direction:'lr'|'tb'`), cycles as feedback arcs, `groups` (boundaries), `lanes` (swimlanes), or manual `x,y`. Several edges into one node merge on a trunk and end in one arrowhead; several out of one node split from a trunk; other shared sides get spread ports (`portGap`, default 22). A crowded layer squeezes `crossGap` to 12 before reporting what does not fit |
 | `treeDiagram` | `root:{label, children, edgeLabel}` | Decision / issue trees, `direction:'tb'|'lr'`; `labelPos` (0–1 along the last leg) |
 | `sequenceDiagram` | `actors` (names or `{id, label}`), `messages:[{from, to, label, kind}]` | sync / reply / async / self; `numbered` |
 | `networkDiagram` | `nodes`, `edges` | `layout:'force'|'ring'|'star'|'grid'|'manual'`; seeded, deterministic; `edgeColor` |
-| `quadrantChart` | `quadrants`, `items:[{label, x, y}]`, `x`, `y` | Quadrant names in the outer corners; item labels placed to avoid collisions; `highlightQuadrant`. Positions are judgments — say so |
+| `quadrantChart` | `quadrants`, `items:[{label, x, y}]`, `x`, `y` | Quadrant names in the outer corners; item labels placed to avoid collisions; `highlightQuadrant`. Without a domain, positions are judgments in 0–1 — say so. With `x:{domain:[1,5], split:3, ticks:true}` / `y:{domain:[0,3.5], split:1.5, ticks:[…], splitLabel:'基準 1.5億円'}` positions are data and the split is a threshold |
 | `cycleDiagram` | `steps:[{label, sub}]`, `center` | Arrows along the circle |
 | `bipartiteDiagram` | `left`, `right` (names or `{id, label}`), `links` (`[from, to]` or `{from, to, weight}`) | Two kinds of entities kept apart |
 | `layerDiagram` | `layers:[{label, items}]` | Architecture strata |
@@ -145,7 +148,10 @@ Every chart takes `before` (markup or a function of the figure context, painted 
 and `extra` (painted above). Diagrams take `bare:true` (with optional `x`, `y`) to return a `<g>`
 for composing several drawings inside one `svgRoot`. `vectorField` takes `maxMagnitude` so panels
 and a key share one arrow scale. Text wraps at ordinary spaces only: join a number and its unit
-with a no-break space (`15\u00a0min`) to keep them on one line.
+with a no-break space (`15\u00a0min`) to keep them on one line. Japanese wraps between phrases:
+particles stay with their word, a number keeps its counter or unit (`2029年度`, `270億円`, `6%まで`)
+and kanji compounds up to eight characters stay whole (`営業利益率`); a phrase wider than the
+line falls back to word segments, then characters. `\n` forces a break.
 Diagrams accept `arrowSize` (default 12). In `flowDiagram`, `labelPos: 0.5` on an edge puts its
 label at the middle of the connector — use it when labels would meet arrowheads in tight layers.
 

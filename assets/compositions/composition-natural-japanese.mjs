@@ -1,7 +1,7 @@
 // Composition study · Natural Japanese — the headline is the question a Japanese reader would
 // actually ask, the answer sits beside it in one plain sentence, and the evidence below carries
 // the one caveat at the hour it concerns. Every number is computed from `hours`.
-import { svgRoot, el, g, textLines, linear, band, theme as makeTheme, fmt } from '../runtime/figure.mjs';
+import { svgRoot, el, textLines, linear, band, theme as makeTheme, fmt } from '../runtime/figure.mjs';
 
 const ID = 'composition-natural-japanese';
 // 試行した4館の合計、平日1日あたりの来館者（人）。入館ゲートの計数、時間帯別（架空のデータ）

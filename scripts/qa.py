@@ -10,11 +10,19 @@ from pathlib import Path
 from review_workspace import ReviewWorkspace,safe_root
 MEASURE=r"""(slide)=>{
  const b=slide.getBoundingClientRect(),scale=b.width/parseFloat(getComputedStyle(slide).width);const overflow=[],missingAlts=[],broken=[],small=[],waivers=[];
- const visible=e=>{if(!e.getClientRects().length)return false;for(let p=e;p&&p!==slide.parentElement;p=p.parentElement){const s=getComputedStyle(p);if(s.display==='none'||s.visibility==='hidden'||Number(s.opacity)===0)return false}return true};
- const clipped=(e,r)=>{let z={left:r.left,right:r.right,top:r.top,bottom:r.bottom};for(let p=e.parentElement;p&&p!==slide;p=p.parentElement){const c=getComputedStyle(p);if(['hidden','clip','scroll','auto'].includes(c.overflow)){const b=p.getBoundingClientRect();z={left:Math.max(z.left,b.left),right:Math.min(z.right,b.right),top:Math.max(z.top,b.top),bottom:Math.min(z.bottom,b.bottom)}}}return z};
+ const srOnly=s=>(s.position==='absolute'||s.position==='fixed')&&(/^rect\(0(px)?,?\s*0(px)?,?\s*0(px)?,?\s*0(px)?\)$/.test(s.clip)||/^inset\((50|100)%\)$/.test(s.clipPath)||(parseFloat(s.width)<=1&&parseFloat(s.height)<=1));
+ const visible=e=>{if(!e.getClientRects().length)return false;for(let p=e;p&&p!==slide.parentElement;p=p.parentElement){const s=getComputedStyle(p);if(s.display==='none'||s.visibility==='hidden'||Number(s.opacity)===0||srOnly(s))return false}return true};
+ // Clip regions: CSS overflow boxes, nested <svg> viewports and SVG clip-path="url(#…)" shapes.
+ const corners=(m,x,y,w,h)=>{const ps=[[x,y],[x+w,y],[x,y+h],[x+w,y+h]].map(([a,c])=>new DOMPoint(a,c).matrixTransform(m));return{left:Math.min(...ps.map(p=>p.x)),right:Math.max(...ps.map(p=>p.x)),top:Math.min(...ps.map(p=>p.y)),bottom:Math.max(...ps.map(p=>p.y))}};
+ const svgClip=p=>{try{if(p instanceof SVGSVGElement&&p.ownerSVGElement){const m=p.parentNode.getScreenCTM();return m?corners(m,p.x.baseVal.value,p.y.baseVal.value,p.width.baseVal.value,p.height.baseVal.value):null}
+  const u=/url\(["']?#([^"')]+)/.exec(getComputedStyle(p).clipPath||'');if(!u||!(p instanceof SVGGraphicsElement))return null;const c=document.getElementById(u[1]),m=p.getScreenCTM();if(!c||!m)return null;
+  const obb=c.clipPathUnits&&c.clipPathUnits.baseVal===2,pb=obb?p.getBBox():null;let z=null;
+  for(const k of c.children){if(!(k instanceof SVGGraphicsElement))continue;const bb=k.getBBox(),r=obb?corners(m,pb.x+bb.x*pb.width,pb.y+bb.y*pb.height,bb.width*pb.width,bb.height*pb.height):corners(m,bb.x,bb.y,bb.width,bb.height);z=z?{left:Math.min(z.left,r.left),right:Math.max(z.right,r.right),top:Math.min(z.top,r.top),bottom:Math.max(z.bottom,r.bottom)}:r}return z}catch(err){return null}};
+ const clipped=(e,r,self=false)=>{let z={left:r.left,right:r.right,top:r.top,bottom:r.bottom};const cut=b=>{z={left:Math.max(z.left,b.left),right:Math.min(z.right,b.right),top:Math.max(z.top,b.top),bottom:Math.min(z.bottom,b.bottom)}};
+  for(let p=self?e:e.parentElement;p&&p!==slide;p=p.parentElement){const v=svgClip(p);if(v){cut(v);continue}const c=getComputedStyle(p);if(!(p instanceof SVGElement&&p.ownerSVGElement)&&['hidden','clip','scroll','auto'].some(k=>c.overflow.split(' ').includes(k)))cut(p.getBoundingClientRect())}return z};
  const ref=e=>e.id||e.getAttribute('data-role')||e.tagName.toLowerCase();
  for(const e of slide.querySelectorAll('h1,h2,h3,p,li,figcaption,label,button,input,select,output,svg,img,video,canvas,[data-check]')){
-  if(!visible(e))continue;const r=clipped(e,e.getBoundingClientRect()),reason=e.closest('[data-qa-overflow]')?.getAttribute('data-qa-overflow');
+  if(!visible(e))continue;const own=e instanceof SVGSVGElement&&e.ownerSVGElement?(svgClip(e)||e.getBoundingClientRect()):e.getBoundingClientRect(),r=clipped(e,own),reason=e.closest('[data-qa-overflow]')?.getAttribute('data-qa-overflow');
   if(reason){waivers.push({element:ref(e),reason});continue}
   if(r.left<b.left-2||r.top<b.top-2||r.right>b.right+2||r.bottom>b.bottom+2)overflow.push({element:ref(e),text:(e.textContent||'').slice(0,70)});
   if(e.matches('h1,h2,h3,p,li,figcaption,label,output')&&parseFloat(getComputedStyle(e).fontSize)<15)small.push(ref(e));
@@ -22,7 +30,12 @@ MEASURE=r"""(slide)=>{
  for(const im of slide.querySelectorAll('img')){if(!im.hasAttribute('alt'))missingAlts.push(ref(im));if(visible(im)&&(!im.complete||!im.naturalWidth))broken.push(im.getAttribute('src')?.slice(0,60))}
  const rects=[];const walker=document.createTreeWalker(slide,NodeFilter.SHOW_TEXT);let n;
  while(n=walker.nextNode()){const e=n.parentElement;if(!n.textContent.trim()||!e||!visible(e)||e.closest('script,style,option,button,select,[data-qa-overlap]'))continue;
-  const range=document.createRange();range.selectNodeContents(n);for(const raw of range.getClientRects()){const c=clipped(e,raw),r={left:c.left,top:c.top,right:c.right,bottom:c.bottom,x:c.left,y:c.top,width:c.right-c.left,height:c.bottom-c.top};if(r.width<1||r.height<1)continue;rects.push({x:r.x,y:r.y,w:r.width,h:r.height,text:n.textContent.trim().slice(0,50),parent:e});
+  const range=document.createRange();range.selectNodeContents(n);
+  // Text boxes are the font's content area (ascent + descent); with a tight line-height (a hero
+  // numeral at 0.9) the line box is a better proxy for the ink, so trim to it, centred.
+  const lh=parseFloat(getComputedStyle(e).lineHeight)*scale;
+  for(const raw0 of range.getClientRects()){const trim=Number.isFinite(lh)&&lh>0&&lh<raw0.height?(raw0.height-lh)/2:0,raw={left:raw0.left,right:raw0.right,top:raw0.top+trim,bottom:raw0.bottom-trim};
+  const c=clipped(e,raw,true),r={left:c.left,top:c.top,right:c.right,bottom:c.bottom,x:c.left,y:c.top,width:c.right-c.left,height:c.bottom-c.top};if(r.width<1||r.height<1)continue;rects.push({x:r.x,y:r.y,w:r.width,h:r.height,text:n.textContent.trim().slice(0,50),parent:e});
   if(r.left<b.left-2||r.top<b.top-2||r.right>b.right+2||r.bottom>b.bottom+2)overflow.push({element:ref(e),text:n.textContent.trim().slice(0,60)})}
  }
  const overlaps=[];for(let i=0;i<rects.length;i++)for(let j=i+1;j<rects.length;j++){const a=rects[i],c=rects[j];if(a.parent===c.parent||a.parent.contains(c.parent)||c.parent.contains(a.parent))continue;const w=Math.min(a.x+a.w,c.x+c.w)-Math.max(a.x,c.x),h=Math.min(a.y+a.h,c.y+c.h)-Math.max(a.y,c.y);if(w>3*scale&&h>4*scale)overlaps.push([a.text,c.text])}

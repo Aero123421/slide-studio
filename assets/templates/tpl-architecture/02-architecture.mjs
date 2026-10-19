@@ -99,5 +99,5 @@ export default {
   content: `<p class="ar-run"><span>Incident review — checkout timeouts, 6 Oct 2026</span><span>2</span></p>
 <h1 class="ar-head" data-region="title">Every price-cache miss fell through to a replica that the reporting jobs were already loading</h1>
 <figure class="ar-fig" style="left:64px;top:196px" data-region="primary">${fig}</figure>
-<p class="ar-src" data-region="source"><span>Simplified to the request path: inventory, payments and the order store are omitted. Arrows point from caller to callee.</span></p>`,
+<p class="ar-src" data-region="source"><span>Illustrative data. Simplified to the request path: inventory, payments and the order store are omitted. Arrows point from caller to callee.</span></p>`,
 };

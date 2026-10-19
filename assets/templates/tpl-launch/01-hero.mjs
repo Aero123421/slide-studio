@@ -13,9 +13,9 @@ const launch = {
 };
 // The fragment: one rule, worded as it appears in the product. Sample data.
 const rule = {
-  name: 'Wrong size, unworn',
+  name: 'Wrong size',
   when: ['Reason is Too small or Too big', 'Delivered under 30 days ago', 'Item price under €150'],
-  then: ['Approve and send a QR code', 'Offer the next size from stock', 'Refund at the first carrier scan'],
+  then: ['Approve and send a QR code', 'Offer the next size from stock', 'If declined, refund at first scan'],
   note: 'Sample rule. In the beta it matched 1,912 returns.',
 };
 

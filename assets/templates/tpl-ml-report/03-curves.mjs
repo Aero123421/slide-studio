@@ -37,7 +37,6 @@ for (const s of scorers) {
 }
 const [mdl, rule] = scorers;
 const alertsLine = mdl.perWeek * TEST.weeks; // alerts over the test period at the model's threshold
-const NB = '\u00a0';
 const pc = v => `${Math.round(100 * v)}%`;
 
 // ---- figure, drawn at its slide size
@@ -66,14 +65,15 @@ const point = s => {
 const names = scorers.map(s => textLines([s.name], { x: x(s.label[0]), y: y(s.label[1]), size: 18, weight: 600, fill: ink(s) })).join('');
 const titles = textLines(['Precision: share of alerts that were failures'], { x: box.x - 48, y: 8, size: 16, fill: 'var(--ml-muted)' })
   + textLines(['Recall: share of failures caught'], { x: box.x + box.w, y: box.y + box.h + 50, anchor: 'end', size: 16, fill: 'var(--ml-muted)' });
-const fig = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-labelledby="${ID}-t ${ID}-d" font-family="var(--ml-sans)">
+const fig = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-labelledby="${ID}-t ${ID}-d" style="font-family:var(--ml-sans)">
 <title id="${ID}-t">Precision–recall curves on the test set: PF-7 v3 and the vibration rule</title>
 <desc id="${ID}-d">Average precision ${mdl.ap.toFixed(2)} for ${mdl.name} and ${rule.ap.toFixed(2)} for the ${rule.name.toLowerCase()}; no-skill precision is ${(100 * prevalence).toFixed(1)}%. At ${mdl.point} the model raises ${Math.round(mdl.perWeek)} alerts a week and catches ${mdl.caught} of ${P} failures (precision ${pc(mdl.precision)}); the rule at ${rule.point} raises ${Math.round(rule.perWeek)} a week and catches ${rule.caught} (precision ${pc(rule.precision)}). Both points lie on the dashed line of equal alert volume.</desc>
 ${grid}${skill}${effort}${curves}${point(rule)}${point(mdl)}${names}${titles}
 </svg>`;
 const rowsTable = [
   ['Alerts a week', Math.round(mdl.perWeek), Math.round(rule.perWeek)],
-  ['Failures caught', `${mdl.caught} <span class="mute">(${pc(mdl.recall)})</span>`, `${rule.caught} <span class="mute">(${pc(rule.recall)})</span>`],
+  ['Failures caught', mdl.caught, rule.caught],
+  ['Recall', pc(mdl.recall), pc(rule.recall)],
   ['Precision', pc(mdl.precision), pc(rule.precision)],
   ['Average precision', mdl.ap.toFixed(2), rule.ap.toFixed(2)],
 ];
@@ -89,7 +89,7 @@ export default {
   content: `<p class="ml-run"><span>PF-7 v3 pump-failure model — evaluation report</span><span>3</span></p>
 <h1 class="ml-head" data-region="title">With the same ${Math.round(mdl.perWeek)} inspections a week, the model catches ${mdl.caught} failures and the vibration rule ${rule.caught}</h1>
 <figure class="ml-fig" style="left:46px;top:200px" data-region="primary">${fig}</figure>
-<p class="ml-cap" style="left:64px;top:628px;width:760px"><b>Figure 3.</b> Precision and recall on the test set as the threshold varies. Dots mark the thresholds in use; the dotted line is a model without skill (${(100 * prevalence).toFixed(1)}%).</p>
+<p class="ml-cap" style="left:64px;top:628px;width:760px" data-region="source"><b>Figure 3.</b> Illustrative data: precision and recall on the test set as the threshold varies. Dots mark the thresholds in use; the dotted line is a model without skill (${(100 * prevalence).toFixed(1)}%).</p>
 <table class="ml-table ml-compare" data-region="support"><thead><tr><th>At the thresholds in use</th><th class="r">${mdl.name}</th><th class="r">${rule.name}</th></tr></thead>
 <tbody>${rowsTable.map(r => `<tr><td>${r[0]}</td><td class="r num">${r[1]}</td><td class="r num">${r[2]}</td></tr>`).join('')}</tbody></table>`,
 };

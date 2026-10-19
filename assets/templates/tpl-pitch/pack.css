@@ -8,7 +8,7 @@
 .tpl-pitch{
   --pp-paper:#F4F1EA;--pp-ink:#171614;--pp-grey:#5F5B54;--pp-context:#B4AEA3;--pp-rule:#CFC8BB;--pp-grid:#E3DED4;
   --pp-accent:#D9442B;--pp-accent-ink:#B5361F;
-  --pp-serif:"Charter","Bitstream Charter","Iowan Old Style",Georgia,serif;
+  --pp-serif:"Charter","Bitstream Charter","Iowan Old Style",Georgia,Caladea,serif;
   --pp-sans:"Inter","Helvetica Neue",Arial,sans-serif;
   --pp-figure:"Inter Display","Inter","Helvetica Neue",Arial,sans-serif;
   /* figure-engine tokens: charts share the pack palette */

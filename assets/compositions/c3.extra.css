@@ -13,10 +13,10 @@
 /* composition-number-and-unit: hero number + unit on one baseline, scope directly under, proof strip below */
 .st.cmp-number-unit { --ss-font-sans: "Inter", "Helvetica Neue", "Segoe UI", Arial, sans-serif; --ss-font-display: "Inter Display", "Inter", "Helvetica Neue", "Segoe UI", Arial, sans-serif; }
 .st.cmp-number-unit .cmp-nu-hero { position: absolute; left: 64px; top: 34px; font: 600 220px/.9 var(--ss-font-display); color: var(--ss-ink); white-space: nowrap; }
-.st.cmp-number-unit .cmp-nu-num { display: inline-block; letter-spacing: -.045em; font-variant-numeric: lining-nums; }
+.st.cmp-number-unit .cmp-nu-num { display: inline-block; margin-left: -.03em; letter-spacing: -.045em; font-variant-numeric: lining-nums; }
 .st.cmp-number-unit .cmp-nu-unit { display: inline-block; margin-left: 26px; font: 500 34px/1.16 var(--ss-font-sans); letter-spacing: -.012em; }
-.st.cmp-number-unit .cmp-nu-scope { position: absolute; left: 64px; top: 262px; width: 736px; font: 400 21px/1.45 var(--ss-font-sans); color: var(--ss-muted); text-wrap: pretty; }
-.st.cmp-number-unit .cmp-nu-fig { position: absolute; left: 64px; right: 64px; top: 330px; height: 330px; margin: 0; }
+.st.cmp-number-unit .cmp-nu-scope { position: absolute; left: 64px; top: 262px; width: 690px; font: 400 21px/1.45 var(--ss-font-sans); color: var(--ss-muted); text-wrap: pretty; }
+.st.cmp-number-unit .cmp-nu-fig { position: absolute; left: 64px; right: 64px; top: 364px; height: 298px; margin: 0; }
 .st.cmp-number-unit .cmp-nu-fig > svg { display: block; width: 100%; height: 100%; overflow: visible; }
 
 /* composition-three-aligned-views: three 4-column panels share question, answer, plot top and baseline */
@@ -47,10 +47,10 @@
 
 /* composition-continuous-handoff: one band across cols 1–10, the end product at its end (cols 11–12) */
 .st.cmp-handoff { --ss-font-sans: "Inter", "Helvetica Neue", "Segoe UI", Arial, sans-serif; --ss-font-display: "Inter Display", "Inter", "Helvetica Neue", "Segoe UI", Arial, sans-serif; }
-.st.cmp-handoff .cmp-ho-fig { position: absolute; left: 64px; top: 176px; width: 960px; height: 460px; margin: 0; }
+.st.cmp-handoff .cmp-ho-fig { position: absolute; left: 64px; top: 238px; width: 960px; height: 372px; margin: 0; }
 .st.cmp-handoff .cmp-ho-fig > svg { display: block; width: 100%; height: 100%; overflow: visible; }
-.st.cmp-handoff .cmp-ho-cup { position: absolute; left: 1040px; top: 222px; width: 176px; margin: 0; }
-.st.cmp-handoff .cmp-ho-cup img { display: block; width: 176px; height: 176px; object-fit: cover; }
+.st.cmp-handoff .cmp-ho-cup { position: absolute; left: 1040px; top: 238px; width: 176px; margin: 0; }
+.st.cmp-handoff .cmp-ho-cup img { display: block; width: 176px; height: 176px; object-fit: cover; object-position: 40% 50%; }
 .st.cmp-handoff .cmp-ho-cup figcaption { margin-top: 12px; display: grid; gap: 2px; font: 400 16px/1.35 var(--ss-font-sans); color: var(--ss-muted); }
 .st.cmp-handoff .cmp-ho-cup figcaption b { font: 650 22px/1.2 var(--ss-font-display); color: var(--ss-ink); font-variant-numeric: tabular-nums; }
 
@@ -91,3 +91,23 @@
 .st.cmp-quiet .cmp-qr-lead { position: absolute; left: 64px; top: 304px; width: 960px; font: 400 22px/1.75 var(--ss-font-sans); color: var(--ss-ink); }
 .st.cmp-quiet .cmp-qr-fig { position: absolute; left: 64px; top: 446px; width: 960px; height: 172px; margin: 0; }
 .st.cmp-quiet .cmp-qr-fig > svg { display: block; width: 100%; height: 100%; overflow: visible; }
+
+/* composition-split-claim: argued text cols 1–5, evidence cols 6–12, one top line */
+.st.cmp-split { --ss-font-sans: "Inter", "Helvetica Neue", "Segoe UI", Arial, sans-serif; --ss-font-display: "Charter", "Iowan Old Style", Georgia, Caladea, serif; --ss-font-serif: var(--ss-font-display); }
+.st.cmp-split .cmp-sc-head { position: absolute; left: 64px; top: 58px; width: 466px; font: 400 46px/1.12 var(--ss-font-display); letter-spacing: -.012em; color: var(--ss-ink); text-wrap: balance; }
+.st.cmp-split .cmp-sc-head em { font-style: normal; color: var(--ss-accent); }
+.st.cmp-split .cmp-sc-text { position: absolute; left: 64px; top: 300px; width: 440px; display: grid; gap: 16px; font: 400 20px/1.5 var(--ss-font-sans); color: var(--ss-ink); text-wrap: pretty; }
+.st.cmp-split .cmp-sc-fig { position: absolute; left: 554px; top: 64px; width: 662px; height: 560px; margin: 0; }
+.st.cmp-split .cmp-sc-fig > svg { display: block; width: 100%; height: 100%; overflow: visible; }
+
+/* composition-closing-experiment: the design grid (cols 1–7) and what each outcome decides (cols 8–12) */
+.st.cmp-closing { --ss-font-sans: "Inter", "Helvetica Neue", "Segoe UI", Arial, sans-serif; --ss-font-display: "Charter", "Iowan Old Style", Georgia, Caladea, serif; --ss-font-serif: var(--ss-font-display); }
+.st.cmp-closing .st-head { font-weight: 400; font-size: 42px; line-height: 1.12; max-width: 1080px; }
+.st.cmp-closing .cmp-ce-fig { position: absolute; left: 64px; top: 196px; width: 640px; height: 420px; margin: 0; }
+.st.cmp-closing .cmp-ce-fig > svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.st.cmp-closing .cmp-ce-rail { position: absolute; left: 750px; top: 196px; width: 466px; height: 420px; display: flex; flex-direction: column; gap: 26px; font: 400 19px/1.45 var(--ss-font-sans); color: var(--ss-ink); }
+.st.cmp-closing .cmp-ce-why b { font-weight: 650; }
+.st.cmp-closing .cmp-ce-dec { margin: 0; display: grid; gap: 18px; padding-top: 22px; border-top: 1px solid var(--ss-rule); }
+.st.cmp-closing .cmp-ce-dec dt { font: 650 19px/1.3 var(--ss-font-sans); color: var(--ss-ink); }
+.st.cmp-closing .cmp-ce-dec dd { margin: 4px 0 0; color: var(--ss-ink); }
+.st.cmp-closing .cmp-ce-when { margin-top: auto; padding-top: 14px; border-top: 1px solid var(--ss-rule); font-size: 17px; color: var(--ss-ink); font-variant-numeric: tabular-nums; }

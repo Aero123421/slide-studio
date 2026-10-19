@@ -55,11 +55,11 @@ export default {
   id: ID,
   language: 'ja',
   title: 'Options compared: three ways to reach the profit target',
-  notes: 'Purpose: 実現手段の3案を同じ評価軸で並べ、推奨案がどこで優れ、どこで劣るかを隠さずに見せる。\nModify: effect（打ち手別の効果）、options（含む打ち手・投資・回収の計算方法）、judged（4段階の評価と根拠）を差し替える。営業利益・利益率・回収年数は自動で計算される。rec: true の列が網掛けになる。\nInvariant: 評価軸はすべて「●ほど良い」の向きにそろえる。数値で言えるものは数値で書き、評価記号には必ず短い根拠を添える。推奨案の弱点も残す。\nStatic: 静的ページ。',
+  notes: 'Purpose: 実現手段の3案を同じ評価軸で並べ、推奨案がどこで優れ、どこで劣るかを隠さずに見せる。\nModify: effect（打ち手別の効果）、options（含む打ち手・投資・回収の計算方法）、judged（4段階の評価と根拠）を差し替える。営業利益・利益率・回収年数は自動で計算される。rec: true の列が網掛けになる。見出しの改行は <br> で文や句の切れ目に入れる。\nInvariant: 評価軸はすべて「●ほど良い」の向きにそろえる。数値で言えるものは数値で書き、評価記号には必ず短い根拠を添える。推奨案の弱点も残す。\nStatic: 静的ページ。',
   sources: [],
   exportPolicy: 'final',
   className: 'tpl-strategy st-options',
-  content: `<h1 class="st-title" data-region="title">${plan.year}年度に${plan.target}%へ届くのは${reach.length === 1 ? `案${reach[0].key}だけ` : `${reach.length}案`}。投資${fmt(rec.invest)}億円は${payText(rec.years)}で回収できる</h1>
+  content: `<h1 class="st-title" data-region="title">${plan.year}年度に${plan.target}%へ届くのは${reach.length === 1 ? `案${reach[0].key}だけ` : `${reach.length}案`}。<br>投資${fmt(rec.invest)}億円は${payText(rec.years)}で回収できる</h1>
 <table class="st-opt" data-region="primary">
   <colgroup><col class="c0"><col><col><col></colgroup>
   <thead>${head}</thead>

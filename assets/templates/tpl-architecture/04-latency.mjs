@@ -68,5 +68,5 @@ export default {
   content: `<p class="ar-run"><span>Incident review — checkout timeouts, 6 Oct 2026</span><span>4</span></p>
 <h1 class="ar-head" data-region="title">p99 sat on the ${s2(TIMEOUT)} timeout for ${minutesCapped} minutes and stayed above the ${s2(SLO)} objective for ${minutesOver}</h1>
 <figure class="ar-fig" style="left:64px;top:228px;--ss-surface:var(--ar-red-tint)" data-region="primary">${fig}</figure>
-<p class="ar-src" data-region="source"><span>1-minute percentiles of <span class="ar-id">POST /checkout</span> at the gateway, UTC. Requests cut off at the timeout count as ${s2(TIMEOUT)}, which is why p99 flattens there.</span></p>`,
+<p class="ar-src" data-region="source"><span>Illustrative data. 1-minute percentiles of checkout requests at the gateway, UTC. Requests cut off at the timeout count as ${s2(TIMEOUT)}, which is why p99 flattens there.</span></p>`,
 };

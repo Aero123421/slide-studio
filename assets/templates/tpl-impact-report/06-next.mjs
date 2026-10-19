@@ -24,7 +24,7 @@ export default {
   id: ID,
   language: 'ja',
   title: 'Next year: targets and how each will be measured',
-  notes: 'Purpose: この一年の結果から来年度の目標を数値で約束し、それぞれをどう測るかまで示す。\nModify: now（今年度の実績）、focus（教室を開く地区）、targets（目標・測り方）を差し替える。地区の割合は参加者数と対象者数から計算される。\nInvariant: 目標は必ず今年度の実績と並べ、測り方と時期を書く。実績は前のページと同じ値にする。計画は予定として書き、決まっていないことは断定しない。\nStatic: 静的ページ。',
+  notes: 'Purpose: この一年の結果から来年度の目標を数値で約束し、それぞれをどう測るかまで示す。\nModify: now（今年度の実績）、focus（教室を開く地区）、targets（目標・測り方）を差し替える。地区の割合は参加者数と対象者数から計算される。見出しの改行は <br> で文や句の切れ目に入れる。\nInvariant: 目標は必ず今年度の実績と並べ、測り方と時期を書く。実績は前のページと同じ値にする。計画は予定として書き、決まっていないことは断定しない。\nStatic: 静的ページ。',
   sources: [],
   exportPolicy: 'final',
   className: 'tpl-impact-report ir-next',

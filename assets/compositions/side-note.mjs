@@ -2,7 +2,7 @@
 // A horizontal profit bridge carries the claim; each note sits in the margin at the height of the
 // row it qualifies, keyed by ※n. The bridge, the headline percentages and the note positions are
 // computed from `bridge`; a changed figure moves its note with it.
-import { svgRoot, el, g, textLines, linear, fmt, theme as makeTheme } from '../runtime/figure.mjs';
+import { svgRoot, el, textLines, linear, fmt, measureText, theme as makeTheme } from '../runtime/figure.mjs';
 
 // Japanese line breaking: phrases joined with <wbr>, set with `word-break: keep-all` (works without auto-phrase).
 const seg = new Intl.Segmenter('ja', { granularity: 'word' });
@@ -36,7 +36,7 @@ const bridge = [ // 営業利益の増減要因、億円（架空の白嶺工業
 ];
 const notes = {
   1: '北米向けの産業用ポンプが伸び、販売台数は前年同期比7%増えた。',
-  2: '1ドル＝149円で換算した（前年同期は143円）。',
+  2: '1ドル＝149円で換算（前年同期143円）。',
   3: '新工場の減価償却費1.8億円を含む。',
   4: '前年同期は旧本社用地の売却益5.6億円を含む。当期に同様の益はない。',
 };
@@ -87,7 +87,7 @@ let floor = 0;
 const margin = Object.entries(notes).map(([k, text]) => {
   const row = rows.findIndex(r => r.note === Number(k));
   const top = Math.max(fig.top + rowY(row) - 14, floor);
-  floor = top + Math.ceil([...text].length / 18) * 30 + 14;   // about 18 characters per line at 17 px in 336 px
+  floor = top + Math.ceil((0.9 * measureText(text, 17)) / 328) * 30 + 12;   // lines in the 328 px column (the estimate runs ~10% wide for Japanese)
   return `<p class="sn-note" style="top:${top}px"><span>※${k}</span>${ja(text)}</p>`;
 }).join('\n');
 
@@ -98,7 +98,7 @@ export default {
   title: 'Side notes: the argument in the main column, qualifications in the margin',
   className: 'st cs-finance-ledger cmp-sidenote',
   notes: 'Purpose: Keep a results page readable when the numbers need qualifications (one-off items, exchange rates, definitions). The argument stays in the main column at full size; the qualifications move to a margin, keyed and aligned to the exact row they qualify, instead of a footnote block nobody reads.\nModify: Replace `bridge` (one row per driver, totals marked) and `notes` (keyed by number, placed on the row that carries the same `note`). Note positions follow the rows; keep each note to one or two sentences.\nInvariant: The main column takes about two thirds of the width; notes sit at 17 px or more, never smaller than the source line; each note starts on the line of its row and carries the same ※ number as the label; decreases show a minus sign as well as red; the non-recurring part of last year’s profit is drawn as its own lighter segment, so the headline’s comparison is visible in the chart.\nStatic: Already static.',
-  sources: [],
+  sources: [{ type: 'original-example', file: 'assets/compositions/side-note.mjs' }],
   exportPolicy: 'final',
   content: `<h1 class="st-head">${ja(`前年の土地売却益を除くと、営業利益は${p1(underlying)}%増えた`)}<br><span class="st-quiet">${ja(`報告ベースでは${p1(reported)}%${reported < 0 ? '減' : '増'}（${fmt(prev, { digits: 1 })}億円→${fmt(now, { digits: 1 })}億円）`)}</span></h1>
 <figure class="sn-fig" data-region="primary">${figure()}</figure>

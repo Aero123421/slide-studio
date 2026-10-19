@@ -9,13 +9,14 @@
 //   3. arrange  one row first; else two rows, cut only where one step hands to one step,
 //               so no connector has to cross a stack; keep the first arrangement that fits
 //   4. place    rows sized by their measured content, equal columns layout.mjs  allocate · kit.mjs grid
-//   5. connect  ports on box edges, orthogonal connectors          kit.mjs     port, connector
+//   5. connect  ports on box edges; in a row an elbow through the  kit.mjs     port, connector
+//               empty column gap, across rows a route around boxes  layout.mjs  routeOrthogonal
 // If no arrangement fits, `arrange` throws with the numbers: shorten, split or give the
 // diagram more room. It never shrinks type to make a fit.
 import fs from 'node:fs/promises';
 import { h, grid, port, connector } from '../../assets/runtime/kit.mjs';
-import { allocate, dagLayers } from '../../assets/runtime/layout.mjs';
-import { theme, el, g, svgRoot, textLines, wrapText, measureText, sum } from '../../assets/runtime/figure.mjs';
+import { allocate, dagLayers, routeOrthogonal } from '../../assets/runtime/layout.mjs';
+import { theme, el, g, svgRoot, textLines, wrapText, wrapBalanced, measureText, sum } from '../../assets/runtime/figure.mjs';
 
 // ------------------------------------------------------------------ the procedure (fictional)
 // Trial NK-301 central laboratory manual, section 4. Each step: who holds the specimen and what they record.
@@ -24,8 +25,8 @@ const steps = [
     en: { title: 'Draw', holder: 'Site nurse', detail: 'Two 4 ml tubes, labelled with the participant code, not the name' },
     ja: { title: '採血', holder: '施設の看護師', detail: '4 mLの採血管2本。ラベルは被験者コードのみで、氏名は書かない' } },
   { id: 'prepare',
-    en: { title: 'Spin, split, freeze', holder: 'Site laboratory', detail: 'Spin within 30 min, split into vials A and B, freeze at −80 °C' },
-    ja: { title: '遠心・分注・凍結', holder: '施設の検査室', detail: '30分以内に遠心し、AとBの2本に分注して−80 °Cで凍結する' } },
+    en: { title: 'Spin, split, freeze', holder: 'Site laboratory', detail: 'Spin within 30 min, split into vials A and B, freeze at −80°C' },
+    ja: { title: '遠心・分注・凍結', holder: '施設の検査室', detail: '30分以内に遠心し、AとBの2本に分注して−80℃で凍結する' } },
   { id: 'ship',
     en: { title: 'Ship on dry ice', holder: 'Courier', detail: 'Sealed box with a temperature logger; both sign the custody form' },
     ja: { title: 'ドライアイスで輸送', holder: '運送業者', detail: '温度ロガー入りの箱を封緘し、引き渡し時に双方が管理票に署名する' } },
@@ -33,11 +34,11 @@ const steps = [
     en: { title: 'Check on arrival', holder: 'Central lab reception', detail: 'Seal, logger trace and every vial code against the manifest; sign' },
     ja: { title: '受領時の確認', holder: '中央検査室の受付', detail: '封、温度の記録、検体番号を送付票と照合してから署名する' } },
   { id: 'store',
-    en: { title: 'Store', holder: 'Central lab', detail: 'Vial A to the assay queue, vial B to the −80 °C archive' },
-    ja: { title: '保管', holder: '中央検査室', detail: 'Aは測定の待機列へ、Bは−80 °Cの保存庫へ' } },
+    en: { title: 'Store', holder: 'Central lab', detail: 'Vial A to the assay queue, vial B to the −80°C archive' },
+    ja: { title: '保管', holder: '中央検査室', detail: 'Aは測定の待機列へ、Bは−80℃の保存庫へ' } },
   { id: 'hold', exception: true,
-    en: { title: 'Quarantine', holder: 'Central lab QA', detail: 'Seal broken, logger above −60 °C or codes differ: hold, tell the sponsor' },
-    ja: { title: '隔離', holder: '中央検査室の品質管理', detail: '封の破損、−60 °C超、番号の不一致があれば保留し、依頼者へ連絡する' } },
+    en: { title: 'Quarantine', holder: 'Central lab QA', detail: 'Seal broken, logger above −60°C or codes differ: hold, tell the sponsor' },
+    ja: { title: '隔離', holder: '中央検査室の品質管理', detail: '封の破損、−60℃超、番号の不一致があれば保留し、依頼者へ連絡する' } },
   { id: 'assay',
     en: { title: 'Assay', holder: 'Analyst', detail: 'Vial A in duplicate with two control levels; the analyst signs the run' },
     ja: { title: '測定', holder: '分析担当者', detail: 'Aを2回測定し、2濃度の精度管理試料も併せて測る。記録に署名する' } },
@@ -68,7 +69,7 @@ function measureStep(step, lang, fields, width) {
   const inner = width - 2 * PAD.x;
   const blocks = fields.map(f => {
     const [size, weight, lh] = TYPE[lang][f];
-    const lines = wrapText(step[lang][f], inner, size, { weight });
+    const lines = (f === 'title' ? wrapBalanced : wrapText)(step[lang][f], inner, size, { weight });   // titles break in even lines
     return { f, lines, size, weight, lh, widest: Math.max(...lines.map(l => measureText(l, size, { weight }))) };
   });
   const height = 2 * PAD.y + sum(blocks.map(b => b.lines.length * b.size * b.lh)) + GAP.block * (blocks.length - 1);
@@ -136,22 +137,38 @@ function drawStep(step, b, measured) {
     text);
 }
 
-/** One connector per hand-off: right port to left port in a row, bottom to top across rows. */
+/** One connector per hand-off. In a row: right port to left port, the elbow in the empty column gap.
+ *  Across rows: a stack in the next row can be taller than its neighbours, so a midpoint elbow could cut
+ *  it; routeOrthogonal finds the shortest path that keeps 14 px clear of every other box, or throws. */
 function drawEdge([from, to], { box, rowOf }) {
   const wraps = rowOf[to] > rowOf[from], end = port(box[to], wraps ? 'top' : 'left');
-  const d = wraps ? connector(box[from], box[to], { from: 'bottom', to: 'top', axis: 'y' }) : connector(box[from], box[to]);
+  let d = connector(box[from], box[to]);
+  if (wraps) {
+    const obstacles = Object.entries(box).filter(([id]) => id !== from && id !== to).map(([, b]) => ({ x: b.x, y: b.y, width: b.w, height: b.h }));
+    d = 'M ' + routeOrthogonal({ from: port(box[from], 'bottom'), to: end, obstacles, clearance: 14 }).map(p => p.join(' ')).join(' L ');
+  }
   const exception = byId[to].exception, color = exception ? t.c('muted') : t.c('ink');
   const head = wraps ? `M${end[0]} ${end[1]}l-5 -9h10z` : `M${end[0]} ${end[1]}l-9 -5v10z`;
   return g({}, el('path', { d, fill: 'none', stroke: color, 'stroke-width': 1.6, 'stroke-dasharray': exception ? '5 4' : null }),
     el('path', { d: head, fill: color }));
 }
 
+/** A note for one step, set under the lowest box with a leader up to the step it explains. */
+function stepNote({ at, text, columns }, { box }, a) {
+  const b = box[at], bottom = Math.max(...Object.values(box).map(x => x.y + x.h)), size = 19, lh = 1.42;
+  const x = b.x + 18, top = bottom + 34, lines = wrapText(text, columns * a.colW + (columns - 1) * GAP.col - 32, size);
+  return g({ class: 'step-note' },
+    el('path', { d: `M${x} ${b.y + b.h}V${top + size * 0.55}h8`, fill: 'none', stroke: t.c('accent'), 'stroke-width': 1.4 }),
+    textLines(lines, { x: x + 14, y: top, size, valign: 'top', lineHeight: lh, fill: t.c('ink') }));
+}
+
 /** The whole figure for one language and one label depth. */
-function custodyFigure({ id, lang, fields, region, title, desc }) {
+function custodyFigure({ id, lang, fields, region, title, desc, note }) {
   const a = arrange(lang, fields, region), placed = place(a, region);
   const svg = svgRoot({ id, width: 1280, height: 720, title, desc, style: 'position:absolute;left:0;top:0' },
     flow.map(e => drawEdge(e, placed)),
-    steps.map(s => drawStep(s, placed.box[s.id], a.m[s.id])));
+    steps.map(s => drawStep(s, placed.box[s.id], a.m[s.id])),
+    note ? stepNote(note, placed, a) : '');
   return { svg: svg.replace('<svg ', `<svg data-layout="${h(a.record.at(-1))}" `), arrangement: a };
 }
 
@@ -167,7 +184,7 @@ const deckCSS = String.raw`
    so its boxes share the page's coordinates (64 px margins, figure band given per page in deck.mjs). */
 .custody { --ss-font-display: "Inter Display", "Inter", "Helvetica Neue", Arial, sans-serif;
            --ss-font-sans: "Inter", "Helvetica Neue", Arial, sans-serif; }
-.custody:lang(ja) { --ss-font-display: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic UI", "Yu Gothic", Meiryo, "IPAGothic", sans-serif;
+.custody:lang(ja) { --ss-font-display: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic UI", "Yu Gothic", Meiryo, "IPAPGothic", "IPAGothic", sans-serif;
                     --ss-font-sans: var(--ss-font-display); }
 .custody .st-head { font-weight: 600; font-size: 38px; line-height: 1.16; letter-spacing: -.015em; max-width: 1110px; }
 .custody:lang(ja) .st-head { font-weight: 700; font-size: 34px; line-height: 1.4; letter-spacing: .02em; max-width: 1060px; }
@@ -180,8 +197,9 @@ const SOURCE = 'Trial NK-301 central laboratory manual, section 4 (fictional).';
 const sources = [{ file: 'examples/constraint-layout/deck.mjs', status: 'illustrative' }];
 const words = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
 
-const summary = custodyFigure({ id: 'custody-summary', lang: 'en', fields: ['title', 'holder'], region: { x: 64, y: 196, w: 1152, h: 440 },
-  title: 'Specimen chain of custody, summary', desc: `${mainPath} steps from the draw to the result; the check on arrival sends a failing box to quarantine.` });
+const summary = custodyFigure({ id: 'custody-summary', lang: 'en', fields: ['title', 'holder'], region: { x: 64, y: 176, w: 1152, h: 300 },
+  title: 'Specimen chain of custody, summary', desc: `${mainPath} steps from the draw to the result; the check on arrival sends a failing box to quarantine.`,
+  note: { at: 'receive', columns: 3, text: 'A box that fails the check (a broken seal, a logger trace above −60°C, or a vial code that does not match the manifest) goes to quarantine and is never assayed.' } });
 const procedure = custodyFigure({ id: 'custody-procedure', lang: 'en', fields: ['title', 'holder', 'detail'], region: { x: 64, y: 172, w: 1152, h: 490 },
   title: 'Specimen chain of custody, full procedure', desc: 'Each step names its holder and what they check and sign.' });
 const japanese = custodyFigure({ id: 'custody-ja', lang: 'ja', fields: ['title', 'holder', 'detail'], region: { x: 64, y: 132, w: 1152, h: 532 },

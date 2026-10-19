@@ -30,7 +30,7 @@
 .cmp-image-led .il-photo { position: absolute; right: 0; bottom: 0; display: block; }
 .cmp-image-led .il-title { position: absolute; left: 60px; top: 50px; width: 1100px; font: 500 60px/1.1 var(--ss-font-display); letter-spacing: -.022em; color: var(--ss-ink); }
 .cmp-image-led .il-dek { position: absolute; left: 64px; top: 158px; width: 330px; font: 400 21px/1.5 var(--ss-font-sans); color: var(--ss-ink); text-wrap: pretty; }
-.cmp-image-led .il-meta { position: absolute; left: 64px; top: 474px; width: 334px; font: 400 18px/1.5 var(--ss-font-sans); color: var(--ss-muted); }
+.cmp-image-led .il-meta { position: absolute; left: 64px; top: 360px; width: 334px; font: 400 18px/1.5 var(--ss-font-sans); color: var(--ss-muted); }
 .cmp-image-led .il-meta b { font-weight: 600; color: var(--ss-ink); }
 .cmp-image-led .il-credit { position: absolute; left: 64px; bottom: 22px; width: 334px; font: 400 15px/1.35 var(--ss-font-sans); color: var(--ss-muted); }
 
@@ -150,6 +150,9 @@
 .cmp-crop-sequence .cq-dot.cq-wet { fill: none; }
 .cmp-crop-sequence .cq-crop { fill: none; stroke: var(--ss-ink); stroke-width: 1.5; }
 .cmp-crop-sequence .cq-crop-label { fill: var(--ss-ink); font-family: var(--ss-font-sans); font-weight: 700; }
+.cmp-crop-sequence .cq-name { fill: var(--ss-muted); stroke: var(--ss-surface); paint-order: stroke; stroke-linejoin: round; font-family: var(--ss-font-sans); font-weight: 500; }
+.cmp-crop-sequence .cq-name-town { fill: var(--ss-ink); font-weight: 600; }
+.cmp-crop-sequence .cq-name-river { fill: var(--ss-accent); font-style: italic; }
 
 /* ── Image pair: two photographs compared on one stated property ────────────────── */
 .st.cmp-image-pair {
@@ -177,8 +180,8 @@
 }
 .cmp-duotone-study .dt-panel { position: absolute; left: 0; top: 0; display: block; }
 .cmp-duotone-study .dt-part { position: absolute; left: 652px; top: 52px; font: 500 18px/1.3 var(--ss-font-sans); color: var(--ss-muted); }
-.cmp-duotone-study .dt-title { position: absolute; left: 646px; top: 132px; font: 300 132px/1 var(--ss-font-display); letter-spacing: -.035em; color: var(--ss-ink); }
-.cmp-duotone-study .dt-num { display: block; margin: 0 0 14px 6px; font: 600 22px/1 var(--ss-font-sans); letter-spacing: 0; color: var(--ss-accent); font-variant-numeric: lining-nums; }
+.cmp-duotone-study .dt-title { position: absolute; left: 646px; top: 168px; font: 300 132px/1 var(--ss-font-display); letter-spacing: -.035em; color: var(--ss-ink); }
+.cmp-duotone-study .dt-num { position: absolute; left: 652px; top: 132px; font: 600 22px/1 var(--ss-font-sans); color: var(--ss-accent); font-variant-numeric: lining-nums; }
 .cmp-duotone-study .dt-line { position: absolute; left: 652px; top: 318px; width: 500px; font: 400 26px/1.4 var(--ss-font-sans); color: var(--ss-ink); text-wrap: pretty; }
 .cmp-duotone-study .dt-source { position: absolute; left: 652px; bottom: 40px; width: 564px; margin: 0; display: flex; gap: 18px; align-items: flex-start; padding-top: 18px; border-top: 1px solid var(--ss-rule); }
 .cmp-duotone-study .dt-source img { display: block; flex: none; }

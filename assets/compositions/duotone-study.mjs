@@ -37,11 +37,12 @@ export default {
   content: `<svg class="dt-panel" data-region="primary" width="${panelW}" height="720" viewBox="${photo.crop.join(' ')}" role="img" aria-label="${photo.alt}">
 <defs>${filter}</defs><image href="${photo.src}" width="${photo.w}" height="${photo.h}" filter="url(#composition-duotone-study-filter)"/></svg>
 <p class="dt-part" data-region="support">${chapter.course}, ${chapter.when.toLowerCase()}</p>
-<h1 class="dt-title" data-region="title"><span class="dt-num">Part ${chapter.number} of ${chapter.of}</span>${chapter.title}</h1>
+<p class="dt-num" data-region="support">Part ${chapter.number} of ${chapter.of}</p>
+<h1 class="dt-title" data-region="title">${chapter.title}</h1>
 <p class="dt-line" data-region="support">${chapter.line}</p>
 <figure class="dt-source" data-region="source">
   <img src="${photo.src}" alt="The same photograph, unedited: a red-brown espresso cup on a wooden table." width="${thumb.w}" height="${thumb.h}">
-  <figcaption><b>Unedited original, whole frame.</b> Shown at left as a duotone: tones from ${Math.round(levels.black * 100)}% to ${Math.round(levels.white * 100)}% grey mapped onto ${inks.shadow} and ${inks.light}, cropped to the cup, no retouching. ${photo.credit}.</figcaption>
+  <figcaption><b>Unedited original, whole frame.</b> Shown at left as a duotone: greys from ${Math.round(levels.black * 100)}% to ${Math.round(levels.white * 100)}% mapped from near-black (${inks.shadow}) to orange (${inks.light}); cropped to the cup; no retouching. ${photo.credit}.</figcaption>
 </figure>
 `,
 };

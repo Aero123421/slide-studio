@@ -39,10 +39,29 @@ finished example with computed headlines.
   twin; `preview.mjs` (with `--css`); `contact-sheet.py` (craft and structured decks,
   `--steps`, `--frames`); `build-studies.mjs` (CSS bundles incl. compositions,
   standalone SVGs, `--css-only`); `build-thumbs.py`; a searchable visual gallery index.
+- **Engine options found by building the libraries**: flow diagrams merge fan-in edges on
+  a trunk (one arrowhead) and split fan-outs from one, spread other shared ports and
+  squeeze crowded layers; Gantt baselines with slip labels; waterfall `colors:'neutral'`,
+  `highlight`, outlined plan bars, a baseline and sub-labels; `heatmap` blank cells for
+  cohort triangles; `quadrantChart` in data units with thresholds; `forestPlot` table
+  columns and marker shapes; ROC/PR operating points with thinned paths; calibration
+  before/after series, Wilson intervals and log counts; line-chart tick values, solid
+  reference lines, band colours and annotations by x value; `columnChart` without
+  category labels; `theme({css: true, system})`. Japanese wrapping keeps a number with
+  its counter or unit and kanji compounds whole, and balanced wrapping never splits a
+  word.
+- **QA measures what is seen**: text clipped by SVG clip paths or nested `<svg>`
+  viewports is not off-slide; screen-reader-only text and empty, unpainted containers
+  neither cover nor are covered; text over a painted sibling goes to pixel review; a
+  tight-leaded hero numeral is measured by its line box. `slop_check.py` reads SVG lines
+  and fills, judges hue by Lab chroma (navy ink is ink), treats table rules as typography
+  and honours a slide's `copyWaivers`.
 - Structured route: localized kickers in the bundled Japanese examples, 15 px chrome,
   a sample label in the deck language, no faded section numeral.
 - Tests: figure-engine suite (every chart renders a finite, accessible SVG with unique
-  ids), HTML style-signal test for `slop_check.py`.
+  ids), HTML style-signal tests for `slop_check.py`, Player 4 browser suite
+  (`tests/player_browser.py`), and integrity regressions for clipped, hidden and
+  tight-leaded text.
 
 ### Also in 4.0 (prepared after 3.4)
 

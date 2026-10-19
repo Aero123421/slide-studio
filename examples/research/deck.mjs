@@ -33,11 +33,9 @@ const deckCSS = String.raw`
 .talk { --ss-font-display: "Charter", "Bitstream Charter", "Iowan Old Style", Georgia, serif;
         --ss-font-sans: "Inter", "Helvetica Neue", Arial, sans-serif; }
 .talk .st-head { font-weight: 400; font-size: 40px; line-height: 1.13; letter-spacing: -.012em; max-width: 1110px; }
-.talk .st-dek { top: 152px; font-size: 20px; color: var(--ss-muted); }
 .talk .st-kpi b { font-weight: 400; }
 .talk .st-kpi span { font-size: 20px; line-height: 1.4; color: var(--ss-ink); }
 .talk .st-text { font-size: 20px; line-height: 1.45; }
-.talk .st-kpi span em { font-style: normal; color: var(--ss-muted); }
 .talk .num { font-variant-numeric: tabular-nums lining-nums; }
 
 /* Cover: one question, set large; the byline sits on the bottom margin. */
@@ -217,8 +215,8 @@ function alertsFigure() {
     return g({}, el('rect', { x: x0, y: y(b.dry), width: bw, height: y(0) - y(b.dry), fill: t.c('accent') }),
       el('rect', { x: x0, y: y(b.dug), width: bw, height: y(b.dry) - y(b.dug) - 1.5, fill: t.c('context') }));
   });
-  const xt = x(T0), key = (fill, dash, label, value, yy) => g({},
-    el('rect', { x: x(0.62), y: yy - 9, width: 18, height: 18, fill, stroke: dash ? t.c('muted') : null, 'stroke-dasharray': dash ? '3 2' : null }),
+  const xt = x(T0), key = (fill, label, value, yy) => g({},                   // a two-line key with totals, in the empty space above the dug bands
+    el('rect', { x: x(0.62), y: yy - 9, width: 18, height: 18, fill }),
     textLines([label], { x: x(0.62) + 28, y: yy, size: 17, valign: 'middle', fill: t.c('ink') }),
     textLines([value], { x: box.x + box.w, y: yy, size: 17, anchor: 'end', valign: 'middle', fill: t.c('ink'), weight: 600, attrs: { 'font-variant-numeric': 'tabular-nums' } }));
   return svgRoot({ id: 'stakes-fig', width: W, height: H, title: 'Leak alerts in 2025 by score band, and what the excavations found',
@@ -232,8 +230,8 @@ function alertsFigure() {
   el('line', { x1: xt, x2: xt, y1: box.y - 56, y2: y(0), stroke: t.c('ink'), 'stroke-width': 1.5 }),
   textLines(['Not dug: outcome never recorded'], { x: xt - 12, y: box.y - 40, size: 17, anchor: 'end', fill: t.c('muted'), weight: 600 }),
   textLines(['Dug: outcome recorded'], { x: xt + 12, y: box.y - 40, size: 17, fill: t.c('ink'), weight: 600 }),
-  key(t.c('context'), false, 'Leak found', count(dug - dry), y(560)),
-  key(t.c('accent'), false, 'No leak found', count(dry), y(500)));
+  key(t.c('context'), 'Leak found', count(dug - dry), y(560)),
+  key(t.c('accent'), 'No leak found', count(dry), y(500)));
 }
 
 /** Page 3: how every flagged site got its reference label. Arrows mean "then". */
@@ -297,7 +295,7 @@ function accuracyFigure() {
   const rows = rates.map(r => ({ label: r.label, estimate: r.p * 100, low: r.lo * 100, high: r.hi * 100, weight: r.n, k: r.k, n: r.n }));
   return forestPlot({
     id: 'accuracy-fig', width: 1152, height: 430, fontSize: 18, rows, domain: [0, 100], highlight: rows[0].label,
-    format: { digits: 0, suffix: '%' }, labelTitle: `At threshold ${t2(T0)}`, columnTitle: 'Sites · estimate (95% CI)',
+    format: { digits: 0, suffix: '%' }, labelTitle: `At threshold ${t2(T0)}`, columnTitle: 'Count and estimate (95% CI)',
     columnText: r => `${r.k} of ${r.n}   ${fmt(r.estimate, { digits: 0 })}%  (${fmt(r.low, { digits: 0 })}–${fmt(r.high, { digits: 0 })})`,
     title: `Accuracy of the leak score at threshold ${t2(T0)} with 95% intervals`,
     desc: `Sensitivity ${pc(sens.p)} (${pc(sens.lo)}–${pc(sens.hi)}), positive predictive value ${pc(ppv.p)}; the 2025 job records give ${pc(recordsPPV)}.`,
@@ -348,13 +346,13 @@ function precisionFigure() {
     textLines([text], { x: at(n)[0] + dx, y: at(n)[1] - 12, size: 16, fill, weight: 600, halo: t.c('paper') }));
   return svgRoot({ id: 'precision-fig', width: W, height: H, title: 'Half-width of the 95% interval on sensitivity by number of confirmed leaks',
     desc: `±${fmt(halfWidth(nLeak) * 100, { digits: 0 })} points with ${nLeak} leaks; ±${fmt(TARGET * 100, { digits: 0 })} needs ${leaksNeeded}.` },
-  axis(y, { orient: 'left', at: box.x, grid: [box.x, box.x + box.w], theme: t, size: 15, tickValues: [0, 10, 20, 30], format: v => (v ? `±${v}` : '0') }),
+  axis(y, { orient: 'left', at: box.x, grid: [box.x, box.x + box.w], theme: t, size: 16, tickValues: [0, 10, 20, 30], format: v => (v ? `±${v}` : '0') }),
   el('line', { x1: box.x, x2: box.x + box.w, y1: y(0), y2: y(0), stroke: t.c('ink'), 'stroke-width': 1.2 }),
-  axis(x, { orient: 'bottom', at: y(0), theme: t, size: 15, tickValues: [0, 50, 100, 150], tickSize: 4 }),
+  axis(x, { orient: 'bottom', at: y(0), theme: t, size: 16, tickValues: [0, 50, 100, 150], tickSize: 4 }),
   el('path', { d: pathFromPoints(Array.from({ length: 143 }, (_, i) => at(i + 8))), fill: 'none', stroke: t.c('muted'), 'stroke-width': 2.2 }),
   mark(nLeak, `now, ${nLeak} leaks`, t.c('ink'), 10),
   mark(leaksNeeded, `${leaksNeeded} leaks`, t.c('accent'), 8),
-  textLines(['confirmed leaks'], { x: box.x + box.w, y: H - 2, size: 15, anchor: 'end', fill: t.c('muted') }));
+  textLines(['confirmed leaks'], { x: box.x + box.w, y: H - 2, size: 16, anchor: 'end', fill: t.c('muted') }));
 }
 
 /** Page 10, right column: where evidence exists — one cell of the districts × seasons plan. */
@@ -370,7 +368,7 @@ function coverageFigure() {
       plan.seasons.map((_, j) => {
         const done = i === 0 && j === 0, xx = labelW + j * cw + (j ? gap : 0);
         return g({}, el('rect', { x: xx, y: yy, width: cw - gap / 2, height: rh, rx: 3, fill: done ? t.c('surface') : 'none', stroke: done ? t.c('ink') : t.c('muted'), 'stroke-width': done ? 1.4 : 1.2, 'stroke-dasharray': done ? null : '4 3' }),
-          textLines([done ? `this study, ${sites.length}` : `${perCell} sites`], { x: xx + (cw - gap / 2) / 2, y: yy + rh / 2, size: 15, anchor: 'middle', valign: 'middle', fill: done ? t.c('ink') : t.c('muted') }));
+          textLines([done ? `this study, ${sites.length}` : `${perCell} sites`], { x: xx + (cw - gap / 2) / 2, y: yy + rh / 2, size: 16, anchor: 'middle', valign: 'middle', fill: done ? t.c('ink') : t.c('muted') }));
       }));
   }));
 }
@@ -395,7 +393,7 @@ const readoutScript = String.raw`
 
 // ------------------------------------------------------------------ pages
 const cls = (layout = '') => `st cs-${SYSTEM} talk ${layout}`.trim();
-const source = (left, right) => `<p class="st-source" data-region="source"><span>${left}</span><span>${right}</span></p>`;
+const source = (left, method) => `<p class="st-source" data-region="source"><span>${left}</span><span>${method}, fictional data</span></p>`;
 const sources = [{ file: 'examples/research/data.json', status: 'illustrative' }];
 
 export default {

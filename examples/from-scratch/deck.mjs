@@ -201,7 +201,7 @@ const deckCSS = String.raw`
 
 // ------------------------------------------------------------------ pages
 const cls = (layout = '') => `st cs-${SYSTEM} board ${layout}`.trim();
-const source = (left, right) => `<p class="st-source" data-region="source"><span>${left}</span><span>${right}</span></p>`;
+const source = (left, method) => `<p class="st-source" data-region="source"><span>${left}</span><span>${method}, fictional data</span></p>`;
 const SOURCE_TRIAL = `Kestrel Bay Transit, bus location records; ${trial.period} against ${trial.baseline}.`;
 const sources = [{ file: 'examples/from-scratch/deck.mjs', status: 'illustrative' }];
 

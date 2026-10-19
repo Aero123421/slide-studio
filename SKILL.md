@@ -24,6 +24,9 @@ delivery. A beautiful false claim is worse than a plain true one.
 - The evidence is the largest thing on the page and is drawn at the size it is shown.
   Text ≥ 18 px for live talks, ≥ 15 px anywhere; nothing overlaps, clips or overflows.
 - One accent per page, and it means "this". Everything else is ink, muted or context grey.
+- Japanese pages read as native Japanese: phrase-level line breaks (the engine wraps SVG
+  text by phrase; in HTML put `<br>` at the phrase boundary of headlines), numbers kept
+  with their units, no English eyebrows, and ▲ never used for an increase.
 - Motion explains a change; the final build is the complete page for PDF.
 - You have **looked at every rendered page** (contact sheet + full-size frames) and
   fixed what you saw. Scripts find defects; they never approve a deck.
@@ -89,7 +92,7 @@ const chart = barChart({ id: 'orders', title: 'Orders by region', desc: `${top.l
 | How good is the model? | `confusionMatrix`, `rocCurve`, `prCurve`, `calibrationChart`, `learningCurve`, `residualPlot` |
 | How does the process / system work? | `flowDiagram` (layers, lanes, boundaries, feedback), `sequenceDiagram`, `treeDiagram`, `layerDiagram`, `networkDiagram`, `cycleDiagram` |
 | When does what happen? | `ganttChart`, `timelineChart` (true time spacing) |
-| Where are we on a judgment? | `quadrantChart` (say positions are judgments), `matrixDiagram` |
+| Where does each option fall against two criteria? | `quadrantChart` (data units with a threshold, or judgments — say which), `matrixDiagram` |
 | Continuous field / physics | `contourPlot`, `vectorField`, `streamlines` |
 
 Draw at display size (`width`/`height` = the region), give every figure `title` and
@@ -182,7 +185,9 @@ Default: remove each of these unless you can say in one line what it tells the r
 `slop_check.py` finds these in HTML (computed styles included), `.scene.json` or
 any `.pptx`. Each warning needs a fix or a one-line reason. The checker cannot see
 taste: the [visual design](references/visual-design.md) guide explains what to do
-instead.
+instead. A deck gets its identity from type, a grid, one color with one meaning and
+real content set at full size — never from ornament (§8 of that guide; the template
+packs show twelve different identities built that way).
 
 ## Delivery
 

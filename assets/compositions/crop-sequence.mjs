@@ -3,7 +3,7 @@
 // input). Everything lives in valley coordinates: u = metres along the valley axis, v = metres
 // across it (negative = north). A building floods when |v| is less than the flood half-width at
 // its u, the same rule that draws the shaded zone, so each frame's percentage is counted, not typed.
-import { rng, noise2D, fmt } from '../runtime/figure.mjs';
+import { rng, noise2D, fmt, measureText } from '../runtime/figure.mjs';
 
 const valley = { w: 12000, h: 8000 }; // frame A extent, metres (3 : 2)
 const axisY = x => 4300 + 420 * Math.sin((2 * Math.PI * x) / 7000 + 0.5) + 140 * Math.sin((2 * Math.PI * x) / 3100 + 1.7);
@@ -128,13 +128,30 @@ function map() {
 </g>`;
 }
 
+// Place names, set per frame at a readable size (px on the slide), in map metres.
+const riverAt = x => { const u = uOf(x), p = at(u), m = channel(x); return [p.x - p.ty * m, p.y + p.tx * m]; };
+const names = {
+  A: [...villages.map(v => ({ text: v.name, at: toXY(v.u, v.v + (v.v < 0 ? -1 : 1) * 420), size: 15 })),
+    { text: 'River Kell', at: (([x, y]) => [x, y + 330])(riverAt(1500)), size: 15, river: true }],
+  B: [{ text: 'Thornford', at: toXY(town.u0 - 900, -880), size: 17, town: true }, { text: 'River Kell', at: (([x, y]) => [x - 420, y + 110])(riverAt(townC[0] - 500)), size: 15, river: true }],
+  C: [{ text: 'Mill Lane', at: toXY(millLane.u - 13, millLane.v1 + 18), size: 15, along: true }],
+};
+const laneAngle = (() => { const p = at(millLane.u); return (Math.atan2(p.tx, -p.ty) * 180) / Math.PI; })();
+
 const frameW = 360, frameH = 240;
 const frame = (c, i) => {
   const k = c.across / frameW; // metres per pixel in this frame
   const inner = crops.slice(i + 1, i + 2).map(o => `<rect x="${d1(o.x)}" y="${d1(o.y)}" width="${d1(o.across)}" height="${d1(o.h)}" class="cq-crop" ${NS}/>` +
     `<text x="${d1(o.x + o.across + 6 * k)}" y="${d1(o.y + 12 * k)}" font-size="${d1(16 * k)}" class="cq-crop-label">${o.key}</text>`).join('');
+  // Keep every name inside its frame (8 px clear of the edges); rotated names are placed by hand.
+  const fit = n => {
+    if (n.along) return n.at;
+    const half = (measureText(n.text, n.size, { weight: 600 }) / 2 + 8) * k, top = (n.size + 8) * k, pad = 8 * k;
+    return [Math.min(Math.max(n.at[0], c.x + half), c.x + c.across - half), Math.min(Math.max(n.at[1], c.y + top), c.y + c.h - pad)];
+  };
+  const labels = (names[c.key] || []).map(n0 => ({ ...n0, at: fit(n0) })).map(n => `<text x="${d1(n.at[0])}" y="${d1(n.at[1])}" font-size="${d1(n.size * k)}" stroke-width="${d1(3.5 * k)}" text-anchor="middle" class="cq-name${n.river ? ' cq-name-river' : ''}${n.town ? ' cq-name-town' : ''}"${n.along ? ` transform="rotate(${laneAngle.toFixed(1)} ${d1(n.at[0])} ${d1(n.at[1])})"` : ''}>${n.text}</text>`).join('');
   return `<svg class="cq-frame" width="${frameW}" height="${frameH}" viewBox="${d1(c.x)} ${d1(c.y)} ${d1(c.across)} ${d1(c.h)}" role="img" aria-label="Crop ${c.key}, ${c.name}: ${km(c.across)} across; ${pct(c.share)} of ${c.in.length} buildings in the frame are inside the flood zone.">
-<use href="#composition-crop-sequence-map"/>${inner}</svg>`;
+<use href="#composition-crop-sequence-map"/>${inner}${labels}</svg>`;
 };
 
 export default {

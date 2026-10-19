@@ -23,7 +23,8 @@ const rings = Array.from({ length: drawn.lastRing - drawn.firstRing + 1 }, (_, i
   const year = drawn.firstRing + i, w = (2.6 * Math.exp(-i / 50) + 1.05) * (0.8 + 0.4 * r());
   return { year, w: w * (markers[year] ?? 1) };
 });
-const scale = 1.42; // px per mm on the slide
+const scale = 1.66; // px per mm on the slide
+const barkMm = 34; // bark thickness outside the last ring, mm
 
 function endGrain(theme = 'css') {
   const t = makeTheme(theme), px = 600, py = 232, drift = [-0.8, -0.35]; // pith and the direction of faster growth
@@ -33,7 +34,11 @@ function endGrain(theme = 'css') {
     const k = 0.06 * rad + 1.5 * Math.sin(i * 0.37); // eccentric growth: centres drift as the tree leans
     return { ...ring, cx: px + drift[0] * k, cy: py + drift[1] * k, r: rad, sap: i >= rings.length - sapwood };
   });
-  const outer = circles.at(-1), heart = circles[circles.length - sapwood - 1];
+  const outer = circles.at(-1), heart = circles[circles.length - sapwood - 1], bark = outer.r + barkMm * scale;
+  const fissures = Array.from({ length: 180 }, (_, i) => { // the bark's deep vertical fissures, seen end-on
+    const a = (i / 180) * 2 * Math.PI + r() * 0.02, r0 = outer.r + 3 + r() * 6, r1 = bark - r() * 10;
+    return `M${(outer.cx + r0 * Math.cos(a)).toFixed(1)} ${(outer.cy + r0 * Math.sin(a)).toFixed(1)}L${(outer.cx + r1 * Math.cos(a)).toFixed(1)} ${(outer.cy + r1 * Math.sin(a)).toFixed(1)}`;
+  }).join('');
   const rays = Array.from({ length: 64 }, (_, i) => { // oak's broad rays, pith to bark
     const a = (i / 64) * 2 * Math.PI + r() * 0.05, r0 = 30 + r() * 120, r1 = outer.r * (0.9 + r() * 0.1);
     return `M${(px + r0 * Math.cos(a)).toFixed(1)} ${(py + r0 * Math.sin(a)).toFixed(1)}L${(px + r1 * Math.cos(a)).toFixed(1)} ${(py + r1 * Math.sin(a)).toFixed(1)}`;
@@ -43,6 +48,8 @@ function endGrain(theme = 'css') {
     return `M${px + r0 * Math.cos(a)} ${py + r0 * Math.sin(a)}L${px + r1 * Math.cos(a - w)} ${py + r1 * Math.sin(a - w)}L${px + r1 * Math.cos(a + w)} ${py + r1 * Math.sin(a + w)}Z`;
   })();
   return g({},
+    el('circle', { cx: outer.cx, cy: outer.cy, r: bark, fill: t.seq(4) }),
+    el('path', { d: fissures, stroke: t.seq(3), 'stroke-width': 1.4, opacity: 0.7, fill: 'none' }),
     el('circle', { cx: outer.cx, cy: outer.cy, r: outer.r, fill: t.seq(1) }),
     el('circle', { cx: heart.cx, cy: heart.cy, r: heart.r, fill: t.seq(2) }),
     el('path', { d: rays, stroke: t.seq(0), 'stroke-width': 1.6, opacity: 0.55, fill: 'none' }),
@@ -52,6 +59,7 @@ function endGrain(theme = 'css') {
     el('circle', { cx: px, cy: py, r: 4, fill: t.seq(4) }));
 }
 
+const count = ['No', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten'];
 const year = String(felled), size = 440, baseline = 380, left = 57; // left: the "1" stem sits on the 64 px margin
 const figure = `<svg class="it-art" width="1280" height="460" viewBox="0 0 1280 460" role="img" aria-label="${year}, set in very large type and filled with a drawing of oak end grain: ${rings.length} growth rings from the pith to the bark edge.">
 <defs><clipPath id="composition-image-in-type-clip"><text x="${left}" y="${baseline}" font-size="${size}" font-weight="900" letter-spacing="${(-0.02 * size).toFixed(1)}" font-family="'Inter Display', Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">${year}</text></clipPath></defs>
@@ -68,6 +76,6 @@ export default {
   content: `${figure.replace('<svg class="it-art"', '<svg class="it-art" data-region="primary"')}
 <p class="it-caption" data-region="support">End grain of tie-beam ${drawn.id}, drawn from its ring widths: ${rings.length} rings, ${drawn.firstRing}–${drawn.lastRing}. Green: the bark edge, the last ring the tree grew.</p>
 <h1 class="it-head" data-region="title">The barn’s roof was built from oaks felled in the winter of ${felled}–${String(felled + 1).slice(2)}</h1>
-<p class="it-dek" data-region="support">${timbers.length} roof timbers match the regional oak chronology. ${withBark.length} keep their bark edge, and in each the last ring grew in ${felled}.</p>
+<p class="it-dek" data-region="support">${count[timbers.length] ?? timbers.length} roof timbers match the regional oak chronology. ${count[withBark.length] ?? withBark.length} keep their bark edge, and in each the last ring grew in ${felled}.</p>
 <p class="st-source" data-region="source"><span>Illustrative data · Hallgate Barn building survey, 2026</span><span>Image inside type</span></p>`,
 };

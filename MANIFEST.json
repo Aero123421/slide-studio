@@ -52,8 +52,8 @@
     },
     {
       "path": "VERIFICATION.md",
-      "bytes": 5497,
-      "sha256": "eb75054076dacadf0d816e401dc9a5e68c9581a2b3335124b896b083bcc5783f"
+      "bytes": 9247,
+      "sha256": "df86433a6559fe30f62576f8a731c7a7244c44103b69a2c1442c1d5a85e9145e"
     },
     {
       "path": "VERSION",
@@ -4712,8 +4712,8 @@
     },
     {
       "path": "tests/release-results.json",
-      "bytes": 13260,
-      "sha256": "c7d6bf5c57b0894f108ce60005f1b2ffc7d9d1e481049f8e06d6595b173503a1"
+      "bytes": 24365,
+      "sha256": "610a70a42d9a5e8cf837215e6de90ba79ad0af93a35b96f08ca10ce98dce34d3"
     },
     {
       "path": "tests/rendered_review.py",

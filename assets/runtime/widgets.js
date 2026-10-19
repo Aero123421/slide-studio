@@ -41,9 +41,9 @@ function quantile(values, p) { // type 7 (R, NumPy default)
 const median = a => quantile(a, 0.5);
 
 /** Locale-aware number with a real minus sign and no "−0". */
-function fmt(v, digits = 0, locale = 'en', signed = false) {
+function fmt(v, digits = 0, locale = 'en', signed = false, group = true) {
   if (!isNum(v)) return '–';
-  const s = Math.abs(v).toLocaleString(locale, { minimumFractionDigits: digits, maximumFractionDigits: digits });
+  const s = Math.abs(v).toLocaleString(locale, { minimumFractionDigits: digits, maximumFractionDigits: digits, useGrouping: group });
   const zero = Number(Math.abs(v).toFixed(digits)) === 0;
   return (v < 0 && !zero ? '−' : signed && v > 0 && !zero ? '+' : '') + s;
 }
@@ -371,7 +371,9 @@ function mount(config, defaultAssets) {
     data: config.data || {}, axes: config.axes || {}, text: config.text || {},
     get state() { return state; }, set state(v) { state = v; },
     spec, slider, select, check, radios, button, draw, size: plotSize, render: () => render(),
-    fmt: (v, d = 0, signed = false) => fmt(v, d, locale, signed), fill: (t, v) => fill(t, v, locale),
+    fmt: (v, d = 0, signed = false, group = true) => fmt(v, d, locale, signed, group), fill: (t, v) => fill(t, v, locale),
+    /** Number on an axis: axes.x.plain (years, codes) turns off digit grouping. */
+    ax: (v, spec, d) => fmt(v, spec?.digits ?? d ?? 0, locale, false, !spec?.plain),
     font: () => (family ||= literalTokens(root).font),
     tw: (s, size = 16, weight = 400) => textWidth(s, size, weight, w.font()),
     wrap: (s, width, size = 16, weight = 400) => wrapText(s, width, size, weight, w.font()),
@@ -887,7 +889,7 @@ KINDS.table = w => {
     if (key === current) w.state.ascending = !w.state.ascending; else { w.state.sortBy = key; w.state.ascending = columns.find(c => c.key === key).ascending ?? true; }
     w.render();
   });
-  const cell = (c, v) => (typeof v === 'number' ? fmt(v, c.digits ?? 0, w.locale) : esc(v ?? ''));
+  const cell = (c, v) => (typeof v === 'number' ? fmt(v, c.digits ?? 0, w.locale, false, !c.plain) + (c.suffix || '') : esc(v ?? ''));
   return {
     render(s) {
       const key = s.sortBy ?? d.sortBy ?? columns[columns.length - 1].key, col = columns.find(c => c.key === key) || columns[columns.length - 1];
@@ -945,7 +947,7 @@ KINDS.brushing = w => {
       const dg = ax.y?.digits ?? (yd[1] - yd[0] <= 2 ? 2 : 0);
       let out = rect(x(lo), b.t - 8, Math.max(2, x(hi) - x(lo)), b.h + 8, { fill: C.surface });
       out += axisY(y, { x: b.l, values: ax.y?.ticks || ticks(yd[0], yd[1], 5), format: v => w.fmt(v, ax.y?.tickDigits ?? (yd[1] - yd[0] <= 2 ? 1 : 0)), grid: [b.l, b.r] });
-      out += axisX(x, { y: b.b, values: ax.x?.ticks || ticks(xd[0], xd[1], 8), format: v => w.fmt(v, ax.x?.digits ?? (xd[1] - xd[0] <= 2 ? 1 : 0)) });
+      out += axisX(x, { y: b.b, values: ax.x?.ticks || ticks(xd[0], xd[1], 8), format: v => w.ax(v, ax.x, xd[1] - xd[0] <= 2 ? 1 : 0) });
       out += line(b.l, b.b, b.r, b.b, { stroke: C.ink, width: 1.4 }) + yTitle(b, ax.y?.title) + xTitle(b, ax.x?.title, b.b + 36);
       out += line(x(lo), b.t - 8, x(lo), b.b, { stroke: C.ink, width: 1.4 }) + line(x(hi), b.t - 8, x(hi), b.b, { stroke: C.ink, width: 1.4 });
       for (const p of rest) out += circle(x(p.x), y(p.y), 5.5, { fill: C.context });
@@ -962,7 +964,7 @@ KINDS.brushing = w => {
         out += text(b.r + 14, b.t - 18, t.medianTitle || 'Median', { size: 16, fill: C.muted, valign: 'bottom' });
       }
       w.draw(svgRoot(W, H, out, t.figure || 'Scatter plot with a selected range'));
-      const vals = { k: picked.length, n: pts.length, low: w.fmt(lo, ax.x?.digits ?? (own ? 0 : 2)), high: w.fmt(hi, ax.x?.digits ?? (own ? 0 : 2)),
+      const vals = { k: picked.length, n: pts.length, low: w.ax(lo, ax.x, own ? 0 : 2), high: w.ax(hi, ax.x, own ? 0 : 2),
         median: w.fmt(mSel, dg), rest: w.fmt(mRest, dg), ratio: isNum(mSel / mRest) ? w.fmt(mSel / mRest, 1) : '–' };
       return { status: w.fill(t.status || 'Selected {k} / {n} observations. Range changes both selection and count.', vals), values: vals };
     },
@@ -1127,9 +1129,9 @@ KINDS.ablation = w => {
       }
       w.draw(svgRoot(W, H, out, t.figure || 'Score for each configuration of components'));
       const fullKey = comps.map(c => c.id).join('+'), full = d.measured ? d.measured[fullKey] : base + sum(comps.map(c => c.effect));
-      const vals = { value: fmt(value, dg, w.locale), config: nameOf(s), delta: fmt(value - full, dg, w.locale, true), full: fmt(full, dg, w.locale) };
+      const vals = { value: fmt(value, dg, w.locale), config: nameOf(s), delta: fmt(value - full, dg, w.locale, true), full: fmt(full, dg, w.locale), n: d.n ?? '' };
       if (d.n && d.measured) vals.margin = fmt(196 * Math.sqrt((value / 100) * (1 - value / 100) / d.n), 1, w.locale);
-      return { status: w.fill(t.status || 'Toy additive score: 40 + 15A + 8B + 12C. Not a measured benchmark.', vals), values: vals };
+      return { status: w.fill((value === full && t.statusFull) || t.status || 'Toy additive score: 40 + 15A + 8B + 12C. Not a measured benchmark.', vals), values: vals };
     },
   };
 };

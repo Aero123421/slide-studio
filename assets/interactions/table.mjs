@@ -53,7 +53,7 @@ Static: The export keeps the starting order (lowest share first). Sort by referr
         { key: 'referrals', name: 'Referrals', unit: 'a month', ascending: false },
         { key: 'median', name: 'Median wait', unit: 'weeks', digits: 1, ascending: false },
         { key: 'p90', name: '90% seen within', unit: 'weeks', digits: 1, ascending: false },
-        { key: 'within', name: `Seen within ${standard.weeks} weeks`, unit: `% · line at ${standard.share}% standard`, digits: 0, bar: { max: 100, ref: standard.share }, flag: { below: standard.share } },
+        { key: 'within', name: `Seen within ${standard.weeks} weeks`, unit: `% of patients; line at the ${standard.share}% standard`, digits: 0, suffix: '%', bar: { max: 100, ref: standard.share }, flag: { below: standard.share } },
       ],
     },
     text: {

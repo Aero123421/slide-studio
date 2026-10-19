@@ -36,7 +36,7 @@ Static: The export shows ${draws} resamples and their 95% interval (${signed(lo)
     axes: { x: { title: 'Yield gain (t/ha)', min: -0.4, max: 1, digits: 2, tickDigits: 1, signed: true } },
     text: {
       resample: 'Resample', batch: 'Draw {n} more',
-      dataTitle: 'The 12 plots · dots above a plot: times this resample drew it',
+      dataTitle: 'The 12 plots; dots above a plot count how often this resample drew it',
       meanLabel: 'this resample {v}', meansTitle: '{k|resample mean|resample means}',
       intervalLabel: '95% of means: {lo} to {hi}',
       status: 'Resample {draws}: mean {mean} t/ha. After {draws} resamples, 95% of means lie between {lo} and {hi}; {above} of {draws} are above zero.',

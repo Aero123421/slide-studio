@@ -416,8 +416,8 @@ ${source(`${SOURCE_STUDY} Counts recomputed from the same scores.`, 'Interactive
         text: {
           positive: 'Leak', negative: 'No leak', rowCount: '{n} sites',
           tp: '{tp} found', fn: '{fn} missed', fp: '{fp} dry digs', tn: '{tn} left alone',
-          rule: 'Crew sent at {threshold} or above', reset: `Reset to ${t2(T0)}`,
-          status: 'At {threshold}: crews go to {flagged} of {total} sites, find {tp} of {positives} leaks and dig {fp} dry holes.',
+          rule: 'Dig at {threshold} or above', reset: `Reset to ${t2(T0)}`,
+          status: 'At {threshold}: {flagged} of {total} sites dug; {tp} of {positives} leaks found, {fp} digs dry.',
           readout: [{ value: '{sensitivity}%', label: 'of leaks found' }, { value: '{falseShare}%', label: 'of digs dry' }],
           figure: 'Leak scores of the surveyed sites by survey result, with the threshold',
         },

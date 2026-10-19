@@ -222,7 +222,7 @@ Colours are role tokens: `tone: 'accent' | 'ink' | 'muted' | 'negative' | 'posit
 | `tabs` | `sections: [{id, name, title, body, facts: [{value, label}], status}]`, `body` a string or a list of paragraphs (`tab`) | `name`, `index`, `count` |
 | `layers` | `viewBox`, `layers: [{id, name, svg, note}]`, `controlOrder` (one boolean per layer) | `shown`, `count`, `notes` (of the visible layers) |
 | `table` | `columns: [{key, name, short, unit, digits, suffix, plain, bar: {max, ref}, flag: {above \| below}, ascending}]`, `rows`, `id`, `sortBy`, `caption`; a header click sorts, a second click reverses (`sortBy`, `ascending`, `order`) | `column`, `direction`, `first`, `last`, `firstValue`, `lastValue`, `count`, `flagged` |
-| `brushing` | `points: [{id, x, y}]`; bounds are in x units, `axes.x.plain` for years (`low`, `high`, `selected`) | `k`, `n`, `others`, `low`, `high`, `median`, `rest`, `ratio` |
+| `brushing` | `points: [{id, x, y}]`; bounds are in x units, `axes.x.plain` for years; `text.statusAll`, `text.statusNone` for a selection of everything or nothing (`low`, `high`, `selected`) | `k`, `n`, `others`, `low`, `high`, `median`, `rest`, `ratio` |
 | `histogram` | `values`, `domain` (peak bins in accent); `controls.bins.values` with `labels` offers named bin widths; `text.statusTwoPeaks` (`bins`, `counts`) | `bins`, `width`, `total`, `peaks`, `peakList`, `first` |
 | `bootstrap` | `values`, `batch` (adds "Draw n more"), `minDraws` (interval shown from then on, default 20); `controls.n: false` resamples all values; `axes.x.signed` (`seed`, `n`, `mean`, `low`, `high`) | `mean`, `draws`, `lo`, `hi`, `observed`, `above` (means above 0) |
 | `ablation` | `components: [{id, name, short}]` with `measured: {none: v, a: v, 'a+b': v, …}` (included ids in component order) and `n` (evaluated cases → 95% margins); or additive `base` and `effect` (one boolean per component, `value`) | `value`, `config`, `full`, `delta`, `margin` |
@@ -233,14 +233,16 @@ Colours are role tokens: `tone: 'accent' | 'ink' | 'muted' | 'negative' | 'posit
 | `magnifier` | `pixelated`, `print: {widthMm, ppi}` (`zoom`, `x`, `y`) | `zoom`, `screen` (screen px per image px), `visible`, `ppi`, `needed`, `maxMm`, `pixelMm` |
 | `video` | `seekTo` (s), `duration`; `assets.video`, `poster`, `captions` | `time`, `duration`, `state` |
 | `audio` | `reference: {name, hz}`, `windowMs`; a 16-bit PCM WAV data URI is decoded and measured in the page (`time`) | `hz` (zero crossings), `seconds`, `peak`, `rms` (dBFS), `cents`, `note`, `time`, `state` |
-| `cad-orbit`, `cad-explode`, `cad-section`, `cad-import` | `parts: [{group, name, note, tone, explode}]` (an OBJ group becomes a direct label with its measured size), `scaleBar` (mm); `text.statusFile` after an import (`yaw`, `pitch`, `explode`, `cut`, `filename`) | `triangles`, `drawn`, `x`, `y`, `z`, `yaw`, `pitch`, `gap`, `height`, `cutPct`, `file` |
+| `cad-orbit`, `cad-explode`, `cad-section`, `cad-import` | `parts: [{group, name, note, tone, explode}]` (an OBJ group becomes a direct label with its measured size, its leader dashed when the part is hidden), `scaleBar` (mm); `text.statusFile` after an import (`yaw`, `pitch`, `explode`, `cut`, `filename`) | `triangles`, `drawn`, `x`, `y`, `z`, `yaw`, `pitch`, `gap`, `height`, `cutPct`, `file`; per OBJ group, the connected pieces in view, e.g. `shownPins` of `piecesPins` |
 | `ink` | a chart to mark up: `lines`, `x`, `labels` as for `scrubber`, `refs`, `marks: [{at, label}]`, `preset: {at, rx, ry}` (the keyboard preset rings sample `at`), `inkTone` (`paths`) | `marks` |
 
 Parameter models: `dosing` (one-compartment IV bolus, C(t) = Σ dose/volume ·
 e^(−k(t − n·interval)), k = ln 2 / halfLife; constants `volume`, `interval`, `horizon`;
 state `dose`, `halfLife`), `decay` (N = initial · 2^(−t/halfLife)), `logistic`
 (P = capacity / (1 + (capacity/start − 1) e^(−rate·t))) and `sine` (the default
-fixture). A curve that leaves a fixed axis says so instead of rescaling.
+fixture). A curve that leaves a fixed axis says so instead of rescaling. Mesh kinds draw
+the file's triangles with a depth buffer, so what is hidden at an angle is really
+hidden — check any claim about visibility at the angle the page shows.
 
 ## 10. Media and 3D boundaries
 
@@ -248,10 +250,12 @@ fixture). A curve that leaves a fixed axis says so instead of rescaling.
 failure fallback. Handle the `play()` promise; never autoplay sound; pause on
 leave, hide and export; seek after metadata. A poster image is not proof of playback.
 
-**Mesh viewer** (`assets/runtime/mesh.js`): ASCII/binary STL and simple OBJ up to
-8 MiB / 40 000 triangles, group colors, orbit, explode by named groups, and a
-cutaway that clips triangles — not a capped CAD section, not STEP, units unknown
-unless supplied. For material-aware 3D integrate an approved, pinned local renderer
+**Mesh viewer**: `assets/runtime/mesh.js` parses ASCII/binary STL and simple OBJ
+(up to 8 MiB / 40 000 triangles); the `cad-*` kinds in `widgets.js` draw the triangles
+with their own depth-buffered rasterizer (hidden surfaces are exact at every angle),
+color and label OBJ groups, orbit, explode by named groups, and cut away by clipping
+triangles — not a capped CAD section, not STEP, units unknown unless supplied
+(`scaleBar` states them). For material-aware 3D integrate an approved, pinned local renderer
 (e.g. `<model-viewer>`) with a poster that stands alone when WebGL is unavailable,
 and record the conversion (source format, units, tessellation, omitted materials).
 

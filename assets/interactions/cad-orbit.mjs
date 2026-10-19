@@ -1,5 +1,7 @@
 // Interaction study · Mesh orbit — turn a real triangle mesh to see what one fixed view hides.
-// Drag the drawing, use the arrow keys on it, or the two sliders; every frame is drawn from the file's triangles.
+// Drag the drawing, use the arrow keys on it, or the two sliders; every frame is drawn from the file's triangles
+// with hidden surfaces removed, and the status counts the posts actually in view ({shownPins} of {piecesPins}).
+// At the starting view (35°, 60°) the ring hides one post; from a tilt of about 86° (eye level is 90°) all four show.
 // The bundled fixture (assets/media/obj.obj, millimetres, z up): four named groups, 328 triangles.
 // Sizes below were measured from the file; the widget measures the same groups again in the browser.
 const fixture = {
@@ -23,14 +25,14 @@ export default {
   study: true,
   id: ID,
   title: 'Mesh orbit: turning an assembly to check clearances',
-  notes: `Purpose: Settle a design-review question by turning the real geometry in the room: from straight in front two of the four posts hide behind the other two; turned, all four show and their clearance to the ring is visible.
+  notes: `Purpose: Settle a design-review question by turning the real geometry in the room: in the usual three-quarter view the ring hides one of the four posts; lowered to eye level all four show. The status line counts the posts in view at every angle.
 Modify: Replace the OBJ (assets.obj) and \`parts\` (OBJ group names, labels, colour roles); the labels, leader lines and sizes follow the file. Update \`fixture\` for the headline.
 Invariant: The drawing is the file's triangles under an orthographic view; nothing is a picture. Drag, arrow keys and sliders change the same yaw and pitch, and reset returns to 35° / 60°.
-Static: The export shows the starting view. For a review pack, add a front view (turn 0°, tilt 90°) next to it.`,
+Static: The export shows the starting view, with three posts in view. For a review pack, add the eye-level view (turn 35°, tilt 90°) next to it.`,
   sources: [{ type: 'mesh', file: 'assets/media/obj.obj', license: 'original fixture' }],
   exportPolicy: 'final',
   className: 'st cs-manufacturing-plant',
-  content: `<h1 class="st-head">From the front two of the four posts hide; turned 35°, all four show, each ${clearance.toFixed(1)} mm clear of the ring</h1>
+  content: `<h1 class="st-head">The ring hides one of the four posts in this view; at eye level all four show, each ${clearance.toFixed(1)} mm clear of it</h1>
 <p class="st-dek">Load-cell mount for a test rig (fictional), ${fixture.triangles} triangles in four parts, millimetres.</p>
 <div class="widget" data-interactive="" id="${ID}-widget" data-region="primary"><div class="w-plot"></div><div class="w-controls"></div><output aria-live="polite" class="w-status"></output></div>
 <p class="st-source" data-region="source"><span>Mesh fixture · orthographic view, flat shading, no materials or tolerances</span><span>Interaction · Mesh orbit</span></p>`,
@@ -45,7 +47,7 @@ Static: The export shows the starting view. For a review pack, add a front view 
     },
     text: {
       reset: 'Reset', canvasLabel: 'Load-cell mount, drawn from its triangles. Drag to turn it; arrow keys turn and tilt.',
-      status: 'Turned {yaw}°, tilted {pitch}° from straight down; {drawn} of {triangles} triangles drawn. Sizes in mm, from the file.',
+      status: 'Turned {yaw}°, tilted {pitch}° from straight down: {shownPins} of {piecesPins} posts in view. Sizes in mm, from the file.',
     },
   }],
 };

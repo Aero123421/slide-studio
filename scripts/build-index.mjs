@@ -48,7 +48,7 @@ let html = await fs.readFile(path.join(ROOT, 'assets/gallery-index.html'), 'utf8
 for (const kind of ['templates', 'diagrams', 'motion', 'interactions', 'compositions']) html = html.replaceAll(`{{COUNT_${kind}}}`, String(resources.filter(r => r.kind === kind).length));
 const colorSystems = (await fs.readdir(path.join(ROOT, 'assets/color-systems'))).filter(f => f.endsWith('.json')).length;
 html = html.replaceAll('{{COUNT_colorsystems}}', String(colorSystems))
-  .replaceAll('{{COUNT_all}}', String(resources.length))
+  .replaceAll('{{COUNT_all}}', String(resources.length + EXAMPLES.length))
   .replaceAll('{{COUNT_examples}}', String(EXAMPLES.length));
 const json = v => JSON.stringify(v).replace(/</g, '\\u003c');
 html = html.replace('{{CATALOG}}', json(rows)).replace('{{EXAMPLES}}', json(EXAMPLES));

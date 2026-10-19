@@ -401,7 +401,9 @@ function mount(config, defaultAssets) {
     const out = view.render ? view.render(state) : '';
     const message = typeof out === 'string' ? out : out?.status ?? '';
     if (status.textContent !== message) status.textContent = message;
-    const items = out?.readout ?? (Array.isArray(w.text.readout) ? w.text.readout.map(r => ({ ...r, value: w.fill(r.value, out?.values || {}), label: w.fill(r.label, out?.values || {}), unit: r.unit ? w.fill(r.unit, out?.values || {}) : '' })) : null);
+    // A readout whose number is undefined (for example a share of zero alerts) shows a bare dash, without its unit.
+    const big = (r, v = w.fill(r.value, out?.values || {})) => (/^–\D*$/.test(v) ? { value: '–', unit: '' } : { value: v, unit: r.unit ? w.fill(r.unit, out?.values || {}) : '' });
+    const items = out?.readout ?? (Array.isArray(w.text.readout) ? w.text.readout.map(r => ({ ...r, ...big(r), label: w.fill(r.label, out?.values || {}) })) : null);
     setReadout(items);
     root.dataset.state = JSON.stringify(state);
     writeSummary();
@@ -1569,32 +1571,44 @@ function meshBounds(mesh) {
 /** Z-buffer rasterizer: exact hidden surfaces at every angle (sorting faces by depth fails for large
  *  faces). polys: [{p: [[x, y, depth], …] in CSS px, rgb, id}]; k = buffer pixels per CSS px.
  *  Returns the image and, per pixel, the id of the visible face's piece (−1 for background). */
-function rasterize(polys, PW, PH, k) {
-  const depth = new Float32Array(PW * PH).fill(-Infinity), ids = new Int32Array(PW * PH).fill(-1);
-  const img = new ImageData(PW, PH), px = img.data;
+function rasterize(polys, PW, PH, k, cache = {}) {
+  // Buffers are kept between frames of the same size (dragging redraws many times a second).
+  if (cache.w !== PW || cache.h !== PH) Object.assign(cache, { w: PW, h: PH, depth: new Float32Array(PW * PH), ids: new Int32Array(PW * PH), img: new ImageData(PW, PH) });
+  const { depth, ids, img } = cache, px = img.data;
+  depth.fill(-Infinity); ids.fill(-1); px.fill(0);
   for (const f of polys) {
     const P = f.p.map(v => [v[0] * k, v[1] * k, v[2]]);
     for (let t = 1; t + 1 < P.length; t++) {
       const a = P[0], b = P[t], c = P[t + 1];
       const area = (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]);
       if (Math.abs(area) < 1e-9) continue;
-      const sg = area > 0 ? 1 : -1;
+      const sg = area > 0 ? 1 : -1, inv = 1 / Math.abs(area);
       const x0 = Math.max(0, Math.floor(Math.min(a[0], b[0], c[0]))), x1 = Math.min(PW - 1, Math.ceil(Math.max(a[0], b[0], c[0])));
       const y0 = Math.max(0, Math.floor(Math.min(a[1], b[1], c[1]))), y1 = Math.min(PH - 1, Math.ceil(Math.max(a[1], b[1], c[1])));
+      // Edge functions (barycentric weights × area) are linear in x: step them along each row.
+      const e0x = -sg * (c[1] - b[1]), e1x = -sg * (a[1] - c[1]), e2x = -sg * (b[1] - a[1]);
+      const dx = (e0x * a[2] + e1x * b[2] + e2x * c[2]) * inv, [r, g, bl] = f.rgb, id = f.id;
+      const qx = x0 + 0.5;
       for (let y = y0; y <= y1; y++) {
         const py = y + 0.5;
-        for (let x = x0; x <= x1; x++) {
-          const qx = x + 0.5;
-          const w0 = sg * ((c[0] - b[0]) * (py - b[1]) - (c[1] - b[1]) * (qx - b[0]));
-          if (w0 < 0) continue;
-          const w1 = sg * ((a[0] - c[0]) * (py - c[1]) - (a[1] - c[1]) * (qx - c[0]));
-          if (w1 < 0) continue;
-          const w2 = sg * ((b[0] - a[0]) * (py - a[1]) - (b[1] - a[1]) * (qx - a[0]));
-          if (w2 < 0) continue;
-          const d = (w0 * a[2] + w1 * b[2] + w2 * c[2]) / (w0 + w1 + w2 || 1), i = y * PW + x;
-          if (d <= depth[i]) continue;
-          depth[i] = d; ids[i] = f.id;
-          const o = i * 4; px[o] = f.rgb[0]; px[o + 1] = f.rgb[1]; px[o + 2] = f.rgb[2]; px[o + 3] = 255;
+        let w0 = sg * ((c[0] - b[0]) * (py - b[1]) - (c[1] - b[1]) * (qx - b[0]));
+        let w1 = sg * ((a[0] - c[0]) * (py - c[1]) - (a[1] - c[1]) * (qx - c[0]));
+        let w2 = sg * ((b[0] - a[0]) * (py - a[1]) - (b[1] - a[1]) * (qx - a[0]));
+        // Only the run of pixels inside all three edges: each edge bounds x from one side.
+        let lo = x0, hi = x1;
+        for (const [w, e] of [[w0, e0x], [w1, e1x], [w2, e2x]]) {
+          if (e > 0) lo = Math.max(lo, x0 + Math.ceil(-w / e - 1e-7));
+          else if (e < 0) hi = Math.min(hi, x0 + Math.floor(w / -e + 1e-7));
+          else if (w < 0) hi = lo - 1;
+        }
+        if (hi < lo) continue;
+        const skip = lo - x0;
+        w0 += e0x * skip; w1 += e1x * skip; w2 += e2x * skip;
+        let d = (w0 * a[2] + w1 * b[2] + w2 * c[2]) * inv;
+        for (let x = lo, i = y * PW + lo; x <= hi; x++, i++, w0 += e0x, w1 += e1x, w2 += e2x, d += dx) {
+          if (w0 < 0 || w1 < 0 || w2 < 0 || d <= depth[i]) continue;
+          depth[i] = d; ids[i] = id;
+          const o = i * 4; px[o] = r; px[o + 1] = g; px[o + 2] = bl; px[o + 3] = 255;
         }
       }
     }
@@ -1621,6 +1635,7 @@ function deepestPoint(ids, PW, PH, id, box, step) {
 function meshWidget(w) {
   const t = w.text, kind = w.config.kind, d = w.data;
   let mesh = StudioMesh.parseOBJ(w.assets.obj), info = meshBounds(mesh), pieces = meshPieces(mesh), offscreen = null;
+  const buffers = {};
   const idsOf = list => new Map([...new Set(list)].map((key, i) => [key, i]));
   let pieceIds = idsOf(pieces);
   w.plot.innerHTML = `<canvas tabindex="0" role="img" aria-label="${esc(t.canvasLabel || 'Interactive triangle mesh. Drag to rotate, or use yaw and pitch sliders.')}"></canvas><svg class="w-mesh-labels" aria-hidden="true"></svg>`;
@@ -1660,7 +1675,7 @@ function meshWidget(w) {
   return {
     render(s) {
       const { width: W, height: H } = w.size(), dpr = Math.min(2, window.devicePixelRatio || 1);
-      canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+      if (canvas.width !== Math.round(W * dpr) || canvas.height !== Math.round(H * dpr)) { canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr); }
       canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
       const ctx = canvas.getContext('2d'), tok = literalTokens(w.root);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
@@ -1694,9 +1709,9 @@ function meshWidget(w) {
       // Rasterize with a depth buffer at twice the pixel density (or the screen's, if higher), then
       // scale down for smooth edges.
       const k = dpr >= 2 ? dpr : 2 * dpr, PW = Math.max(1, Math.round(W * k)), PH = Math.max(1, Math.round(H * k));
-      const { img, ids } = rasterize(polys, PW, PH, k);
+      const { img, ids } = rasterize(polys, PW, PH, k, buffers);
       offscreen ||= document.createElement('canvas');
-      offscreen.width = PW; offscreen.height = PH;
+      if (offscreen.width !== PW || offscreen.height !== PH) { offscreen.width = PW; offscreen.height = PH; }
       offscreen.getContext('2d').putImageData(img, 0, 0);
       ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
       ctx.drawImage(offscreen, 0, 0, W, H);
@@ -1705,23 +1720,31 @@ function meshWidget(w) {
       // visible pixels of the part's most visible piece. A part hidden behind others (or above the cut)
       // gets a dashed leader and a muted label.
       let svg = '';
+      // The visible pixels of each connected piece: count and bounding box.
+      const nIds = pieceIds.size, count = new Int32Array(nIds), bx = new Int32Array(nIds * 4);
+      for (let q = 0; q < nIds; q++) { bx[q * 4] = PW; bx[q * 4 + 1] = PH; bx[q * 4 + 2] = -1; bx[q * 4 + 3] = -1; }
+      for (let y = 0, i = 0; y < PH; y++) for (let x = 0; x < PW; x++, i++) {
+        const id = ids[i];
+        if (id < 0) continue;
+        count[id]++;
+        const o = id * 4;
+        if (x < bx[o]) bx[o] = x; if (y < bx[o + 1]) bx[o + 1] = y; if (x > bx[o + 2]) bx[o + 2] = x; if (y > bx[o + 3]) bx[o + 3] = y;
+      }
+      const seen = { get: id => (count[id] ? { n: count[id], box: [bx[id * 4], bx[id * 4 + 1], bx[id * 4 + 2], bx[id * 4 + 3]] } : undefined) };
+      // Pieces of each group in view (at least 24 px² showing): {shownPins} of {piecesPins}.
+      const inView = {};
+      for (const g of groups) {
+        const mine = [...new Set(mesh.faces.map((f, fi) => (f.group === g ? pieceIds.get(pieces[fi]) : -1)).filter(id => id >= 0))];
+        inView[g] = { pieces: mine.length, shown: mine.filter(id => (seen.get(id)?.n || 0) >= 24 * k * k).length };
+      }
       if (named.length) {
-        const seen = new Map();   // piece id → {n, box}
-        for (let i = 0; i < ids.length; i++) {
-          const id = ids[i];
-          if (id < 0) continue;
-          let st = seen.get(id);
-          if (!st) seen.set(id, st = { n: 0, box: [PW, PH, -1, -1] });
-          const x = i % PW, y = (i - x) / PW;
-          st.n++; if (x < st.box[0]) st.box[0] = x; if (y < st.box[1]) st.box[1] = y; if (x > st.box[2]) st.box[2] = x; if (y > st.box[3]) st.box[3] = y;
-        }
         const items = named.map(g => {
           const gb = info.groups[g], mid = gb.min.map((v, k2) => (v + gb.max[k2]) / 2), dims = gb.max.map((v, k2) => v - gb.min[k2]);
           const own = polys.filter(f => f.g === g), mine = [...new Set(own.map(f => f.id))];
-          const shown = mine.map(id => ({ id, ...(seen.get(id) || { n: 0 }) })).filter(p => p.n >= 12 * k * k).sort((a, b) => b.n - a.n)[0];
+          const shown = mine.map(id => ({ id, ...(seen.get(id) || { n: 0 }) })).filter(p => p.n >= 24 * k * k).sort((a, b) => b.n - a.n)[0];
           let anchor = null, hidden = cut < 1 && gb.min[2] > limit;
           if (shown && !hidden) {
-            const pt = deepestPoint(ids, PW, PH, shown.id, shown.box, Math.max(1, Math.round(1.5 * k)));
+            const pt = deepestPoint(ids, PW, PH, shown.id, shown.box, Math.max(1, Math.round(2 * k)));
             if (pt) anchor = [(pt[0] + 0.5) / k, (pt[1] + 0.5) / k];
           }
           if (!anchor) {
@@ -1759,6 +1782,7 @@ function meshWidget(w) {
       const vals = { triangles: fmt(mesh.faces.length, 0, w.locale), groups: groups.length, drawn: fmt(polys.length, 0, w.locale), file: s.filename || '',
         x: fmt(dims[0], 1, w.locale), y: fmt(dims[1], 1, w.locale), z: fmt(dims[2], 1, w.locale), yaw: fmt(s.yaw, 0, w.locale), pitch: fmt(s.pitch, 0, w.locale),
         gap: fmt(explode * extent * 0.3, 0, w.locale), height: fmt(limit - min[2], 1, w.locale), cutPct: fmt(cut * 100, 0, w.locale) };
+      for (const g of groups) { const key = String(g).replace(/\W/g, ''); vals['shown' + key] = inView[g].shown; vals['pieces' + key] = inView[g].pieces; }
       const fallback = (s.filename ? s.filename + ' · ' : 'Original assembly · ') + `${mesh.faces.length} triangles. ` +
         (kind === 'cad-section' ? 'Open cutaway, not a capped CAD solid.' : 'Units: mm for the supplied fixture; imported mesh units are not inferred.');
       const template = s.filename ? t.statusFile : t.status;

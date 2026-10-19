@@ -4,7 +4,7 @@ Use --out a JSON path to retain a compact machine-readable record outside the sk
 Use SLIDE_STUDIO_INLINE=1 only when file navigation is unavailable and HTML is self-contained.
 """
 from pathlib import Path
-import argparse,json,sys,hashlib,struct,math,subprocess
+import argparse,json,os,re,sys,hashlib,struct,math,subprocess
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'scripts'))
 from qa import launch,open_deck,guard_network
 from playwright.sync_api import sync_playwright
@@ -139,7 +139,24 @@ def main():
    def orbit():
     cfg=study('cad-orbit');r=show('cad-orbit');cv=r.locator('canvas');before=cv.screenshot();value(r,label(cfg,'yaw'),90);expect(cv.screenshot()!=before);current=page.evaluate('SlideStudio.getState().current');cv.focus();cv.press('ArrowRight');expect(state('cad-orbit')['yaw']==95);expect(page.evaluate('SlideStudio.getState().current')==current)
     expect(r.locator('.w-mesh-labels text').count()>=2*len(cfg['data']['parts']),'parts are not labelled');reset('cad-orbit')
-   check('mesh vertex rendering responds to yaw and keyboard without slide leakage; parts labelled',orbit)
+    # Posts in view at eye level, from the OBJ itself: a post is hidden when a nearer post covers its whole projected width.
+    verts=[];group=None;pins=set()
+    for ln in (ROOT/'assets/media/obj.obj').read_text().splitlines():
+     p=ln.split()
+     if not p:continue
+     if p[0]=='v':verts.append(tuple(map(float,p[1:4])))
+     elif p[0] in('g','o'):group=' '.join(p[1:])
+     elif p[0]=='f' and group=='Pins':pins.update(int(t.split('/')[0])-1 for t in p[1:])
+    mx=sum(verts[i][0] for i in pins)/len(pins);my=sum(verts[i][1] for i in pins)/len(pins);posts={}
+    for i in pins:posts.setdefault((verts[i][0]>mx,verts[i][1]>my),[]).append(verts[i][:2])
+    def in_view(yaw):
+     a=math.radians(yaw);iv=[(min(x*math.cos(a)-y*math.sin(a) for x,y in q),max(x*math.cos(a)-y*math.sin(a) for x,y in q),sum(x*math.sin(a)+y*math.cos(a) for x,y in q)/len(q)) for q in posts.values()]
+     return sum(1 for lo,hi,d in iv if not any(d2>d and lo2<=lo+1e-6 and hi2>=hi-1e-6 for lo2,hi2,d2 in iv))
+    expect(len(posts)==4 and in_view(0)==2 and in_view(35)==4,'post fixture changed')
+    for yaw in(0,35):
+     value(r,label(cfg,'yaw'),yaw);value(r,label(cfg,'pitch'),90);expect(f'{in_view(yaw)} of {len(posts)} posts in view' in r.locator('.w-status').inner_text(),f'posts in view at {yaw} degrees')
+    reset('cad-orbit')
+   check('mesh vertex rendering responds to yaw and keyboard without slide leakage; parts labelled; posts in view counted',orbit)
    def explode():
     cfg=study('cad-explode');r=show('cad-explode');before=r.locator('canvas').screenshot();value(r,label(cfg,'explode'),.8);expect(r.locator('canvas').screenshot()!=before);reset('cad-explode')
    check('assembly groups actually separate',explode)
@@ -210,8 +227,23 @@ def main():
     r=go('ink');r.get_by_role('button',name='Add focus annotation').click();expect(len(st('ink')['paths'])==1,'defaults step 24');rs('ink');expect(st('ink')['paths']==[],'defaults step 25')
    check('default fixtures keep the original behaviour when a deck passes no data',defaults)
    def index_search():
-    page.set_content((ROOT/'gallery/index.html').read_text(),wait_until='load');expect(page.locator('#results tr').count()==300);page.get_by_label('Search by explanatory purpose').fill('error-bars');expect(page.locator('#results tr').count()==1)
-   check('offline workshop index filters actual source catalog',index_search)
+    # Expected counts come from assets/catalog.json, each study's declared language and the index's example list, filtered here the way a reader searches.
+    rows=json.loads((ROOT/'assets/catalog.json').read_text(encoding='utf-8'))['resources']
+    index=ROOT/'gallery/index.html';page.set_content(index.read_text(encoding='utf-8'),wait_until='load') if os.environ.get('SLIDE_STUDIO_INLINE')=='1' else page.goto(index.resolve().as_uri(),wait_until='load');examples=page.evaluate('examples');cards=page.locator('#results .item')
+    total=len(rows)+len(examples);expect(cards.count()==total,f'{cards.count()} cards for {total} entries')
+    hrefs=set(cards.locator('a').evaluate_all('(xs)=>xs.map(a=>a.getAttribute("href"))'))
+    expect(all(r['gallery'].removeprefix('gallery/') in hrefs for r in rows),'every catalog study has a card')
+    thumbs=cards.locator('img').evaluate_all('(xs)=>xs.map(i=>i.getAttribute("src"))');expect(all((ROOT/'gallery'/t).exists() for t in thumbs),'every card has its thumbnail')
+    def hay(r):return ' '.join([r.get('title',''),r['id'],r.get('purpose',''),*r.get('tags',[])]).lower()
+    for r in rows:r['language']='ja' if re.search(r"language:\s*['\"]ja",(ROOT/r['source']).read_text(encoding='utf-8')) else 'en'
+    def hits(q,kind='',lang=''):return sum(1 for r in [*rows,*[{**e,'kind':'examples'} for e in examples]] if (not kind or r['kind']==kind) and (not lang or r.get('language','en')==lang) and all(w in hay(r) for w in q.split()))
+    box=page.get_by_label('Search the gallery')
+    box.fill('error-bars');expect(cards.count()==hits('error-bars')==1,'search narrows to one study');expect(page.locator('#count').inner_text()==f'1 of {total}')
+    box.fill('加重平均');expect(cards.count()==hits('加重平均')>0,'Japanese tags are searchable')
+    box.fill('');page.locator('.kinds button[data-kind="interactions"]').click();expect(cards.count()==hits('',kind='interactions')==24,'kind filter')
+    page.get_by_label('Language').select_option('ja');expect(cards.count()==hits('',kind='interactions',lang='ja')>0,'kind and language filters combine')
+    page.locator('.kinds button[data-kind=""]').click();page.get_by_label('Language').select_option('');box.fill('zzzz-no-such-study');expect(cards.count()==0 and page.locator('#results .empty').count()==1,'an empty search explains itself')
+   check('gallery index lists every study and filters by search, kind and language',index_search)
    # Probe actual animated transitions for each source, then direct jumps and reverse states.
    open_deck(page,ROOT/'gallery/motion.html')
    def motion():
@@ -229,7 +261,6 @@ def main():
    check('no page errors, player warnings or external network requests',lambda:(expect(not errors,str(errors)),expect(not blocked,str(blocked))))
    version=browser.version
   finally:browser.close()
- import os
  report={'browser':version,'loadMode':'inline-self-contained' if os.environ.get('SLIDE_STUDIO_INLINE')=='1' else 'file-url','viewportChecks':[[1280,780],[390,844]],'checks':checks,'passed':all(c['passed'] for c in checks),'errors':errors,'blockedNetwork':blocked,'limits':['Chromium only.','Tests validate behavior, not artistic quality, native-speaker fluency or external-agent performance.','Screenshots used for frame-change comparisons were held in memory.']}
  text=json.dumps(report,indent=2,ensure_ascii=False)
  if args.out:Path(args.out).write_text(text,encoding='utf-8')

@@ -49,8 +49,8 @@ const gridLines = fys.map(fy => [
 ].join('')).join('');
 const phaseMarks = phases.map((p, i) => {
   const a = x(p.from) + (i ? 4 : 0), b = x(p.to) - 4;
-  return el('path', {d: `M${a} ${Y.phase + 12}V${Y.phase + 6}H${b}V${Y.phase + 12}`, fill: 'none', stroke: 'var(--st-accent)', 'stroke-width': 1.2})
-    + textLines([p.name], {x: a, y: Y.phase - 2, cls: 'sv-h sv-a'});
+  return el('path', {d: `M${a} ${Y.phase + 12}V${Y.phase + 6}H${b}V${Y.phase + 12}`, fill: 'none', stroke: 'var(--st-link)', 'stroke-width': 1.2})
+    + textLines([p.name], {x: a, y: Y.phase - 2, cls: 'sv-h', attrs: {style: 'fill:var(--st-ink)'}});
 }).join('');
 const workRows = work.map((w, i) => {
   const cy = yRow(i) + Y.rowH / 2;

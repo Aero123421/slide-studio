@@ -1,7 +1,7 @@
 // Diagram study · Faceted field — an angular mass made of a few large facets under one light.
 // The stone is generated from a seed: an outline ring and a raised inner ring are joined into
 // triangles, and each facet's tone comes from its 3-D normal, so the light can never contradict itself.
-import { svgRoot, el, g, theme as makeTheme, mixHex, rng, pathFromPoints, sum } from '../runtime/figure.mjs';
+import { svgRoot, el, g, theme as makeTheme, rng, pathFromPoints, sum } from '../runtime/figure.mjs';
 
 // Shortlist for the prize, by craft (illustrative).
 const crafts = [
@@ -19,8 +19,6 @@ const cap = s => s[0].toUpperCase() + s.slice(1);
 // The stone: `sides` outline points with seeded jitter, an inner ring pulled toward the light and raised.
 const W = 1280, H = 720;
 const motif = { seed: 11, cx: 1010, cy: 268, R: 390, squash: 0.86, sides: 7, inner: 0.42, pull: [-70, 30], rise: 0.7, light: [-0.55, -0.6, 0.58] };
-
-const tone = (t, a, b, k) => (t.literal ? mixHex(t.hex(a), t.hex(b), k) : `color-mix(in srgb, ${t.c(a)}, ${t.c(b)} ${+(k * 100).toFixed(1)}%)`);
 
 export function figure(theme = 'css') {
   const t = makeTheme(theme), rand = rng(motif.seed), { cx, cy, R, sides } = motif;
@@ -44,7 +42,7 @@ export function figure(theme = 'css') {
     return Math.max(0, (nx * light[0] + ny * light[1] + nz * light[2]) / m);
   };
   const face = (pts, s) => el('path', { d: pathFromPoints(pts.map(p => [p[0], p[1]]), { close: true }),
-    fill: tone(t, 'paper', 'ink', 0.03 + 0.4 * s ** 1.7), stroke: tone(t, 'paper', 'ink', 0.08 + 0.4 * s ** 1.7), 'stroke-width': 0.8, 'stroke-linejoin': 'round' });
+    fill: t.mix('ink', 'paper', 0.03 + 0.4 * s ** 1.7), stroke: t.mix('ink', 'paper', 0.08 + 0.4 * s ** 1.7), 'stroke-width': 0.8, 'stroke-linejoin': 'round' });
   // The one champagne line: the rim edge whose outward normal faces the light most (a glint on the edge).
   const rim = outer.map((p, k) => {
     const q = outer[(k + 1) % sides], mx = (p[0] + q[0]) / 2 - cx, my = (p[1] + q[1]) / 2 - cy, m = Math.hypot(mx, my);

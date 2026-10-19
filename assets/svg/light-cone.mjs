@@ -1,7 +1,7 @@
-// Diagram study · Light cone — a schematic beam that carries the eye from a source to the statement.
-// The cone is one flat tone (no glow, no gradient); short rays near the source give it direction and
-// stop well before the text, which sits entirely inside the calm, lit part of the cone.
-import { svgRoot, el, g, theme as makeTheme, mixHex, rng, polar, pathFromPoints, sum } from '../runtime/figure.mjs';
+// Diagram study · Light cone — a beam split into rays whose widths carry the data.
+// One ray per market leaves a single aperture, where the rays are stacked to the full budget; each
+// ray keeps its width all the way out, so width = share of next year's growth spend.
+import { svgRoot, el, theme as makeTheme, textLines, pathFromPoints, sum, esc } from '../runtime/figure.mjs';
 
 // Share of the growth budget by market, this year and planned for 2027 (illustrative).
 const markets = [
@@ -12,48 +12,58 @@ const markets = [
   { name: 'Czechia and Slovakia', y2026: 0.06, y2027: 0.03 }, { name: 'Baltics', y2026: 0.05, y2027: 0.02 },
   { name: 'Hungary', y2026: 0.09, y2027: 0.02 },
 ];
-const focus = markets.filter(m => m.focus), rest = markets.length - focus.length;
+for (const year of ['y2026', 'y2027']) {
+  const total = sum(markets.map(m => m[year]));
+  if (Math.abs(total - 1) > 1e-9) throw Error(`${year} shares add to ${(total * 100).toFixed(1)}%, not 100%`);
+}
+const focus = markets.filter(m => m.focus), rest = markets.filter(m => !m.focus);
 const pct = v => Math.round(v * 100);
 const words = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'];
 const cap = s => s[0].toUpperCase() + s.slice(1);
 const list = a => a.slice(0, -1).join(', ') + ' and ' + a.at(-1);
 
-// Cone: apex, axis angle and half-angle in degrees (SVG angles: negative points up).
+// Beam: rays stacked at the aperture (x0), fanned out to evenly gapped ends (x1); px per percentage point.
 const W = 1280, H = 720;
-const motif = { apex: [56, 566], axis: -15, half: 18.5, rays: 13, rayReach: [150, 400], seed: 5 };
-
-const tone = (t, a, b, k) => (t.literal ? mixHex(t.hex(a), t.hex(b), k) : `color-mix(in srgb, ${t.c(a)}, ${t.c(b)} ${+(k * 100).toFixed(1)}%)`);
+const beam = { x0: 132, x1: 884, centre: 456, perPoint: 2, gap: 16 };
 
 export function figure(theme = 'css') {
-  const t = makeTheme(theme), rand = rng(motif.seed), [ax, ay] = motif.apex, rad = d => (d * Math.PI) / 180;
-  const a0 = rad(motif.axis - motif.half), a1 = rad(motif.axis + motif.half), far = 2200;
-  const cone = pathFromPoints([[ax, ay], polar(ax, ay, far, a0), polar(ax, ay, far, a1)], { close: true });
-  // Rays fan evenly across the cone; their lengths are seeded and they all stop short of the text.
-  const rays = Array.from({ length: motif.rays }, (_, k) => {
-    const a = a0 + ((k + 0.5) / motif.rays) * (a1 - a0), len = motif.rayReach[0] + rand() * (motif.rayReach[1] - motif.rayReach[0]);
-    const [x0, y0] = polar(ax, ay, 16, a), [x1, y1] = polar(ax, ay, len, a);
-    return el('line', { x1: x0, y1: y0, x2: x1, y2: y1 });
+  const t = makeTheme(theme), { x0, x1, centre, perPoint, gap } = beam;
+  const rays = [...markets].sort((a, b) => b.y2027 - a.y2027 || a.name.localeCompare(b.name));
+  const total = 100 * perPoint, spread = total + gap * (rays.length - 1);
+  let s0 = centre - total / 2, e0 = centre - spread / 2;
+  const placed = rays.map(m => {
+    const w = m.y2027 * 100 * perPoint, ray = { ...m, w, s0, e0 };
+    s0 += w; e0 += w + gap;
+    return ray;
   });
+  const band = r => el('path', { d: pathFromPoints([[x0, r.s0], [x1, r.e0], [x1, r.e0 + r.w], [x0, r.s0 + r.w]], { close: true }),
+    fill: r.focus ? t.c('accent') : t.mix('ink', 'paper', 0.24) });
+  const others = placed.filter(r => !r.focus), top = others[0].e0, bottom = others.at(-1).e0 + others.at(-1).w;
+  const ink = t.c('ink'), muted = t.c('muted');
   return svgRoot({ id: 'light-cone-fig', width: W, height: H, theme: t,
-    title: 'A schematic cone of light rising from the lower left',
-    desc: 'A flat, slightly lighter wedge opens from a small source at the lower left toward the upper right, with short rays near the source. It is a schematic, directional illustration, not a simulation of light.' },
-  el('defs', {}, el('clipPath', { id: 'light-cone-clip' }, el('rect', { x: 0, y: 0, width: W, height: H }))),
-  g({ 'clip-path': 'url(#light-cone-clip)' },
-    el('path', { d: cone, fill: tone(t, 'paper', 'ink', 0.075) }),
-    g({ stroke: tone(t, 'paper', 'ink', 0.2), 'stroke-width': 1.2, 'stroke-linecap': 'round' }, rays),
-    el('circle', { cx: ax, cy: ay, r: 6, fill: t.c('ink') })));
+    title: 'Growth budget 2027 split into one ray per market',
+    desc: `${rays.length} rays leave one aperture; each ray's width is its market's share of the 2027 growth budget. ${list(focus.map(m => `${m.name} ${pct(m.y2027)}%`))} are drawn bright; the other ${rest.length} markets share ${pct(sum(rest.map(m => m.y2027)))}%.` },
+  placed.map(band),
+  el('line', { x1: x0 - 2, y1: centre - total / 2 - 8, x2: x0 - 2, y2: centre + total / 2 + 8, stroke: ink, 'stroke-width': 2 }),
+  textLines(['2027 growth budget'], { x: x0 - 2, y: centre + total / 2 + 40, size: 15, fill: muted }),
+  // Labels at the ray ends: the funded markets one by one, the rest as one bracketed group.
+  placed.filter(r => r.focus).map(r => el('text', { x: x1 + 16, y: r.e0 + r.w / 2 + 6, 'font-size': 17, fill: ink },
+    el('tspan', { 'font-weight': 700 }, `${pct(r.y2027)}%`), el('tspan', { dx: 6 }, esc(r.name)))),
+  el('path', { d: `M${x1 + 10} ${top}h6V${bottom}h-6`, fill: 'none', stroke: muted, 'stroke-width': 1.2 }),
+  el('text', { x: x1 + 26, y: (top + bottom) / 2 + 5, 'font-size': 16, fill: muted },
+    el('tspan', { 'font-weight': 700 }, `${pct(sum(others.map(r => r.y2027)))}%`), el('tspan', { dx: 6 }, `${words[others.length]} other markets`)));
 }
 
 export default {
   study: true,
   id: 'light-cone',
-  title: 'Light cone: a directional beam toward the statement',
+  title: 'Light cone: a beam whose rays carry the shares',
   className: 'st st--full cs-strategy-dark',
-  notes: 'Purpose: Lead the eye from a source to one strategic statement with a schematic beam — the page equivalent of a spotlight.\nModify: Replace `markets` (mark the chosen ones with focus: true); the counts, the 2027 share, this year\'s share and the market names recompute. Move the beam with `motif.apex`, `axis` and `half`; keep the text block inside the wide end of the cone.\nInvariant: Schematic, not a light simulation: one flat tone, no glow or gradient. Text sits only on the calm, ray-free part of the cone; rays stop short of it.\nStatic: Already static. The art comes first in the markup so the text paints above it.',
+  notes: 'Purpose: Lead the eye from one source to a strategic choice with a beam split into rays, one per market, whose widths are the markets\' shares of next year\'s growth budget.\nModify: Replace `markets` (focus: true marks the funded ones); the headline, dek, ray widths and labels recompute, and the page refuses to build unless each year adds to 100%. Change `beam.perPoint` for overall thickness, `gap` for how far the rays fan apart, `x0/x1/centre` to move the beam.\nInvariant: Ray width is proportional to share and constant along the ray; rays are stacked at the aperture and sorted by share. Funded rays in brass and labelled, all others dim and labelled once as a group. Flat fills only: no glow or gradient.\nStatic: Already static. The art comes first in the markup so the text paints above it.',
   sources: [{ type: 'original-example', file: 'assets/svg/light-cone.mjs' }],
   exportPolicy: 'final',
-  content: `<figure class="st-fig" data-region="decoration">${figure()}</figure>
-<h1 class="st-head" style="left:580px;top:288px;max-width:620px;font-size:46px;line-height:1.12">${cap(words[focus.length])} of ${words[markets.length]} markets will get ${pct(sum(focus.map(m => m.y2027)))}% of growth spend in 2027</h1>
-<p class="st-dek" style="left:580px;top:432px;max-width:580px">${list(focus.map(m => m.name))}, up from ${pct(sum(focus.map(m => m.y2026)))}% this year. The other ${words[rest]} keep their service teams but start no new campaigns.</p>
-<p class="st-source" data-region="source"><span>Illustrative data · fictional company, 2027 budget round; the beam is schematic</span><span>Light cone</span></p>`,
+  content: `<figure class="st-fig" data-region="primary">${figure()}</figure>
+<h1 class="st-head" style="top:56px;max-width:1080px;font-size:44px;line-height:1.12;font-family:var(--ss-font-sans)">${cap(words[focus.length])} of ${words[markets.length]} markets will get ${pct(sum(focus.map(m => m.y2027)))}% of growth spend in 2027</h1>
+<p class="st-dek" style="top:176px;max-width:900px">${list(focus.map(m => m.name))}, up from ${pct(sum(focus.map(m => m.y2026)))}% this year. The other ${words[rest.length]} keep their service teams but start no new campaigns.</p>
+<p class="st-source" data-region="source"><span>Illustrative data · fictional company, 2027 budget round; ray width is proportional to share</span><span>Light cone</span></p>`,
 };

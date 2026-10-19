@@ -81,8 +81,9 @@ const box = (x, y, w, h, label, acc) => el('rect', { x, y, width: w, height: h, 
 const data = (x, y, label, sub) => el('text', { x, y, class: 's-strong' }, label) + el('text', { x, y: y + 24, class: 's-lab' }, sub);
 
 // pipeline geometry (one row per data source)
-const r1 = 0, r2 = 104, bh = 52, mx = 200, mw = 180;        // row tops, box height, model column
-const probX = 470, opX = 650, opW = 220, pseudoX = 960;
+// every node starts on a grid column (page x = 64 + 98k → figure x = 98k); boxes span 2 columns (172 px)
+const r1 = 0, r2 = 104, bh = 52, mx = 196, mw = 172;        // row tops, box height, model column (col 3)
+const probX = 490, opX = 686, opW = 172, pseudoX = 980;      // cols 6, 8, 11
 const pipeline = [
   data(0, r1 + 22, '未ラベル画像', `${n0(setup.unlabeled)}枚`),
   arrow(`M136 ${r1 + bh / 2}H${mx - 6}`),
@@ -91,7 +92,7 @@ const pipeline = [
   el('text', { x: probX, y: r1 + bh / 2 + 6, class: 's-strong' }, '確率マップ'),
   arrow(`M${probX + 100} ${r1 + bh / 2}H${opX - 6}`),
   box(opX, r1, opW, bh, '2段のしきい値', true),
-  el('text', { x: opX + opW / 2, y: r1 + bh + 24, 'text-anchor': 'middle', class: 's-lab s-acc' }, `始点${setup.high}以上・延長${setup.low}以上`),
+  el('text', { x: opX + opW / 2, y: r1 + bh + 24, 'text-anchor': 'middle', class: 's-lab s-acc' }, `${setup.high}以上から始め、${setup.low}以上でつなぐ`),
   arrow(`M${opX + opW + 6} ${r1 + bh / 2}H${pseudoX - 8}`, true),
   el('text', { x: pseudoX, y: r1 + bh / 2 + 6, class: 's-strong s-acc' }, '擬似ラベル'),
   data(0, r2 + 22, 'ラベル付き画像', `${setup.labeled}枚と正解マスク`),
@@ -104,9 +105,9 @@ const pipeline = [
 ].join('');
 
 // zoom: three registered panels of the same 50×50 patch
-const s = 3.4, P = N * s, zy = 218, zx = [0, 206, 412];
+const s = 3.44, P = N * s, zy = 218, zx = [0, 196, 392];   // panels on cols 1, 3, 5; 2-column span
 function panel(x0, kind) {
-  const out = [el('rect', { x: x0, y: zy, width: P, height: P, fill: '#fff' })];
+  const out = [`<g shape-rendering="crispEdges">`, el('rect', { x: x0, y: zy, width: P, height: P, fill: '#fff' })];
   for (let j = 0; j < N; j++) for (let i = 0; i < N; i++) {
     const k = idx(i, j); let fill = null, op = null;
     if (kind === 'prob') { if (prob[k] > 0.04) { fill = 'var(--rj-ink)'; op = prob[k].toFixed(2); } }
@@ -117,16 +118,16 @@ function panel(x0, kind) {
     }
     if (fill) out.push(el('rect', { x: x0 + i * s, y: zy + j * s, width: s, height: s, fill, 'fill-opacity': op }));
   }
-  out.push(el('rect', { x: x0 + 0.5, y: zy + 0.5, width: P - 1, height: P - 1, fill: 'none', stroke: 'var(--rj-base2)' }));
+  out.push(el('rect', { x: x0 + 0.5, y: zy + 0.5, width: P - 1, height: P - 1, fill: 'none', stroke: 'var(--rj-base2)' }), '</g>');
   return out.join('');
 }
-const shape = r => r.ends === ends.length ? `枝の先までつながり、正解の${pct(r.kept)}が残る` : `細い部分が消え、残るのは正解の${pct(r.kept)}`;
+const shape = r => r.ends === ends.length ? ['枝の先までつながり、', `正解の${pct(r.kept)}が残る`] : ['細い部分が消え、', `残るのは正解の${pct(r.kept)}`];
 const zoomLabels = [
-  ['(a) 確率マップ', '教師の出力。濃いほど高い'],
+  ['(a) 確率マップ', ['教師の出力。', '濃いほど高い']],
   [`(b) しきい値${setup.high}だけ`, shape(result.single)],
   ['(c) 2段のしきい値', shape(result.twoLevel)],
 ];
-const textBlock = (x, y, t, cls) => { const [a, b] = t.split('、'); return el('text', { x, y, class: cls }, el('tspan', { x }, b ? a + '、' : a), b ? el('tspan', { x, dy: 21 }, b) : ''); };
+const textBlock = (x, y, lines, cls) => el('text', { x, y, class: cls }, lines.map((l, k) => el('tspan', { x, dy: k ? 21 : null }, l)).join(''));
 const zoom = zx.map((x, k) => el('text', { x, y: zy - 12, class: 's-panel' }, zoomLabels[k][0])
   + panel(x, ['prob', 'single', 'two'][k])
   + textBlock(x, zy + P + 24, zoomLabels[k][1], k === 2 ? 's-lab s-acc' : 's-lab')).join('');
@@ -151,7 +152,7 @@ export default {
   className: 'tpl-research-ja rj-method',
   content: `<h1 class="rj-h" data-region="title">50枚で学んだ教師が擬似ラベルを作り、<span class="nw">細い線は2段のしきい値で残す</span></h1>
 <figure class="rj-fig" style="left:64px;top:184px" data-region="primary">${fig}</figure>
-<p class="rj-eq" style="left:750px;top:404px;width:466px" data-region="support">確率が<b>${setup.high}以上</b>の画素を始点に、<b>${setup.low}以上</b>で隣り合う画素をたどって擬似ラベルに加える。細い枝の確率は<span class="nw">${thinP.toFixed(1)}前後</span>しかないため、1段のしきい値では消えてしまう。</p>
-<p class="rj-note" style="left:750px;top:532px;width:466px" data-region="source">下段は模式図。灰色は正解にあるが擬似ラベルから落ちた画素</p>
+<p class="rj-eq" style="left:652px;top:404px;width:564px" data-region="support">確率が<b>${setup.high}以上</b>の画素を始点に、<b>${setup.low}以上</b>で隣り合う画素をたどって擬似ラベルに加える。細い枝の確率は<span class="nw">${thinP.toFixed(1)}前後</span>しかないため、<span class="nw">1段のしきい値</span>では消えてしまう。</p>
+<p class="rj-note" style="left:652px;top:532px;width:564px" data-region="source">下段は模式図。灰色は正解にあるが擬似ラベルから落ちた画素</p>
 <footer class="rj-foot"><span>ラベル50枚で学ぶひび割れ検出</span><b>3</b></footer>`,
 };

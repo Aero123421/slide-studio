@@ -12,7 +12,7 @@ const plans = [
   { name: 'Scale', for: 'Over 1,000, or several warehouses', price: 490, included: 4000, extra: 0.14, exchange: true, grading: true, warehouses: 'Unlimited', support: 'Named manager, within 1 hour' },
 ];
 const pick = plans.find(p => p.pick);
-const yes = on => on ? 'Yes' : '<span class="ln-no" aria-hidden="true">—</span><span class="sr-only">Not included</span>';
+const yes = on => on ? 'Yes' : '<span class="ln-no" role="img" aria-label="Not included">—</span>';
 const rows = [
   ['Returns included', p => p.included.toLocaleString('en-GB')],
   ['Each extra return', p => eur(p.extra)],
@@ -39,5 +39,5 @@ export default {
 <tr class="ln-price"><th scope="row">Price per month</th>${plans.map(p => `<td><b>${eur(p.price)}</b></td>`).join('')}</tr>
 ${rows.map(([label, f]) => `<tr><th scope="row">${label}</th>${plans.map(p => `<td>${f(p)}</td>`).join('')}</tr>`).join('\n')}
 </tbody></table>
-<p class="ln-at ln-note" data-region="source" style="left:${C(1)}px;top:645px;width:${span(1, 12)}px">Every plan includes approve by rule and refund at first scan. Euros per month, excluding VAT; annual billing gives two months free. 1.x customers keep their price until renewal.</p>`,
+<p class="ln-at ln-note" data-region="source" style="left:${C(1)}px;top:645px;width:${span(1, 12)}px">Every plan includes approve by rule and refund at first scan. Euros per month, excluding VAT. 1.x customers keep their price until renewal.</p>`,
 };

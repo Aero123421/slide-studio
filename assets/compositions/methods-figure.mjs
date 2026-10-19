@@ -20,74 +20,81 @@ const spare = limit - frozenAt;
 const plasmaMl = tube.fillMl * tube.plasmaShare;
 
 export function figure(themeArg = 'css') {
-  const t = makeTheme(themeArg), W = 1152, H = 474, px = 1.3;      // drawing scale: 1.3 px per mm
-  const colW = W / steps.length, base = 168;                          // objects stand on this line
-  const axisY = 420, x = linear([0, limit], [10, W - 12]);
+  const t = makeTheme(themeArg), W = 1152, H = 500, px = 1.5;      // drawing scale: 1.5 px per mm
+  const colW = W / steps.length, base = 190;                          // objects stand on this line
+  const axisY = 452, x = linear([0, limit], [10, W - 12]);
+  // One material, one tone, in every drawing: whole blood and red cells dark, plasma light grey, buffy coat white.
+  const tone = { blood: t.c('muted'), cells: t.c('muted'), plasma: t.c('context'), buffy: t.c('paper') };
   const tubeAt = (cx, kind) => {
-    const w = tube.mm[0] * px, h = tube.mm[1] * px, cap = 20, x0 = cx - w / 2, top = base - h, r = w / 2;
+    const w = tube.mm[0] * px, h = tube.mm[1] * px, cap = 22, x0 = cx - w / 2, top = base - h, r = w / 2;
     const body = `M${x0} ${top + cap}V${base - r}A${r} ${r} 0 0 0 ${x0 + w} ${base - r}V${top + cap}`;
     const liquidTop = base - (h - cap) * 0.78;                        // 10 mL fills about 78% of the body
+    const cells = (base - liquidTop) * (1 - tube.plasmaShare), buffyY = base - cells - 4;
     const clip = `composition-methods-figure-clip-${Math.round(cx)}`;
     const layers = kind === 'blood'
-      ? [el('rect', { x: x0, y: liquidTop, width: w, height: base - liquidTop, fill: t.c('muted') })]
-      : (() => { const H2 = base - liquidTop, cells = H2 * (1 - tube.plasmaShare), buffy = 4;
-        return [el('rect', { x: x0, y: liquidTop, width: w, height: H2, fill: t.c('surface') }),
-          el('rect', { x: x0, y: base - cells, width: w, height: cells, fill: t.c('muted') }),
-          el('rect', { x: x0, y: base - cells - buffy, width: w, height: buffy, fill: t.c('paper'), stroke: t.c('rule'), 'stroke-width': 0.8 })]; })();
+      ? [el('rect', { x: x0, y: liquidTop, width: w, height: base - liquidTop, fill: tone.blood })]
+      : [el('rect', { x: x0, y: liquidTop, width: w, height: base - liquidTop, fill: tone.plasma }),
+        el('rect', { x: x0, y: base - cells, width: w, height: cells, fill: tone.cells }),
+        el('rect', { x: x0, y: buffyY, width: w, height: 4, fill: tone.buffy })];
+    const lx = x0 + w + 6, label = (text, y, va = 'middle') => g({},
+      el('line', { x1: x0 + w + 1, x2: lx + 6, y1: y, y2: y, stroke: t.c('ink'), 'stroke-width': 1 }),
+      textLines([text], { x: lx + 12, y, size: 16, valign: va, fill: t.c('ink') }));
     return g({},
       el('defs', {}, el('clipPath', { id: clip }, el('path', { d: body + 'Z' }))),
       g({ 'clip-path': `url(#${clip})` }, layers),
       el('path', { d: body, fill: 'none', stroke: t.c('ink'), 'stroke-width': 1.6 }),
       el('rect', { x: x0 - 2, y: top, width: w + 4, height: cap, rx: 2, fill: t.c('ink') }),
-      textLines(['T1'], { x: x0 + w + 10, y: top + cap + 4, size: 16, valign: 'top', fill: t.c('muted') }),
+      textLines(['T1'], { x: x0 + w + 10, y: top + cap / 2, size: 16, valign: 'middle', fill: t.c('muted'), weight: 600 }),
       kind === 'layers' ? g({},
-        textLines([`plasma ≈ ${fmt(plasmaMl, { digits: 1 })} mL`], { x: x0 + w + 10, y: liquidTop + 16, size: 16, valign: 'top', fill: t.c('ink') }),
-        textLines(['buffy coat'], { x: x0 + w + 10, y: base - (base - liquidTop) * (1 - tube.plasmaShare) - 2, size: 16, valign: 'middle', fill: t.c('ink') }),
-        textLines(['red cells'], { x: x0 + w + 10, y: base - 12, size: 16, valign: 'bottom', fill: t.c('ink') })) : '');
+        label(`plasma ≈ ${fmt(plasmaMl, { digits: 1 })} mL`, liquidTop + (base - liquidTop - cells) / 2),
+        label('buffy coat', buffyY + 2),
+        label('red cells', base - cells / 2)) : '');
   };
-  const vialAt = (cx, label, fillShare, light) => {
-    const w = vial.mm[0] * px, h = vial.mm[1] * px, cap = 12, x0 = cx - w / 2, top = base - h, r = 4;
+  const vialAt = (cx, label, fillShare, material) => {
+    const w = vial.mm[0] * px, h = vial.mm[1] * px, cap = 13, x0 = cx - w / 2, top = base - h, r = 4;
     const fillTop = base - (h - cap) * fillShare;
     return g({},
-      el('rect', { x: x0, y: fillTop, width: w, height: base - fillTop, rx: r, fill: light ? t.c('surface') : t.c('muted') }),
+      el('rect', { x: x0, y: fillTop, width: w, height: base - fillTop, rx: r, fill: tone[material] }),
+      material === 'buffy' ? el('line', { x1: x0 + 2, x2: x0 + w - 2, y1: fillTop, y2: fillTop, stroke: t.c('ink'), 'stroke-width': 1 }) : '',
       el('rect', { x: x0, y: top + cap, width: w, height: h - cap, rx: r, fill: 'none', stroke: t.c('ink'), 'stroke-width': 1.4 }),
       el('rect', { x: x0 - 1.5, y: top, width: w + 3, height: cap, rx: 2, fill: t.c('ink') }),
       textLines([label], { x: cx, y: base + 8, size: 15, anchor: 'middle', valign: 'top', fill: t.c('muted') }));
   };
-  const vials = (cx) => {
-    const ids = [...aliquots.plasma, aliquots.buffy], gap = 26, x0 = cx - ((ids.length - 1) * gap) / 2;
-    return ids.map((id, k) => vialAt(x0 + k * gap, id, id === aliquots.buffy ? 0.18 : aliquots.plasmaMl / vial.ml, id !== aliquots.buffy));
-  };
+  const ids = [...aliquots.plasma, aliquots.buffy], pitch = 30;
+  const vials = cx => ids.map((id, k) => vialAt(cx - ((ids.length - 1) * pitch) / 2 + k * pitch, id,
+    id === aliquots.buffy ? 0.16 : aliquots.plasmaMl / vial.ml, id === aliquots.buffy ? 'buffy' : 'plasma'));
   const objects = steps.map((s, i) => {
-    const cx = colW * i + colW / 2 - (s.object === 'layers' ? 34 : 0);
+    const cx = colW * i + colW / 2 - (s.object === 'layers' ? 44 : 0);
     if (s.object === 'blood' || s.object === 'layers') return tubeAt(cx, s.object);
     if (s.object === 'vials') return g({}, vials(cx));
-    const bw = 5 * 26 + 18, bx = cx - bw / 2;                         // the freezer box holds the same five vials
-    return g({}, vials(cx), el('rect', { x: bx, y: base - vial.mm[1] * px - 14, width: bw, height: vial.mm[1] * px + 40, fill: 'none', stroke: t.c('ink'), 'stroke-width': 1.4 }));
+    const bw = ids.length * pitch + 14, bh = vial.mm[1] * px + 46, bx = cx - bw / 2;   // the freezer box holds the same five vials
+    return g({}, vials(cx), el('rect', { x: bx, y: base - vial.mm[1] * px - 14, width: bw, height: bh, fill: 'none', stroke: t.c('ink'), 'stroke-width': 1.4 }));
   });
   const text = steps.map((s, i) => g({},
-    textLines([`${i + 1}  ${s.name}`], { x: colW * i + 12, y: base + 50, size: 20, weight: 700, valign: 'top', fill: i === steps.length - 1 ? t.c('accent') : t.c('ink') }),
-    textLines(s.lines, { x: colW * i + 12, y: base + 80, size: 17, lineHeight: 1.35, valign: 'top', fill: t.c('ink') })));
+    textLines([`${i + 1}  ${s.name}`], { x: colW * i + 12, y: base + 56, size: 20, weight: 700, valign: 'top', fill: i === steps.length - 1 ? t.c('accent') : t.c('ink') }),
+    textLines(s.lines, { x: colW * i + 12, y: base + 86, size: 17, lineHeight: 1.35, valign: 'top', fill: t.c('ink') })));
+  // The time track: each step's real interval, numbered like its column; instants are dots.
   const track = steps.map((s, i) => {
-    const a = x(s.from), b = x(s.to), mid = (a + b) / 2, last = i === steps.length - 1;
-    return g({},
-      el('line', { x1: colW * i + colW / 2, y1: base + 136, x2: mid, y2: axisY - 16, stroke: t.c('rule'), 'stroke-width': 1.2 }),
-      b - a > 2 ? el('rect', { x: a, y: axisY - 12, width: b - a, height: 12, fill: t.c('ink') }) : el('circle', { cx: a, cy: axisY - 6, r: last ? 8 : 5, fill: last ? t.c('accent') : t.c('ink') }));
+    const a = x(s.from), b = x(s.to), last = i === steps.length - 1, instant = b - a < 12;
+    const mark = instant
+      ? el('circle', { cx: a, cy: axisY - 7, r: last ? 8 : 6, fill: last ? t.c('accent') : t.c('ink') })
+      : el('rect', { x: a + 1.5, y: axisY - 13, width: b - a - 3, height: 13, fill: t.c('ink') });
+    return g({}, mark, textLines([String(i + 1)], { x: (a + b) / 2, y: axisY - 24, size: 16, anchor: 'middle', fill: last ? t.c('accent') : t.c('ink'), weight: 700 }));
   });
   const ticks = [0, 30, 60, 90, 120].map(v => g({},
     el('line', { x1: x(v), x2: x(v), y1: axisY, y2: axisY + 6, stroke: t.c('ink') }),
-    textLines([v === limit ? `${v} min` : String(v)], { x: x(v), y: axisY + 12, size: 16, anchor: v === limit ? 'end' : 'middle', valign: 'top', fill: t.c('muted'), attrs: { 'font-variant-numeric': 'tabular-nums' } })));
-  const dimY = axisY - 40;
+    textLines([v === limit ? `${v} min after the draw` : String(v)], { x: x(v), y: axisY + 12, size: 16, anchor: v === limit ? 'end' : 'middle', valign: 'top', fill: t.c('muted'), attrs: { 'font-variant-numeric': 'tabular-nums' } })));
+  const dimY = axisY - 62;
   return svgRoot({ id: 'composition-methods-figure-fig', width: W, height: H, theme: t,
     title: 'Plasma handling: five steps from blood draw to freezer, on a minutes axis',
     desc: `Tube T1 is drawn, rests upright for up to 30 minutes, is centrifuged at 1,500 g for 10 minutes, split into ${aliquots.plasma.length} plasma aliquots and one buffy-coat vial, and frozen at −80 °C ${frozenAt} minutes after the draw, ${spare} minutes inside the ${limit}-minute limit.` },
-  objects, text, track,
+  objects, text,
   el('line', { x1: x(0), x2: x(limit), y1: axisY, y2: axisY, stroke: t.c('ink'), 'stroke-width': 1.4 }),
-  ticks,
-  el('line', { x1: x(limit), x2: x(limit), y1: dimY - 22, y2: axisY, stroke: t.c('ink'), 'stroke-width': 1.4, 'stroke-dasharray': '4 4' }),
-  textLines([`Limit: frozen within ${limit} min of the draw`], { x: x(limit), y: dimY - 30, size: 16, anchor: 'end', fill: t.c('ink'), weight: 600 }),
+  track, ticks,
+  el('line', { x1: x(limit), x2: x(limit), y1: dimY - 26, y2: axisY, stroke: t.c('ink'), 'stroke-width': 1.4, 'stroke-dasharray': '4 4' }),
+  textLines([`Limit: frozen within ${limit} min`], { x: x(limit) - 10, y: dimY - 18, size: 16, anchor: 'end', valign: 'middle', fill: t.c('ink'), weight: 600 }),
   el('path', { d: `M${x(frozenAt)} ${dimY - 6}V${dimY + 6}M${x(frozenAt)} ${dimY}H${x(limit)}`, fill: 'none', stroke: t.c('accent'), 'stroke-width': 1.4 }),
-  textLines([`frozen at ${frozenAt} min, ${spare} min to spare`], { x: x(frozenAt) + 12, y: dimY - 8, size: 16, fill: t.c('accent'), weight: 600 }));
+  textLines([`${spare} min to spare`], { x: (x(frozenAt) + x(limit)) / 2, y: dimY - 8, size: 16, anchor: 'middle', fill: t.c('accent'), weight: 600 }));
 }
 
 export default {
@@ -95,7 +102,7 @@ export default {
   id: 'composition-methods-figure',
   title: 'Methods figure: a sample’s path in order, mapped onto true time',
   className: 'st st--tall cs-clinical-trial cmp-methods',
-  notes: 'Purpose: Show a technical procedure (a sample-handling protocol, an assay, a build pipeline) so it can be read in the order it happens and checked against its time limits, with the object’s identity and quantities visible at every step.\nModify: Replace `steps` (name, start and end in minutes, the object state and two short lines of conditions) and the object dimensions. Columns stay evenly spaced for reading; the connectors and bars recompute on the true time axis. Draw the object to scale in each state; label quantities on the drawing (volumes, layers) rather than in a legend.\nInvariant: One sequence, numbered, left to right; units on every quantity; the same object (T1 and its vials P1–P4, B1) carries through; no pictograms; the time axis is true, so long waits look long; the accent marks only the step and the margin the headline is about.\nStatic: Already static. A build could add the time axis after the steps, but the final page must show both.',
+  notes: 'Purpose: Show a technical procedure (a sample-handling protocol, an assay, a build pipeline) so it can be read in the order it happens and checked against its time limits, with the object’s identity and quantities visible at every step.\nModify: Replace `steps` (name, start and end in minutes, the object state and two short lines of conditions) and the object dimensions. Columns stay evenly spaced for reading; the numbered bars recompute on the true time axis. Draw the object to scale in each state; label quantities on the drawing (volumes, layers) rather than in a legend.\nInvariant: One sequence, numbered, left to right; units on every quantity; the same object (T1 and its vials P1–P4, B1) carries through; no pictograms; the time axis is true, so long waits look long; the accent marks only the step and the margin the headline is about.\nStatic: Already static. A build could add the time axis after the steps, but the final page must show both.',
   sources: [],
   exportPolicy: 'final',
   content: `<h1 class="st-head">Plasma reaches −80 °C <em>${frozenAt} minutes</em> after the draw, with ${spare} minutes to spare</h1>

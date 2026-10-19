@@ -2,6 +2,7 @@
 // Words align on module 2; the opening quotation mark hangs outside them in module 1.
 const ID = 'tpl-keynote-quote';
 const M = n => 64 + 48 * n;            // x of module n (24 modules of 48 px)
+const nb = s => s.replace(/(\d) (?=[A-Za-z%°])/g, '$1\u00a0');   // keep numbers with their units
 
 const quote = {
   // Under about 90 characters so it holds three lines at 64 px. Use words that were actually said.
@@ -19,7 +20,7 @@ export default {
   exportPolicy: 'final',
   className: 'tpl-keynote kn-quote-page',
   content: `<blockquote class="kn-at" data-region="title" style="left:${M(2)}px;top:212px;width:${M(23) - M(2)}px">
-  <p class="kn-statement kn-quote" style="margin-top:-10.6px"><span class="kn-hang" aria-hidden="true">“</span>${quote.text}”</p>
+  <p class="kn-statement kn-quote" style="margin-top:-10.6px"><span class="kn-hang" aria-hidden="true">“</span>${nb(quote.text)}”</p>
 </blockquote>
 <p class="kn-at kn-label" data-region="support" style="left:${M(2)}px;top:464px;width:${M(20) - M(2)}px">${quote.name}<br><span class="kn-grey">${quote.context}</span></p>`,
 };

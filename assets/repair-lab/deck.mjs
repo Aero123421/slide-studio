@@ -58,11 +58,13 @@ export const css = `${frame}\n${waAi}\n
   font: 600 18px/1.6 var(--ss-font-sans); color: var(--ss-negative); pointer-events: none; }
 .lab .lab-note span { display: block; font-weight: 400; color: var(--ss-ink); }
 .lab svg .lab-svg-ring { fill: none; stroke: var(--ss-negative); stroke-width: 2.5; }
+.lab .lab-wf { --ss-positive: var(--ss-ink); }   /* waterfall: delta bars take the accent, their labels stay ink */
 
 /* Reading tables (pair 9, talk page 3). Hairlines, tabular figures, units in the header. */
-.lab .lab-table { position: absolute; left: 64px; right: 64px; top: 196px; border-collapse: collapse; font-size: 20px; line-height: 1.5; font-variant-numeric: tabular-nums; }
+.lab .lab-table { position: absolute; left: 64px; top: 196px; width: 1152px; border-collapse: collapse; font-size: 22px; line-height: 1.5; font-variant-numeric: tabular-nums; }
 .lab .lab-table th { padding: 0 20px 12px 0; border-bottom: 1.5px solid var(--ss-ink); font: 600 16px/1.4 var(--ss-font-sans); color: var(--ss-muted); text-align: left; vertical-align: bottom; }
-.lab .lab-table td { padding: 15px 20px 15px 0; border-bottom: 1px solid var(--ss-rule); vertical-align: top; }
+.lab .lab-table td { padding: 18px 20px 18px 0; border-bottom: 1px solid var(--ss-rule); vertical-align: top; }
+.lab .lab-table td:last-child, .lab .lab-table th:last-child { padding-right: 0; }
 .lab .lab-table .n { text-align: right; }
 .lab .lab-table .is-best { color: var(--ss-accent); font-weight: 700; }
 .lab .lab-table .is-open { font-weight: 700; }
@@ -93,6 +95,8 @@ ${body}
 }
 /** BEFORE only: ring the faulty words. The ring appears at build 1, with the note. */
 const fault = text => `<span class="lab-fault">${text}<i class="lab-ring" data-step="1" data-motion="reveal" aria-hidden="true"></i></span>`;
+/** BEFORE only: a ring around a whole positioned container (put it inside the container). */
+const ringBox = '<i class="lab-ring" data-step="1" data-motion="reveal" aria-hidden="true"></i>';
 /** BEFORE only: the diagnosis note (what is wrong · the fix), placed in free space. */
 const note = (what, fix, style) => `<p class="lab-note" data-step="1" data-motion="reveal" data-qa-overlap="diagnosis note drawn over the page on purpose" style="${style}">${what}<span>${fix}</span></p>`;
 /** BEFORE only: a ring drawn inside a figure, in the figure's own coordinates. */
@@ -145,15 +149,15 @@ pair('amount-and-rate', {
       title: '首都圏の売上の増減（百万円）',
       desc: `${sales.prior}百万円から${sales.current}百万円へ。増加${growth.delta.value}百万円の内訳は${salesDrivers.map(d => `${d.label}${d.value}`).join('、')}。`,
       data: [{ label: '2025年度', value: sales.prior, total: true }, ...salesDrivers, { label: '2026年度', value: sales.current, total: true }],
-      positiveColor: 'var(--ss-accent)',
-      annotate: [{ at: '新店3店', text: `増加分の${num(newStoreShare * 100)}%`, dx: 70, dy: -10, marker: 'none', size: 17 }],
+      positiveColor: 'var(--ss-accent)', className: 'lab-wf',
+      extra: ({ x, y }) => textLines([`増加分の${num(newStoreShare * 100)}%`], { x: x.center(salesDrivers[0].label), y: y(sales.prior) + 30, size: 17, anchor: 'middle', fill: 'var(--ss-accent)', weight: 600 }),
     })}</figure>
 <div class="st-rail" data-region="support">
   <div class="st-kpi"><b>+${num(growth.delta.value)}<small>百万円</small></b><span>増加額　${sales.current} − ${sales.prior}</span></div>
   <hr class="st-rule">
   <div class="st-kpi"><b>+${num(growth.percent)}<small>%</small></b><span>伸び率　${growth.delta.value} ÷ ${sales.prior}</span></div>
 </div>
-${v === 'before' ? note('「30」は伸び率（%）の数字。', `金額の差は ${sales.current} − ${sales.prior} ＝ ${growth.delta.value}百万円。`, 'left:600px;top:118px;width:380px') : ''}`,
+${v === 'before' ? note('「30」は伸び率（%）の数字。', `金額の差は ${sales.current} − ${sales.prior} ＝ ${growth.delta.value}百万円。`, 'left:660px;top:116px;width:380px') : ''}`,
     source: `${SYNTH}・首都圏12店舗とECの税抜売上。2025年度と2026年度`,
     tag,
   }),
@@ -222,11 +226,11 @@ pair('paired-sign', {
 <div class="st-rail" data-region="support">
   <div class="st-kpi">${v === 'before' ? fault(`<b class="is-accent">${num(cooling.mean, 1)}<small>℃</small></b>`) : `<b class="is-accent">${num(cooling.mean, 1)}<small>℃</small></b>`}<span>平均の差（新 − 従来、${cooling.n}台）</span></div>
   <hr class="st-rule">
-  <div class="st-kpi"><b>${num(cooling.sampleSD, 1)}<small>℃</small></b><span>差の標準偏差（n − 1）。台ごとのばらつきは平均の差と同じくらい</span></div>
+  <div class="st-kpi"><b>${num(cooling.sampleSD, 1)}<small>℃</small></b><span>差の標準偏差（n − 1）。ばらつきは平均の差と同じ程度</span></div>
   <hr class="st-rule">
   <p class="st-text">${missingIds.join('・')}は新プレートの測定中に熱電対が断線。平均は残る${cooling.n}台で計算</p>
 </div>
-${v === 'before' ? note('棒は「従来 − 新」、平均は「新 − 従来」。', '図ではほとんどが＋なのに、平均は−になる。', 'left:470px;top:404px;width:400px') : ''}`,
+${v === 'before' ? note('棒は「従来 − 新」、<br>平均は「新 − 従来」で計算。', '図ではほとんどが＋なのに、<br>平均は−になる。', 'left:132px;top:192px;width:316px') : ''}`,
     source: `${SYNTH}・電池モジュール6台、2C放電30分、室温25℃。温度上昇＝最高セル温度 − 室温`,
     tag,
   }),
@@ -262,14 +266,14 @@ pair('missing-is-not-a-line', {
       refLines: [{ y: turbidityLimit, label: `取水を絞る目安 ${turbidityLimit}度`, labelPos: 'start' }],
       bands: v === 'after' ? [{ from: turbidityGap.month - 0.42, to: turbidityGap.month + 0.42 }] : [],
       extra: ({ x, y }) => v === 'after'
-        ? textLines(['欠測', turbidityGap.reason], { x: x(turbidityGap.month), y: y(2.4), size: 17, anchor: 'middle', fill: 'var(--ss-ink)', weight: 600, lineHeight: 1.35 })
+        ? textLines(['欠測', turbidityGap.reason], { x: x(turbidityGap.month), y: y(7.2), size: 17, anchor: 'middle', fill: 'var(--ss-ink)', weight: 600, lineHeight: 1.35 })
         : svgRing(x(6) - 22, y(13.5), x(8) - x(6) + 44, y(10.4) - y(13.5)),
     });
     return labPage({
       head: `中川橋の濁度は、${overLimit.join('と')}に${turbidityLimit}度を超えた`,
       quiet: `${turbidityGap.month}月は${turbidityGap.reason}したため、値は分からない`,
       body: `<figure class="st-fig" data-region="primary">${chart}</figure>
-${v === 'before' ? note('7月は測っていないのに、6月と8月を線でつないでいる。', '線は観測した変化に見える。増水した月の値こそ分からない。', 'left:700px;top:500px;width:440px') : ''}`,
+${v === 'before' ? note('7月は測っていないのに、線が6月と8月をつないでいる。', '観測した変化のように見えてしまう。', 'left:120px;top:228px;width:520px') : ''}`,
       source: `${SYNTH}・中川橋の定点、毎月第1水曜に採水（2025年）。${v === 'before' ? '7月は欠測' : '取水の目安は架空の運用基準'}`,
       tag,
     });
@@ -311,15 +315,15 @@ pair('conditional-outcomes', {
   },
   page: (v, tag) => {
     const nodes = [
-      { id: 'in', label: '返品を受け付ける', sub: `9月 ${num(returns.received)}件`, kind: 'terminal' },
+      { id: 'in', label: '返品受付', sub: `9月 ${num(returns.received)}件`, kind: 'terminal' },
       { id: 'inspect', label: '全数検査', kind: 'decision' },
-      ...returns.outcomes.map(o => ({ id: o.id, label: o.label, sub: `${o.count}件（${num(share(o) * 100)}%）・平均${o.days}日` })),
+      ...returns.outcomes.map(o => ({ id: o.id, label: o.label, sub: `${o.count}件（${num(share(o) * 100)}%）\n発送まで平均${o.days}日` })),
     ];
     const edges = v === 'before'
       ? [{ from: 'in', to: 'inspect' }, { from: 'inspect', to: 'back' }, ...chainEdges.map(e => ({ from: e.from, to: e.to }))]
       : [{ from: 'in', to: 'inspect' }, ...branchGraph.edges.map(e => ({ from: e.from, to: e.to, label: e.label }))];
     const diagram = flowDiagram({
-      id: `returns-${v}`, width: 1152, height: 482, fontSize: 20, nodeMaxWidth: 200, nodeMinWidth: 120, gap: 44,
+      id: `returns-${v}`, width: 1152, height: 482, fontSize: 22, nodeMaxWidth: 230, nodeMinWidth: 130, gap: 40,
       title: '返品の検査と、その後の行き先',
       desc: v === 'before' ? '返却、修理、交換が順番につながって描かれている。'
         : `検査の結果で、${returns.outcomes.map(o => `${o.condition}なら${o.label}`).join('、')}に分かれる。`,
@@ -369,7 +373,7 @@ pair('encoding-map', {
       series: v === 'before' ? queues.map(q => ({ ...q, color: 'var(--ss-ink)' })) : queues,
       highlight: v === 'after' ? north.name : null, endLabels: v === 'after', markers: v === 'after' ? 'last' : 'none',
       format: { digits: 0, suffix: '分' },
-      annotate: v === 'after' ? [{ series: north.name, at: queueChange.week, text: queueChange.text, dx: -40, dy: -70, size: 17, width: 220 }] : [],
+      annotate: v === 'after' ? [{ series: north.name, at: queueChange.week, text: queueChange.text, dx: -40, dy: -70, size: 17, width: 320 }] : [],
       after: v === 'before'
         ? legend(legendItems, { x: 760, y: 14, size: 17, gap: 28 }) + svgRing(744, -6, 392, 40)
         : '',
@@ -378,7 +382,7 @@ pair('encoding-map', {
       head: `${v === 'after' ? '<em>北支所</em>' : '北支所'}の待ち時間だけが8月から伸び、${north.values.at(-1)}分になった`,
       quiet: `本庁舎と南支所は${othersRange[0]}〜${othersRange[1]}分で、ほぼ横ばい`,
       body: `<figure class="st-fig" data-region="primary">${chart}</figure>
-${v === 'before' ? note('凡例は3色なのに、線はすべて同じ色。', 'どの線が北支所なのか、読み取れない。', 'left:820px;top:236px;width:380px') : ''}`,
+${v === 'before' ? note('凡例は3色なのに、線はすべて同じ色。', 'どの線が北支所なのか、読み取れない。', 'left:130px;top:530px;width:400px') : ''}`,
       source: `${SYNTH}・区民課の受付窓口、平日9〜17時の平均待ち時間（週ごと、2026年）`,
       tag,
     });
@@ -409,11 +413,11 @@ pair('proposal-scope', {
   page: (v, tag) => {
     const rows = v === 'before' ? ['現在', '新システム'] : ['現在（2026年上期の実績）', '新システム（ベンダー試算）'];
     const chart = stackedBarChart({
-      id: `close-${v}`, width: 1152, height: 300, fontSize: 18, locale: 'ja', labelWidth: 260,
+      id: `close-${v}`, width: 1152, height: 330, fontSize: 18, locale: 'ja', labelWidth: 260,
       title: '月次決算にかかる営業日（工程別）',
       desc: `現在${num(closeNow, 1)}営業日、新システムは試算で${num(closeEst, 1)}営業日。変わるのは${changedTasks.join('と')}。`,
       categories: rows, series: closeTasks.map(t => ({ name: t.name, values: [t.now, t.est] })),
-      highlight: changedTasks, format: { digits: 1 }, axis: true, unit: '営業日',
+      highlight: changedTasks, format: { digits: 1, suffix: '日' }, axis: true, rowHeight: 92,
       extra: ({ x, y }) => v === 'after'
         ? el('rect', { x: x(0) - 4, y: y(rows[1]) - 4, width: x(closeEst) - x(0) + 8, height: y.bw + 8, rx: 4, fill: 'none', stroke: 'var(--ss-ink)', 'stroke-width': 1.5, 'stroke-dasharray': '6 5' })
         : '',
@@ -423,11 +427,11 @@ pair('proposal-scope', {
         ? `新システムで、月次決算は${num(closeNow - closeEst)}営業日早く締まる`
         : `ベンダー試算では、月次決算は${num(closeNow)}営業日から${num(closeEst)}営業日に縮む`,
       quiet: v === 'before' ? '売掛金の照合が自動になり、手作業が減る' : `社内での実測はまだない。${trial.period}の並行稼働で確かめる`,
-      body: `<figure class="st-fig st-top" data-region="primary" style="top:200px;bottom:auto;height:300px">${chart}</figure>
+      body: `<figure class="st-fig st-top" data-region="primary" style="top:200px;bottom:auto;height:330px">${chart}</figure>
 ${v === 'before'
-    ? `<p class="lab-tiny" style="top:520px">${fault('※ベンダー提示の試算値です。当社の環境での実測ではありません。')}</p>`
-    : `<p class="lab-under" style="top:540px"><b>並行稼働で測ること</b>　${trial.checks.join('、')}。点線の枠は試算の値</p>`}
-${v === 'before' ? note('見出しは実測のように言い切り、', '「試算」は12pxの注記にしか書かれていない。', 'left:640px;top:548px;width:420px') : ''}`,
+    ? `<p class="lab-tiny" style="top:556px">${fault('※ベンダー提示の試算値です。当社の環境での実測ではありません。')}</p>`
+    : `<p class="lab-under" style="top:572px"><b>並行稼働で測ること</b>　${trial.checks.join('、')}。点線の枠は試算の値</p>`}
+${v === 'before' ? note('見出しは実測のように言い切り、', '「試算」は12pxの注記にしか書かれていない。', 'left:640px;top:584px;width:420px') : ''}`,
       source: `${SYNTH}・経理部の月次決算（営業日）。${v === 'before' ? '' : '新システムの値はベンダー提示の試算'}`,
       tag,
     });
@@ -447,17 +451,17 @@ const lines = ['みなと線', '北山線'];
 /** A route strip: stations at equal steps, what the traveller does under each. Geometry from `journey`. */
 function journeyStrip(id, { width = 1152, height = 400 } = {}) {
   const x = i => 150 + i * ((width - 300) / (journey.length - 1)), trackY = 120, last = journey.length - 1;
-  const parts = [el('line', { x1: x(0), x2: x(last), y1: trackY, y2: trackY, stroke: 'var(--ss-ink)', 'stroke-width': 8, 'stroke-linecap': 'round' })];
-  lines.forEach((name, i) => parts.push(textLines([name], { x: (x(i) + x(i + 1)) / 2, y: trackY - 22, size: 18, anchor: 'middle', fill: 'var(--ss-muted)', weight: 600 })));
+  const parts = [el('line', { x1: x(0), x2: x(last), y1: trackY, y2: trackY, stroke: 'var(--ss-ink)', 'stroke-width': 9, 'stroke-linecap': 'round' })];
+  lines.forEach((name, i) => parts.push(textLines([name], { x: (x(i) + x(i + 1)) / 2, y: trackY - 22, size: 19, anchor: 'middle', fill: 'var(--ss-muted)', weight: 600 })));
   journey.forEach((s, i) => {
     const end = i === last, c = end ? 'var(--ss-accent)' : 'var(--ss-ink)';
-    parts.push(el('circle', { cx: x(i), cy: trackY, r: 17, fill: 'var(--ss-paper)', stroke: c, 'stroke-width': 6 }));
-    parts.push(textLines([`${s.station}（${s.role}）`], { x: x(i), y: 40, size: 22, anchor: 'middle', fill: 'var(--ss-ink)', weight: 700 }));
-    parts.push(textLines([s.act], { x: x(i), y: 190, size: 20, anchor: 'middle', fill: 'var(--ss-ink)' }));
-    parts.push(textLines(['↓'], { x: x(i), y: 232, size: 20, anchor: 'middle', fill: c }));
-    parts.push(textLines([s.result], { x: x(i), y: 274, size: 22, anchor: 'middle', fill: c, weight: 700 }));
+    parts.push(el('circle', { cx: x(i), cy: trackY, r: 19, fill: end ? c : 'var(--ss-paper)', stroke: c, 'stroke-width': 7 }));
+    parts.push(textLines([`${s.station}（${s.role}）`], { x: x(i), y: 40, size: 26, anchor: 'middle', fill: 'var(--ss-ink)', weight: 700 }));
+    parts.push(textLines([s.act], { x: x(i), y: 196, size: 22, anchor: 'middle', fill: 'var(--ss-ink)' }));
+    parts.push(textLines(['↓'], { x: x(i), y: 240, size: 22, anchor: 'middle', fill: c }));
+    parts.push(textLines([s.result], { x: x(i), y: 286, size: 26, anchor: 'middle', fill: c, weight: 700 }));
   });
-  parts.push(textLines(['途中で捨てると、北山駅で東浜駅からの運賃をもう一度払うことになる。'], { x: width / 2, y: 360, size: 20, anchor: 'middle', fill: 'var(--ss-muted)' }));
+  parts.push(textLines([`途中で捨てると、${journey[last].station}で${journey[0].station}からの運賃をもう一度払うことになる。`], { x: width / 2, y: 372, size: 21, anchor: 'middle', fill: 'var(--ss-muted)' }));
   return svgRoot({ id, width, height, title: 'きっぷの扱い：乗車から降車まで', desc: journey.map(s => `${s.station}で${s.act}と${s.result}`).join('。') }, ...parts);
 }
 
@@ -521,8 +525,8 @@ pair('small-top-heavy', {
     head: `健診の結果は、受診から平均${checkupTotal}営業日で届く`,
     quiet: `いちばん長いのは${v === 'after' ? `<em>${slowest.label}</em>` : slowest.label}で、${slowest.days}日かかる`,
     body: v === 'before'
-      ? `<div class="lab-cards" data-region="primary">${fault(checkupSteps.map(s => `<div class="lab-card"><h3>${s.label}</h3><p>${s.note}</p><p>${num(s.days, s.days % 1 ? 1 : 0)}日</p></div>`).join(''))}</div>
-${note('14pxの文字が上に詰まり、下半分が空いている。', '工程と日数を、ページ全体を使って描く。', 'left:64px;top:380px;width:430px')}`
+      ? `<div class="lab-cards" data-region="primary">${checkupSteps.map(s => `<div class="lab-card"><h3>${s.label}</h3><p>${s.note}</p><p>${num(s.days, s.days % 1 ? 1 : 0)}日</p></div>`).join('')}${ringBox}</div>
+${note('14pxの文字が上に詰まり、下半分が空いている。', '工程と日数を、ページ全体を使って描く。', 'left:64px;top:356px;width:430px')}`
       : `<figure class="st-fig" data-region="primary" style="top:188px;bottom:50px">${stepTimeline(`checkup-${v}`)}</figure>`,
     source: `${SYNTH}・2026年4〜9月の受診者1,240人の平均（営業日）`,
     tag,
@@ -539,6 +543,8 @@ const sites = [                                            // 移転候補。賃
   { name: '中町スクエア', rent: 365, area: 140, walk: 7, from: '2026年12月', quake: '旧耐震・補強済み', rooms: 1 },
 ];
 const perTsubo = s => Math.round((s.rent * 10000) / s.area);    // 円／坪
+const budget = 500, nearWalk = 5;                          // 万円／月と、駅からの徒歩分（総務部の条件）
+const inBudget = sites.filter(s => s.rent <= budget), nearAndInBudget = inBudget.filter(s => s.walk <= nearWalk);
 const cheapest = [...sites].sort((a, b) => perTsubo(a) - perTsubo(b))[0];
 const unconfirmed = sites.filter(s => s.quake == null);
 
@@ -555,12 +561,13 @@ pair('dense-reference', {
     head: `坪単価がもっとも低いのは${cheapest.name}`,
     quiet: `${unconfirmed.map(s => s.name).join('・')}は耐震基準を確認中。回答は11月末`,
     body: v === 'before'
-      ? `<div class="lab-cards" data-region="primary" style="top:200px">${fault(sites.map(s => `<div class="lab-card"><h3>${s.name}</h3><p>賃料 ${s.rent}万円／月<br>${s.area}坪・駅から${s.walk}分<br>入居 ${s.from}〜</p></div>`).join(''))}</div>
-${note('カードに分けたので、横に並べて比べられない。', '耐震基準と会議室、坪単価の3項目も消えた。', 'left:64px;top:390px;width:440px')}`
+      ? `<div class="lab-cards" data-region="primary" style="top:200px">${sites.map(s => `<div class="lab-card"><h3>${s.name}</h3><p>賃料 ${s.rent}万円／月<br>${s.area}坪・駅から${s.walk}分<br>入居 ${s.from}〜</p></div>`).join('')}${ringBox}</div>
+${note('カードに分けたので、横に並べて比べられない。', '耐震基準と会議室、坪単価の3項目も消えた。', 'left:64px;top:364px;width:440px')}`
       : `<table class="lab-table" data-region="primary">
   <thead><tr><th>物件</th><th class="n">賃料（万円／月）</th><th class="n">面積（坪）</th><th class="n">坪単価（円）</th><th class="n">駅から</th><th>入居できる時期</th><th>耐震基準</th><th class="n">会議室</th></tr></thead>
   <tbody>${sites.map(s => `<tr><td><b>${s.name}</b></td><td class="n">${num(s.rent)}</td><td class="n">${num(s.area)}</td><td class="n${s === cheapest ? ' is-best' : ''}">${num(perTsubo(s))}</td><td class="n">徒歩${s.walk}分</td><td>${s.from}</td><td${s.quake ? '' : ' class="is-open"'}>${s.quake ?? '確認中（11月末に回答）'}</td><td class="n">${s.rooms}室</td></tr>`).join('')}</tbody>
-</table>`,
+</table>
+<p class="lab-under" style="top:556px"><b>条件で絞ると</b>　月${budget}万円以内は${inBudget.length}件。そのうち駅から徒歩${nearWalk}分以内は${nearAndInBudget.map(s => s.name).join('・')}だけ</p>`,
     source: `${SYNTH}・仲介会社の資料（2026年10月時点）。賃料は共益費込み、税抜。坪単価＝賃料÷面積`,
     tag,
   }),
@@ -584,8 +591,10 @@ function cremaFigure(id, { width = 1152, height = 482 } = {}) {
     el('defs', {}, el('clipPath', { id: `${id}-clip` }, el('rect', { x: 0, y: 0, width: pw, height: ph }))),
     el('image', { href: photo.src, x: -crop.x * crop.scale, y: -crop.y * crop.scale, width: photo.w * crop.scale, height: photo.h * crop.scale, 'clip-path': `url(#${id}-clip)`, preserveAspectRatio: 'none' }),
   ];
-  cremaNotes.forEach((n, i) => {
-    const [x, y] = toFig(n.at), ty = 70 + i * 190;
+  let nextY = 0;                                          // notes stack in the order of their targets, so leaders never cross
+  [...cremaNotes].sort((a, b) => a.at[1] - b.at[1]).forEach(n => {
+    const [x, y] = toFig(n.at), ty = Math.max(y, nextY);
+    nextY = ty + 170;
     parts.push(el('circle', { cx: x, cy: y, r: 7, fill: 'var(--ss-paper)', stroke: 'var(--ss-ink)', 'stroke-width': 2.5 }));
     parts.push(el('path', { d: `M${x + 7} ${y}H${pw + 24}L${noteX - 16} ${ty}H${noteX - 8}`, fill: 'none', stroke: 'var(--ss-ink)', 'stroke-width': 1.5 }));
     parts.push(textLines([n.title], { x: noteX, y: ty, size: 24, valign: 'middle', fill: 'var(--ss-ink)', weight: 700 }));
@@ -608,7 +617,7 @@ pair('image-evidence', {
     body: v === 'before'
       ? `<div style="position:absolute;left:64px;top:206px">${fault(`<img src="${photo.src}" alt="エスプレッソのカップ" style="display:block;width:270px;height:180px;object-fit:cover;border-radius:18px;box-shadow:0 10px 26px rgb(24 42 62 / .22)">`)}</div>
 <ul class="st-text" data-region="primary" style="position:absolute;left:380px;top:206px;width:520px;margin:0;padding-left:1.2em">${cremaNotes.map(n => `<li>${n.title}：${n.text}</li>`).join('')}</ul>
-${note('写真が小さく、説明が写真のどこを', '指しているのか分からない。', 'left:64px;top:420px;width:400px')}`
+${note('写真が小さなカードに収まっている。', '説明が写真のどこを指すのか、読み取れない。', 'left:64px;top:420px;width:420px')}`
       : `<figure class="st-fig" data-region="primary" style="bottom:56px">${cremaFigure(`crema-${v}`)}</figure>`,
     source: `写真：${photo.credit}${v === 'after' ? `。原画${photo.w}×${photo.h}を切り取り、${crop.scale}倍で表示` : ''}`,
     tag,
@@ -619,11 +628,13 @@ ${note('写真が小さく、説明が写真のどこを', '指しているの�
 // 11 · 文字種の混入 — an untranslated Hindi word left in a Japanese headline
 // ════════════════════════════════════════════════════════════════════════════
 const defectRate = [                                       // 不良率（%）＝不良数÷検査数。プネ工場の月次品質報告（英語版）から
-  { label: '4月', value: 2.8 }, { label: '5月', value: 2.5 }, { label: '6月', value: 2.1 },
-  { label: '7月', value: 1.6 }, { label: '8月', value: 1.3 }, { label: '9月', value: 1.1 },
+  { label: '4月', value: 2.8 }, { label: '5月', value: 2.7 }, { label: '6月', value: 2.6 },
+  { label: '7月', value: 1.9 }, { label: '8月', value: 1.4 }, { label: '9月', value: 1.1 },
 ];
-const inspectionChange = { month: '6月', text: '6月から外観検査を画像検査に切り替え' };
+const inspectionChange = { month: '6月', text: '6月中旬、外観検査を画像検査に切り替え' };
 const firstRate = defectRate[0], lastRate = defectRate.at(-1);
+const switchRate = defectRate.find(d => d.label === inspectionChange.month);
+const afterSwitch = defectRate.length - 1 - defectRate.indexOf(switchRate);     // か月
 const sourceWord = { found: 'दर', intended: '率' };        // दर = "rate" (Hindi), left over from the source report
 
 pair('source-before-font', {
@@ -636,14 +647,14 @@ pair('source-before-font', {
   },
   page: (v, tag) => labPage({
     head: `プネ工場の不良${v === 'before' ? fault(sourceWord.found) : sourceWord.intended}は、${nw(`${firstRate.label}の${num(firstRate.value, 1)}%`)}から${nw(`${lastRate.label}の${num(lastRate.value, 1)}%`)}に下がった`,
-    quiet: `${inspectionChange.text}てから、下がり方が速くなった`,
+    quiet: `画像検査に切り替えた${inspectionChange.month}からの${afterSwitch}か月で、${num(switchRate.value - lastRate.value, 1)}ポイント下がった`,
     body: `<figure class="st-fig" data-region="primary">${columnChart({
       id: `defects-${v}`, width: 1152, height: 482, fontSize: 18, locale: 'ja',
       title: 'プネ工場の不良率（%、月別）', desc: `${firstRate.label}${firstRate.value}%から${lastRate.label}${lastRate.value}%へ。`,
       data: defectRate, format: { digits: 1, suffix: '%' }, highlight: lastRate.label, unit: '不良率（%）',
-      annotate: [{ at: inspectionChange.month, text: inspectionChange.text, dx: 0, dy: -64, size: 17, width: 260 }],
+      annotate: [{ at: inspectionChange.month, text: inspectionChange.text, dx: 0, dy: -64, size: 17, width: 340 }],
     })}</figure>
-${v === 'before' ? note(`「${sourceWord.found}」はヒンディー語で「率」。`, '訳し漏れなので、フォントを替えても直らない。', 'left:470px;top:130px;width:420px') : ''}`,
+${v === 'before' ? note(`「${sourceWord.found}」はヒンディー語で「率」。`, '訳し漏れなので、フォントを替えても直らない。', 'left:800px;top:216px;width:410px') : ''}`,
     source: `${SYNTH}・プネ（Pune）工場の月次品質報告（英語版）から翻訳。不良率＝不良数÷検査数`,
     tag,
   }),
@@ -673,23 +684,23 @@ pair('export-note', {
   },
   page: (v, tag) => {
     const chart = barChart({
-      id: `plans-${v}`, width: 1152, height: 300, fontSize: 20, locale: 'ja', rowHeight: 84,
+      id: `plans-${v}`, width: 1152, height: 330, fontSize: 20, locale: 'ja', rowHeight: 96,
       title: `${horizon}か月の総額（万円）`, desc: `${planTotals.map(p => `${p.id}案${p.total}万円`).join('、')}。`,
       data: planTotals.map(p => ({ label: `${p.id}案　${planNames[p.id]}`, value: p.total })),
       highlight: `${cheapestPlan.id}案　${planNames[cheapestPlan.id]}`, format: { digits: 0, suffix: '万円' }, domain: [0, 600], labelWidth: 330,
-      extra: ({ x, y, data }) => data.map((d, i) => {
-        const p = planTotals[d.i];
-        return textLines([`初期${p.initial} ＋ 月額${p.monthly}×${horizon}`], { x: x(d.value) + 128, y: y.center(d.label), size: 18, valign: 'middle', fill: 'var(--ss-muted)' });
+      extra: ({ x, y, data }) => data.map(d => {                // the formula inside its bar: 初期費用 ＋ 月額 × 期間
+        const p = planTotals[d.i], on = p.id === cheapestPlan.id;
+        return textLines([`初期${p.initial} ＋ 月額${p.monthly} × ${horizon}`], { x: x(0) + 16, y: y.center(d.label), size: 18, valign: 'middle', fill: on ? 'var(--ss-on-accent)' : 'var(--ss-ink)', weight: 600 });
       }).join(''),
     });
     return labPage({
       head: `${horizon}か月の総額は、${v === 'after' ? `<em>${cheapestPlan.id}案</em>` : `${cheapestPlan.id}案`}がもっとも低く${num(cheapestPlan.total)}万円`,
       quiet: `${runnerUp.id}案との差は${num(runnerUp.total - cheapestPlan.total)}万円。${num(shortWinner.to)}か月未満で使い終えるなら${shortWinner.id}案が安い`,
-      body: `<figure class="st-fig st-top" data-region="primary" style="top:206px;bottom:auto;height:300px">${chart}</figure>
+      body: `<figure class="st-fig st-top" data-region="primary" style="top:200px;bottom:auto;height:330px">${chart}</figure>
 ${v === 'before'
-    ? `<p class="lab-under" style="top:540px;color:var(--ss-muted)">${fault(exportMemo)}</p>
-${note('出力の操作は、聴き手に関係がない。', '表示条件を書き、メモは台本へ移す。', 'left:700px;top:520px;width:380px')}`
-    : `<p class="lab-under" style="top:540px"><b>表示条件</b>　${horizon}か月。総額＝初期費用＋月額×${horizon}。税と追加作業費は含まない</p>`}`,
+    ? `<p class="lab-under" style="top:572px;color:var(--ss-muted)">${fault(exportMemo)}</p>
+${note('出力の操作は、聴き手に関係がない。', '代わりに表示条件を書き、メモは台本へ。', 'left:700px;top:556px;width:400px')}`
+    : `<p class="lab-under" style="top:572px"><b>表示条件</b>　${horizon}か月。総額＝初期費用＋月額×${horizon}。税と追加作業費は含まない</p>`}`,
       source: `${SYNTH}・受発注システム更新の3案の見積もり（2026年9月時点、税抜）`,
       tag,
     });

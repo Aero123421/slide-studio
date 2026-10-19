@@ -45,7 +45,7 @@ export default {
   exportPolicy: 'final',
   className: 'tpl-ml-report ml-confusion',
   content: `<p class="ml-run"><span>PF-7 v3 pump-failure model — evaluation report</span><span>2</span></p>
-<h1 class="ml-head" data-region="title">At ${Math.round(m.perWeek)} alerts a week the model caught ${m.tp} of ${failed} failures; the ${m.fn} it missed carry the cost</h1>
+<h1 class="ml-head" data-region="title">At ${Math.round(m.perWeek)} alerts a week the model caught ${m.tp}${NB}of${NB}${failed} failures; the ${m.fn} it missed carry the cost</h1>
 <div class="ml-matrix" data-region="primary" role="table" aria-label="Confusion matrix on the test set at threshold ${TEST.threshold}">
   <div class="ml-corner"></div><div class="ml-colh">Model alerted<span>p ≥ ${TEST.threshold}</span></div><div class="ml-colh">No alert<span>p &lt; ${TEST.threshold}</span></div>
   <div class="ml-rowh">Failed within 7 days<span class="num">${num(failed)} pump-weeks</span></div>
@@ -53,7 +53,7 @@ export default {
   ${cell(m.fn, 'failures missed', `${pc(1 - m.recall)} of failures`, 'ml-costly')}
   <div class="ml-rowh">Did not fail<span class="num">${num(healthy)} pump-weeks</span></div>
   ${cell(m.fp, 'false alarms', `${pc(m.fp / healthy, 1)} of healthy weeks`)}
-  ${cell(m.tn, 'quiet weeks', `${pc(m.tn / healthy, 1)} of healthy weeks`)}
+  ${cell(m.tn, 'quiet weeks', `${pc(m.tn / healthy, 1)} of healthy weeks`, 'ml-quiet')}
   <div class="ml-corner"></div><div class="ml-foot num"><b>${pc(m.precision)}</b> of alerts were real failures (precision)</div>
 </div>
 <p class="ml-cap" style="left:64px;top:614px;width:662px"><b>Figure 2.</b> Test set, ${TEST.weeks} weeks from 5${NB}Jan 2026: ${num(rows.length)} pump-weeks. An alert is a calibrated failure probability of ${TEST.threshold} or more.</p>

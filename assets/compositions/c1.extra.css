@@ -64,4 +64,42 @@
 .cmp-geometric-poster .gp-title { position: absolute; left: 58px; top: 44px; font: 300 128px/1 var(--ss-font-display); letter-spacing: -.035em; color: var(--ss-ink); }
 .cmp-geometric-poster .gp-line { position: absolute; left: 64px; top: 196px; width: 300px; font: 400 22px/1.4 var(--ss-font-sans); color: var(--ss-ink); text-wrap: pretty; }
 .cmp-geometric-poster .gp-meta { position: absolute; left: 64px; top: 336px; width: 280px; font: 400 18px/1.45 var(--ss-font-sans); color: var(--ss-muted); }
-.cmp-geometric-poster .gp-caption { position: absolute; left: 64px; top: 560px; width: 270px; font: 400 15px/1.4 var(--ss-font-sans); color: var(--ss-muted); }
+.cmp-geometric-poster .gp-caption { position: absolute; left: 64px; top: 560px; width: 270px; font: 400 15px/1.4 var(--ss-font-sans); color: var(--ss-muted); text-wrap: pretty; }
+
+/* ── Research result: estimate, interval and conditions side by side (ja) ─────────── */
+.st.cmp-research-result {
+  --ss-font-sans: "Inter", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic UI", "Yu Gothic", Meiryo, "IPAPGothic", sans-serif;
+  --ss-font-display: var(--ss-font-sans);
+}
+.cmp-research-result .st-head, .cmp-research-result .rr-dek, .cmp-research-result .rr-rail { word-break: auto-phrase; line-break: strict; }
+.cmp-research-result .rr-dek { top: 150px; max-width: 1060px; font-size: 18px; }
+.cmp-research-result .rr-fig { position: absolute; left: 64px; top: 220px; width: 810px; height: 420px; margin: 0; }
+.cmp-research-result .rr-fig > svg { display: block; }
+.cmp-research-result .rr-rail { position: absolute; left: 904px; top: 214px; width: 312px; }
+.cmp-research-result .rr-rail-head { margin: 0 0 10px; padding-bottom: 8px; border-bottom: 1px solid var(--ss-rule); font: 700 18px/1.4 var(--ss-font-sans); color: var(--ss-ink); }
+.cmp-research-result .rr-item { display: grid; grid-template-columns: 5em 1fr; column-gap: 10px; margin: 0 0 8px; font: 400 16px/1.55 var(--ss-font-sans); color: var(--ss-ink); font-variant-numeric: tabular-nums lining-nums; }
+.cmp-research-result .rr-item b { font-weight: 600; color: var(--ss-muted); }
+.cmp-research-result .nw { white-space: nowrap; }
+
+/* ── Dense reference table: aligned figures without boxes (ja) ─────────────────────── */
+.st.cmp-dense-table {
+  --ss-font-sans: "Inter", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic UI", "Yu Gothic", Meiryo, "IPAPGothic", sans-serif;
+  --ss-font-display: var(--ss-font-sans);
+}
+.cmp-dense-table .st-head, .cmp-dense-table .dt-dek { word-break: auto-phrase; line-break: strict; }
+.cmp-dense-table .dt-dek { top: 150px; font-size: 18px; }
+.cmp-dense-table .dt-table { position: absolute; left: 64px; top: 198px; width: 1152px; border-collapse: collapse; font: 400 17px/1.2 var(--ss-font-sans); color: var(--ss-ink); font-variant-numeric: tabular-nums lining-nums; }
+.cmp-dense-table .dt-c-name { width: 132px; }
+.cmp-dense-table th, .cmp-dense-table td { padding: 0 14px 0 0; text-align: right; white-space: nowrap; }
+.cmp-dense-table thead th { font: 600 15px/1.3 var(--ss-font-sans); color: var(--ss-muted); vertical-align: bottom; }
+.cmp-dense-table thead small { display: block; font: 400 15px/1.3 var(--ss-font-sans); }
+.cmp-dense-table .dt-group th { padding-bottom: 6px; text-align: left; color: var(--ss-ink); }
+.cmp-dense-table .dt-group th[colspan] { border-bottom: 1px solid var(--ss-rule); padding-left: 18px; }
+.cmp-dense-table .dt-cols th { padding-top: 8px; padding-bottom: 8px; border-bottom: 1.5px solid var(--ss-ink); }
+.cmp-dense-table th:first-child, .cmp-dense-table td:first-child, .cmp-dense-table tbody th, .cmp-dense-table tfoot th { text-align: left; }
+.cmp-dense-table tbody th, .cmp-dense-table tfoot th { font-weight: 600; }
+.cmp-dense-table tbody tr { height: 33px; border-bottom: 1px solid var(--ss-rule); }
+.cmp-dense-table tbody tr:last-child { border-bottom: 0; }
+.cmp-dense-table .dt-key { font-weight: 600; }
+.cmp-dense-table .dt-below .dt-key { color: var(--ss-accent); }
+.cmp-dense-table .dt-total { height: 38px; border-top: 1.5px solid var(--ss-ink); font-weight: 600; }

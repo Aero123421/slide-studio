@@ -1,6 +1,6 @@
 // Diagram study · Isometric lattice — one projection for the scaffold and for everything built on it.
 // Grid lines, the slab and the blocks all go through iso(u, v, w), so the projection cannot drift.
-import { svgRoot, el, g, theme as makeTheme, mixHex, sum, pathFromPoints } from '../runtime/figure.mjs';
+import { svgRoot, el, g, theme as makeTheme, sum, pathFromPoints } from '../runtime/figure.mjs';
 
 // Services per team and how many already start from the shared platform template (illustrative).
 const teams = [
@@ -22,8 +22,6 @@ const motif = {
   slot: [2, 2], lift: 2.7,                         // empty cell [u, v] and how high its module hovers
 };
 
-const tone = (t, a, b, k) => (t.literal ? mixHex(t.hex(a), t.hex(b), k) : `color-mix(in srgb, ${t.c(a)}, ${t.c(b)} ${+(k * 100).toFixed(1)}%)`);
-
 export function figure(theme = 'css') {
   const t = makeTheme(theme), { a, origin: [ox, oy], cells, inset, slab, slot: [lu, lv], lift } = motif;
   const C = Math.cos(Math.PI / 6), S = Math.sin(Math.PI / 6);
@@ -35,8 +33,8 @@ export function figure(theme = 'css') {
   for (let k = Math.ceil(g0); k <= Math.floor(g1); k++) grid.push(el('path', { d: pathFromPoints([iso(k, g0), iso(k, g1)]) }), el('path', { d: pathFromPoints([iso(g0, k), iso(g1, k)]) }));
   // A box from (u, v, w0) with size (du, dv, dh); light from the upper left: top lightest, +v face mid, +u face darkest.
   const box = (u, v, w0, du, dv, dh, accent = false) => {
-    const w1 = w0 + dh, face = k => (accent ? tone(t, 'paper', 'accent', 0.08 + k * 1.5) : tone(t, 'paper', 'ink', k));
-    return g({ stroke: accent ? t.c('accent') : tone(t, 'paper', 'ink', 0.4), 'stroke-width': accent ? 2.4 : 1.3, 'stroke-linejoin': 'round' },
+    const w1 = w0 + dh, face = k => (accent ? t.mix('accent', 'paper', 0.08 + k * 1.5) : t.mix('ink', 'paper', k));
+    return g({ stroke: accent ? t.c('accent') : t.mix('ink', 'paper', 0.4), 'stroke-width': accent ? 2.4 : 1.3, 'stroke-linejoin': 'round' },
       el('path', { d: poly([iso(u + du, v, w0), iso(u + du, v + dv, w0), iso(u + du, v + dv, w1), iso(u + du, v, w1)]), fill: face(0.15) }),
       el('path', { d: poly([iso(u, v + dv, w0), iso(u + du, v + dv, w0), iso(u + du, v + dv, w1), iso(u, v + dv, w1)]), fill: face(0.07) }),
       el('path', { d: poly([iso(u, v, w1), iso(u + du, v, w1), iso(u + du, v + dv, w1), iso(u, v + dv, w1)]), fill: face(0) }));
@@ -50,7 +48,7 @@ export function figure(theme = 'css') {
   return svgRoot({ id: 'isometric-grid-fig', width: W, height: H, theme: t,
     title: 'Isometric scaffold with modules on a slab',
     desc: `A finite isometric ground lattice holds a slab carrying a ${cells} by ${cells} grid of identical modules. One slot is empty; its module, outlined in the accent colour, is being lowered into place. Everything shares one 30-degree projection; the modules carry no values.` },
-  g({ stroke: tone(t, 'paper', 'ink', 0.2), 'stroke-width': 1 }, grid),
+  g({ stroke: t.mix('ink', 'paper', 0.2), 'stroke-width': 1 }, grid),
   box(-m, -m, 0, cells + 2 * m, cells + 2 * m, slab.h),
   // The empty slot, outlined where the hovering module will land.
   el('path', { d: poly([iso(lu + inset, lv + inset, top), iso(lu + 1 - inset, lv + inset, top), iso(lu + 1 - inset, lv + 1 - inset, top), iso(lu + inset, lv + 1 - inset, top)]),

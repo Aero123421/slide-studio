@@ -1,6 +1,6 @@
 // Diagram study · Offset hatching — a title-page margin textured by rows of short marks, each row offset by half a step.
 // Mark length and weight shrink toward the text column, so the texture thins out instead of ending in a hard edge.
-import { svgRoot, el, g, theme as makeTheme, mixHex, fmt } from '../runtime/figure.mjs';
+import { svgRoot, el, g, theme as makeTheme, fmt } from '../runtime/figure.mjs';
 
 // Commodities named in the archive's merchants' letters, 1868–1913 (illustrative; a letter can name several).
 const letters = 1240;
@@ -18,8 +18,6 @@ const cap = s => s[0].toUpperCase() + s.slice(1);
 const W = 1280, H = 720;
 const motif = { width: 300, step: 24, row: 22, angle: 62, length: [15, 5], weight: [2, 0.9] };
 
-const tone = (t, a, b, k) => (t.literal ? mixHex(t.hex(a), t.hex(b), k) : `color-mix(in srgb, ${t.c(a)}, ${t.c(b)} ${+(k * 100).toFixed(1)}%)`);
-
 export function figure(theme = 'css') {
   const t = makeTheme(theme), { width, step, row, angle } = motif, a = (angle * Math.PI) / 180;
   const marks = [];
@@ -34,7 +32,7 @@ export function figure(theme = 'css') {
   return svgRoot({ id: 'offset-hatching-fig', width: W, height: H, theme: t,
     title: 'Offset hatching in the left margin',
     desc: `Rows of short diagonal marks fill the left margin, each row shifted by half a step; the marks shorten and thin toward the text so the texture fades out. ${marks.length} marks, decoration only.` },
-  g({ stroke: tone(t, 'paper', 'ink', 0.55), 'stroke-linecap': 'round' }, marks));
+  g({ stroke: t.mix('ink', 'paper', 0.55), 'stroke-linecap': 'round' }, marks));
 }
 
 export default {

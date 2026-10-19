@@ -44,7 +44,7 @@
 .tpl-architecture .ar-kicker .ar-id{margin-left:14px;font-weight:400;color:var(--ar-muted)}
 .tpl-architecture .ar-title{position:absolute;left:64px;top:108px;width:1054px;margin:0;
   font:600 56px/1.07 var(--ar-display);letter-spacing:-.022em;color:var(--ar-ink);text-wrap:balance}
-.tpl-architecture .ar-summary{position:absolute;left:64px;top:300px;width:564px;margin:0;font:400 22px/1.5 var(--ar-sans);color:var(--ar-ink)}
+.tpl-architecture .ar-summary{position:absolute;left:64px;top:300px;width:564px;margin:0;font:400 22px/1.5 var(--ar-sans);color:var(--ar-ink);text-wrap:pretty}
 .tpl-architecture .ar-impact{position:absolute;left:750px;top:300px;width:466px}
 .tpl-architecture .ar-impact dl{margin:0}
 .tpl-architecture .ar-impact h2{margin:0 0 6px;font:600 17px/24px var(--ar-sans);color:var(--ar-ink)}
@@ -57,13 +57,13 @@
 .tpl-architecture .ar-impact dd{margin:0;font:400 16px/1.4 var(--ar-sans);color:var(--ar-ink2)}
 .tpl-architecture .ar-meta{position:absolute;left:64px;top:562px;width:564px;margin:0;display:grid;grid-template-columns:repeat(4,auto);
   justify-content:start;column-gap:40px;border-top:1px solid var(--ar-rule);padding-top:14px}
-.tpl-architecture .ar-meta dt{font:400 15px/20px var(--ar-sans);color:var(--ar-muted)}
+.tpl-architecture .ar-meta dt{font:400 16px/20px var(--ar-sans);color:var(--ar-muted)}
 .tpl-architecture .ar-meta dd{margin:4px 0 0;font:500 17px/24px var(--ar-sans);color:var(--ar-ink)}
 
 /* ---- 05 timeline: interpretation rail beside the log ---- */
 .tpl-architecture .ar-rail{position:absolute;left:848px;top:200px;width:368px}
 .tpl-architecture .ar-rail h2{margin:0 0 10px;font:600 17px/24px var(--ar-sans);color:var(--ar-ink)}
-.tpl-architecture .ar-rail p{margin:0;padding:12px 0 14px;border-top:1px solid var(--ar-rule);font:400 18px/1.45 var(--ar-sans);color:var(--ar-ink2)}
+.tpl-architecture .ar-rail p{margin:0;padding:12px 0 14px;border-top:1px solid var(--ar-rule);font:400 18px/1.45 var(--ar-sans);color:var(--ar-ink2);text-wrap:pretty}
 .tpl-architecture .ar-rail p b{font-weight:600;color:var(--ar-ink)}
 
 /* ---- 06 actions: a table for reading ---- */

@@ -3,6 +3,7 @@
 // title and sentence hang from the same line at module 2. Nothing else on the page.
 const ID = 'tpl-keynote-chapter';
 const M = n => 64 + 48 * n;            // x of module n (24 modules of 48 px)
+const nb = s => s.replace(/(\d) (?=[A-Za-z%°])/g, '$1\u00a0');   // keep numbers with their units
 
 const chapters = [                      // the talk's three chapters, as claims
   'Why the evening peak keeps growing',
@@ -22,6 +23,6 @@ export default {
   exportPolicy: 'final',
   className: 'tpl-keynote kn-chapter',
   content: `<p class="kn-at kn-display kn-chapter-no" aria-hidden="true" style="left:${M(0)}px;top:212px;width:${M(2) - M(0)}px">${current + 1}</p>
-<h2 class="kn-at kn-display" data-region="title" style="left:${M(2)}px;top:212px;width:${M(16) - M(2)}px"><span class="sr-only">Chapter ${current + 1} of ${chapters.length}: </span>${chapters[current]}</h2>
-<p class="kn-at kn-lead" data-region="support" style="left:${M(2)}px;top:434px;width:${M(20) - M(2)}px">${sentence}</p>`,
+<h2 class="kn-at kn-display" data-region="title" aria-label="Chapter ${current + 1} of ${chapters.length}: ${chapters[current]}" style="left:${M(2)}px;top:212px;width:${M(16) - M(2)}px">${chapters[current]}</h2>
+<p class="kn-at kn-lead" data-region="support" style="left:${M(2)}px;top:434px;width:${M(20) - M(2)}px">${nb(sentence)}</p>`,
 };

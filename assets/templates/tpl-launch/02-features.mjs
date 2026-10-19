@@ -24,6 +24,6 @@ export default {
   exportPolicy: 'final',
   className: 'tpl-launch ln-features',
   content: `<h2 class="ln-at ln-head" data-region="title" style="left:${C(1)}px;top:64px;width:${span(1, 11)}px">${['', '', 'Two', 'Three', 'Four'][features.length]} jobs 2.0 now does on its own</h2>
-<ul class="ln-at ln-list" data-region="primary" style="left:${C(1)}px;top:152px;width:${span(1, 12)}px">${features.map(f => `<li><h3>${f.name}<span class="ln-plans">${f.plans}</span></h3><p>${nb(f.does)}</p><p><span class="ln-proof">${nb(f.proof)}</span><span class="ln-proof-what">${f.what}</span></p></li>`).join('')}</ul>
-<p class="ln-at ln-note" data-region="source" style="left:${C(1)}px;top:645px;width:${span(1, 12)}px">Fernhook 2.0 beta: ${beta.shops} shops, ${fmtInt(beta.returns)} returns, ${beta.from} – ${beta.to}. Medians. Sample data.</p>`,
+<ul class="ln-at ln-list" data-region="primary" style="left:${C(1)}px;top:152px;width:${span(1, 12)}px">${features.map(f => `<li><div><h3>${f.name}</h3><span class="ln-plans">${f.plans}</span></div><p>${nb(f.does)}</p><p><span class="ln-proof">${nb(f.proof)}</span><span class="ln-proof-what">${f.what}</span></p></li>`).join('')}</ul>
+<p class="ln-at ln-note" data-region="source" style="left:${C(1)}px;top:645px;width:${span(1, 12)}px">Fernhook 2.0 beta: ${beta.shops} shops, ${fmtInt(beta.returns)} returns, ${beta.from} – ${beta.to}. Times are medians. Sample data.</p>`,
 };

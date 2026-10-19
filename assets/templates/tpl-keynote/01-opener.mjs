@@ -2,6 +2,7 @@
 // A type poster on the day grid: title and premise hung from the top, speaker and event on the bottom line.
 const ID = 'tpl-keynote-opener';
 const M = n => 64 + 48 * n;            // x of module n (24 modules of 48 px = the hours of a day)
+const nb = s => s.replace(/(\d) (?=[A-Za-z%°])/g, '$1\u00a0');   // keep numbers with their units
 
 const talk = {
   title: 'Moving evening demand to midday',
@@ -20,7 +21,7 @@ export default {
   exportPolicy: 'final',
   className: 'tpl-keynote kn-opener',
   content: `<h1 class="kn-at kn-display" data-region="title" style="left:${M(0)}px;top:64px;width:${M(24) - M(0)}px">${talk.title}</h1>
-<p class="kn-at kn-lead" data-region="support" style="left:${M(0)}px;top:286px;width:${M(19) - M(0)}px">${talk.premise.join('<br>')}</p>
+<p class="kn-at kn-lead" data-region="support" style="left:${M(0)}px;top:286px;width:${M(19) - M(0)}px">${talk.premise.map(nb).join('<br>')}</p>
 <p class="kn-at kn-label kn-grey" style="left:${M(0)}px;top:641px;width:${M(11) - M(0)}px">${talk.speaker}</p>
 <p class="kn-at kn-label kn-grey" style="left:${M(12)}px;top:641px;width:${M(24) - M(12)}px">${talk.event}</p>`,
 };

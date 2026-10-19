@@ -1,6 +1,6 @@
 // Diagram study · Wave lines — noise-displaced lines spaced in perspective to read as a calm sea.
 // Lines crowd toward the horizon and swell toward the viewer; one seeded noise field keeps them coherent.
-import { svgRoot, el, g, theme as makeTheme, mixHex, noise2D, pathFromPoints, fmt } from '../runtime/figure.mjs';
+import { svgRoot, el, g, theme as makeTheme, noise2D, pathFromPoints, fmt } from '../runtime/figure.mjs';
 
 // Seagrass replanted by the trust, hectares, and next season's plan (illustrative).
 const meadow = [{ year: 2025, hectares: 1.4 }, { year: 2026, hectares: 3.2 }];
@@ -17,8 +17,6 @@ const day = d => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', 
 const W = 1280, H = 720;
 const motif = { horizon: 384, bottom: 648, count: 32, spread: 1.85, swell: 1.1, freq: [11, 2.1], drift: 0.045, seed: 12 };   // swell: amplitude in units of the local line gap; drift: phase step per line
 
-const tone = (t, a, b, k) => (t.literal ? mixHex(t.hex(a), t.hex(b), k) : `color-mix(in srgb, ${t.c(a)}, ${t.c(b)} ${+(k * 100).toFixed(1)}%)`);
-
 export function figure(theme = 'css') {
   const t = makeTheme(theme), noise = noise2D(motif.seed), { horizon, bottom, count } = motif;
   const depth = k => (k / (count - 1)) ** motif.spread;                  // 0 at the horizon, 1 nearest the viewer
@@ -32,12 +30,12 @@ export function figure(theme = 'css') {
       const swell = Math.sin(2 * Math.PI * (u * freq + k * motif.drift)), chop = (noise.fbm(u * freq * 1.7, k * 0.05, 3) - 0.5) * 2;
       return [u * W, base + amp * calm * (0.7 * swell + 0.3 * chop)];
     });
-    return el('path', { d: pathFromPoints(pts), stroke: tone(t, 'paper', 'muted', 0.16 + 0.56 * z), 'stroke-width': 0.7 + 1.9 * z });
+    return el('path', { d: pathFromPoints(pts), stroke: t.mix('muted', 'paper', 0.16 + 0.56 * z), 'stroke-width': 0.7 + 1.9 * z });
   });
   return svgRoot({ id: 'wave-lines-fig', width: W, height: H, theme: t,
     title: 'Wave lines receding to a horizon',
     desc: `${count} noise-displaced lines, crowded and calm at the horizon and wider and heavier toward the viewer, suggest the surface of a bay. They are decoration, not a measured waveform.` },
-  el('line', { x1: 0, y1: horizon, x2: W, y2: horizon, stroke: tone(t, 'paper', 'muted', 0.3), 'stroke-width': 1 }),
+  el('line', { x1: 0, y1: horizon, x2: W, y2: horizon, stroke: t.mix('muted', 'paper', 0.3), 'stroke-width': 1 }),
   g({ fill: 'none', 'stroke-linecap': 'round' }, lines));
 }
 

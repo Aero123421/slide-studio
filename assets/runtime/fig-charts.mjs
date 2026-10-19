@@ -56,8 +56,9 @@ function finish(o, ctx, parts, resolve, extraCtx = {}) {
     return callout({ theme: t, size: a.size ?? size, bounds: { w: W, h: ctx.H }, marker: p.marker ?? 'dot', ...a, x: p.x, y: p.y, attrs: a.step ? { 'data-step': a.step, 'data-motion': a.motion || 'reveal', 'data-delay': a.delay || null } : (a.attrs || {}) });
   });
   const extra = typeof o.extra === 'function' ? o.extra({ ...ctx, ...extraCtx }) : (o.extra || '');
+  const before = typeof o.before === 'function' ? o.before({ ...ctx, ...extraCtx }) : (o.before || ''); // painted under the marks
   return svgRoot({ id, width: W, height: H, title: o.title, desc: o.desc, theme: t, className: o.className || '', font: o.font || 'sans' },
-    o.defs ? el('defs', {}, o.defs) : '', o.before || '', parts, notes, extra, o.after || '');
+    o.defs ? el('defs', {}, o.defs) : '', before, parts, notes, extra, o.after || '');
 }
 
 function colorFor(ctx, o, item, i, fallback) {
@@ -567,6 +568,8 @@ export function bulletChart(o) {
 export function waterfallChart(o) {
   const ctx = setup(o);
   const { t, size, labelSize, build } = ctx;
+  // build.holdFirst: the opening total is on the page from build 0; contributions then build.
+  const hold = (k, s) => !!(build && o.build?.holdFirst && k === 0 && s.total);
   let run = 0;
   const steps = o.data.map((d, i) => {
     if (d.total) {
@@ -596,14 +599,14 @@ export function waterfallChart(o) {
   steps.forEach((s, k) => {
     const up = s.to >= s.from, y0 = y(s.from), y1 = y(s.to), xx = x(s.label);
     const fill = s.total ? t.c('ink') : up ? (o.positiveColor || t.c('positive')) : (o.negativeColor || t.c('negative'));
-    parts.push(el('rect', { x: xx, y: Math.min(y0, y1), width: x.bw, height: Math.max(1.5, Math.abs(y1 - y0)), fill, rx: 2, class: s.total ? 'ss-total' : 'ss-delta', style: build ? `transform-origin:${up ? '50% 100%' : '50% 0%'}` : null, ...buildAttrs(build, { i: k, motion: 'grow-y' }) }));
+    parts.push(el('rect', { x: xx, y: Math.min(y0, y1), width: x.bw, height: Math.max(1.5, Math.abs(y1 - y0)), fill, rx: 2, class: s.total ? 'ss-total' : 'ss-delta', style: build ? `transform-origin:${up ? '50% 100%' : '50% 0%'}` : null, ...(hold(k, s) ? {} : buildAttrs(build, { i: k, motion: 'grow-y' })) }));
     if (k < steps.length - 1) {
       const nx = x(steps[k + 1].label);
-      parts.push(el('line', { x1: xx + x.bw, x2: nx, y1: y1, y2: y1, stroke: t.c('muted'), 'stroke-width': 1.2, 'stroke-dasharray': '3 3', ...buildAttrs(build, { i: k, label: true }) }));
+      parts.push(el('line', { x1: xx + x.bw, x2: nx, y1: y1, y2: y1, stroke: t.c('muted'), 'stroke-width': 1.2, 'stroke-dasharray': '3 3', ...(hold(k, s) ? {} : buildAttrs(build, { i: k, label: true })) }));
     }
     const label = s.total ? vf(s.to) : sf(s.to - s.from);
     const top = Math.min(y0, y1);
-    parts.push(textLines([label], { x: xx + x.bw / 2, y: top - 8, size, anchor: 'middle', fill: s.total ? t.c('ink') : up ? t.c('positive') : t.c('negative'), weight: 700, attrs: { 'font-variant-numeric': 'tabular-nums', ...buildAttrs(build, { i: k, label: true }) } }));
+    parts.push(textLines([label], { x: xx + x.bw / 2, y: top - 8, size, anchor: 'middle', fill: s.total ? t.c('ink') : up ? t.c('positive') : t.c('negative'), weight: 700, attrs: { 'font-variant-numeric': 'tabular-nums', ...(hold(k, s) ? {} : buildAttrs(build, { i: k, label: true })) } }));
     parts.push(textLines(wrapLabel(s.label, x.step - 6, labelSize - 1), { x: xx + x.bw / 2, y: box.y + box.h + 10, size: labelSize - 1, anchor: 'middle', valign: 'top', fill: t.c('ink'), weight: s.total ? 700 : null, lineHeight: 1.15 }));
   });
   if (lo < 0) parts.push(el('line', { x1: box.x, x2: box.x + box.w, y1: y(0), y2: y(0), stroke: t.c('ink'), 'stroke-width': 1.2 }));
@@ -797,7 +800,7 @@ export function lineChart(o) {
       parts.push(el('path', { d: pathFromPoints(seg, { curve: o.curve }), fill: 'none', stroke: c, 'stroke-width': strong ? (o.strokeWidth ?? 3.2) : 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round', 'stroke-dasharray': s.dash || null, pathLength: build ? 1 : null, class: 'ss-line', ...buildAttrs(build, { i: 0, s: k, motion: 'draw' }) }));
     }
     const fin = pts.filter(p => isNum(p[1]));
-    if (o.markers === 'all') for (const p of fin) parts.push(el('circle', { cx: p[0], cy: p[1], r: strong ? 4.5 : 3, fill: c, stroke: t.c('paper'), 'stroke-width': 1.5 }));
+    if (o.markers === 'all') for (const p of fin) parts.push(el('circle', { cx: p[0], cy: p[1], r: strong ? 4.5 : 3, fill: c, stroke: t.c('paper'), 'stroke-width': 1.5, ...buildAttrs(build, { s: k, label: true }) }));
     const last = fin.at(-1);
     if (o.markers !== 'none' && last) parts.push(el('circle', { cx: last[0], cy: last[1], r: strong ? 6 : 4, fill: c, stroke: t.c('paper'), 'stroke-width': 2, ...buildAttrs(build, { s: k, label: true }) }));
     if (last) ends.push({ id: k, y: last[1], h: labelSize * 1.25, x: last[0], s, c, strong });

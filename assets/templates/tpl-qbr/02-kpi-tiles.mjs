@@ -4,7 +4,7 @@
 import { svgRoot, el, linear, pathFromPoints, fmt } from '../../runtime/figure.mjs';
 
 const ID = 'tpl-qbr-kpi-tiles';
-const quarters = ['2024年10–12月', '2025年1–3月', '2025年4–6月', '2025年7–9月', '2025年10–12月', '2026年1–3月', '2026年4–6月', '2026年7–9月'];
+const quarters = ['2024年10〜12月', '2025年1〜3月', '2025年4〜6月', '2025年7〜9月', '2025年10〜12月', '2026年1〜3月', '2026年4〜6月', '2026年7〜9月'];
 // kind: 'amount' (百万円; ratios are growth rates in %) or 'rate' (%; ratios are differences in pt).
 // better: 'up' or 'down' (月次解約率 is better when lower). series = the 8 quarters above, this quarter last.
 const kpis = [

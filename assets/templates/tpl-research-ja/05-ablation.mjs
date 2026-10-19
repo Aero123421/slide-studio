@@ -39,7 +39,7 @@ const x = linear([-16, 2], [col.plot0, col.plot1]);
 let yy = headH;
 const out = [];
 const rule = (y, strong) => el('line', { x1: 0, x2: W, y1: y, y2: y, stroke: strong ? 'var(--rj-ink)' : 'var(--rj-rule)', 'stroke-width': strong ? 1.5 : 1 });
-const head = (tx, anchor, lines) => textLines(lines, { x: tx, y: headH - 12, size: 15, valign: 'bottom', anchor, fill: 'var(--rj-muted)', lineHeight: 1.3 });
+const head = (tx, anchor, lines) => textLines(lines, { x: tx, y: headH - 12, size: 16, valign: 'bottom', anchor, fill: 'var(--rj-muted)', lineHeight: 1.3 });
 out.push(head(col.name, 'start', [`構成（ラベル${labeled}枚）`]), head(col.iou, 'end', ['IoU（%）']), head(col.diff, 'end', ['提案法との差', '[95%区間]']),
   head((col.plot0 + col.plot1) / 2, 'middle', ['差（ポイント）']), head(col.breaks, 'end', ['途切れ', '（か所／枚）']), rule(headH, true));
 const num = (tx, ty, text, opts = {}) => textLines([text], { x: tx, y: ty, size: 19, anchor: 'end', valign: 'middle', fill: 'var(--rj-ink)', weight: opts.weight, attrs: { 'font-variant-numeric': 'tabular-nums' } });
@@ -51,7 +51,7 @@ out.push(textLines([full.name], { x: col.name, y: cy, size: 19, valign: 'middle'
 yy += rowH;
 const plotTop = yy;
 for (const g of groups) {
-  out.push(rule(yy), textLines([g.title], { x: col.name, y: yy + groupH / 2 + 2, size: 15, valign: 'middle', fill: 'var(--rj-muted)' }));
+  out.push(rule(yy), textLines([g.title], { x: col.name, y: yy + groupH / 2 + 2, size: 16, valign: 'middle', fill: 'var(--rj-muted)' }));
   yy += groupH;
   for (const r of g.rows) {
     cy = yy + rowH / 2;
@@ -90,6 +90,6 @@ export default {
   className: 'tpl-research-ja rj-ablation',
   content: `<h1 class="rj-h" data-region="title">効いているのは2段のしきい値。外すとIoUが<span class="nw">${f1(-top.d)}ポイント</span>下がり、<span class="nw">途切れは${f1(times)}倍</span>になる</h1>
 <figure class="rj-fig" style="left:64px;top:184px" data-region="primary">${table}</figure>
-<p class="rj-note" style="left:64px;top:${184 + H + 10}px;width:1152px" data-region="source">全行ラベル${labeled}枚、評価画像は共通。差は同じ${runs}回の試行（同じ画像の選び方と乱数の種）どうしの差の平均と95%信頼区間（t分布）で、白抜きの点は区間が0をまたぐ。途切れは、正解では1本の線が予測で切れた箇所の1枚あたりの数。</p>
+<p class="rj-note" style="left:64px;top:${184 + H + 10}px;width:1152px" data-region="source">全行ラベル${labeled}枚、評価画像は共通。差は同じ${runs}回の試行（同じ画像の選び方と乱数シード）どうしの差の平均と95%信頼区間（t分布）。<br>白抜きの点は区間が0をまたぐ行。途切れは、正解では1本の線が予測で切れた箇所の1枚あたりの数。</p>
 <footer class="rj-foot"><span>ラベル50枚で学ぶひび割れ検出</span><b>5</b></footer>`,
 };

@@ -20,8 +20,11 @@ function setup(o, defaults = {}) {
 function root(o, ctx, defs, parts) {
   const notes = (o.annotate || []).map(a => callout({ theme: ctx.t, size: a.size ?? ctx.size - 1, ...a, attrs: a.step ? { 'data-step': a.step, 'data-motion': a.motion || 'reveal' } : {} }));
   const extra = typeof o.extra === 'function' ? o.extra(ctx) : (o.extra || '');
-  return svgRoot({ id: ctx.id, width: ctx.W, height: ctx.H, title: o.title, desc: o.desc, theme: ctx.t, className: o.className || '' },
-    el('defs', {}, defs, o.defs || ''), o.before || '', parts, notes, extra, o.after || '');
+  const body = [el('defs', {}, defs, o.defs || ''), o.before || '', parts, notes, extra, o.after || ''];
+  // bare:true returns a <g> (with its own defs) to compose inside a larger figure; place it with
+  // a transform on the group, e.g. flowDiagram({…, bare: true, x: 40, y: 120}).
+  if (o.bare) return g({ class: `ss-figure ${o.className || ''}`.trim(), id: ctx.id, transform: o.x || o.y ? `translate(${n(o.x || 0)} ${n(o.y || 0)})` : null }, ...body);
+  return svgRoot({ id: ctx.id, width: ctx.W, height: ctx.H, title: o.title, desc: o.desc, theme: ctx.t, className: o.className || '' }, ...body);
 }
 function markers(ctx) {
   const { t, id } = ctx, size = ctx.arrowSize ?? 12;

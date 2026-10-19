@@ -41,7 +41,7 @@ const messages = [
   [`開発の完了見込みは<span class="nw">${md(forecastEnd)}</span>。計画より<span class="nw">${slipWeeks}週間</span>遅い`,
     `直近3スプリントの平均は${dev.velocity}ポイント（計画${dev.planVelocity}）。変更要求で${dev.added}ポイント増えた`],
   [`後続の工程も${slipWeeks}週間ずれるが、予備期間の中に収まる`,
-    `予備期間${bufferWeeks}週間のうち${slipWeeks}週間を使い、残りは${bufferLeft}週間。これ以上遅れると${md(t(goLive))}の本番稼働に響く`],
+    `予備期間${bufferWeeks}週間のうち${slipWeeks}週間を使う。残る${bufferLeft}週間を超えて遅れると${md(t(goLive))}の稼働に響く`],
   [`受入テストの担当者${uat.testers}名が、まだ決まっていない`,
     `受入テストは${ymd(t(uat.start))}から。各部門の指名を${md(t(asks[1].due))}までにいただきたい`],
 ];

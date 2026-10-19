@@ -4,10 +4,10 @@
 import { fmt } from '../../runtime/figure.mjs';
 
 const ID = 'tpl-qbr-next-quarter';
-const quarter = { name: '第3四半期', months: '10–12月' };
+const quarter = { name: '第3四半期', months: '10〜12月' };
 // This quarter's figures the KPIs start from (same data as pages 3–5).
 const funnel = { leads: 4820, meetings: 964, prevRate: 26.0 };            // 件, 前期の商談化率 %
-const onboarding = { newContracts: 118, supported: 65 };                  // 7–9月の新規契約社数と導入支援の実施社数
+const onboarding = { newContracts: 118, supported: 65 };                  // 7〜9月の新規契約社数と導入支援の実施社数
 const cloud = { cost: 244, revenue: 2078 };                               // クラウド基盤費と売上高, 百万円
 const priorities = [
   { what: 'インサイドセールス3名を11月末までに採用し、初回接触を48時間以内に戻す', from: '商談化率の低下', page: 4,
@@ -17,7 +17,7 @@ const priorities = [
   { what: '予約インスタンスへの切り替えとログ保管の階層化で、クラウド基盤費を抑える', from: '基盤費の計画超過', page: 3,
     kpi: '基盤費の売上高比率', now: cloud.cost / cloud.revenue * 100, target: 11.0, digits: 1, owner: '佐伯 亮', role: '技術本部長', due: '2026-12-28' },
 ];
-const note = '注：KPIの現状は2026年7–9月期の実績。目標は12月単月の実績で判定する。';
+const note = '注：KPIの現状は2026年7〜9月期の実績。目標は12月単月の実績で判定する。';
 const running = '2026年度 第2四半期 業績レビュー';
 const page = 6;
 

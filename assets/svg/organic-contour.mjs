@@ -1,7 +1,7 @@
 // Diagram study · Organic contour — one authored silhouette, a banded stone, against a strict text grid.
 // The outline is a closed curve built from a few chosen harmonics; the bands inside are level lines
 // of a tilted, gently warped plane (marching squares), clipped to the stone.
-import { svgRoot, el, g, theme as makeTheme, mixHex, pathFromPoints, contourLines, noise2D } from '../runtime/figure.mjs';
+import { svgRoot, el, g, theme as makeTheme, pathFromPoints, contourLines, noise2D } from '../runtime/figure.mjs';
 
 // Colleagues returning from long leave, and how many were still employed six months later (illustrative).
 const cohorts = [
@@ -20,8 +20,6 @@ const motif = {
   outline: [[-1, 0.06], [-0.84, -0.4], [-0.4, -0.64], [0.2, -0.66], [0.74, -0.46], [1.02, -0.04], [0.86, 0.38], [0.34, 0.58], [-0.3, 0.6], [-0.78, 0.42]],
   bands: 24, tilt: 0.42, warp: 0.6, scale: 0.95, seed: 8, beat: [0.8, 0.8, 1.7, 0.8],   // beat: stroke widths cycling across the bands
 };
-
-const tone = (t, a, b, k) => (t.literal ? mixHex(t.hex(a), t.hex(b), k) : `color-mix(in srgb, ${t.c(a)}, ${t.c(b)} ${+(k * 100).toFixed(1)}%)`);
 
 export function figure(theme = 'css') {
   const t = makeTheme(theme), { cx, cy, R, turn } = motif, noise = noise2D(motif.seed);
@@ -45,8 +43,8 @@ export function figure(theme = 'css') {
     title: 'A dark, banded stone',
     desc: `One smooth stone-shaped silhouette at the right edge of the page, crossed by fine, gently wandering bands like the strata of an agate. The form is decoration and encodes no data.` },
   el('defs', {}, el('clipPath', { id: 'organic-contour-clip' }, el('path', { d: outline }))),
-  el('path', { d: outline, fill: tone(t, 'paper', 'ink', 0.84) }),
-  g({ 'clip-path': 'url(#organic-contour-clip)', fill: 'none', stroke: tone(t, 'paper', 'ink', 0.52), 'stroke-linejoin': 'round' }, bands));
+  el('path', { d: outline, fill: t.mix('ink', 'paper', 0.84) }),
+  g({ 'clip-path': 'url(#organic-contour-clip)', fill: 'none', stroke: t.mix('ink', 'paper', 0.52), 'stroke-linejoin': 'round' }, bands));
 }
 
 export default {

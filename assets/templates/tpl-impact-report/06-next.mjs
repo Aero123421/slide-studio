@@ -8,7 +8,7 @@ const targets = [                    // goal = 2026年度の目標。sub = 補�
   {what: '参加する子ども', sub: '実人数', now: now.kids, goal: 540, unit: '人', how: '毎回の出席記録'},
   {what: `${focus.name}地区で支援が届く割合`, sub: `${focus.opens}に3つ目の教室を開く（${focus.kids}人→${focus.goalKids}人）`,
     now: Math.round(focus.kids / focus.eligible * 100), goal: Math.round(focus.goalKids / focus.eligible * 100), unit: '%',
-    how: '参加者 ÷ 就学援助を受ける小中学生（市の統計、毎年5月）', key: true},
+    how: '参加者 ÷ 就学援助を受ける小中学生<span class="ir-nw">（市の統計、毎年5月）</span>', key: true},
   {what: '3月まで通い続ける子ども', now: now.stay, goal: 85, more: true, unit: '%', how: '4月と3月の在籍名簿を照合'},
   {what: '宿題を最後までやり切る子ども', now: now.homework, goal: 80, unit: '%', how: '子どもアンケート（7月・2月）'},
   {what: '高校に進む中学3年生', now: now.enrolled === now.grade9 ? '全員' : now.enrolled, goal: '全員', unit: '', how: '進路調査（3月）'},
@@ -16,7 +16,7 @@ const targets = [                    // goal = 2026年度の目標。sub = 補�
 ];
 
 const n = v => (typeof v === 'number' ? v.toLocaleString('ja-JP') : v);
-const cell = (v, unit, more) => `${n(v)}${unit ? `<small>${unit}${more ? '以上' : ''}</small>` : ''}`;
+const cell = (v, unit, more) => (typeof v === 'number' ? `${n(v)}${unit ? `<small>${unit}${more ? '以上' : ''}</small>` : ''}` : `<span class="word">${v}</span>`);
 const key = targets.find(t => t.key);
 
 export default {
@@ -32,7 +32,7 @@ export default {
 <table class="ir-plan" data-region="primary">
   <colgroup><col style="width:392px"><col style="width:196px"><col style="width:196px"><col></colgroup>
   <thead><tr><th>目標</th><th class="num">2025年度 実績</th><th class="num">2026年度 目標</th><th class="how">測り方</th></tr></thead>
-  <tbody>${targets.map(t => `<tr${t.key ? ' class="is-focus"' : ''}><td>${t.what}${t.sub ? `<span>${t.sub}</span>` : ''}</td><td class="num">${cell(t.now, t.unit)}</td><td class="num is-goal">${cell(t.goal, t.unit, t.more)}</td><td class="how">${t.how}</td></tr>`).join('')}</tbody>
+  <tbody>${targets.map(t => `<tr${t.key ? ' class="is-focus"' : ''}><td>${t.what}${t.sub ? `<span class="sub">${t.sub}</span>` : ''}</td><td class="num">${cell(t.now, t.unit)}</td><td class="num is-goal">${cell(t.goal, t.unit, t.more)}</td><td class="how">${t.how}</td></tr>`).join('')}</tbody>
 </table>
 <p class="ir-thanks">ご寄付とご協力をいただいた皆さまに、心より感謝申し上げます。</p>
 <div class="ir-foot" data-region="source"><p>目標は2026年4月の理事会で決定。${key.what}の対象は${n(focus.eligible)}人（2025年5月1日現在）</p><p>ゆうがた教室　2025年度 活動報告<b>6</b></p></div>`,

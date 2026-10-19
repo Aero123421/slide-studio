@@ -15,10 +15,10 @@ const lanes = [
 // Spans from the trace, ms after the shopper sent the request. The gateway cancels everything at the timeout.
 const spans = [
   { lane: 'gateway', start: 0, end: 2000 },
-  { lane: 'checkout', start: 3, end: 1846 }, // then the payment step starts and is cancelled at the timeout
-  { lane: 'pricing', start: 21, end: 1846 },
+  { lane: 'checkout', start: 3, end: 1828 }, // then the payment step starts and is cancelled at the timeout
+  { lane: 'pricing', start: 21, end: 1828 },
   { lane: 'cache', start: 24, end: 26 },
-  { lane: 'replica', start: 27, end: 1839, label: 'SELECT price rules' },
+  { lane: 'replica', start: 27, end: 1821, label: 'SELECT price rules' },
 ];
 // Messages at their real times. ret = a response travelling back up the call chain.
 const messages = [
@@ -27,8 +27,8 @@ const messages = [
   { from: 'checkout', to: 'pricing', t: 21 },
   { from: 'pricing', to: 'cache', t: 24 },
   { from: 'pricing', to: 'replica', t: 27 },
-  { from: 'replica', to: 'pricing', t: 1839, ret: true },
-  { from: 'pricing', to: 'checkout', t: 1846, ret: true },
+  { from: 'replica', to: 'pricing', t: 1821, ret: true },
+  { from: 'pricing', to: 'checkout', t: 1828, ret: true },
   { from: 'gateway', to: 'shopper', t: 2000, ret: true, label: '504 Gateway Timeout' },
 ];
 
@@ -70,7 +70,7 @@ const notes = `<line x1="${tx}" y1="${TOP - 34}" x2="${tx}" y2="${bottom}" strok
 <text x="${X(0) + 12}" y="${rowY.shopper - 10}" class="t-note"><tspan class="t-name" style="font-size:16px">POST /checkout</tspan></text>
 <text x="${tx - 10}" y="${rowY.shopper - 10}" text-anchor="end" class="t-note">${messages.at(-1).label}</text>
 <text x="${X(26) + 10}" y="${rowY.cache + 6}" class="t-note t-red">miss after ${ms(span('cache').end - span('cache').start)}</text>
-<text x="${(X(span('replica').start) + X(span('replica').end)) / 2}" y="${rowY.replica - 18}" text-anchor="middle" class="t-strong t-red t-num">${span('replica').label}: ${ms(replicaMs)}</text>
+<text x="${(X(span('replica').start) + X(span('replica').end)) / 2}" y="${rowY.replica - 18}" text-anchor="middle" class="t-strong t-red t-num">${span('replica').label}, ${sec(replicaMs)}</text>
 <text x="${tx - 10}" y="${rowY.checkout - 16}" text-anchor="end" class="t-note t-num">Payment step needs about ${ms(trace.paymentNeeds)}; <tspan class="t-strong">${ms(leftMs)} were left</tspan></text>`;
 const marks = `<marker id="${ID}-fill" viewBox="0 0 10 10" refX="9.5" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0 0.8L10 5L0 9.2Z" fill="${INK}"/></marker>`
   + `<marker id="${ID}-open" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto"><path d="M1 1L9 5L1 9" fill="none" stroke="${GREY}" stroke-width="1.6"/></marker>`;

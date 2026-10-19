@@ -58,7 +58,7 @@ const ends = placed.map(p => {
 }).join('');
 // full-label reference
 const ref = el('line', { x1: box.x, x2: lastX + 18, y1: y(full.mean), y2: y(full.mean), stroke: 'var(--rj-ink)', 'stroke-width': 1.2, 'stroke-dasharray': '2 4' })
-  + textLines([`全ラベル（${fmt(full.n)}枚）で学習　${f1(full.mean)}`], { x: box.x + 8, y: y(full.mean) - 9, size: 16, fill: 'var(--rj-ink2)', attrs: { 'font-variant-numeric': 'tabular-nums' } });
+  + textLines([`全ラベル（${fmt(full.n)}枚）で学習　${f1(full.mean)}`], { x: box.x + 10, y: y(full.mean) + 22, size: 16, fill: 'var(--rj-ink2)', attrs: { 'font-variant-numeric': 'tabular-nums' } });
 // the comparison the headline makes: 提案法@50 and 教師あり@match
 const pA = [X(by.ours, fi), y(ours)], pB = [X(by.sup, match.i), y(match.v)];
 const AR = `${ID}-ar`;
@@ -98,6 +98,6 @@ export default {
   className: 'tpl-research-ja rj-result',
   content: `<h1 class="rj-h" data-region="title">ラベル${focusN}枚の提案法は、<span class="nw">教師あり学習の${match.n}枚と</span>ほぼ同じ精度に届く</h1>
 <figure class="rj-fig" style="left:64px;top:184px" data-region="primary">${chart}</figure>
-<p class="rj-note" style="left:64px;top:594px;width:1152px" data-region="source">点は${runs}回の試行の平均、縦線は95%信頼区間（t分布、自由度${runs - 1}）。試行ごとにラベル付き画像の選び方と乱数の種を変えた。評価は学習に使っていない${test.bridges}橋の${test.images}枚。</p>
+<p class="rj-note" style="left:64px;top:594px;width:1152px" data-region="source">点は${runs}回の試行の平均、縦線は95%信頼区間（t分布、自由度${runs - 1}）。試行ごとにラベル付き画像の選び方と乱数シードを変えた。評価は学習に使っていない${test.bridges}橋の${test.images}枚。</p>
 <footer class="rj-foot"><span>ラベル50枚で学ぶひび割れ検出</span><b>4</b></footer>`,
 };

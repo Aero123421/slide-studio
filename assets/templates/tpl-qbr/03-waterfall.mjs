@@ -14,7 +14,7 @@ const drivers = [                       // 計画との差（営業利益への�
   { label: 'その他の\n販管費', value: -21, note: '業務委託費の増加' },
 ];
 const hiring = { planned: 32, joined: 19 };   // 期初からの採用計画と入社数（全社）, 人
-const source = '出所：経理部 月次決算（2026年7–9月）';
+const source = '出所：経理部 月次決算（2026年7〜9月）';
 const running = '2026年度 第2四半期 業績レビュー';
 const page = 3;
 

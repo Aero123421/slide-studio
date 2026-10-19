@@ -82,5 +82,5 @@ export default {
   className: 'tpl-launch ln-before-after',
   content: `<h2 class="ln-at ln-head" data-region="title" style="left:${C(1)}px;top:64px;width:${span(1, 11)}px">The same return: refunded after ${long(before.refund)} in 1.x, after ${long(after.refund)} in 2.0</h2>
 <figure class="ln-at" data-region="primary" style="left:${C(1)}px;top:216px;width:${W}px;height:${H}px">${chart}</figure>
-<p class="ln-at ln-note" data-region="source" style="left:${C(1)}px;top:645px;width:${span(1, 12)}px">Two comparable returns of the same item for the same reason, request to refund. Dark grey: waiting on your team. Sample data.</p>`,
+<p class="ln-at ln-note" data-region="source" style="left:${C(1)}px;top:645px;width:${span(1, 12)}px">The same item returned for the same reason in July (1.x) and September 2026 (2.0 beta), request to refund. Dark grey: waiting on your team. Sample data.</p>`,
 };

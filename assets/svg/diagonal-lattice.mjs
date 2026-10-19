@@ -1,6 +1,6 @@
 // Diagram study · Diagonal lattice — two families of angled rules that read as structure, set beside a calm title field.
 // The lattice is texture: its pitch, angle and edge come from `motif`; the cover text comes from `storeys`.
-import { svgRoot, el, g, theme as makeTheme, mixHex, n, sum } from '../runtime/figure.mjs';
+import { svgRoot, el, g, theme as makeTheme, n, sum } from '../runtime/figure.mjs';
 
 // Albion Yard: homes per storey on the retained car-park frame (illustrative).
 const storeys = [
@@ -14,8 +14,6 @@ const review = { body: 'planning committee', date: '3 February 2027', practice: 
 const W = 1280, H = 720;
 const motif = { angle: 62, pitch: 40, major: 3, edgeTop: 1000, floor: 652, accentAt: [1010, 400] };   // accentAt: a point the accent diamond snaps to
 
-const tone = (t, a, b, k) => (t.literal ? mixHex(t.hex(a), t.hex(b), k) : `color-mix(in srgb, ${t.c(a)}, ${t.c(b)} ${+(k * 100).toFixed(1)}%)`);
-
 export function figure(theme = 'css') {
   const t = makeTheme(theme), { pitch, major, edgeTop } = motif;
   const c = 1 / Math.tan((motif.angle * Math.PI) / 180);      // horizontal run per unit of height
@@ -28,7 +26,7 @@ export function figure(theme = 'css') {
   const member = (k, dir) => {
     const x0 = edgeTop + k * pitch, isMajor = k % major === 0;
     return el('line', { x1: x0, y1: 0, x2: x0 + dir * H * c, y2: H,
-      stroke: isMajor ? tone(t, 'paper', 'accent', 0.62) : tone(t, 'paper', 'accent', 0.3), 'stroke-width': isMajor ? 2.2 : 1 });
+      stroke: isMajor ? t.mix('accent', 'paper', 0.62) : t.mix('accent', 'paper', 0.3), 'stroke-width': isMajor ? 2.2 : 1 });
   };
   // Joints where two major members cross: x = (a + b)/2, y = (a − b)/(2c) for top-edge starts a (down-left) and b (down-right).
   const joints = [];
@@ -46,12 +44,12 @@ export function figure(theme = 'css') {
     title: 'Diagonal lattice field with a slanted edge',
     desc: 'Two families of angled rules cross to form a diamond lattice on the right of the page, with heavier members every third rule, round joints where they cross and one diamond outlined in the accent colour. The lattice is texture, not a drawing of the building.' },
   el('defs', {}, el('clipPath', { id: 'diagonal-lattice-clip' }, el('path', { d: field }))),
-  el('path', { d: field, fill: tone(t, 'paper', 'surface', 0.7) }),
+  el('path', { d: field, fill: t.mix('surface', 'paper', 0.7) }),
   g({ 'clip-path': 'url(#diagonal-lattice-clip)' },
     ks.map(k => member(k, -1)), ks.map(k => member(k, 1)),
-    joints.map(([x, y]) => el('circle', { cx: x, cy: y, r: 4, fill: t.c('paper'), stroke: tone(t, 'paper', 'accent', 0.75), 'stroke-width': 1.6 })),
+    joints.map(([x, y]) => el('circle', { cx: x, cy: y, r: 4, fill: t.c('paper'), stroke: t.mix('accent', 'paper', 0.75), 'stroke-width': 1.6 })),
     el('path', { d: `M${cell.map(p => `${n(p[0])} ${n(p[1])}`).join('L')}Z`, fill: 'none', stroke: t.c('accent'), 'stroke-width': 4, 'stroke-linejoin': 'round' })),
-  el('path', { d: `M${n(edgeTop)} 0L${n(xb)} ${n(yb)}H${W}`, fill: 'none', stroke: tone(t, 'paper', 'accent', 0.62), 'stroke-width': 2.2 }));
+  el('path', { d: `M${n(edgeTop)} 0L${n(xb)} ${n(yb)}H${W}`, fill: 'none', stroke: t.mix('accent', 'paper', 0.62), 'stroke-width': 2.2 }));
 }
 
 export default {

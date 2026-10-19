@@ -109,7 +109,7 @@ export default {
   sources: [],
   exportPolicy: 'final',
   className: 'tpl-strategy st-tree',
-  content: `<h1 class="st-title" data-region="title">6%に必要な改善は${f1(required)}億円。<br>その${share >= 0.45 && share < 0.55 ? '半分' : `${Math.round(share * 100)}%`}は物流費の見直しで生み出せる</h1>
+  content: `<h1 class="st-title" data-region="title">6%に必要な改善は${f1(required)}億円。<br>その${share >= 0.45 && share < 0.55 ? '半分' : `${Math.round(share * 100)}%`}は物流費の見直しで見込める</h1>
 <figure class="st-fig" style="left:64px;top:178px;width:${W}px;height:${H}px" data-region="primary">${svg}</figure>
 <div class="st-foot" data-region="source"><p>注：効果は${plan.year}年度の年間効果。売上高は2025年度の${plan.sales2025}億円から年3%伸び、${plan.year}年度に${plan.sales2029}億円となる前提<br>出典：青柳リビング EC事業部門の管理会計（2025年度）、白峰パートナーズ分析</p><p>EC事業の収益改善<b>2</b></p></div>`,
 };

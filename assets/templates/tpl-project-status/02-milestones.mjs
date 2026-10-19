@@ -1,7 +1,7 @@
 // Template: プロジェクト月次状況報告 · マイルストーン（基準計画と見込み）. Synthetic example content; replace data and copy.
 // One date axis for the whole project: thin line = baseline (基準計画), thick bar = actual / forecast,
 // vertical line = 基準日. Slips, the remaining buffer and the headline are computed from `phases`.
-import { svgRoot, el, g, textLines, linear, measureText } from '../../runtime/figure.mjs';
+import { svgRoot, el, g, textLines, linear } from '../../runtime/figure.mjs';
 
 const ID = 'tpl-project-status-milestones';
 const project = { name: '基幹システム移行プロジェクト', meeting: '第7回ステアリングコミッティ', date: '2026-10-21' };
@@ -49,7 +49,7 @@ const axis = months.map((m, i) => {
 }).join('');
 const bar = (from, to, y, h, attrs) => el('rect', { x: x(t(from)), y, width: Math.max(3, x(t(to) + DAY) - x(t(from))), height: h, ...attrs });
 const label = (p, y) => {
-  const status = p.status ? `<tspan fill="var(--${p.status === 'ok' ? 'ok' : p.status === 'warn' ? 'warn' : 'late'})">●</tspan> ${STATUS[p.status]}` : p.state === 'done' ? '完了' : '';
+  const status = p.status ? `<tspan style="fill:var(--${p.status})">●</tspan> ${STATUS[p.status]}` : p.state === 'done' ? '完了' : '';
   return textLines([p.name], { x: 0, y, size: 18, valign: 'middle', fill: 'var(--ink)', weight: p.status ? 700 : null })
     + (status ? `<text x="${x0 - 24}" y="${(y + 16 * 0.36).toFixed(1)}" font-size="16" text-anchor="end" style="fill:var(--${p.status ? 'ink' : 'muted'})">${status}</text>` : '');
 };

@@ -312,7 +312,10 @@ function tokenize(line) {
       const cur = raw[i], next = raw[i + 1];
       if ((/^[㐀-鿿]$/u.test(cur) || /^[A-Za-z0-9]{1,3}$/.test(cur)) && /^[ぁ-ヿ㐀-鿿]/u.test(next)) { raw[i] = cur + next; raw.splice(i + 1, 1); }
     }
-  } else raw = text.match(/[　-ヿ㐀-鿿가-힯＀-￯]|[^\s　-ヿ㐀-鿿가-힯＀-￯]+\s*|\s+/gu) || [];
+  } else {
+    // Words break at ordinary spaces only: no-break spaces (U+00A0, U+202F, U+2007) keep "15 min" together.
+    raw = text.match(/[　-ヿ㐀-鿿가-힯＀-￯]|(?:[^\s　-ヿ㐀-鿿가-힯＀-￯]|[\u00A0\u202F\u2007])+[^\S\u00A0\u202F\u2007]*|[^\S\u00A0\u202F\u2007]+/gu) || [];
+  }
   const out = [];
   for (const tok of raw) {
     const first = [...tok][0];
@@ -718,7 +721,7 @@ export function tickLabelWidth(scale, { format, count = 5, size = 16, tickValues
 export function callout({ x, y, text, title, dx = 48, dy = -48, width = 240, size = 16, theme: th, color, lineColor,
   marker = 'dot', leader = 'elbow', align = 'auto', weight, halo = true, cls = 'ss-callout', attrs = {}, gap = 6, bounds } = {}) {
   const t = theme(th), ink = color || t.c('ink'), line = lineColor || t.c('muted');
-  const lines = wrapText(text, width, size, { weight });
+  const lines = wrapBalanced(text, width, size, { weight });
   const titleLines = title ? wrapText(title, width, size, { weight: 700 }) : [];
   const textW = Math.max(blockWidth(lines, size, { weight }), blockWidth(titleLines, size, { weight: 700 }));
   const lh = size * 1.3, total = titleLines.length + lines.length, blockH = total * lh;

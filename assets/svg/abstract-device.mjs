@@ -19,7 +19,7 @@ const words = ['zero', 'one', 'two', 'three', 'four', 'five'];
 
 // Sheet layout: millimetres → px, origin of each view, and where the annotations sit.
 const W = 1280, H = 720;
-const sheet = { scale: 2.8, front: [560, 220], gap: 150 };
+const sheet = { scale: 2.8, front: [548, 220], gap: 184 };
 
 export function figure(theme = 'css') {
   const t = makeTheme(theme), s = sheet.scale, [fx, fy] = sheet.front, size = spec.size * s;
@@ -84,7 +84,7 @@ export default {
   exportPolicy: 'final',
   content: `<figure class="st-fig" data-region="decoration">${figure()}</figure>
 <h1 class="st-head" style="top:132px;max-width:460px;font-size:46px;line-height:1.1">${spec.name} takes ${fmt(readings)} air readings in every school day</h1>
-<p class="st-dek" style="top:318px;max-width:440px">One reading every ${spec.interval} seconds through a ${fmt(schoolDay.hours, { digits: 1 })}-hour day.</p>
+<p class="st-dek" style="top:318px;max-width:440px">One reading every ${spec.interval} seconds through a <span style="white-space:nowrap">${fmt(schoolDay.hours, { digits: 1 })}-hour</span> day.</p>
 <dl data-region="support" style="position:absolute;left:64px;top:430px;width:440px;margin:0;display:grid;grid-template-columns:104px 1fr;row-gap:10px;font:400 18px/1.4 var(--ss-font-sans);color:var(--ss-ink)">
   <dt style="color:var(--ss-muted)">Measures</dt><dd style="margin:0">${list(spec.measures)}</dd>
   <dt style="color:var(--ss-muted)">Battery</dt><dd style="margin:0">${words[spec.batteryYears]} school years</dd>

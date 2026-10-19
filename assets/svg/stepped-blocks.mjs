@@ -1,7 +1,7 @@
 // Diagram study · Stepped mass — connected rectangular masses in one oblique projection.
 // Terraces step down away from a tall block and a cantilever reaches back over the void, so the
 // silhouette is asymmetric; every face is toned by its orientation, never picked per block.
-import { svgRoot, el, g, theme as makeTheme, mixHex, sum, pathFromPoints } from '../runtime/figure.mjs';
+import { svgRoot, el, g, theme as makeTheme, sum, pathFromPoints } from '../runtime/figure.mjs';
 
 // Works in the exhibition, by medium, and the estates they come from (illustrative).
 const works = [{ medium: 'drawings', count: 64 }, { medium: 'photographs', count: 38 }, { medium: 'models', count: 10 }];
@@ -21,13 +21,11 @@ const motif = {
   slit: [0.3, 0.72], bay: 1.5,                                          // window band (fractions of the storey) and fin spacing (modules)
 };
 
-const tone = (t, a, b, k) => (t.literal ? mixHex(t.hex(a), t.hex(b), k) : `color-mix(in srgb, ${t.c(a)}, ${t.c(b)} ${+(k * 100).toFixed(1)}%)`);
-
 export function figure(theme = 'css') {
   const t = makeTheme(theme), { u, storey, ground: [gx, gy], depth: [dx, dy] } = motif;
   const P = (x, y, z) => [gx + x * u + z * u * dx, gy - y * u + z * u * dy];
   const quad = pts => el('path', { d: pathFromPoints(pts, { close: true }) });
-  const shade = { front: tone(t, 'paper', 'ink', 0.2), top: tone(t, 'paper', 'ink', 0.07), side: tone(t, 'paper', 'ink', 0.42), slit: tone(t, 'paper', 'ink', 0.6) };
+  const shade = { front: t.mix('ink', 'paper', 0.2), top: t.mix('ink', 'paper', 0.07), side: t.mix('ink', 'paper', 0.42), slit: t.mix('ink', 'paper', 0.6) };
   // Bottom to top: each storey stands on the one below, so later storeys correctly cover earlier ones.
   const storeys = motif.floors.map(([x0, x1, z0, z1], k) => {
     const y0 = k * storey, y1 = y0 + storey, [s0, s1] = motif.slit.map(f => y0 + f * storey);

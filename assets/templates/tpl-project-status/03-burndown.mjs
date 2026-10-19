@@ -9,7 +9,7 @@ const sprint = { first: '2026-08-10', days: 14, planned: 8 };   // 2-week sprint
 const scope = 600;                                             // 当初の総ポイント
 const done = [64, 66, 68, 71, 71];                             // completed points per sprint (1–5)
 const added = [0, 0, 20, 0, 0];                                // points added by change requests per sprint
-const change = { sprint: 3, label: '変更要求 +20' };            // annotation on the actual line
+const change = { sprint: 3, label: '変更要求CR-08で+20' };     // annotation on the actual line
 const lookback = 3;                                            // sprints averaged for the forecast
 const page = 3;
 

@@ -1,7 +1,7 @@
 // Diagram study · Contour ribbons — a bundle of nested curves that sweeps toward the page's main figure.
 // Every curve is the same cubic path offset along its normal, and the gaps widen along the sweep,
 // so the bundle fans out and leads the eye without crossing the type.
-import { svgRoot, el, g, theme as makeTheme, mixHex, pathFromPoints, fmt, sum } from '../runtime/figure.mjs';
+import { svgRoot, el, g, theme as makeTheme, pathFromPoints, fmt, sum } from '../runtime/figure.mjs';
 
 // Annual logistics cost by component, £ millions: seven depots today vs three regional hubs (illustrative).
 const cost = [
@@ -20,8 +20,6 @@ const cap = s => s[0].toUpperCase() + s.slice(1);
 const W = 1280, H = 720;
 const motif = { base: [[-80, 590], [330, 640], [600, 470], [1360, 432]], count: 15, gap: [6, 12] };   // base is the bundle's upper edge
 
-const tone = (t, a, b, k) => (t.literal ? mixHex(t.hex(a), t.hex(b), k) : `color-mix(in srgb, ${t.c(a)}, ${t.c(b)} ${+(k * 100).toFixed(1)}%)`);
-
 export function figure(theme = 'css') {
   const t = makeTheme(theme), [P0, P1, P2, P3] = motif.base;
   const B = s => [0, 1].map(i => (1 - s) ** 3 * P0[i] + 3 * (1 - s) ** 2 * s * P1[i] + 3 * (1 - s) * s ** 2 * P2[i] + s ** 3 * P3[i]);
@@ -33,7 +31,7 @@ export function figure(theme = 'css') {
       return [x - (dy / m) * k * gap, y + (dx / m) * k * gap];               // offset toward the lower side
     });
     const mid = 1 - Math.abs(k / (motif.count - 1) - 0.5) * 2;               // darker in the middle of the bundle
-    return el('path', { d: pathFromPoints(pts), stroke: tone(t, 'paper', 'ink', 0.14 + 0.24 * mid), 'stroke-width': 1 + 0.9 * mid });
+    return el('path', { d: pathFromPoints(pts), stroke: t.mix('ink', 'paper', 0.14 + 0.24 * mid), 'stroke-width': 1 + 0.9 * mid });
   });
   return svgRoot({ id: 'contour-ribbons-fig', width: W, height: H, theme: t,
     title: 'A bundle of nested curves sweeping to the right',

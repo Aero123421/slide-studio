@@ -12,12 +12,12 @@ const facts = {
 const bridges = facts.trainBridges + facts.testBridges;
 const lists = {
   contributions: [
-    `擬似ラベルを<b>2段のしきい値</b>で作り、幅1画素の細い枝まで途切れさせずに学習に使えるようにした。`,
-    `ラベル${facts.labeled}枚で<b class="nw">IoU ${facts.oursIoU}%</b>。教師あり学習の${facts.matchN}枚（${facts.matchIoU}%）と同じ水準で、途切れは<span class="nw">1枚あたり${facts.breaksSup}か所</span>から<b class="nw">${facts.breaksOurs}か所</b>に減った。`,
+    `擬似ラベルを<b>2段のしきい値</b>で作り、<span class="nw">幅1画素の細い枝まで</span>途切れさせずに学習に使えるようにした。`,
+    `ラベル${facts.labeled}枚で<b class="nw">IoU ${facts.oursIoU}%</b>。<span class="nw">教師あり学習の${facts.matchN}枚（${facts.matchIoU}%）</span>と同じ水準で、途切れは<span class="nw">1枚あたり${facts.breaksSup}か所</span>から<b class="nw">${facts.breaksOurs}か所</b>に減った。`,
   ],
   limits: [
     `確かめたのは${facts.structure}の${bridges}橋だけ。鋼部材や舗装では試していない。`,
-    '幅1画素より細いひび割れは、正解そのものが作業者によって揺れる。',
+    '幅1画素より細いひび割れは、正解そのものが<span class="nw">作業者によって揺れる。</span>',
   ],
   next: [
     '別の管理者が撮った点検画像で外部検証する。',

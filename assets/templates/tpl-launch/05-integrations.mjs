@@ -23,11 +23,11 @@ const links = [
 ];
 const fresh = links.filter(l => l.isNew);
 
-// Geometry in the SVG's own coordinates (1152 × 440, drawn 1:1 at x 64, y 200). Steps start on column 3.
-const W = 1152, H = 440, X0 = C(3) - 64, PITCH = (W - X0) / steps.length, LINE = 54, ROW0 = 118, ROWH = 54;
+// Geometry in the SVG's own coordinates (1152 × 420, drawn 1:1 at x 64, y 200). Steps start on column 3.
+const W = 1152, H = 420, X0 = C(3) - 64, PITCH = (W - X0) / steps.length, LINE = 54, ROW0 = 118, ROWH = 54;
 const sx = s => X0 + PITCH * steps.indexOf(s);
 const ry = s => ROW0 + ROWH * systems.indexOf(s);
-const colour = l => (l.isNew ? 'var(--ln-green)' : 'var(--ln-context)');
+const colour = l => (l.isNew ? 'var(--ln-green)' : 'var(--ln-mark)');
 
 const top = g({},
   textLines(['Fernhook'], { x: 0, y: LINE + 6, cls: 'ln-t-head' }),
@@ -44,31 +44,28 @@ const drops = g({}, ...[false, true].flatMap(isNew => steps.map(s => {
   const here = links.filter(l => l.step === s && !!l.isNew === isNew);
   if (!here.length) return '';
   const bottom = Math.max(...here.map(l => ry(l.system)));
-  return el('line', { x1: sx(s), x2: sx(s), y1: LINE, y2: bottom, stroke: isNew ? 'var(--ln-green)' : 'var(--ln-context)', 'stroke-width': isNew ? 3 : 1.5 });
+  return el('line', { x1: sx(s), x2: sx(s), y1: LINE, y2: bottom, stroke: isNew ? 'var(--ln-green)' : 'var(--ln-mark)', 'stroke-width': isNew ? 3 : 1.5 });
 })));
 const marks = g({}, ...links.map(l => g({},
   el('circle', { cx: sx(l.step), cy: ry(l.system), r: 7, fill: colour(l), stroke: 'var(--ln-paper)', 'stroke-width': 3 }),
   textLines([l.what], { x: sx(l.step) + 16, y: ry(l.system), valign: 'middle', cls: l.isNew ? 'ln-t-green' : 'ln-t-label' }))));
-const KEY_Y = H - 14;
-const key = g({},
-  el('circle', { cx: 6, cy: KEY_Y, r: 7, fill: 'var(--ln-green)' }), textLines(['New in 2.0'], { x: 22, y: KEY_Y, valign: 'middle', cls: 'ln-t-label' }),
-  el('circle', { cx: 162, cy: KEY_Y, r: 7, fill: 'var(--ln-context)' }), textLines(['Connected since 1.x'], { x: 178, y: KEY_Y, valign: 'middle', cls: 'ln-t-label' }));
 
 const chart = svgRoot({
   id: `${ID}-fig`, width: W, height: H, className: 'ln-fig',
   title: 'Which outside system Fernhook connects to at each step of a return',
   desc: `${steps.join(', ')}. ${links.map(l => `${l.step}: ${l.system}, ${l.what}${l.isNew ? ' (new in 2.0)' : ''}`).join('; ')}. ${Object.entries(inside).map(([s, t]) => `${s}: ${t.toLowerCase()}`).join('; ')}.`,
-}, rows, top, drops, marks, key);
+}, rows, top, drops, marks);
 
 export default {
   study: true,
   id: ID,
   title: `Integrations: ${fresh.length} new connections in 2.0`,
-  notes: 'Purpose: Show where the product sits among systems the customer already runs — which system connects at which step — and what this release adds.\nModify: Edit steps (in order), systems (rows) and links (system, step, what passes in ≤ 15 characters, isNew for this release). Positions, drops, colours, the key and the description follow the data.\nInvariant: One row per system, one column per step, in the order a return happens. Green only for what is new in this release, and the key names it; everything else is grey.\nStatic: No builds.',
+  notes: 'Purpose: Show where the product sits among systems the customer already runs — which system connects at which step — and what this release adds.\nModify: Edit steps (in order), systems (rows) and links (system, step, what passes in ≤ 15 characters, isNew for this release). Positions, drops, colours, the key and the description follow the data.\nInvariant: One row per system, one column per step, in the order a return happens. Green only for what is new in this release, and the key on the bottom line names it; everything else is grey.\nStatic: No builds.',
   sources: [],
   exportPolicy: 'final',
   className: 'tpl-launch ln-integrations',
   content: `<h2 class="ln-at ln-head" data-region="title" style="left:${C(1)}px;top:64px;width:${span(1, 10)}px">New in 2.0: the carrier’s first scan goes straight to your payment provider</h2>
 <figure class="ln-at" data-region="primary" style="left:${C(1)}px;top:200px;width:${W}px;height:${H}px">${chart}</figure>
-<p class="ln-at ln-note" data-region="source" style="left:${C(1)}px;top:645px;width:${span(1, 12)}px">All six connect from Settings, Connections; none needs code. Systems shown are the kinds most beta shops use.</p>`,
+<p class="ln-at ln-note" data-region="source" style="left:${C(1)}px;top:645px;width:${span(1, 8)}px">All six connect from Settings, Connections; none needs code.</p>
+<p class="ln-at ln-label ln-key" style="left:${C(9)}px;top:642.9px;width:${span(9, 12)}px"><i class="ln-new"></i>New in 2.0<i></i>Connected since 1.x</p>`,
 };

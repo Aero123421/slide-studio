@@ -2,6 +2,7 @@
 // A reading list — who, then what — under one statement; the contact line bookends the opener's speaker line.
 const ID = 'tpl-keynote-closing';
 const M = n => 64 + 48 * n;            // x of module n (24 modules of 48 px)
+const nb = s => s.replace(/(\d) (?=[A-Za-z%°])/g, '$1\u00a0');   // keep numbers with their units
 
 const close = {
   statement: 'Three changes before summer 2027',
@@ -18,12 +19,12 @@ export default {
   study: true,
   id: ID,
   title: `Close: ${close.statement.toLowerCase().replace(/^./, c => c.toUpperCase())}`,
-  notes: 'Purpose: End on what specific people in the room can do next, and how to reach the speaker; this page stays up during questions.\nModify: Edit close.statement, the asks (who can act; one change each, with a number or a date) and the contact and data lines.\nInvariant: Each ask names who acts and what changes, measurably. Three or four asks at most. Contact sits on the opener\'s bottom line (baseline 656), the data link starting on module 13. No yellow.\nStatic: No builds; all asks are visible during questions.',
+  notes: 'Purpose: End on what specific people in the room can do next, and how to reach the speaker; this page stays up during questions.\nModify: Edit close.statement, the asks (who can act; one change each, with a number or a date) and the contact and data lines.\nInvariant: Each ask names who acts and what changes, measurably. Three or four asks at most. Contact sits on the opener\'s bottom line (baseline 656), the data link starting at the centre line (module 12), as on the opener. No yellow.\nStatic: No builds; all asks are visible during questions.',
   sources: [],
   exportPolicy: 'final',
   className: 'tpl-keynote kn-closing',
   content: `<h2 class="kn-at kn-statement" data-region="title" style="left:${M(0)}px;top:64px;width:${M(24) - M(0)}px">${close.statement}</h2>
-<ul class="kn-at kn-asks" data-region="primary" style="left:${M(0)}px;top:196px;width:${M(24) - M(0)}px">${close.asks.map(a => `<li><b>${a.who}</b><span>${a.what}</span></li>`).join('')}</ul>
+<ul class="kn-at kn-asks" data-region="primary" style="left:${M(0)}px;top:196px;width:${M(24) - M(0)}px">${close.asks.map(a => `<li><b>${a.who}</b><span>${nb(a.what)}</span></li>`).join('')}</ul>
 <p class="kn-at kn-label" data-region="support" style="left:${M(0)}px;top:641px;width:${M(12) - M(0)}px;white-space:nowrap">${close.contact}</p>
-<p class="kn-at kn-label kn-grey" style="left:${M(13)}px;top:641px;width:${M(24) - M(13)}px;white-space:nowrap">${close.data}</p>`,
+<p class="kn-at kn-label kn-grey" style="left:${M(12)}px;top:641px;width:${M(24) - M(12)}px;white-space:nowrap">${close.data}</p>`,
 };

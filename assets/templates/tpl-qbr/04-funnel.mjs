@@ -4,7 +4,7 @@
 import { svgRoot, el, g, textLines, linear, fmt, measureText } from '../../runtime/figure.mjs';
 
 const ID = 'tpl-qbr-funnel';
-const periods = { now: '7–9月', prev: '4–6月' };
+const periods = { now: '7〜9月', prev: '4〜6月' };
 const stages = [                         // 件数
   { label: 'リード', rate: null, now: 4820, prev: 4080 },
   { label: '商談', rate: '商談化率', now: 964, prev: 1061 },

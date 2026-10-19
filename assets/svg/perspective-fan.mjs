@@ -1,7 +1,7 @@
 // Diagram study · Perspective fan — converging rules and receding cross-rules from one vanishing point.
 // Rays and cross-rules are both computed from the same vanishing point and horizon, so the floor
 // stays a true one-point perspective however it is cropped.
-import { svgRoot, el, g, theme as makeTheme, mixHex, fmt, sum } from '../runtime/figure.mjs';
+import { svgRoot, el, g, theme as makeTheme, fmt, sum } from '../runtime/figure.mjs';
 
 // 売上高の実績と中期計画の目標（億円、架空のデータ）。
 const segments = [
@@ -18,8 +18,6 @@ const kanji = ['〇', '一', '二', '三', '四', '五'];
 const W = 1280, H = 720;
 const motif = { vp: [1004, 284], front: 650, rays: { from: -7, to: 9, spacing: 66 }, depth: 0.55, rules: 14, horizon: 360 };   // horizon: how far the horizon line runs left of the vanishing point
 
-const tone = (t, a, b, k) => (t.literal ? mixHex(t.hex(a), t.hex(b), k) : `color-mix(in srgb, ${t.c(a)}, ${t.c(b)} ${+(k * 100).toFixed(1)}%)`);
-
 export function figure(theme = 'css') {
   const t = makeTheme(theme), [vx, vy] = motif.vp, f = motif.front - vy;      // f: drop from horizon to the front edge
   const { from, to, spacing } = motif.rays;
@@ -35,8 +33,8 @@ export function figure(theme = 'css') {
     title: '一点透視の床',
     desc: `一つの消失点から${to - from + 1}本の線を手前の縁へ放ち、奥行きに応じた間隔で${motif.rules}本の横線を引いた一点透視の床。装飾であり、計測した図ではない。` },
   el('defs', {}, el('clipPath', { id: 'perspective-fan-clip' }, el('rect', { x: 0, y: 0, width: W, height: H }))),
-  g({ 'clip-path': 'url(#perspective-fan-clip)', stroke: tone(t, 'paper', 'ink', 0.5), 'stroke-linecap': 'round' },
-    el('line', { x1: vx - motif.horizon, y1: vy, x2: W, y2: vy, stroke: tone(t, 'paper', 'ink', 0.3), 'stroke-width': 1 }),
+  g({ 'clip-path': 'url(#perspective-fan-clip)', stroke: t.mix('ink', 'paper', 0.5), 'stroke-linecap': 'round' },
+    el('line', { x1: vx - motif.horizon, y1: vy, x2: W, y2: vy, stroke: t.mix('ink', 'paper', 0.3), 'stroke-width': 1 }),
     rays, rules));
 }
 

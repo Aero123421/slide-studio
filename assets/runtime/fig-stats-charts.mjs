@@ -265,7 +265,7 @@ export function scatterPlot(o) {
   if (groups.length > 1) parts.push(legend(groups.map((gname, k) => ({ label: String(gname), color: t.cat(k), shape: 'dot' })), { x: box.x, y: 12, size: size - 1, theme: t }));
   if (fit && o.fitLabel !== false) {
     const last = fit.band.at(-1);
-    parts.push(textLines([o.fitLabel || `Fit: slope ${fmt(fit.slope, { digits: 2, locale: ctx.locale })}, R² ${fmt(fit.r2, { digits: 2 })}`], { x: x(last.x) - 4, y: y(last.hi) - 10, size: size - 1, anchor: 'end', fill: o.fitColor ?? t.c('accent'), weight: 700, halo: t.c('paper') }));
+    parts.push(textLines([o.fitLabel || `Fit: slope ${fmt(fit.slope, { digits: 2, locale: ctx.locale })}, R² ${fmt(fit.r2, { digits: 2 })}`], { x: x(last.x) - 4, y: y(last.hi) - 10, size: size - 1, anchor: 'end', fill: o.fitColor ?? t.c('accent'), weight: 700, halo: t.c('paper'), attrs: buildAttrs(build && { ...build, start: build.start + 1 }, { label: true }) }));
   }
   const resolve = a => { const p = typeof a.at === 'string' ? pts.find(q => q.label === a.at) : a.at; return p && { x: x(p.x), y: y(p.y) }; };
   return finish(o, ctx, parts, resolve, { x, y, box, fit });

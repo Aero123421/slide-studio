@@ -26,7 +26,7 @@ const perVisit = Math.round(yen / visits / 100) * 100;      // 1,800円（100円
 const n = v => v.toLocaleString('ja-JP');
 const approx = Math.round(perChild / 10000);                // 約13万円
 
-// ---- geometry: bar across the full measure (figure at x=64, y=184)
+// ---- geometry: bar across the full measure (figure at x=64, y=186; its first line hangs from y≈200)
 const W = 1152, barY = 54, barH = 56, gap = 2;
 let acc = 0;
 const segs = spend.map(s => { const x0 = acc / total * W; acc += s.v; return {...s, x0, x1: acc / total * W}; });
@@ -65,7 +65,7 @@ export default {
   exportPolicy: 'final',
   className: 'tpl-impact-report ir-budget',
   content: `<h1 class="ir-h" data-region="title">子ども一人あたりの費用は、一年で<span class="ir-nw">約${approx}万円</span>でした</h1>
-<figure class="ir-fig" style="left:64px;top:170px;width:${W}px;height:${H}px" data-region="support">${svg}</figure>
+<figure class="ir-fig" style="left:64px;top:186px;width:${W}px;height:${H}px" data-region="support">${svg}</figure>
 <div class="ir-cost" style="left:64px" data-region="primary"><p class="ir-n">${n(perChild)}<small>円</small></p><p class="ir-n-l">子ども一人あたりの年間費用</p><p class="ir-n-d">支出 <b>${n(total)}万円</b> ÷ 参加した子ども <b>${n(kids)}人</b></p></div>
 <div class="ir-cost" style="left:652px"><p class="ir-n">${n(perVisit)}<small>円</small></p><p class="ir-n-l">1回の参加あたり</p><p class="ir-n-d">支出 <b>${n(total)}万円</b> ÷ 延べ参加 <b>${n(visits)}人</b></p></div>
 <div class="ir-foot" data-region="source"><p>2025年度決算（万円）。収入は${n(inTotal)}万円：${income.map(x => `${x.name}${n(x.v)}`).join('・')}。<br>差額${n(inTotal - total)}万円は、2026年度の新しい教室の開設に充てる</p><p>ゆうがた教室　2025年度 活動報告<b>4</b></p></div>`,

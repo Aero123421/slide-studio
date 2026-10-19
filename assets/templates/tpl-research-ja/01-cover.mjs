@@ -25,7 +25,7 @@ const crack = {
   main: [[-1, 11, 2.7], [6, 13, 2.6], [12, 16, 2.5], [17, 16.5, 2.3], [22, 20, 2.1], [27, 23, 1.8], [31, 27, 1.6], [36, 29, 1.3], [41, 33, 1.1], [46, 38, 1.0], [51, 40, 0.9]],
   branch: [[22, 20, 1.3], [24, 26, 1.1], [23, 32, 1.0], [26, 38, 0.9], [28, 44, 0.8], [30, 51, 0.8]],
 };
-const px = 6.4;                                            // drawn size of one image pixel
+const px = 6;                                              // drawn size of one image pixel (integer: no seams)
 const N = crack.size, segs = [crack.main, crack.branch].flatMap(l => l.slice(1).map((p, i) => [l[i], p]));
 const hash = (i, j) => { let h = (i * 374761393 + j * 668265263) ^ 0x5bd1e995; h = Math.imul(h ^ (h >>> 13), 1274126177); return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };
 const smooth = (x, y) => { const i = Math.floor(x), j = Math.floor(y), fx = x - i, fy = y - j, q = t => t * t * (3 - 2 * t);
@@ -52,7 +52,7 @@ for (let j = 0; j < N; j++) for (let i = 0; i < N;) {
   i = k;
 }
 const S = N * px;
-const specimen = `<svg width="${S}" height="${S}" viewBox="0 0 ${S} ${S}" role="img" aria-labelledby="${ID}-t"><title id="${ID}-t">点検画像の一部（${N}×${N}画素の模式図）。枝分かれしたひび割れが幅3画素から1画素へ細くなる</title>${runs.join('')}</svg>`;
+const specimen = `<svg width="${S}" height="${S}" viewBox="0 0 ${S} ${S}" shape-rendering="crispEdges" role="img" aria-labelledby="${ID}-t"><title id="${ID}-t">点検画像の一部（${N}×${N}画素の模式図）。枝分かれしたひび割れが幅3画素から1画素へ細くなる</title>${runs.join('')}</svg>`;
 const weekday = ['日', '月', '火', '水', '木', '金', '土'][new Date(Date.UTC(talk.date.y, talk.date.m - 1, talk.date.d)).getUTCDay()];
 const dateText = `${talk.date.y}年${talk.date.m}月${talk.date.d}日（${weekday}）`;
 const authors = talk.authors

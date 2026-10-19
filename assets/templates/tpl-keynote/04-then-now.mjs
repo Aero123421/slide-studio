@@ -69,7 +69,7 @@ function panel(d) {
 }
 
 const header = (d, left) => `<p class="kn-at kn-statement" style="left:${left}px;top:200px;width:${4 * 48}px">${d.year}</p>
-<p class="kn-at kn-label kn-grey" style="left:${left + 4 * 48}px;top:232.1px;width:${8 * 48}px">${d.date.replace(/ \d{4}$/, '')}</p>`;
+<p class="kn-at kn-label kn-grey" style="left:${left + 4 * 48}px;top:232.1px;width:${PW - 4 * 48}px">${d.date.replace(/ \d{4}$/, '')}</p>`;
 
 export default {
   study: true,

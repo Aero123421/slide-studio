@@ -1,7 +1,7 @@
 // Diagram study · Quarter-arc rhythm — nested quarter circles on a tile grid that join into waves.
 // Every tile carries the same two corners of arcs, so the arcs link across tiles into
 // continuous diagonal waves that run toward the calm corner where the chapter title sits.
-import { svgRoot, el, g, theme as makeTheme, mixHex, n } from '../runtime/figure.mjs';
+import { svgRoot, el, g, theme as makeTheme, n } from '../runtime/figure.mjs';
 
 // The network change this chapter is about (illustrative): weekday headway in minutes, 06:00–21:00.
 const routesBefore = 11;
@@ -19,8 +19,6 @@ const current = 1;                                    // zero-based index of thi
 // Tile grid. Radii are symmetric about s/2, so an arc of radius r meets one of s − r in the next tile.
 const W = 1280, H = 720;
 const motif = { s: 80, rows: 8, edge: 1090, gap: 12, fade: 3.5, accentLine: 9 };   // field: x + y ≥ edge; arcs fade over 3.5 tiles from it
-
-const tone = (t, a, b, k) => (t.literal ? mixHex(t.hex(a), t.hex(b), k) : `color-mix(in srgb, ${t.c(a)}, ${t.c(b)} ${+(k * 100).toFixed(1)}%)`);
 
 export function figure(theme = 'css') {
   const t = makeTheme(theme), { s, rows, gap } = motif, cols = Math.ceil(W / s);
@@ -47,7 +45,7 @@ export function figure(theme = 'css') {
     desc: 'Tiles of nested quarter circles join into continuous waves that rise from the lower right toward the upper left; one wave is drawn in the accent colour. The pattern is decorative and encodes no data.' },
   el('defs', {}, el('clipPath', { id: 'quarter-arcs-clip' }, el('path', { d: field }))),
   g({ 'clip-path': 'url(#quarter-arcs-clip)', fill: 'none', 'stroke-linecap': 'round' },
-    arcs.filter(l => !isAccent(l)).map(l => el('path', { d: l.d, stroke: tone(t, 'paper', 'muted', (l.r === s / 2 ? 0.52 : 0.32) * (0.12 + 0.88 * fade(l))), 'stroke-width': l.r === s / 2 ? 2.4 : 1.6 })),
+    arcs.filter(l => !isAccent(l)).map(l => el('path', { d: l.d, stroke: t.mix('muted', 'paper', (l.r === s / 2 ? 0.52 : 0.32) * (0.12 + 0.88 * fade(l))), 'stroke-width': l.r === s / 2 ? 2.4 : 1.6 })),
     arcs.filter(isAccent).map(l => el('path', { d: l.d, stroke: t.c('accent'), 'stroke-width': 4.5 }))));
 }
 

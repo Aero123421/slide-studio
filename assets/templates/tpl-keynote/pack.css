@@ -52,7 +52,7 @@
 .tpl-keynote .kn-chapter-no{color:var(--kn-grey);font-variant-numeric:tabular-nums}
 
 /* 05 quote: the opening mark hangs outside the text edge so the words align on module 2. */
-.tpl-keynote .kn-quote{text-wrap:balance}
+.tpl-keynote .kn-quote{font-weight:600;text-wrap:balance}   /* someone else's voice: lighter than the speaker's statements */
 .tpl-keynote .kn-quote .kn-hang{position:absolute;right:100%;margin-right:.04em}
 
 /* 06 close: a reading list of asks — who, then what. Hairlines separate; whitespace groups. */

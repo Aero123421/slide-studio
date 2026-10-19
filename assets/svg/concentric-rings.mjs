@@ -1,7 +1,7 @@
 // Diagram study · Concentric rings — a field of rings that makes an optical centre for one number.
 // The rings are decoration: their count, spacing and weight follow `motif`, never the data.
 // The number in the centre and the headline are computed from `months`.
-import { svgRoot, el, g, theme as makeTheme, mixHex, fmt, sum } from '../runtime/figure.mjs';
+import { svgRoot, el, g, theme as makeTheme, fmt, sum } from '../runtime/figure.mjs';
 
 // Member rooftop generation and town demand, MWh per month, 2026 (illustrative).
 const months = [
@@ -20,16 +20,13 @@ const span = majority.length > 1 ? `${majority[0].m} to ${majority.at(-1).m}` : 
 const W = 1280, H = 720;
 const motif = { cx: 900, cy: 334, core: 178, outer: 392, ratio: 1.041, cadence: [2.4, 0.9, 0.9, 0.9] };
 
-// Solid tone between two theme roles (CSS color-mix in slides, literal hex in standalone files).
-const tone = (t, a, b, k) => (t.literal ? mixHex(t.hex(a), t.hex(b), k) : `color-mix(in srgb, ${t.c(a)}, ${t.c(b)} ${+(k * 100).toFixed(1)}%)`);
-
 export function figure(theme = 'css') {
   const t = makeTheme(theme), radii = [];
   for (let r = motif.core; r <= motif.outer; r *= motif.ratio) radii.push(r);
   const rings = radii.map((r, k) => {
     const u = k / (radii.length - 1);                                // 0 at the core, 1 at the edge
     return el('circle', { cx: motif.cx, cy: motif.cy, r, fill: 'none',
-      stroke: tone(t, 'paper', 'muted', 0.7 - 0.56 * u), 'stroke-width': motif.cadence[k % motif.cadence.length] });
+      stroke: t.mix('muted', 'paper', 0.7 - 0.56 * u), 'stroke-width': motif.cadence[k % motif.cadence.length] });
   });
   return svgRoot({ id: 'concentric-rings-fig', width: W, height: H, theme: t,
     title: 'Concentric rings around an empty centre',

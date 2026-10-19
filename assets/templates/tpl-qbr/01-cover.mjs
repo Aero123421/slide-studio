@@ -6,7 +6,7 @@ const doc = {
   company: 'ミズナラ・テクノロジーズ株式会社',   // fictional company
   classification: '社外秘',
   fiscalYear: 2026,                              // 年度 (April start)
-  quarter: 2,                                    // 第2四半期 = 7–9月
+  quarter: 2,                                    // 第2四半期 = 7〜9月
   title: '業績レビュー',
   meeting: { name: '経営会議', date: '2026-10-20' },
   author: '経営企画部',

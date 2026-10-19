@@ -14,7 +14,7 @@ import fs from 'node:fs/promises';
 import { h } from '../../assets/runtime/kit.mjs';
 import {
   theme, el, g, svgRoot, textLines, linear, band, axis, niceDomain, fmt, sum, median, beeswarm,
-  confusionAt, rocPoints, auc, flowDiagram, forestPlot, lineChart,
+  pathFromPoints, confusionAt, rocPoints, auc, flowDiagram, forestPlot, lineChart,
 } from '../../assets/runtime/figure.mjs';
 
 // ------------------------------------------------------------------ CSS: grammar + one color system
@@ -40,34 +40,41 @@ const deckCSS = String.raw`
 .talk .num { font-variant-numeric: tabular-nums lining-nums; }
 
 /* Cover: one question, set large; the byline sits on the bottom margin. */
-.talk .cover-title { position: absolute; left: 64px; top: 196px; margin: 0; font: 400 88px/1.02 var(--ss-font-display); letter-spacing: -.022em; }
-.talk .cover-lead { position: absolute; left: 64px; top: 316px; width: 760px; font: 400 26px/1.38 var(--ss-font-sans); }
+.talk .cover-title { position: absolute; left: 64px; top: 196px; margin: 0; font: 400 88px/1.02 var(--ss-font-display); letter-spacing: -.012em; }
+.talk .cover-lead { position: absolute; left: 64px; top: 316px; width: 800px; font: 400 26px/1.38 var(--ss-font-sans); text-wrap: balance; }
+.talk .nowrap { white-space: nowrap; }
+.talk .cover-rug { position: absolute; left: 64px; top: 452px; width: 1152px; height: 96px; }
 .talk .cover-by { position: absolute; left: 64px; right: 64px; bottom: 56px; padding-top: 18px; border-top: 1px solid var(--ss-rule); display: flex; justify-content: space-between; font: 400 19px/1.4 var(--ss-font-sans); }
 .talk .cover-by span:last-child { color: var(--ss-muted); }
 
-/* Explore: the threshold widget owns .w-plot, .w-controls and .w-status; this page only places
-   them. The plot keeps the widget's 700 × 360 viewBox aspect so the axis overlay stays registered. */
+/* Explore: the threshold widget owns .w-plot, .w-controls and .w-status; this page only places and
+   tunes them. The plot keeps the widget's 700 × 360 viewBox aspect (here 1.15×), so the overlay registers.
+   Widget internals this page relies on (assets/runtime/widgets.js): dots use --ss-cat-1 below and
+   --ss-cat-2 at or above the threshold; the second <line> is an unlabelled vertical axis, hidden here. */
+.talk #research-threshold { --ss-cat-1: var(--ss-context); --ss-cat-2: var(--ss-accent); }
 .talk .widget { position: absolute; left: 64px; top: 176px; width: 1152px; height: 470px; display: grid;
-  grid-template-columns: 770px 1fr; grid-template-rows: 396px 1fr; column-gap: 48px; }
+  grid-template-columns: 805px 1fr; grid-template-rows: 414px 1fr; column-gap: 40px; }
 .talk .w-plot { grid-column: 1; grid-row: 1; }
 .talk .w-plot > svg { width: 100%; height: 100%; display: block; }
-.talk .w-controls { grid-column: 2; grid-row: 1; align-self: start; display: grid; gap: 14px; }
-.talk .w-controls label { display: grid; grid-template-columns: 1fr auto; row-gap: 10px; font: 600 18px/1.3 var(--ss-font-sans); }
-.talk .w-controls label > span { grid-area: 1 / 1; }
-.talk .w-controls output { grid-area: 1 / 2; font: 600 22px/1 var(--ss-font-sans); color: var(--ss-accent); font-variant-numeric: tabular-nums; }
-.talk .w-controls input[type=range] { grid-area: 2 / 1 / 3 / 3; width: 100%; margin: 0; accent-color: var(--ss-accent); }
+.talk .w-plot line:nth-of-type(2) { display: none; }
+.talk .w-controls { grid-column: 2; grid-row: 1; align-self: start; display: grid; gap: 14px; padding-top: 4px; }
+.talk .w-controls label { display: grid; row-gap: 12px; font: 600 18px/1.3 var(--ss-font-sans); }
+.talk .w-controls output { display: none; }   /* the readout prints the threshold as 0.50, like every other page */
+.talk .w-controls input[type=range] { width: 100%; margin: 0; accent-color: var(--ss-accent); }
 .talk .w-controls button { justify-self: start; font: 500 16px/1.2 var(--ss-font-sans); color: var(--ss-ink); background: none; border: 1px solid var(--ss-rule); border-radius: 6px; padding: 8px 12px; cursor: pointer; }
-.talk .w-status { grid-column: 1; grid-row: 2; padding-top: 6px; font: 400 15px/1.3 var(--ss-font-sans); color: var(--ss-muted); }
+.talk .w-status { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }   /* announced, not shown: the readout says the same in words */
 .talk .w-export-summary { grid-column: 2 !important; grid-row: 1 !important; }
-.talk .w-axis { position: absolute; left: 64px; top: 176px; width: 770px; height: 396px; pointer-events: none; }
-.talk .readout { position: absolute; left: 882px; top: 318px; width: 334px; }
+.talk .w-axis { position: absolute; left: 64px; top: 176px; width: 805px; height: 414px; pointer-events: none; }
+.talk .readout { position: absolute; left: 909px; top: 300px; width: 307px; }
+.talk .readout .ro-t { font: 400 18px/1.4 var(--ss-font-sans); margin-bottom: 10px; }
+.talk .readout .ro-t b { font: 400 34px/1 var(--ss-font-display); color: var(--ss-accent); margin-left: 4px; font-variant-numeric: tabular-nums lining-nums; }
 .talk .readout table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
-.talk .readout th { font: 600 16px/1.3 var(--ss-font-sans); color: var(--ss-muted); text-align: left; padding: 0 0 8px; }
-.talk .readout tbody th { padding: 14px 10px 14px 0; border-top: 1px solid var(--ss-rule); vertical-align: top; color: var(--ss-ink); }
-.talk .readout td { padding: 10px 0 12px; border-top: 1px solid var(--ss-rule); font: 400 16px/1.25 var(--ss-font-sans); color: var(--ss-muted); vertical-align: top; }
-.talk .readout td b { display: block; font: 400 34px/1.05 var(--ss-font-display); color: var(--ss-ink); }
+.talk .readout thead th { font: 600 16px/1.3 var(--ss-font-sans); color: var(--ss-muted); text-align: left; padding: 0 0 8px; }
+.talk .readout tbody th { font: 600 16px/1.3 var(--ss-font-sans); text-align: left; padding: 14px 8px 12px 0; border-top: 1px solid var(--ss-rule); vertical-align: top; }
+.talk .readout tbody td { padding: 10px 0 12px; border-top: 1px solid var(--ss-rule); font: 400 16px/1.25 var(--ss-font-sans); color: var(--ss-muted); vertical-align: top; }
+.talk .readout td b { display: block; font: 400 34px/1.05 var(--ss-font-display); color: var(--ss-ink); font-variant-numeric: tabular-nums lining-nums; }
 .talk .readout td.sent b { color: var(--ss-accent); }
-.talk .readout p { margin-top: 12px; font: 400 18px/1.4 var(--ss-font-sans); }
+.talk .readout .ro-rates { margin-top: 12px; font: 400 18px/1.4 var(--ss-font-sans); border-top: 1px solid var(--ss-rule); padding-top: 12px; }
 
 /* Compare: a table for reading; tabular figures, hairlines, the current rule in bold. */
 .talk .tbl { position: absolute; left: 64px; top: 196px; width: 1152px; border-collapse: collapse; font: 400 22px/1.3 var(--ss-font-sans); font-variant-numeric: tabular-nums lining-nums; }
@@ -80,20 +87,22 @@ const deckCSS = String.raw`
 .talk .tbl tr.focus td.key { color: var(--ss-accent); font-weight: 650; }
 
 /* Limits: three findings, each led by the number that sets its size. */
-.talk .limits { position: absolute; left: 64px; top: 188px; width: 1152px; list-style: none; padding: 0; margin: 0; }
+.talk .limits { position: absolute; left: 64px; top: 176px; width: 1152px; list-style: none; padding: 0; margin: 0; }
 .talk .limits li { display: grid; grid-template-columns: 270px 1fr; column-gap: 24px; padding: 22px 0 24px; border-top: 1px solid var(--ss-rule); }
 .talk .limits li:last-child { border-bottom: 1px solid var(--ss-rule); }
 .talk .limits b { font: 400 54px/1 var(--ss-font-display); letter-spacing: -.02em; font-variant-numeric: lining-nums; }
 .talk .limits h2 { font: 600 22px/1.3 var(--ss-font-sans); margin: 4px 0 6px; }
 .talk .limits p { font: 400 20px/1.45 var(--ss-font-sans); color: var(--ss-ink); max-width: 820px; }
 
-/* Next study: three decisions as columns on the grid (4 columns each), no boxes. */
-.talk .next { position: absolute; left: 64px; top: 204px; width: 1152px; display: grid; grid-template-columns: repeat(3, 1fr); column-gap: 24px; }
-.talk .next section { border-top: 2px solid var(--ss-ink); padding-top: 18px; }
-.talk .next h2 { font: 600 22px/1.3 var(--ss-font-sans); margin: 0 0 14px; }
-.talk .next b { display: block; font: 400 48px/1 var(--ss-font-display); letter-spacing: -.02em; margin-bottom: 14px; }
-.talk .next b.st-accent { color: var(--ss-accent); }
-.talk .next p { font: 400 20px/1.45 var(--ss-font-sans); }
+/* Next study: three decisions as columns of four grid columns each; a figure slot of equal height in each. */
+.talk .next { position: absolute; left: 64px; top: 196px; width: 1152px; display: grid; grid-template-columns: repeat(3, 1fr); column-gap: 24px; }
+.talk .next section { border-top: 2px solid var(--ss-ink); padding-top: 16px; display: grid; grid-template-rows: auto 190px auto; }
+.talk .next h2 { font: 600 22px/1.3 var(--ss-font-sans); margin: 0 0 12px; }
+.talk .next .vis { align-self: center; }
+.talk .next .vis svg { display: block; width: 368px; height: 176px; overflow: visible; }
+.talk .next .swing { font: 400 60px/1 var(--ss-font-display); letter-spacing: -.02em; color: var(--ss-accent); font-variant-numeric: lining-nums; }
+.talk .next .swing + span { display: block; margin-top: 12px; font: 400 17px/1.4 var(--ss-font-sans); color: var(--ss-muted); }
+.talk .next p { margin-top: 14px; font: 400 20px/1.45 var(--ss-font-sans); }
 `;
 
 // ------------------------------------------------------------------ data
@@ -165,12 +174,31 @@ claim(best.every(b => b.t >= VIEW[0] && b.t <= VIEW[1]), 'every optimum lies ins
 const missedFlow = median(sites.filter(s => s.leak && s.score < T0).map(s => s.flow));
 const foundFlow = median(sites.filter(s => s.leak && s.score >= T0).map(s => s.flow));
 
-// Page 10 · leaks needed for ±10 points on sensitivity (normal approximation), and sites to find them.
-const leaksNeeded = Math.ceil(1.96 ** 2 * sens.p * (1 - sens.p) / 0.1 ** 2);
+// Page 10 · confirmed leaks needed for a Wilson interval of ±10 points at today's sensitivity,
+// the flagged sites that takes at this study's leak rate, and how they split over the sampling plan.
+const halfWidth = n => { const w = wilson(sens.p * n, n); return (w.hi - w.lo) / 2; };
+const TARGET = 0.10;
+const leaksNeeded = Array.from({ length: 400 }, (_, i) => i + 1).find(n => halfWidth(n) <= TARGET);
 const sitesNeeded = Math.round(leaksNeeded / (nLeak / sites.length) / 10) * 10;
+const plan = { districts: [study.district, 'Brackwater', 'Linton Vale'], seasons: ['Winter', 'Summer'] };
+const perCell = Math.ceil(sitesNeeded / (plan.districts.length * plan.seasons.length));
 
 // ------------------------------------------------------------------ figures
 const t = theme();                                                  // CSS-variable colors from cs-laboratory
+
+/** Page 1: the study's 64 scores as a rug on the score axis, with the line the talk is about. */
+function coverRug() {
+  const W = 1152, H = 96, base = 58, x = linear([0, 1], [0, W]);
+  return svgRoot({ id: 'cover-rug', width: W, height: H, title: `Leak scores of the ${sites.length} flagged sites, with today's threshold`,
+    desc: `${sites.length} scores from ${fmt(Math.min(...scores), { digits: 2 })} to ${fmt(Math.max(...scores), { digits: 2 })}; ${now.digs} at or above ${t2(T0)}.` },
+  el('line', { x1: 0, x2: W, y1: base, y2: base, stroke: t.c('rule'), 'stroke-width': 1.2 }),
+  scores.map(v => el('line', { x1: x(v), x2: x(v), y1: base - 20, y2: base, stroke: t.c('muted'), 'stroke-width': 1.6 })),
+  el('line', { x1: x(T0), x2: x(T0), y1: 6, y2: base + 6, stroke: t.c('accent'), 'stroke-width': 2.5 }),
+  textLines([`${t2(T0)}: today, a crew is sent at or above this score`], { x: x(T0) + 10, y: 18, size: 17, fill: t.c('accent'), weight: 600 }),
+  textLines(['0'], { x: 0, y: base + 24, size: 16, fill: t.c('muted') }),
+  textLines([`Leak score of the ${sites.length} flagged sites`], { x: 24, y: base + 24, size: 16, fill: t.c('muted') }),
+  textLines(['1'], { x: W, y: base + 24, size: 16, anchor: 'end', fill: t.c('muted') }));
+}
 
 /** Page 2: 2025 alerts by score band; only bands at 0.50 and above were ever excavated. */
 function alertsFigure() {
@@ -206,14 +234,14 @@ function alertsFigure() {
 /** Page 3: how every flagged site got its reference label. Arrows mean "then". */
 function designFigure() {
   return flowDiagram({
-    id: 'design-fig', width: 800, height: 482, fontSize: 18, nodeMaxWidth: 250, direction: 'tb', gap: 40, crossGap: 48,
+    id: 'design-fig', width: 800, height: 482, fontSize: 19, nodeMaxWidth: 260, direction: 'tb', gap: 40, crossGap: 48,
     title: 'Study flow: from flagged sites to reference labels',
     desc: `All ${sites.length} flagged sites were surveyed blind to the score. Leak noise at ${heard.length}; all ${heard.length} excavated: ${nLeak} leaks, ${dryHoles.length} dry. ${quiet.length} quiet sites were not excavated.`,
     nodes: [
       { id: 'flagged', label: 'Flagged sites', sub: `${sites.length} in ${study.district}, ${study.window}`, kind: 'terminal' },
       { id: 'survey', label: 'Blind acoustic survey', sub: `all ${sites.length}; crews never saw the score` },
       { id: 'heard', label: 'Leak noise heard', sub: `${heard.length} sites, all excavated` },
-      { id: 'quiet', label: 'No leak noise', sub: `${quiet.length} sites → no leak`, muted: true },
+      { id: 'quiet', label: 'No leak noise', sub: `${quiet.length} sites → no leak` },
       { id: 'leak', label: 'Leak found', sub: `${nLeak} sites → leak`, emphasis: true },
       { id: 'dry', label: 'Dry excavation', sub: `${dryHoles.length} sites → no leak` },
     ],
@@ -223,7 +251,7 @@ function designFigure() {
 
 /** Page 4: every surveyed site on the score axis, split by what the survey found; today's rule on top (build 1). */
 function ruleFigure() {
-  const W = 1152, H = 482, r = 8, box = { x: 240, y: 74, w: 896, h: 340 };
+  const W = 1152, H = 482, r = 10, box = { x: 240, y: 74, w: 896, h: 340 };
   const x = linear([0, 1], [box.x, box.x + box.w]), xt = x(T0);
   const groups = [
     { key: 'leak', title: 'Leak found', sub: `${nLeak} sites, excavated`, list: sites.filter(s => s.leak), right: ['found', now.tp], left: ['missed', now.fn] },
@@ -231,8 +259,8 @@ function ruleFigure() {
   ];
   const yb = band(groups.map(gp => gp.key), [box.y, box.y + box.h], { inner: 0.16, outer: 0.02 });
   const tally = (value, word, xx, yy, anchor, fill) => el('text', { x: xx, y: yy, 'text-anchor': anchor === 'end' ? 'end' : null, fill },
-    el('tspan', { 'font-size': 30, 'font-family': t.font('serif'), style: 'font-family:var(--ss-font-display)' }, String(value)),
-    el('tspan', { 'font-size': 18, dx: 7 }, word));
+    el('tspan', { 'font-size': 34, style: 'font-family:var(--ss-font-display)' }, String(value)),
+    el('tspan', { 'font-size': 19, dx: 8 }, word));
   const rows = groups.map(gp => {
     const cy = yb.center(gp.key), swarm = beeswarm(gp.list.map(s => x(s.score)), { r, gap: 2 });
     const dot = (p, fill) => el('circle', { cx: p.x, cy: cy + p.y, r, fill, stroke: t.c('paper'), 'stroke-width': 1.5 });
@@ -255,7 +283,7 @@ function ruleFigure() {
   g({ 'data-step': 1, 'data-motion': 'reveal', 'data-duration': 600 },
     el('line', { x1: xt, x2: xt, y1: box.y - 50, y2: box.y + box.h, stroke: t.c('ink'), 'stroke-width': 1.5 }),
     textLines([`Crew sent at ${t2(T0)} or above`], { x: xt + 12, y: box.y - 34, size: 17, fill: t.c('ink'), weight: 600 }),
-    textLines(['No crew below'], { x: xt - 12, y: box.y - 34, size: 17, anchor: 'end', fill: t.c('muted'), weight: 600 }),
+    textLines([`No crew below ${t2(T0)}`], { x: xt - 12, y: box.y - 34, size: 17, anchor: 'end', fill: t.c('muted'), weight: 600 }),
     rows.map(rw => rw.rule)));
 }
 
@@ -271,7 +299,7 @@ function accuracyFigure() {
     // The forest plot lays rows out on band(labels, plot height, inner .2, outer .05); mark the job-record rate on the PPV row.
     extra: ({ x, box }) => {
       const yb = band(rows.map(r => r.label), [box.y, box.y + box.h], { inner: 0.2, outer: 0.05 }), cy = yb.center(rows[2].label), xr = x(recordsPPV * 100);
-      return g({}, el('line', { x1: xr, x2: xr, y1: cy - 18, y2: cy + 18, stroke: t.c('ink'), 'stroke-width': 2 }),
+      return g({}, el('path', { d: `M${xr} ${cy + 9}l-6 10h12z`, fill: t.c('ink') }),
         textLines([`2025 job records ${pc(recordsPPV)}`], { x: xr, y: cy + 24, size: 16, anchor: 'middle', valign: 'top', fill: t.c('ink') }));
     },
   });
@@ -280,20 +308,20 @@ function accuracyFigure() {
 /** Page 6: labels for the threshold widget's plot. The widget draws scores at x = 55 + 610·score and its
  *  axis at y = 300 in a 700 × 360 viewBox (assets/runtime/widgets.js); this overlay uses the same frame. */
 function widgetAxis() {
-  const X = v => 55 + 610 * v, s = 15.5;                            // 15.5 units ≈ 17 px at the plot's 1.1× scale
+  const X = v => 55 + 610 * v, s = 16 / 1.15;                        // 16 px at the plot's 1.15× scale
   return el('svg', { class: 'w-axis', viewBox: '0 0 700 360', 'aria-hidden': 'true' },
-    [0, .25, .5, .75, 1].map(v => textLines([fmt(v, { digits: 2 })], { x: X(v), y: 322, size: s, anchor: 'middle', fill: t.c('muted'), attrs: { 'font-variant-numeric': 'tabular-nums' } })),
-    textLines(['Leak score'], { x: X(1), y: 350, size: s, anchor: 'end', fill: t.c('muted') }),
+    [0, .1, .2, .3, .4, .5, .6, .7, .8, .9, 1].map(v => g({}, el('line', { x1: X(v), x2: X(v), y1: 300, y2: 304.5, stroke: t.c('rule') }),
+      textLines([fmt(v, { digits: 1 })], { x: X(v), y: 322, size: s, anchor: 'middle', fill: t.c('muted'), attrs: { 'font-variant-numeric': 'tabular-nums' } }))),
+    textLines(['Leak score'], { x: X(1), y: 348, size: s, anchor: 'end', fill: t.c('muted') }),
     el('circle', { cx: 64, cy: 20, r: 7, fill: t.c('accent') }), textLines(['Crew sent (score at or above the threshold)'], { x: 78, y: 20, size: s, valign: 'middle', fill: t.c('ink') }),
     el('circle', { cx: 444, cy: 20, r: 7, fill: t.c('context') }), textLines(['Not sent'], { x: 458, y: 20, size: s, valign: 'middle', fill: t.c('ink') }));
 }
 
 /** Page 8: cost of each threshold, in dry-dig equivalents, for three prices of a missed leak. */
 function valueFigure() {
-  const shade = [t.seq(2), t.seq(4), t.seq(6)];
   return lineChart({
     id: 'value-fig', width: 800, height: 482, xType: 'linear', x: inView.map(c => c.t), markers: 'all', endValues: false, fontSize: 17,
-    series: R.map((r, k) => ({ name: `Miss = ${r} dry dig${r > 1 ? 's' : ''}`, values: inView.map(c => costOf(c, r)), color: shade[k] })),
+    series: R.map(r => ({ name: `Miss = ${r} dry dig${r > 1 ? 's' : ''}`, values: inView.map(c => costOf(c, r)), color: t.c('muted') })), strokeWidth: 2.4,
     xFormat: v => fmt(v, { digits: 1 }), xTicks: 6, yDomain: [0, 70], unit: `Dry digs + R × missed leaks, per ${sites.length} sites`, xLabel: 'Threshold',
     title: 'Cost of each threshold in dry-dig equivalents, for three prices of a missed leak',
     desc: best.map((b, i) => `If a miss costs ${R[i]} dry digs, the cheapest threshold is ${t2(b.t)}.`).join(' '),
@@ -301,9 +329,45 @@ function valueFigure() {
       el('line', { x1: x(T0), x2: x(T0), y1: box.y, y2: box.y + box.h, stroke: t.c('muted'), 'stroke-width': 1.2, 'stroke-dasharray': '4 4' }),
       textLines([`today ${t2(T0)}`], { x: x(T0) + 6, y: box.y + 4, size: 16, valign: 'top', fill: t.c('muted') }),
       best.map((b, i) => g({ 'data-step': i + 1, 'data-motion': 'reveal' },
-        el('circle', { cx: x(b.t), cy: y(costOf(b, R[i])), r: 9, fill: 'none', stroke: t.c('accent'), 'stroke-width': 2.5 }),
-        textLines([`best ${t2(b.t)}`], { x: x(b.t), y: y(costOf(b, R[i])) + 30, size: 17, anchor: 'middle', fill: t.c('accent'), weight: 650, halo: t.c('paper') })))),
+        el('circle', { cx: x(b.t), cy: y(costOf(b, R[i])), r: 7, fill: t.c('accent'), stroke: t.c('paper'), 'stroke-width': 2.5 }),
+        textLines([`best ${t2(b.t)}`], { x: x(b.t), y: y(costOf(b, R[i])) - 28, size: 17, anchor: 'middle', fill: t.c('accent'), weight: 650, halo: t.c('paper') })))),
   });
+}
+
+/** Page 10, middle column: the sensitivity interval narrows with the square root of confirmed leaks. */
+function precisionFigure() {
+  const W = 368, H = 176, box = { x: 44, y: 12, w: 316, h: 124 };
+  const x = linear([0, 150], [box.x, box.x + box.w]), y = linear([0, 30], [box.y + box.h, box.y]);
+  const at = n => [x(n), y(halfWidth(n) * 100)];
+  const mark = (n, text, fill, dx) => g({}, el('circle', { cx: at(n)[0], cy: at(n)[1], r: 6, fill, stroke: t.c('paper'), 'stroke-width': 2 }),
+    textLines([text], { x: at(n)[0] + dx, y: at(n)[1] - 12, size: 16, fill, weight: 600, halo: t.c('paper') }));
+  return svgRoot({ id: 'precision-fig', width: W, height: H, title: 'Half-width of the 95% interval on sensitivity by number of confirmed leaks',
+    desc: `±${fmt(halfWidth(nLeak) * 100, { digits: 0 })} points with ${nLeak} leaks; ±${fmt(TARGET * 100, { digits: 0 })} needs ${leaksNeeded}.` },
+  axis(y, { orient: 'left', at: box.x, grid: [box.x, box.x + box.w], theme: t, size: 15, tickValues: [0, 10, 20, 30], format: v => (v ? `±${v}` : '0') }),
+  el('line', { x1: box.x, x2: box.x + box.w, y1: y(0), y2: y(0), stroke: t.c('ink'), 'stroke-width': 1.2 }),
+  axis(x, { orient: 'bottom', at: y(0), theme: t, size: 15, tickValues: [0, 50, 100, 150], tickSize: 4 }),
+  el('path', { d: pathFromPoints(Array.from({ length: 143 }, (_, i) => at(i + 8))), fill: 'none', stroke: t.c('muted'), 'stroke-width': 2.2 }),
+  mark(nLeak, `now, ${nLeak} leaks`, t.c('ink'), 10),
+  mark(leaksNeeded, `${leaksNeeded} leaks`, t.c('accent'), 8),
+  textLines(['confirmed leaks'], { x: box.x + box.w, y: H - 2, size: 15, anchor: 'end', fill: t.c('muted') }));
+}
+
+/** Page 10, right column: where evidence exists — one cell of the districts × seasons plan. */
+function coverageFigure() {
+  const W = 368, H = 176, labelW = 118, head = 26, gap = 6;
+  const cw = (W - labelW - gap) / plan.seasons.length, rh = (H - head - gap * (plan.districts.length - 1)) / plan.districts.length;
+  return svgRoot({ id: 'coverage-fig', width: W, height: H, title: 'Sampling plan: three districts by two seasons',
+    desc: `Evidence exists for ${study.district} in winter only (this study, ${sites.length} sites). The plan samples about ${perCell} flagged sites in each of the six cells.` },
+  plan.seasons.map((season, j) => textLines([season], { x: labelW + j * cw + cw / 2, y: 16, size: 16, anchor: 'middle', fill: t.c('muted'), weight: 600 })),
+  plan.districts.map((d, i) => {
+    const yy = head + i * (rh + gap);
+    return g({}, textLines([d], { x: 0, y: yy + rh / 2, size: 16, valign: 'middle', fill: t.c('ink'), weight: 600 }),
+      plan.seasons.map((_, j) => {
+        const done = i === 0 && j === 0, xx = labelW + j * cw + (j ? gap : 0);
+        return g({}, el('rect', { x: xx, y: yy, width: cw - gap / 2, height: rh, rx: 3, fill: done ? t.c('surface') : 'none', stroke: done ? t.c('ink') : t.c('muted'), 'stroke-width': done ? 1.4 : 1.2, 'stroke-dasharray': done ? null : '4 3' }),
+          textLines([done ? `this study, ${sites.length}` : `${perCell} sites`], { x: xx + (cw - gap / 2) / 2, y: yy + rh / 2, size: 15, anchor: 'middle', valign: 'middle', fill: done ? t.c('ink') : t.c('muted') }));
+      }));
+  }));
 }
 
 // ------------------------------------------------------------------ the widget's live 2 × 2 readout
@@ -338,7 +402,8 @@ export default {
     {
       id: 'question', title: 'Where should the crews dig?', className: cls('cover'),
       content: `<h1 class="cover-title" data-region="title">Where should the crews dig?</h1>
-<p class="cover-lead" data-region="support">Testing the night-noise leak score against blind acoustic surveys at all ${sites.length} sites it flagged in ${h(study.district)}, ${h(study.window)}</p>
+<p class="cover-lead" data-region="support">Testing the night-noise leak score against blind acoustic surveys at all ${sites.length} sites it flagged in ${h(study.district)}, <span class="nowrap">${h(study.window)}</span></p>
+<figure class="cover-rug" data-region="support">${coverRug()}</figure>
 <p class="cover-by" data-region="source"><span><b>Mara Ellison</b> · Network Analytics, Northmoor Water</span><span>Water Loss Research Day · 12 November 2026</span></p>`,
       notes: `The decision is a line on a score. Today crews dig wherever the night-noise score reaches ${t2(T0)}. This talk asks whether that is the right line, and what we would need to know to move it. Everything here comes from one month in one district; the numbers are small on purpose and I will show their uncertainty.`,
       sources,
@@ -373,8 +438,8 @@ ${source(`${SOURCE_STUDY} · score frozen at 06:00 on each survey day`, 'Study f
     },
     {
       id: 'method', className: cls(),
-      title: `At today's threshold of ${t2(T0)}, crews would reach ${now.tp} of the ${nLeak} leaks and dig ${now.fp} dry holes`,
-      content: `<h1 class="st-head" data-region="title">At today’s threshold of ${t2(T0)}, crews would reach <em>${now.tp}</em> of the ${nLeak} leaks and dig ${now.fp} dry holes</h1>
+      title: `Today's threshold of ${t2(T0)} sends crews to ${now.tp} of the ${nLeak} leaks and to ${now.fp} dry holes`,
+      content: `<h1 class="st-head" data-region="title">Today’s threshold of ${t2(T0)} sends crews to <em>${now.tp}</em> of the ${nLeak} leaks and to ${now.fp} dry holes</h1>
 <figure class="st-fig" data-region="primary">${ruleFigure()}</figure>
 ${source(`${SOURCE_STUDY} · one dot per site`, 'Strip plot by reference label')}`,
       notes: `First the observations: one dot per site, placed by its score, split by what the survey and excavation found. Leaks sit mostly to the right, but the two groups overlap between about 0.2 and 0.7. [Next] Then today's rule: everything at ${t2(T0)} or above gets a crew. Four counts fall out of that one line: ${now.tp} found, ${now.fn} missed, ${now.fp} dry, ${now.tn} correctly left alone.`,
@@ -396,10 +461,11 @@ ${source(`${SOURCE_STUDY} · Wilson score intervals · area under the ROC curve 
 <div class="widget" data-interactive="" id="research-threshold" data-region="primary"><div class="w-plot"></div><div class="w-controls"></div><output aria-live="polite" class="w-status"></output></div>
 ${widgetAxis()}
 <div class="readout" id="explore-readout" data-region="support">
+  <p class="ro-t">At threshold <b data-k="t">${t2(T0)}</b></p>
   <table><thead><tr><td></td><th scope="col">Crew sent</th><th scope="col">Not sent</th></tr></thead>
   <tbody><tr><th scope="row">Leak</th><td class="sent"><b data-k="tp">${now.tp}</b>found</td><td><b data-k="fn">${now.fn}</b>missed</td></tr>
   <tr><th scope="row">No leak</th><td class="sent"><b data-k="fp">${now.fp}</b>dry digs</td><td><b data-k="tn">${now.tn}</b>left alone</td></tr></tbody></table>
-  <p>Threshold <b data-k="t">${t2(T0)}</b>: <b data-k="sens">${pc(sens.p)}</b> of leaks found, <b data-k="dry">${pc(now.fp / now.digs)}</b> of digs dry</p>
+  <p class="ro-rates"><b data-k="sens">${pc(sens.p)}</b> of leaks found<br><b data-k="dry">${pc(now.fp / now.digs)}</b> of digs dry</p>
 </div>
 ${source(`${SOURCE_STUDY} · counts recomputed from the same ${sites.length} scores`, 'Interactive threshold')}`,
       notes: `Move the threshold and watch the two right-hand cells. Going down from 0.60 to 0.30, each step picks up exactly one more leak, and two to five more dry digs. Going up, dry digs vanish quickly but leaks go with them. The static handout keeps today's ${t2(T0)}; the next page has the other thresholds as a table.`,
@@ -445,15 +511,18 @@ ${source(SOURCE_STUDY, 'Study limits')}`,
     },
     {
       id: 'next', className: cls(),
-      title: `Before the threshold moves, the next study must price a missed leak and confirm about ${leaksNeeded} leaks`,
-      content: `<h1 class="st-head" data-region="title">Before the threshold moves, the next study must price a missed leak and confirm about ${leaksNeeded} leaks</h1>
+      title: `Before anyone moves the threshold, the next study must price a missed leak and confirm about ${leaksNeeded} leaks across the network`,
+      content: `<h1 class="st-head" data-region="title">Before anyone moves the threshold, the next study must price a missed leak and confirm about ${leaksNeeded} leaks across the network</h1>
 <div class="next" data-region="primary">
-  <section><h2>What a missed leak is worth</h2><b class="st-accent num">${t2(best[0].t)} → ${t2(best.at(-1).t)}</b><p>The best threshold moves this far as R goes from ${R[0]} to ${R.at(-1)}. Log flow and run time for every confirmed leak, and agree a value per cubic metre with finance.</p></section>
-  <section><h2>How many leaks to confirm</h2><b class="num">${leaksNeeded} leaks</b><p>Enough for ±10 points on sensitivity, against ±${fmt((sens.hi - sens.lo) * 50, { digits: 0 })} now: about ${count(sitesNeeded)} flagged sites at ${h(study.district)}’s leak rate of ${pc(nLeak / sites.length)}.</p></section>
-  <section><h2>Where and when to sample</h2><b class="num">3 × 2</b><p>Three districts, winter and summer, cast-iron and plastic mains, with a sample of quiet sites excavated to check the survey.</p></section>
+  <section><h2>Price a missed leak</h2><div class="vis"><b class="swing">${t2(best[0].t)} → ${t2(best.at(-1).t)}</b><span>best threshold as R goes from ${R[0]} to ${R.at(-1)} dry digs per missed leak</span></div>
+    <p>Log the flow and the run time of every confirmed leak, and agree a value per cubic metre with finance.</p></section>
+  <section><h2>Confirm about ${leaksNeeded} leaks</h2><div class="vis">${precisionFigure()}</div>
+    <p>That narrows sensitivity from ±${fmt(halfWidth(nLeak) * 100, { digits: 0 })} to ±${fmt(TARGET * 100, { digits: 0 })} points: about ${count(sitesNeeded)} flagged sites at ${h(study.district)}’s leak rate of ${pc(nLeak / sites.length)}.</p></section>
+  <section><h2>Three districts, two seasons</h2><div class="vis">${coverageFigure()}</div>
+    <p>${h(study.district)} in March is one cell of six. Excavate a sample of quiet sites as well, to count the leaks the survey misses.</p></section>
 </div>
-${source(`${SOURCE_STUDY} · sample size by normal approximation`, 'Next study')}`,
-      notes: `The order matters. Without R, a more precise study still cannot choose a threshold. With R and about ${leaksNeeded} confirmed leaks, the choice becomes a calculation we can defend to the regulator and to the crews.`,
+${source(`${SOURCE_STUDY} · intervals and sample size by the Wilson method`, 'Next study')}`,
+      notes: `The order matters. Without R, a more precise study still cannot choose a threshold. With R and about ${leaksNeeded} confirmed leaks from more than one district and season, the choice becomes a calculation we can defend to the regulator and to the crews.`,
       sources,
     },
   ],

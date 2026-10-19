@@ -21,10 +21,10 @@ that turns a correlation into a cause.
 
 | Attribute | Meaning |
 |---|---|
-| `data-step="n"` | Hidden until build `n` (0 = visible from the start). `data-until="m"` hides it after build `m`. |
+| `data-step="n"` | Hidden until build `n` (0 = visible from the start). `data-until="m"` hides it after build `m` (on its own: visible from 0 through `m`; the slide then has a build `m + 1`). |
 | `data-motion="preset"` | How it enters (table below). Unknown names raise a player warning, which fails QA. |
-| `data-delay="ms"` | Wait before entering (≤ 2400). Use for deliberate order inside one build. |
-| `data-stagger="ms"` | On a parent: its children enter one after another with this gap. |
+| `data-delay="ms"` | Wait before entering or before a `data-states` change (≤ 2400). Use for deliberate order inside one build. |
+| `data-stagger="ms"` | On a parent: its children enter (or change state) one after another with this gap. |
 | `data-duration="ms"` | Effect length (default 500, max 1600). |
 | `data-easing` | `standard`, `emphasized`, `decelerate`, `accelerate`, `smooth`, `linear`, or any CSS easing. |
 

@@ -28,9 +28,9 @@ export default {
   exportPolicy: 'final',
   className: 'tpl-launch ln-hero',
   content: `<h1 class="ln-at ln-display ln-green" data-region="title" style="left:${C(1)}px;top:64px">${launch.name}</h1>
-<p class="ln-at ln-lead" data-region="support" style="left:${C(1)}px;top:236px;width:${span(1, 6)}px;text-wrap:balance">${nb(launch.changed)}</p>
-<p class="ln-at ln-body ln-grey" style="left:${C(1)}px;top:476px;width:${span(1, 6)}px">${launch.availability.map(nb).join('<br>')}</p>
-<figure class="ln-at ln-rule" data-region="primary" style="left:${C(8)}px;top:236px;width:${span(8, 12)}px" aria-label="Sample return rule">
+<p class="ln-at ln-lead" data-region="support" style="left:${C(1)}px;top:272px;width:${span(1, 6)}px;text-wrap:balance">${nb(launch.changed)}</p>
+<p class="ln-at ln-body" style="left:${C(1)}px;top:512px;width:${span(1, 6)}px">${launch.availability.map(nb).join('<br>')}</p>
+<figure class="ln-at ln-rule" data-region="primary" style="left:${C(8)}px;top:272px;width:${span(8, 12)}px" aria-label="Sample return rule">
   <h3>${rule.name}</h3>
   <dl><dt>When</dt><dd>${rule.when.map(nb).join('<br>')}</dd><dt>Then</dt><dd>${rule.then.map(nb).join('<br>')}</dd></dl>
   <p>${rule.note}</p>

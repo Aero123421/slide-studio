@@ -88,7 +88,7 @@ function maskPanel(x0) {
 }
 const bx = P + gap;
 const caption = (x, y, lines) => el('text', { x, y, class: 's-lab' }, lines.map((l, k) => el('tspan', { x, dy: k ? 22 : null }, l)).join(''));
-const fig = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-labelledby="${ID}-t ${ID}-d">
+const fig = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" shape-rendering="crispEdges" role="img" aria-labelledby="${ID}-t ${ID}-d">
 <title id="${ID}-t">ひび割れを含む画像の一部と、その正解マスク（模式図）</title>
 <desc id="${ID}-d">(a) ${N}×${N}画素の点検画像。幅${wMax}画素から${wMin}画素へ細くなるひび割れが枝分かれして走り、細い部分は背景とほぼ同じ濃さになる。(b) 同じ範囲の正解マスク。ひび割れの画素に1を付けると${n0(N * N)}画素のうち${crackPixels}画素（${(share * 100).toFixed(1)}%）になる。</desc>
 <text x="0" y="18" class="s-panel">(a) 点検画像の一部<tspan class="s-lab" dx="10">${N}×${N}画素</tspan></text>
@@ -96,7 +96,7 @@ const fig = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" 
 ${patch(0)}
 ${maskPanel(bx)}
 ${caption(0, top + P + 30, [`幅${wMax}画素の幹から幅${wMin}画素の枝まで。`, '細い部分は背景とほとんど同じ濃さ'])}
-${caption(bx, top + P + 30, [`1を付ける画素は${n0(N * N)}のうち${crackPixels}`, `（${(share * 100).toFixed(1)}%）。1画素ずつ塗って決める`])}
+${caption(bx, top + P + 30, [`1を付けるのは${crackPixels}画素（${(share * 100).toFixed(1)}%）。`, '1画素ずつ塗って決める'])}
 </svg>`;
 
 export default {

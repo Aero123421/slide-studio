@@ -1,7 +1,7 @@
 // Diagram study · Botanical line study — a tea branch drawn from a stem curve and a parametric leaf.
 // Every leaf is the same function (outline with serrations, midrib, paired veins) placed along the
 // stem at alternating angles, so stroke weights and proportions stay consistent across the drawing.
-import { svgRoot, el, g, theme as makeTheme, mixHex, pathFromPoints, textLines } from '../runtime/figure.mjs';
+import { svgRoot, el, g, theme as makeTheme, pathFromPoints, textLines } from '../runtime/figure.mjs';
 
 // 茶園の摘採計画（架空）。一番茶は立春から数えて八十八夜目に摘みはじめる。
 const garden = { name: '沢谷茶園', hectares: 3.2 };
@@ -20,13 +20,11 @@ const motif = {
   bud: 48, angle: 48, width: 0.4, teeth: 14,
 };
 
-const tone = (t, a, b, k) => (t.literal ? mixHex(t.hex(a), t.hex(b), k) : `color-mix(in srgb, ${t.c(a)}, ${t.c(b)} ${+(k * 100).toFixed(1)}%)`);
-
 export function figure(theme = 'css') {
   const t = makeTheme(theme), [P0, P1, P2, P3] = motif.stem;
   const B = s => [0, 1].map(i => (1 - s) ** 3 * P0[i] + 3 * (1 - s) ** 2 * s * P1[i] + 3 * (1 - s) * s ** 2 * P2[i] + s ** 3 * P3[i]);
   const dB = s => [0, 1].map(i => 3 * (1 - s) ** 2 * (P1[i] - P0[i]) + 6 * (1 - s) * s * (P2[i] - P1[i]) + 3 * s ** 2 * (P3[i] - P2[i]));
-  const ink = t.c('ink'), vein = tone(t, 'paper', 'ink', 0.62);
+  const ink = t.c('ink'), vein = t.mix('ink', 'paper', 0.62);
   // One leaf: axis from `base` along angle `a` (radians), slightly curved; serrated margin; midrib and veins.
   const leaf = (base, a, L, { wash = 0.06, folded = 1 } = {}) => {
     const ux = Math.cos(a), uy = Math.sin(a), vx = -uy, vy = ux, half = (L * motif.width * folded) / 2;
@@ -46,7 +44,7 @@ export function figure(theme = 'css') {
     }
     const midrib = pathFromPoints(Array.from({ length: 21 }, (_, i) => axis((i / 20) * 0.97)));
     return g({},
-      el('path', { d: outline, fill: tone(t, 'paper', 'ink', wash), stroke: ink, 'stroke-width': 1.5, 'stroke-linejoin': 'round' }),
+      el('path', { d: outline, fill: t.mix('ink', 'paper', wash), stroke: ink, 'stroke-width': 1.5, 'stroke-linejoin': 'round' }),
       el('path', { d: midrib, fill: 'none', stroke: ink, 'stroke-width': 1.1 }),
       g({ fill: 'none', stroke: vein, 'stroke-width': 0.9, 'stroke-linecap': 'round' }, veins));
   };

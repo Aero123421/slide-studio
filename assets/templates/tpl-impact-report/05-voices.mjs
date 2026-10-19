@@ -25,9 +25,9 @@ export default {
   exportPolicy: 'final',
   className: 'tpl-impact-report ir-voices',
   content: `<h1 class="ir-h" data-region="title">変化は、子ども自身の言葉にも、家庭と学校の声にも表れている</h1>
-<div data-region="primary">${quote(main, '', 'left:64px;top:206px;width:662px')}</div>
-<div data-region="support">${quote(rest[0], ' is-s', 'left:848px;top:210px;width:368px')}
+<div data-region="primary">${quote(main, '', 'left:162px;top:200px;width:564px')}</div>
+<div data-region="support">${quote(rest[0], ' is-s', 'left:848px;top:200px;width:368px')}
 <hr class="ir-q-rule">
-${quote(rest[1], ' is-s', 'left:848px;top:438px;width:368px')}</div>
+${quote(rest[1], ' is-s', 'left:848px;top:428px;width:368px')}</div>
 <div class="ir-foot" data-region="source"><p>${source.when}の${source.how}から、本人の了解を得て掲載（この例は架空の声）</p><p>ゆうがた教室　2025年度 活動報告<b>5</b></p></div>`,
 };

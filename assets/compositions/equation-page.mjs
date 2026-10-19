@@ -14,11 +14,11 @@ const f1 = v => fmt(v, { digits: 1 }), f2 = v => fmt(v, { digits: 2 });
 const unit = 'W m<sup>−2</sup>';
 const math = (inner, label) => `<math aria-label="${label}">${inner}</math>`;
 const terms = [
-  { sym: math('<mi mathvariant="normal">Δ</mi><mi>F</mi>', 'Delta F'), text: 'Radiative forcing: extra energy kept per square metre of Earth, compared with 1750', value: unit },
+  { sym: math('<mi mathvariant="normal">Δ</mi><mi>F</mi>', 'Delta F'), text: 'Forcing: extra energy kept per m² since 1750', value: unit },
   { sym: math('<mi>C</mi>', 'C'), text: 'CO₂ in the air now', value: `${today.c} ppm` },
   { sym: math('<msub><mi>C</mi><mn>0</mn></msub>', 'C zero'), text: 'CO₂ before 1750', value: `${law.c0} ppm` },
-  { sym: math(`<mn>${law.a}</mn>`, String(law.a)), text: 'Fitted to detailed radiative-transfer calculations', value: unit },
-  { sym: math('<mi mathvariant="normal">ln</mi>', 'natural logarithm'), text: 'Natural logarithm: every doubling adds the same step', value: '', hot: true },
+  { sym: math(`<mn>${law.a}</mn>`, String(law.a)), text: 'Fitted to radiative-transfer calculations', value: unit },
+  { sym: math('<mi mathvariant="normal">ln</mi>', 'natural logarithm'), text: 'Natural log: each doubling adds one equal step', value: '', hot: true },
 ];
 
 export function figure(themeArg = 'css') {
@@ -29,7 +29,7 @@ export function figure(themeArg = 'css') {
     const c0 = doublings[i], yA = y(forcing(c0)), yB = y(forcing(c));
     return g({},
       el('path', { d: `M${x(c0)} ${yA}H${x(c)}V${yB}`, fill: 'none', stroke: t.c('accent'), 'stroke-width': 2.4 }),
-      textLines(['×2'], { x: (x(c0) + x(c)) / 2, y: yA + 22, size: 17, anchor: 'middle', fill: t.c('ink'), weight: 600 }),
+      textLines(['×2'], { x: (x(c0) + x(c)) / 2, y: yA - 9, size: 17, anchor: 'middle', fill: t.c('ink'), weight: 600 }),
       textLines([`+${f1(perDoubling)}`], { x: x(c) + 8, y: (yA + yB) / 2, size: 17, valign: 'middle', fill: t.c('accent'), weight: 700 }));
   });
   return svgRoot({ id: 'composition-equation-page-fig', width: W, height: H, theme: t,
@@ -44,8 +44,10 @@ export function figure(themeArg = 'css') {
   stairs,
   el('path', { d: pathFromPoints(curve), fill: 'none', stroke: t.c('ink'), 'stroke-width': 3, 'stroke-linejoin': 'round' }),
   el('circle', { cx: x(today.c), cy: y(now), r: 6, fill: t.c('ink'), stroke: t.c('paper'), 'stroke-width': 2 }),
-  textLines([`${today.year}: ${today.c} ppm,`, `${f1(now)} W m⁻²`], { x: x(today.c) - 12, y: y(now) - 34, size: 17, anchor: 'end', lineHeight: 1.25, fill: t.c('ink') }),
-  doublings.map(c => textLines([`${fmt(c)}`], { x: x(c), y: y(forcing(c)) + (c === law.c0 ? 22 : -14), size: 15, anchor: 'middle', fill: t.c('muted') })));
+  textLines([String(today.year)], { x: x(today.c) - 10, y: y(now) - 10, size: 17, anchor: 'end', fill: t.c('ink'), weight: 600 }),
+  doublings.map((c, i) => textLines([`${fmt(c)} ppm`], i === 0
+    ? { x: x(c) + 8, y: y(0) + 22, size: 15, fill: t.c('muted') }
+    : { x: x(c) - 8, y: y(forcing(c)) - 10, size: 15, anchor: 'end', fill: t.c('muted') })));
 }
 
 export default {
@@ -58,10 +60,10 @@ export default {
   exportPolicy: 'final',
   content: `<h1 class="st-head">Each doubling of CO₂ adds the same <em>${f1(perDoubling)} W m<sup>−2</sup></em> of forcing</h1>
 <div class="eq-formula" data-region="primary">
-  <math class="eq-main" aria-label="Delta F equals ${law.a} times the natural logarithm of C over C zero"><mrow><mi mathvariant="normal">Δ</mi><mi>F</mi><mo>=</mo><mn>${law.a}</mn><mo>&#x2062;</mo><mrow class="eq-hot"><mi mathvariant="normal">ln</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mfrac><mi>C</mi><msub><mi>C</mi><mn>0</mn></msub></mfrac><mo>)</mo></mrow></mrow></mrow></math>
+  <math class="eq-main" aria-label="Delta F equals ${law.a} times the natural logarithm of C over C zero"><mrow><mi mathvariant="normal">Δ</mi><mi>F</mi><mo>=</mo><mn>${law.a}</mn><mspace width="0.22em"></mspace><mi mathvariant="normal" class="eq-hot">ln</mi><mo>&#x2061;</mo><mrow><mo stretchy="false">(</mo><mi>C</mi><mo>/</mo><msub><mi>C</mi><mn>0</mn></msub><mo stretchy="false">)</mo></mrow></mrow></math>
   <p class="eq-words">In words: the extra heating grows with the logarithm of how many times CO₂ has multiplied since 1750.</p>
 </div>
-<dl class="eq-terms" data-region="support">${terms.map(r => `<div${r.hot ? ' class="eq-hot"' : ''}><dt>${r.sym}</dt><dd>${r.text}</dd><dd class="eq-unit">${r.value}</dd></div>`).join('')}</dl>
+<dl class="eq-terms" data-region="support">${terms.map(r => `<div${r.hot ? ' class="eq-hot"' : ''}><dt>${r.sym}</dt>${r.value ? `<dd>${r.text}</dd><dd class="eq-unit">${r.value}</dd>` : `<dd class="eq-span">${r.text}</dd>`}</div>`).join('')}</dl>
 <p class="eq-example" data-region="support">${today.year}: ${law.a} × ln(${today.c} ⁄ ${law.c0}) = <b>${f2(now)} ${unit}</b></p>
 <figure class="eq-fig" data-region="primary">${figure()}</figure>
 <p class="st-source" data-region="source"><span>Simplified expression for CO₂ forcing; constants from the published fit, ${today.year} value rounded</span><span>Equation, terms and one plot</span></p>`,

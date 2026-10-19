@@ -1,6 +1,6 @@
 // Diagram study · Landscape planes — depth from a few flat planes: pale far ridges, darker near hills, a lit valley floor.
 // Each ridge line is seeded noise with its own scale; the valley is a dip shared by the near planes.
-import { svgRoot, el, theme as makeTheme, mixHex, noise2D, pathFromPoints, textLines, sum } from '../runtime/figure.mjs';
+import { svgRoot, el, theme as makeTheme, noise2D, pathFromPoints, textLines, sum } from '../runtime/figure.mjs';
 
 // 湿地の調査：年ごとの確認種数と踏査日数（架空のデータ）。
 const surveys = [
@@ -25,8 +25,6 @@ const motif = {
   wetland: { x: 872, y: 634, rx: 104, ry: 19, label: [1040, 640] },
 };
 
-const tone = (t, a, b, k) => (t.literal ? mixHex(t.hex(a), t.hex(b), k) : `color-mix(in srgb, ${t.c(a)}, ${t.c(b)} ${+(k * 100).toFixed(1)}%)`);
-
 export function figure(theme = 'css') {
   const t = makeTheme(theme), noise = noise2D(motif.seed), { valley } = motif;
   const ridge = (p, k) => {
@@ -46,8 +44,8 @@ export function figure(theme = 'css') {
   return svgRoot({ id: 'landscape-study-fig', width: W, height: H, theme: t,
     title: '谷戸の風景：遠い尾根から谷底の湿地まで',
     desc: `遠くの淡い尾根から手前の濃い丘まで${motif.planes.length}枚の面を重ね、谷底の明るい平地に調査区の湿地を置いた架空の風景画。実在の場所ではない。` },
-  motif.planes.map((p, k) => el('path', { d: ridge(p, k), fill: tone(t, 'paper', 'ink', p.tone) })),
-  el('path', { d: pathFromPoints([...floorPts, [W, H], [0, H]], { close: true }), fill: tone(t, 'paper', 'ink', motif.floor.tone) }),
+  motif.planes.map((p, k) => el('path', { d: ridge(p, k), fill: t.mix('ink', 'paper', p.tone) })),
+  el('path', { d: pathFromPoints([...floorPts, [W, H], [0, H]], { close: true }), fill: t.mix('ink', 'paper', motif.floor.tone) }),
   el('path', { d: pathFromPoints(marsh, { curve: 'linear', close: true }), fill: t.c('accent') }),
   // Label on the lit valley floor, never on the dark hills.
   el('line', { x1: w.x + w.rx * 0.9, y1: w.y + 2, x2: w.label[0] - 10, y2: w.label[1], stroke: t.c('ink'), 'stroke-width': 1.2 }),

@@ -47,7 +47,7 @@ export default {
   exportPolicy: 'final',
   className: 'tpl-impact-report ir-logic',
   content: `<h1 class="ir-h" data-region="title">学習会を重ねるうちに、<br>宿題を最後までやり切る子どもは${K.homework.july}%から${K.homework.feb}%に増えた</h1>
-${stages.map((s, i) => `<section class="ir-stage${s.out ? ' is-out' : ''}" style="left:${cols[i]}px" data-region="${s.out ? 'primary' : 'support'}"><h2>${s.h}<span>${s.sub}</span></h2>
+${stages.map((s, i) => `<section class="ir-stage${s.out ? ' is-out' : ''}" style="left:${cols[i]}px" data-region="${s.out ? 'primary' : 'support'}"><div class="ir-stage-h"><h2>${s.h}</h2><span>${s.sub}</span></div>
   <ul>${s.items.map(it => `<li><b>${it.pre ? `<small class="pre">${it.pre}</small>` : ''}${it.v}<small>${it.u}</small></b>${it.t}${it.how ? `<i>${it.how}</i>` : ''}</li>`).join('')}</ul></section>`).join('\n')}
 ${flow}
 <p class="ir-goal"><span>めざす姿</span>${goal}</p>

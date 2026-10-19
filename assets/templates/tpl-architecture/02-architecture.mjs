@@ -59,10 +59,10 @@ function route(l) {
   const vx = gapX(a, b);
   return [[x0, y0], [vx, y0], [vx, y1], [x1, y1]];
 }
-const RED = 'var(--ar-red)', GREY = 'var(--ar-line)', INK = 'var(--ar-ink)';
+const RED = 'var(--ar-red)', INK = 'var(--ar-ink)';
 const DASH = { sync: null, async: '7 5', repl: '1.5 5' };
 const path = pts => pts.map((p, i) => `${i ? 'L' : 'M'}${p[0]} ${p[1]}`).join('');
-const edge = l => `<path d="${path(route(l))}" fill="none" stroke="${l.incident ? RED : GREY}" stroke-width="${l.incident ? 2.4 : 1.6}"${DASH[l.kind] ? ` stroke-dasharray="${DASH[l.kind]}"` : ''} stroke-linecap="${l.kind === 'repl' ? 'round' : 'butt'}" stroke-linejoin="round" marker-end="url(#${ID}-${l.incident ? 'red' : 'grey'})"/>`;
+const edge = l => `<path d="${path(route(l))}" fill="none" stroke="${l.incident ? RED : INK}" stroke-width="${l.incident ? 2.4 : 1.5}"${DASH[l.kind] ? ` stroke-dasharray="${DASH[l.kind]}"` : ''} stroke-linecap="${l.kind === 'repl' ? 'round' : 'butt'}" stroke-linejoin="round" marker-end="url(#${ID}-${l.incident ? 'red' : 'ink'})"/>`;
 const box = b => `<g><rect x="${b.x}" y="${b.y}" width="${b.w}" height="${b.h}" rx="5" fill="${b.degraded ? 'var(--ar-red-tint)' : 'var(--ar-paper)'}" stroke="${b.degraded ? RED : INK}" stroke-width="${b.degraded ? 2 : 1.25}"/>`
   + `<text x="${b.x + 14}" y="${b.y + 28}" class="${b.plain ? 't-strong' : 't-name'}"${b.plain ? ' style="font-size:17px"' : ''}>${b.name}</text>`
   + `<text x="${b.x + 14}" y="${b.y + 50}" class="t-role${b.degraded ? ' t-red' : ''}">${b.role}</text></g>`;
@@ -70,9 +70,9 @@ const bands = zones.map(z => `<rect x="${Z[z.id].x}" y="0" width="${z.width}" he
 // legend: line styles carry meaning, so they are the one thing that needs a key
 const LY = BAND_H + 40;
 const key = [
-  { label: 'Synchronous call', w: 150, swatch: x => `<line x1="${x}" y1="${LY - 5}" x2="${x + 34}" y2="${LY - 5}" stroke="${GREY}" stroke-width="1.6"/>` },
-  { label: 'Asynchronous event', w: 168, swatch: x => `<line x1="${x}" y1="${LY - 5}" x2="${x + 34}" y2="${LY - 5}" stroke="${GREY}" stroke-width="1.6" stroke-dasharray="7 5"/>` },
-  { label: 'Replication', w: 108, swatch: x => `<line x1="${x}" y1="${LY - 5}" x2="${x + 34}" y2="${LY - 5}" stroke="${GREY}" stroke-width="1.6" stroke-dasharray="1.5 5" stroke-linecap="round"/>` },
+  { label: 'Synchronous call', w: 150, swatch: x => `<line x1="${x}" y1="${LY - 5}" x2="${x + 34}" y2="${LY - 5}" stroke="${INK}" stroke-width="1.5"/>` },
+  { label: 'Asynchronous event', w: 168, swatch: x => `<line x1="${x}" y1="${LY - 5}" x2="${x + 34}" y2="${LY - 5}" stroke="${INK}" stroke-width="1.5" stroke-dasharray="7 5"/>` },
+  { label: 'Replication', w: 108, swatch: x => `<line x1="${x}" y1="${LY - 5}" x2="${x + 34}" y2="${LY - 5}" stroke="${INK}" stroke-width="1.5" stroke-dasharray="1.5 5" stroke-linecap="round"/>` },
   { label: 'Incident path', w: 118, swatch: x => `<line x1="${x}" y1="${LY - 5}" x2="${x + 34}" y2="${LY - 5}" stroke="${RED}" stroke-width="2.4"/>` },
   { label: 'Degraded component', w: 170, swatch: x => `<rect x="${x + 6}" y="${LY - 13}" width="22" height="16" rx="3" fill="var(--ar-red-tint)" stroke="${RED}" stroke-width="2"/>` },
 ];
@@ -84,7 +84,7 @@ const incidentPath = links.filter(l => l.incident).map(l => `${B[l.from].name} â
 const fig = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-labelledby="${ID}-t ${ID}-d">
 <title id="${ID}-t">Checkout architecture by network zone, with the incident path</title>
 <desc id="${ID}-d">${zones.map(z => `${z.label}: ${parts.filter(p => p.zone === z.id).map(p => p.name).join(', ')}`).join('. ')}. Incident path: ${incidentPath}. Degraded: ${parts.filter(p => p.degraded).map(p => `${p.name} (${p.role})`).join('; ')}. ${B.promo.name} invalidated the cache asynchronously; ${B.reporting.name} reads the same replica; ${B.primary.name} replicates to it.</desc>
-<defs>${marker('red', RED)}${marker('grey', GREY)}</defs>
+<defs>${marker('red', RED)}${marker('ink', INK)}</defs>
 ${bands}${links.map(edge).join('')}${parts.map(p => box(B[p.id])).join('')}${legend}
 </svg>`;
 

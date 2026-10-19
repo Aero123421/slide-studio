@@ -95,7 +95,7 @@ wrap, `marker: 'dot'|'ring'|'none'`, `leader: 'elbow'|'straight'|'none'`.
 | `dotPlot` | `data:[{label, values:{s: v}}]`, `series` | Cleveland dot plot; `legend:false` when the headline names the series; `valueLabels:'all'` |
 | `lollipopChart` | `data:[{label, value}]` | Lighter alternative to bars; `reference:{value,label}` threshold |
 | `bulletChart` | `data:[{label, sub, value, target, ranges}]` | Actual vs target vs qualitative ranges |
-| `waterfallChart` | `data:[{label, value, total?}]` | Running total; connectors; validated totals |
+| `waterfallChart` | `data:[{label, value, total?}]` | Running total; connectors; validated totals; `build:{…, holdFirst:true}` keeps the opening total on the page from build 0 |
 
 ### Part to whole
 | `waffleChart` | `value`/`total` or `parts` | 10×10 = 1% cells, filled from bottom-left; largest-remainder rounding; `align:'start'|'end'` |
@@ -141,6 +141,11 @@ wrap, `marker: 'dot'|'ring'|'none'`, `leader: 'elbow'|'straight'|'none'`.
 | `matrixDiagram` | `rows`, `cols`, `cells`, `symbols` | RACI / coverage with ●◐○ |
 
 All statistics charts accept `xTickValues` / `yTickValues` for explicit ticks (e.g. hourly marks).
+Every chart takes `before` (markup or a function of the figure context, painted under the marks)
+and `extra` (painted above). Diagrams take `bare:true` (with optional `x`, `y`) to return a `<g>`
+for composing several drawings inside one `svgRoot`. `vectorField` takes `maxMagnitude` so panels
+and a key share one arrow scale. Text wraps at ordinary spaces only: join a number and its unit
+with a no-break space (`15\u00a0min`) to keep them on one line.
 Diagrams accept `arrowSize` (default 12). In `flowDiagram`, `labelPos: 0.5` on an edge puts its
 label at the middle of the connector — use it when labels would meet arrowheads in tight layers.
 

@@ -4,18 +4,18 @@
 import { svgRoot, el, g, textLines, fmt } from '../../runtime/figure.mjs';
 
 const ID = 'tpl-qbr-cohort-heatmap';
-// 継続率（契約社数ベース、%）. Each row lists quarters 1, 2, … since contract, up to the end of 2026年7–9月.
+// 継続率（契約社数ベース、%）. Each row lists quarters 1, 2, … since contract, up to the end of 2026年7〜9月.
 const cohorts = [
-  { label: '2024年7–9月', values: [95.2, 92.6, 90.9, 89.5, 88.4, 87.6, 86.9, 86.3] },
-  { label: '2024年10–12月', values: [95.6, 93.1, 91.2, 89.9, 88.9, 88.0, 87.2] },
-  { label: '2025年1–3月', values: [95.0, 92.8, 91.0, 89.6, 88.5, 87.8] },
-  { label: '2025年4–6月', values: [95.8, 93.4, 91.6, 90.3, 89.3] },
-  { label: '2025年7–9月', values: [95.4, 93.1, 91.4, 90.1] },
-  { label: '2025年10–12月', values: [98.1, 96.7, 95.6] },
-  { label: '2026年1–3月', values: [97.8, 96.3] },
-  { label: '2026年4–6月', values: [98.3] },
+  { label: '2024年7〜9月', values: [95.2, 92.6, 90.9, 89.5, 88.4, 87.6, 86.9, 86.3] },
+  { label: '2024年10〜12月', values: [95.6, 93.1, 91.2, 89.9, 88.9, 88.0, 87.2] },
+  { label: '2025年1〜3月', values: [95.0, 92.8, 91.0, 89.6, 88.5, 87.8] },
+  { label: '2025年4〜6月', values: [95.8, 93.4, 91.6, 90.3, 89.3] },
+  { label: '2025年7〜9月', values: [95.4, 93.1, 91.4, 90.1] },
+  { label: '2025年10〜12月', values: [98.1, 96.7, 95.6] },
+  { label: '2026年1〜3月', values: [97.8, 96.3] },
+  { label: '2026年4〜6月', values: [98.3] },
 ];
-const changeFrom = '2025年10–12月';   // first cohort after the onboarding change
+const changeFrom = '2025年10〜12月';   // first cohort after the onboarding change
 const changeMonth = '2025年10月';     // when the change took effect
 const change = `${changeMonth}から導入支援を刷新`;
 const compareAt = 2;                  // compare cohorts at this many quarters after contract

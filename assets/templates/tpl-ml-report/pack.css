@@ -4,7 +4,7 @@
    (starts 64,162,260,358,456,554,652,750,848,946,1044,1142). Scale: Headline 40 · Lead 22 · Body 20 · Label 16–17 · Caption 16 · Note 15. */
 .tpl-ml-report{
   --ml-paper:#ffffff;--ml-ink:#1b1e23;--ml-ink2:#454a52;--ml-muted:#676d76;--ml-rule:#d7dadf;--ml-grid:#edeff2;
-  --ml-model:#1f5a96;--ml-model-tint:#e8eff7;--ml-base:#9298a0;--ml-base-ink:#666c75;
+  --ml-model:#1f5a96;--ml-model-tint:#e8eff7;--ml-model-soft:#a9c0dc;--ml-base:#9298a0;--ml-base-soft:#d0d3d8;--ml-base-ink:#666c75;
   --ml-serif:"Charter","Bitstream Charter","Iowan Old Style",Caladea,Georgia,serif;
   --ml-sans:"Inter","Helvetica Neue",Arial,sans-serif;
   /* figure-engine tokens: the model is the accent, everything else is ink and grey */
@@ -25,7 +25,7 @@
   font:400 40px/1.13 var(--ml-serif);letter-spacing:-.012em;color:var(--ml-ink);text-wrap:balance}
 .tpl-ml-report .ml-fig{position:absolute;margin:0}
 .tpl-ml-report .ml-fig>svg{display:block;overflow:visible}
-.tpl-ml-report .ml-cap{position:absolute;margin:0;font:400 16px/1.45 var(--ml-sans);color:var(--ml-ink2)}
+.tpl-ml-report .ml-cap{position:absolute;margin:0;font:400 16px/1.45 var(--ml-sans);color:var(--ml-ink2);text-wrap:pretty}
 .tpl-ml-report .ml-cap b{font-weight:600;color:var(--ml-ink)}
 .tpl-ml-report .num{font-variant-numeric:tabular-nums}
 .tpl-ml-report .nw{white-space:nowrap}
@@ -41,12 +41,12 @@
 /* ---- rail: interpretation beside an exhibit (lines and space, no boxes) ---- */
 .tpl-ml-report .ml-rail{position:absolute;margin:0}
 .tpl-ml-report .ml-rail h2{margin:0 0 10px;font:400 24px/1.2 var(--ml-serif);color:var(--ml-ink)}
-.tpl-ml-report .ml-rail p{margin:0;padding:12px 0 14px;border-top:1px solid var(--ml-rule);font:400 18px/1.45 var(--ml-sans);color:var(--ml-ink2)}
+.tpl-ml-report .ml-rail p{margin:0;padding:12px 0 14px;border-top:1px solid var(--ml-rule);font:400 18px/1.45 var(--ml-sans);color:var(--ml-ink2);text-wrap:pretty}
 .tpl-ml-report .ml-rail p b{font-weight:600;color:var(--ml-ink)}
 
 /* ---- reading text and tables ---- */
 .tpl-ml-report .ml-lead{position:absolute;left:64px;top:172px;width:1054px;margin:0;font:400 20px/1.45 var(--ml-sans);color:var(--ml-ink2)}
-.tpl-ml-report .ml-note{position:absolute;left:64px;width:858px;margin:0;font:400 18px/1.5 var(--ml-sans);color:var(--ml-ink2)}
+.tpl-ml-report .ml-note{position:absolute;left:64px;width:858px;margin:0;font:400 18px/1.5 var(--ml-sans);color:var(--ml-ink2);text-wrap:pretty}
 .tpl-ml-report .ml-note b{font-weight:600;color:var(--ml-ink)}
 .tpl-ml-report .ml-table{position:absolute;left:64px;width:1152px;border-collapse:collapse;font:400 18px/1.35 var(--ml-sans);color:var(--ml-ink)}
 .tpl-ml-report .ml-table th{padding:0 24px 9px 0;text-align:left;vertical-align:bottom;font:600 16px/20px var(--ml-sans);color:var(--ml-muted);border-bottom:1.5px solid var(--ml-ink)}
@@ -72,6 +72,7 @@
 .tpl-ml-report .ml-cell .nm{display:block;margin-top:10px;font:500 18px/1.3 var(--ml-sans);color:var(--ml-ink)}
 .tpl-ml-report .ml-cell .rt{display:block;margin-top:2px;font:400 16px/1.4 var(--ml-sans);color:var(--ml-muted)}
 .tpl-ml-report .ml-costly{outline:3px solid var(--ml-ink);outline-offset:-2px;z-index:1}
+.tpl-ml-report .ml-quiet :is(b,.nm){color:var(--ml-muted)}
 .tpl-ml-report .ml-foot{grid-column:2/4;padding:10px 18px 0;font:400 16px/1.4 var(--ml-sans);color:var(--ml-ink2)}
 .tpl-ml-report .ml-foot b{font-weight:600;color:var(--ml-ink)}
 
@@ -86,3 +87,19 @@
 
 /* 04 importance: the engine bolds highlighted row labels; the colour already says it */
 .tpl-ml-report.ml-importance .ss-fig text[font-weight="700"]{font-weight:500}
+
+/* 05 calibration: the rail states the two summary numbers, raw → calibrated */
+.tpl-ml-report .ml-facts p b{display:block;margin-bottom:2px;font:600 26px/1.2 var(--ml-sans);letter-spacing:-.01em;color:var(--ml-ink)}
+
+/* 06 model card: a two-column reading page */
+.tpl-ml-report .ml-card{position:absolute;left:64px;top:194px;width:1152px;display:grid;grid-template-columns:564px 564px;column-gap:24px}
+.tpl-ml-report .ml-card h2{margin:18px 0 6px;font:400 24px/1.2 var(--ml-serif);color:var(--ml-ink)}
+.tpl-ml-report .ml-card h2:first-child{margin-top:0}
+.tpl-ml-report .ml-card p{margin:0 0 9px;font:400 18px/1.42 var(--ml-sans);color:var(--ml-ink2);text-wrap:pretty}
+.tpl-ml-report .ml-card p b{font-weight:600;color:var(--ml-ink)}
+.tpl-ml-report .ml-metrics{width:100%;border-collapse:collapse;font:400 18px/1.3 var(--ml-sans);border-top:1.5px solid var(--ml-ink)}
+.tpl-ml-report .ml-metrics :is(th,td){padding:7px 16px 8px 0;border-bottom:1px solid var(--ml-rule);text-align:left;vertical-align:baseline}
+.tpl-ml-report .ml-metrics th{font-weight:400;color:var(--ml-ink2)}
+.tpl-ml-report .ml-metrics td.num{font-weight:600;color:var(--ml-ink);text-align:right;white-space:nowrap}
+.tpl-ml-report .ml-metrics td:last-child{padding-right:0;color:var(--ml-muted)}
+.tpl-ml-report .ml-card .ml-when{margin-top:10px;font-size:16px;color:var(--ml-muted)}

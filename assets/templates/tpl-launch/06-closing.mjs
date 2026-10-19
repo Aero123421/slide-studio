@@ -9,7 +9,7 @@ const nb = s => s.replace(/(\d) (?=[A-Za-z€%°])/g, '$1 ');   // keep numbers
 const dates = [
   { date: '3 November 2026', what: 'Growth and Scale can switch, from today', today: true },
   { date: '1 December 2026', what: 'Starter can switch' },
-  { date: '31 March 2027', what: '1.x is switched off; accounts still on it move to 2.0' },
+  { date: '31 March 2027', what: '1.x ends; accounts still on it move over' },
 ];
 const start = [                          // a real sequence, so it is numbered
   'Open Settings, Returns, Version and choose 2.0. Your 1.x rules are copied across.',
@@ -30,8 +30,8 @@ export default {
   className: 'tpl-launch ln-closing',
   content: `<h2 class="ln-at ln-head" data-region="title" style="left:${C(1)}px;top:64px;width:${span(1, 10)}px">Switch to 2.0 from today; 1.x keeps working until ${nb(end)}</h2>
 <ol class="ln-at ln-dates" data-region="primary" style="left:${C(1)}px;top:212px;width:${span(1, 12)}px">${dates.map(d => `<li${d.today ? ' class="ln-today"' : ''}><b>${nb(d.date)}</b><span>${nb(d.what)}</span></li>`).join('')}</ol>
-<div class="ln-at" data-region="support" style="left:${C(1)}px;top:376px;width:${span(1, 6)}px"><h3 class="ln-col-head">How to start</h3><ol class="ln-steps">${start.map(s => `<li>${nb(s)}</li>`).join('')}</ol></div>
-<div class="ln-at" style="left:${C(7)}px;top:376px;width:${span(7, 12)}px"><h3 class="ln-col-head">Moving from 1.x</h3><p class="ln-body" style="margin-top:0">${nb(migration)}</p></div>
+<div class="ln-at" data-region="support" style="left:${C(1)}px;top:360px;width:${span(1, 6)}px"><h3 class="ln-col-head">How to start</h3><ol class="ln-steps">${start.map(s => `<li>${nb(s)}</li>`).join('')}</ol></div>
+<div class="ln-at" style="left:${C(7)}px;top:360px;width:${span(7, 12)}px"><h3 class="ln-col-head">Moving from 1.x</h3><p class="ln-body" style="margin-top:0">${nb(migration)}</p></div>
 <p class="ln-at ln-label" style="left:${C(1)}px;top:642.9px;width:${span(1, 6)}px">${contact.guide}</p>
 <p class="ln-at ln-label ln-grey" style="left:${C(7)}px;top:642.9px;width:${span(7, 12)}px">${contact.help}</p>`,
 };

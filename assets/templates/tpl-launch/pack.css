@@ -1,5 +1,5 @@
 /* Template pack: Product launch (tpl-launch). Every selector is scoped to .tpl-launch.
-   Light and precise: warm white paper, near-black ink, two greys, one brand green that means
+   Light and precise: warm white paper, near-black ink, greys (text, rule, fill, mark ≥ 3:1), one brand green that means
    "Fernhook 2.0" — the name once, 2.0's path, the recommended plan, what is new, today.
 
    Grid: 64 px margins; 12 columns of 74 px with 24 px gutters (column n starts at 64 + 98(n−1)).
@@ -8,7 +8,7 @@
    its first cap height to the element's `top` (Inter: ascent .97em, descent .24em, cap .73em).
    Scale: 120 display · 44 headline/figures · 26 lead · 20 body · 18 label · 15 note. */
 .tpl-launch{
-  --ln-paper:#FAFAF8;--ln-ink:#141414;--ln-grey:#62656A;--ln-rule:#DADAD5;--ln-context:#B9BAB5;--ln-tint:#EFEFEB;--ln-green:#0B6B4A;
+  --ln-paper:#FAFAF8;--ln-ink:#141414;--ln-grey:#62656A;--ln-rule:#DADAD5;--ln-context:#B9BAB5;--ln-mark:#8F918C;--ln-tint:#EFEFEB;--ln-green:#0B6B4A;
   --ln-display:"Inter Display","Inter","Helvetica Neue",Arial,sans-serif;
   --ln-text:"Inter","Helvetica Neue",Arial,sans-serif;
   /* figure-engine tokens */
@@ -65,6 +65,11 @@
 .tpl-launch .ln-list .ln-proof{font:600 44px/1 var(--ln-display);letter-spacing:-.02em;display:block}
 .tpl-launch .ln-list .ln-proof-what{display:block;margin-top:8px;font:400 18px/1.35 var(--ln-text);color:var(--ln-grey)}
 
+/* 05 integrations: the key shares the bottom line with the note. */
+.tpl-launch .ln-key{text-align:right;white-space:nowrap}
+.tpl-launch .ln-key i{display:inline-block;width:14px;height:14px;border-radius:50%;background:var(--ln-mark);margin:0 8px 0 28px;vertical-align:-1px}
+.tpl-launch .ln-key i.ln-new{background:var(--ln-green);margin-left:0}
+
 /* 04 pricing: a reading table. Four equal blocks of three columns; hairlines only. */
 .tpl-launch .ln-table{border-collapse:collapse;table-layout:fixed;font:400 18px/1.35 var(--ln-text);font-variant-numeric:tabular-nums}
 .tpl-launch .ln-table th,.tpl-launch .ln-table td{padding:9px 24px 9px 0;text-align:left;vertical-align:baseline;border-top:1px solid var(--ln-rule)}
@@ -75,7 +80,7 @@
 .tpl-launch .ln-table .ln-price td{padding-top:14px;padding-bottom:12px}
 .tpl-launch .ln-table .ln-price b{font:600 44px/1 var(--ln-display);letter-spacing:-.02em}
 .tpl-launch .ln-table .ln-price small{font:400 15px/1 var(--ln-text);color:var(--ln-grey);margin-left:6px}
-.tpl-launch .ln-table .ln-no{color:var(--ln-context)}
+.tpl-launch .ln-table .ln-no{color:var(--ln-grey)}
 .tpl-launch .ln-table tr:last-child>*{border-bottom:1px solid var(--ln-rule)}
 .tpl-launch .ln-table th:last-child,.tpl-launch .ln-table td:last-child{padding-right:0}
 /* The recommended plan: its position (the middle) and one 4 px green rule over its column — not the gutter. */

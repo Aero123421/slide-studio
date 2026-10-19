@@ -117,7 +117,7 @@ HTML_JS=r'''()=>{const out=[];const slides=[...document.querySelectorAll('.slide
    if(own&&!(el instanceof SVGElement&&el.tagName!=='text'&&el.tagName!=='tspan'))els.push({...box,kind:'text',text:el.innerText?.trim()||own,size:parseFloat(cs.fontSize)*k,color:rgb(cs.color)});
    const bg=rgb(cs.backgroundColor);if(bg&&!(el===s))els.push({...box,kind:'shape',fill:bg});
    for(const side of ['Top','Right','Bottom','Left']){const bw=parseFloat(cs['border'+side+'Width']);const bc=rgb(cs['border'+side+'Color']);if(bw>=2&&bc&&cs['border'+side+'Style']!=='none'){const others=['Top','Right','Bottom','Left'].filter(x=>x!==side).every(x=>parseFloat(cs['border'+x+'Width'])<1);if(others){const t=bw*k;const b=side==='Top'?{x:box.x,y:box.y,w:box.w,h:t}:side==='Bottom'?{x:box.x,y:box.y+box.h-t,w:box.w,h:t}:side==='Left'?{x:box.x,y:box.y,w:t,h:box.h}:{x:box.x+box.w-t,y:box.y,w:t,h:box.h};els.push({...b,kind:'shape',fill:bc,edgeOf:{...box}})}}}
-   if(el instanceof SVGGeometryElement){const f=rgb(cs.fill)||rgb(cs.stroke);if(f&&['rect','line'].includes(el.tagName))els.push({...box,kind:el.tagName==='line'?'line':'shape',fill:f,svg:true})}}
+   if(el instanceof SVGGeometryElement){const f=el.tagName==='line'?rgb(cs.stroke):(rgb(cs.fill)||rgb(cs.stroke));if(f&&['rect','line'].includes(el.tagName))els.push({...box,kind:el.tagName==='line'?'line':'shape',fill:f,svg:true})}}
   out.push({id:s.id||('slide-'+(i+1)),title:s.getAttribute('aria-label')||'',notes:s.dataset.notes||'',elements:els,style:styleSignals(s,r0,k)})}return out;
  // Style signals of the machine-made look: ornament, glow, chips, spaced caps, emoji, an accent phrase that labels nothing.
  function styleSignals(s,r0,k){
@@ -153,7 +153,7 @@ HTML_JS=r'''()=>{const out=[];const slides=[...document.querySelectorAll('.slide
     if(!(h1&&h1.contains(el))&&col)st.texts.push(col.hex);}
    if(el.children.length===0){const lines=(el.innerText||'').split('\n').map(x=>x.trim()).filter(Boolean);if(lines.length>=3&&lines.every(l=>l.length===1&&/[A-Za-z]/.test(l)))st.stacked.push(lines.join(''))}
    if(h1&&h1.contains(el))continue;
-   if(el instanceof SVGGeometryElement){for(const p of [cs.fill,cs.stroke]){const c=rgba(p);if(c&&c.a>.3)st.marks.push(c.hex)}}
+   if(el instanceof SVGGeometryElement){for(const p of (el.tagName==='line'?[cs.stroke]:[cs.fill,cs.stroke])){const c=rgba(p);if(c&&c.a>.3)st.marks.push(c.hex)}}
    else if(el!==s){const c=rgba(cs.backgroundColor);if(c&&c.a>.3)st.marks.push(c.hex);for(const sd of ['Top','Left','Bottom','Right'])if(parseFloat(cs['border'+sd+'Width'])>=1){const c2=rgba(cs['border'+sd+'Color']);if(c2&&c2.a>.3)st.marks.push(c2.hex)}}}
   if(h1){const hc=rgba(getComputedStyle(h1).color),kids=[...h1.querySelectorAll('*')].filter(e=>{const c=rgba(getComputedStyle(e).color);return c&&hc&&c.hex!==hc.hex&&(e.textContent||'').trim()});
    if(kids.length)st.accent={text:kids.map(e=>e.textContent.trim()).join(' ').slice(0,48),color:rgba(getComputedStyle(kids[0]).color).hex,head:hc&&hc.hex};}

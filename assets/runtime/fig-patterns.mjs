@@ -102,7 +102,9 @@ export function contourPlot(fn, { x = 0, y = 0, width, height, domain = { x0: 0,
 }
 
 /** Arrows for a 2-D vector field fn(x,y) → [u,v], sampled on a grid. Length ∝ magnitude (capped). */
-export function vectorField(fn, { x = 0, y = 0, width, height, domain = { x0: -1, x1: 1, y0: -1, y1: 1 }, cols = 18, rows = 11, theme: th, scale = 1, color, attrs = {} }) {
+export function vectorField(fn, { x = 0, y = 0, width, height, domain = { x0: -1, x1: 1, y0: -1, y1: 1 }, cols = 18, rows = 11, theme: th, scale = 1, color, maxMagnitude, attrs = {} }) {
+  // maxMagnitude fixes the length scale (arrow of length 0.82 cell = that magnitude), so two
+  // panels or a key share one scale; by default the sampled maximum sets it.
   const t = theme(th), out = [];
   const cw = width / cols, ch = height / rows, maxLen = Math.min(cw, ch) * 0.82;
   const samples = [];
@@ -111,12 +113,12 @@ export function vectorField(fn, { x = 0, y = 0, width, height, domain = { x0: -1
     const [u, v] = fn(fx, fy);
     samples.push({ px: x + (i + 0.5) * cw, py: y + (j + 0.5) * ch, u, v, m: Math.hypot(u, v) });
   }
-  const maxM = Math.max(...samples.map(s => s.m)) || 1;
+  const maxM = maxMagnitude ?? (Math.max(...samples.map(s => s.m)) || 1);
   for (const s of samples) {
-    const L = (s.m / maxM) * maxLen * scale, a = Math.atan2(-s.v, s.u);
+    const L = Math.min(1.25, s.m / maxM) * maxLen * scale, a = Math.atan2(-s.v, s.u);
     const x0 = s.px - (Math.cos(a) * L) / 2, y0 = s.py - (Math.sin(a) * L) / 2, x1 = s.px + (Math.cos(a) * L) / 2, y1 = s.py + (Math.sin(a) * L) / 2;
     const head = Math.min(7, L * 0.4), ha = 0.5;
-    const c = color || t.seqAt(0.35 + 0.65 * (s.m / maxM));
+    const c = color || t.seqAt(0.35 + 0.65 * Math.min(1, s.m / maxM));
     out.push(el('path', { d: `M${n(x0)} ${n(y0)}L${n(x1)} ${n(y1)}M${n(x1 - Math.cos(a - ha) * head)} ${n(y1 - Math.sin(a - ha) * head)}L${n(x1)} ${n(y1)}L${n(x1 - Math.cos(a + ha) * head)} ${n(y1 - Math.sin(a + ha) * head)}`, fill: 'none', stroke: c, 'stroke-width': 1.8, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }));
   }
   return g({ class: 'ss-vector-field', ...attrs }, out);

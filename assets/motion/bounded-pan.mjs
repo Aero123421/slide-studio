@@ -74,6 +74,6 @@ export default {
   exportPolicy: 'final',
   content: `<h1 class="st-head" style="font-family:var(--ss-font-sans)">${extYear}年の<em>延伸区間</em>の${ext.length}停留場で、全線の乗車の${extShare}%を占める</h1>
 <figure class="st-fig" data-region="primary"><div style="position:relative;width:${W}px;height:470px">${figure()}
-<div style="position:absolute;left:0;top:${viewY}px;width:${W}px;height:${viewH}px;overflow:hidden"><div style="width:${canvasW}px;height:${viewH}px" data-states="${statesAttr(pan)}" data-duration="1100" data-easing="smooth">${canvas()}</div></div></div></figure>
+<div style="position:absolute;left:0;top:${viewY}px;width:${W}px;height:${viewH}px;overflow:hidden" data-qa-text-clip="the canvas pans; stops outside the frame are off-screen by design"><div style="width:${canvasW}px;height:${viewH}px" data-states="${statesAttr(pan)}" data-duration="1100" data-easing="smooth">${canvas()}</div></div></div></figure>
 <p class="st-source" data-region="source"><span>架空のデータ · 2025年度の平日平均、ICカードの乗車記録</span><span>モーション · 固定した枠の中でパンする（2ステップ）</span></p>`,
 };

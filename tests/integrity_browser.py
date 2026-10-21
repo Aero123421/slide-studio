@@ -15,9 +15,9 @@ def run():
     def test(name,fn):
         try:fn();rows.append({'name':name,'passed':True})
         except Exception as e:rows.append({'name':name,'passed':False,'error':str(e)[:1200]})
-    def build(content,css=''):
+    def build(content,css='',script=None):
         deck={'title':'Rendered integrity study','css':'.slide{background:#fff;color:#14232e;padding:64px;font:28px Arial}h1{font-size:48px}'+css,
-              'slides':[{'id':'study','title':'Rendered integrity study','content':content}]}
+              'slides':[{'id':'study','title':'Rendered integrity study','content':content}],**({'script':script} if script else {})}
         js="import {renderCraft} from './scripts/craft-core.mjs';process.stdout.write(await renderCraft("+json.dumps(deck)+"));"
         return subprocess.check_output(['node','--input-type=module','-e',js],cwd=ROOT,text=True)
     integrity=(ROOT/'assets/runtime/rendered-integrity.js').read_text()
@@ -60,6 +60,18 @@ def run():
             r=inspect('<p style="position:absolute;left:90px;top:140px">A title must remain visible.</p><div style="position:absolute;left:80px;top:155px;width:700px;height:100px;background:#bbc;z-index:2"></div>')
             expect(has(r,'warnings','text-occlusion'),str(r))
         test('a text line hidden behind another element gets a stacking warning',occluded)
+        def sr_only_sibling():
+            r=inspect('<h1 style="position:relative;font-size:96px">6 hours<span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap">Six hours separate the two peaks</span></h1>')
+            expect(not has(r,'warnings','text-occlusion'),str(r))
+        test('visually hidden screen-reader text neither covers nor is covered',sr_only_sibling)
+        def empty_container():
+            r=inspect('<p style="position:absolute;left:90px;top:140px">Label text stays readable.</p><div style="position:absolute;left:80px;top:120px;width:700px;height:120px;z-index:2"><span data-step="1" style="visibility:hidden">Later</span></div>')
+            expect(not has(r,'warnings','text-occlusion'),str(r))
+        test('an empty, unpainted container over text is not an occlusion',empty_container)
+        def over_sibling():
+            r=inspect('<div style="position:relative;height:200px"><div style="position:absolute;left:0;top:0;width:500px;height:120px;background:#1d3557"></div><p style="position:absolute;left:20px;top:30px;color:#fff;margin:0">412,000 objects</p></div>')
+            expect(not r['integrityBlocking'] and any('412,000' in x['text'] for x in r['renderedIntegrity']['unmeasured']),str(r))
+        test('white text on a painted sibling shape is left to pixel review, not failed',over_sibling)
         version=browser.version;browser.close()
     test('QA uses the same CSS preflight as the build gate',lambda:expect(not css_preflight(['.x{color:red;.grid{display:grid}'])['passed']))
     with tempfile.TemporaryDirectory(prefix='studio-integrity-') as td:
@@ -70,6 +82,50 @@ def run():
         source.write_text(source.read_text().replace('</style>', '.broken{color:red;.grid{display:grid}</style>',1))
         args.out=str(folder/'broken-css');broken=render(args)
         test('syntactically broken stylesheet fails real QA even without pageerror',lambda:expect(not broken['passed'] and not broken['cssIntegrity']['passed']))
+        long='This label runs far past the right edge of the slide'
+        clips=('<svg style="position:absolute;left:880px;top:220px;overflow:visible" width="300" height="260"><svg width="300" height="120"><text x="60" y="70" font-size="28">'+long+'</text></svg>'
+               '<defs><clipPath id="cp"><rect x="0" y="130" width="300" height="120"/></clipPath></defs><g clip-path="url(#cp)"><text x="60" y="200" font-size="28">'+long+'</text></g></svg>')
+        source.write_text(build('<h1>Clipped labels</h1>'+clips));args.out=str(folder/'svg-clips');clipped_ok=render(args)
+        test('text clipped by a nested SVG viewport or an SVG clip path is not off-slide',lambda:expect(not clipped_ok['results'][0]['overflow'],str(clipped_ok['results'][0]['overflow'])))
+        source.write_text(build('<h1>Unclipped label</h1><svg style="position:absolute;left:880px;top:220px;overflow:visible" width="300" height="120"><text x="60" y="70" font-size="28">'+long+'</text></svg>'));args.out=str(folder/'svg-overflow');unclipped=render(args)
+        test('the same text without a clip is still reported off-slide',lambda:expect(unclipped['results'][0]['overflow'],str(unclipped['results'][0])))
+        source.write_text(build('<p style="font-size:220px;line-height:.9;margin:0">2.9</p><p style="margin:0;font-size:28px">kWh of heat per kWh of electricity</p>'));args.out=str(folder/'hero');hero=render(args)
+        test('a tight-leaded hero numeral is measured by its line box, not its font box',lambda:expect(not hero['results'][0]['overlaps'],str(hero['results'][0]['overlaps'])))
+        source.write_text(build('<p style="font-size:60px;margin:0">Overlapping line</p><p style="font-size:60px;margin:-50px 0 0">Second line on top</p>'));args.out=str(folder/'overlap');overlap=render(args)
+        test('text that really overlaps is still reported',lambda:expect(overlap['results'][0]['overlaps'],str(overlap['results'][0])))
+        # PDF text layer: Inter's alternates (figure punctuation, tabular digits) export as private-use
+        # code points; export.py must still deliver a searchable PDF (via its text-layer fallback).
+        source.write_text(build('<h1>Opening hours</h1><p style="font-family:Inter,Arial;font-variant-numeric:tabular-nums">Open 18:00 – 19:30, 1,234 visits, +12.5%</p>'))
+        pdf_out=folder/'hours.pdf'
+        exported=subprocess.run([sys.executable,str(ROOT/'scripts/export.py'),str(source),str(pdf_out),'--force'],capture_output=True,text=True)
+        def searchable_pdf():
+            expect(exported.returncode==0,exported.stdout[-600:]+exported.stderr[-600:])
+            from pypdf import PdfReader
+            text=PdfReader(str(pdf_out)).pages[0].extract_text()
+            expect('18:00' in text and '1,234' in text and not any(0xE000<=ord(c)<=0xF8FF for c in text),repr(text))
+        test('PDF export keeps figures and punctuation searchable when a font maps alternates to private use',searchable_pdf)
+        # A widget redraws for print (its onExport runs on beforeprint), after the fallback has been applied:
+        # the redrawn figures must be searchable too. The redraw keeps the same text, as a widget's does.
+        redraw="const draw=()=>{document.getElementById('axis').innerHTML=\"<text x='10' y='50' font-size='28' style='font-family:Inter;font-variant-numeric:tabular-nums'>0.1 0.2 0.3 at 18:00</text>\"};draw();addEventListener('beforeprint',draw);"
+        source.write_text(build("<h1>Axis drawn by a widget</h1><svg id='axis' width='900' height='80'></svg>",script=redraw));redraw_pdf=folder/'redraw.pdf'
+        redrawn=subprocess.run([sys.executable,str(ROOT/'scripts/export.py'),str(source),str(redraw_pdf),'--force'],capture_output=True,text=True)
+        def searchable_redraw():
+            expect(redrawn.returncode==0,redrawn.stdout[-600:]+redrawn.stderr[-600:])
+            from pypdf import PdfReader
+            text=PdfReader(str(redraw_pdf)).pages[0].extract_text()
+            expect('0.1 0.2 0.3' in text and '18:00' in text and not any(0xE000<=ord(c)<=0xF8FF for c in text),repr(text))
+        test('PDF text stays searchable when a widget redraws its figure while the page prints',searchable_redraw)
+        # CJK fonts that share one glyph between a radical and its ideograph make Chromium write ⽉/⻑
+        # into the text layer; the export rewrites those entries so 月 and 長 can be searched.
+        source.write_text(build('<h1 lang="ja">月次報告の作り方を見直す</h1><p lang="ja" style="font-family:\'Noto Sans CJK JP\',IPAPGothic,sans-serif">店長の時間を店に戻す。西宮店、長期、方針、見込み。</p>'))
+        ja_pdf=folder/'ja.pdf'
+        ja=subprocess.run([sys.executable,str(ROOT/'scripts/export.py'),str(source),str(ja_pdf),'--force'],capture_output=True,text=True)
+        def searchable_ja():
+            expect(ja.returncode==0,ja.stdout[-600:]+ja.stderr[-600:])
+            from pypdf import PdfReader
+            text=''.join(p.extract_text() for p in PdfReader(str(ja_pdf)).pages)
+            expect(all(w in text for w in ['月次','方','見直','店長','西宮']) and not any(0x2E80<=ord(c)<=0x2FDF for c in text),repr(text))
+        test('PDF export writes ideographs, not radical code points, so Japanese text can be searched',searchable_ja)
         source.write_text(build('<p style="background:#fff;color:#fff">Essential information.</p>'));args.out=str(folder/'broken-contrast');bad=render(args)
         test('severe rendered contrast failure reaches the QA exit gate',lambda:expect(not bad['passed'] and any(x['integrityBlocking'] for x in bad['results'])))
         if os.environ.get('SLIDE_STUDIO_INLINE')!='1':

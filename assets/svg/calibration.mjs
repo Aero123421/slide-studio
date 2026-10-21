@@ -1,17 +1,57 @@
-// Original editable study. Read notes for purpose, modifications, and invariants.
-// Asset placeholders are embedded by scripts/craft-core.mjs. Change content and geometry freely.
+// Diagram study · Calibration — does a predicted 70% come true 70% of the time?
+// The engine bins raw probabilities (10 equal-width bins), plots mean predicted against observed
+// frequency and draws the count per bin; the printed counts and the headline use the same bins.
+import { calibrationChart, calibrationBins, g, textLines, rng, fmt, pct, theme as makeTheme } from '../runtime/figure.mjs';
+
+// Held-out evaluation set (illustrative): 3,000 pump-weeks, 180 followed by a failure within 7 days,
+// each with the failure-risk model's predicted probability.
+const rand = rng(2025);
+const normal = () => Math.sqrt(-2 * Math.log(1 - rand())) * Math.cos(2 * Math.PI * rand());
+const N = 3000, failures = 180;
+const labels = Array.from({ length: N }, (_, i) => (i < failures ? 1 : 0));
+const probs = labels.map(y => Math.round(1000 / (1 + Math.exp(4.9 - 2.5 * (normal() + (y ? 1.9 : 0))))) / 1000);
+
+const bins = calibrationBins(probs, labels, 10);
+const used = bins.filter(b => b.n > 0);
+const worst = [...used].filter(b => b.n >= 20).sort((a, b) => (b.meanPredicted - b.observed) - (a.meanPredicted - a.observed))[0];
+const low = used.filter(b => b.x1 <= 0.3), lowGap = Math.max(...low.map(b => Math.abs(b.meanPredicted - b.observed)));
+const above = used.filter(b => b.x0 >= 0.3), aboveN = above.reduce((s, b) => s + b.n, 0);
+const overstated = above.filter(b => b.meanPredicted > b.observed).length;
+
+export function figure(theme = 'css') {
+  return calibrationChart({
+    id: 'calibration-fig', theme, width: 800, height: 470, fontSize: 17, histHeight: 70,
+    title: 'Reliability diagram for the pump-failure risk model, 10 equal-width bins',
+    desc: `Below 30% predicted risk, observed failure rates are within ${fmt(lowGap * 100, { digits: 0 })} percentage points of the prediction. Above 30%, ${overstated} of ${above.length} bins observe fewer failures than predicted; the ${pct(worst.x0)}–${pct(worst.x1)} bin predicts ${pct(worst.meanPredicted)} and observes ${pct(worst.observed)} (n = ${worst.n}). Most predictions sit below 10%.`,
+    bins, yLabel: 'Observed failure rate', xLabel: 'Mean predicted risk in bin', countLabel: 'Pump-weeks per bin (count printed)', perfectLabel: '',
+    annotate: [{ at: worst.meanPredicted, y: worst.observed, text: `Predicted ${pct(worst.meanPredicted)}, observed ${pct(worst.observed)} (n = ${worst.n})`, dx: -24, dy: 116, width: 340, marker: 'ring', color: makeTheme(theme).c('accent'), weight: 600 }],
+    // print every bin's count on its bar: sparse bins must read as sparse, not just as short bars
+    extra: ({ x, y, box, t }) => {
+      const histH = 70, base = box.y + box.h + 50 + histH, maxN = Math.max(...bins.map(q => q.n)); // the engine's histogram geometry
+      return g({ class: 'bin-counts' }, bins.map(b => {
+        const h = (b.n / maxN) * histH, inside = h > 26;
+        return textLines([fmt(b.n)], { x: (x(b.x0) + x(b.x1)) / 2, y: inside ? base - h + 18 : base - h - 5, size: 15, anchor: 'middle', fill: t.c('ink'), weight: 600 });
+      }),
+      // the diagonal's label, set level between gridlines where the curve runs below it (the engine's default sits on the curve)
+      textLines(['Perfectly calibrated'], { x: x(0.84), y: y(0.88), size: 16, fill: t.c('muted'), anchor: 'end' }));
+    },
+  });
+}
+
 export default {
   study: true,
-  "id": "calibration",
-  "title": "Calibration reliability",
-  "notes": "Purpose: Compare predicted probability with empirical frequency\nModify: Rewrite labels, recompute geometry from source data, adapt framing and orientation.\nInvariant: Include bin counts or uncertainty; define predicted and observed probability.\nStatic: Already static; preserve semantic labels and readable strokes.",
-  "sources": [
-    {
-      "type": "original-example",
-      "file": "assets/svg/calibration.svg"
-    }
-  ],
-  "exportPolicy": "final",
-  "className": "",
-  "content": "<h1 class=\"g-title\">Calibration reliability</h1><p class=\"g-purpose\">Compare predicted probability with empirical frequency</p><div class=\"g-demo\"><svg aria-labelledby=\"g-calibration-calibration-title g-calibration-calibration-desc\" role=\"img\" viewbox=\"0 0 800 440\" xmlns=\"http://www.w3.org/2000/svg\"><title id=\"g-calibration-calibration-title\">Calibration reliability</title><desc id=\"g-calibration-calibration-desc\">Compare predicted probability with empirical frequency. Original schematic. Values are illustrative, not measured.</desc><g data-part=\"drawing\"><line stroke=\"#17252d\" stroke-width=\"2\" x1=\"90\" x2=\"720\" y1=\"350\" y2=\"350\"></line><line stroke=\"#17252d\" stroke-width=\"2\" x1=\"90\" x2=\"90\" y1=\"70\" y2=\"350\"></line><line stroke=\"#718594\" stroke-dasharray=\"6 6\" stroke-width=\"2\" x1=\"90\" x2=\"700\" y1=\"350\" y2=\"65\"></line><polyline fill=\"none\" points=\"120.0,330.0 250.0,290.0 380.0,245.0 510.0,175.0 650.0,95.0\" stroke=\"#28617b\" stroke-width=\"4\"></polyline><circle cx=\"120\" cy=\"330\" fill=\"#ae4f31\" r=\"8\"></circle><circle cx=\"250\" cy=\"290\" fill=\"#ae4f31\" r=\"8\"></circle><circle cx=\"380\" cy=\"245\" fill=\"#ae4f31\" r=\"8\"></circle><circle cx=\"510\" cy=\"175\" fill=\"#ae4f31\" r=\"8\"></circle><circle cx=\"650\" cy=\"95\" fill=\"#ae4f31\" r=\"8\"></circle></g></svg>\n</div><div class=\"g-footer\">Original instructional study · schematic / synthetic content <code>assets/svg/calibration.svg</code></div>"
+  id: 'calibration',
+  title: 'Calibration: predicted probability against observed frequency',
+  className: 'st st--rail cs-tech-conference-light',
+  notes: 'Purpose: Check whether predicted probabilities can be read as probabilities, bin by bin, and show how many cases stand behind each bin.\nModify: Replace `labels` and `probs` with your outcomes and predicted probabilities; bins, the reliability curve, the counts, the worst-bin callout and the headline recompute. Change the bin count only with enough cases per bin.\nInvariant: Predicted = mean predicted probability in the bin; observed = share of cases in the bin with the outcome; the diagonal is perfect calibration; counts per bin are printed so a sparse bin is never read as precise.\nStatic: Already static. For small bins, add intervals (see calibration-points).',
+  sources: [{ type: 'original-example', file: 'assets/svg/calibration.mjs' }],
+  exportPolicy: 'final',
+  content: `<h1 class="st-head">Above 30%, the risk scores overstate failure: <em>predicted ${pct(worst.meanPredicted)}, observed ${pct(worst.observed)}</em></h1>
+<figure class="st-fig" data-region="primary">${figure()}</figure>
+<div class="st-rail" data-region="support">
+  <p class="st-text"><strong>Predicted</strong> is the model's average risk score for the pump-weeks in a bin; <strong>observed</strong> is the share of them followed by a failure within 7 days.</p>
+  <hr class="st-rule">
+  <div class="st-kpi"><b>${fmt(aboveN)}</b><span>of ${fmt(N)} pump-weeks scored above 30%: enough to show the bias, too few to read any one bin precisely.</span></div>
+</div>
+<p class="st-source" data-region="source"><span>Illustrative data · held-out set of ${fmt(N)} pump-weeks, ${failures} failures</span><span>Reliability diagram</span></p>`,
 };

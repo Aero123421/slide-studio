@@ -1,6 +1,8 @@
 # Authoring guide
 
-Start with the story contract, then author with either structured authoring (`studio.mjs`) or the creative authoring API (`craft.mjs`).
+Start with the story contract. Author with the default HTML route (`craft.mjs`, below);
+use the structured JSON route (`studio.mjs`) when the deliverable must be a native,
+editable PowerPoint.
 
 ---
 
@@ -56,6 +58,125 @@ behind an interaction that the final PDF cannot expose.
 
 ---
 
+## The default route: authored decks (`craft.mjs`)
+
+### Project setup
+
+```sh
+node "$SKILL_DIR/scripts/craft.mjs" init ./deck --language ja --colors wa-ai
+```
+
+`init` writes a self-contained project: `deck.mjs` (a draft with a computed chart),
+`theme.css` (page grammar + one color system), `figure.mjs` and its `fig-*.mjs`
+modules, `studio-kit.mjs`, `layout.mjs`, `quant.mjs`, `semantic-graph.mjs`,
+`brief.md` and `assets/`. The project never imports from the installed skill, so
+it survives skill updates and can be zipped and shared. `--colors` takes any id in
+`assets/color-systems/` (default `laboratory`, `wa-ai` for Japanese).
+
+### The deck module
+
+`craft.mjs` imports trusted local `.mjs` — it executes JavaScript; never build a
+downloaded module you have not read.
+
+```js
+import fs from 'node:fs/promises';
+import { h } from './studio-kit.mjs';
+import { lineChart, fmt } from './figure.mjs';
+
+const css = await fs.readFile(new URL('./theme.css', import.meta.url), 'utf8');
+const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+const active = [22, 25, 27, 31, 35, 38];                       // thousands, from source X
+const growth = fmt((active.at(-1) / active[0] - 1) * 100, { digits: 0 });
+
+export default {
+  title: 'Activation review', language: 'en', readingMode: 'live', transition: 'fade', draft: false,
+  css,
+  slides: [{
+    id: 'active-users', title: `Active users grew ${growth}% in six months`, className: 'st cs-laboratory',
+    content: `<h1 class="st-head">Active users grew <em>${growth}%</em> in six months</h1>
+      <figure class="st-fig" data-region="primary">${lineChart({ id: 'au', title: 'Active users, thousands',
+        width: 1152, height: 470, x: months, series: [{ name: 'Active users', values: active }], build: { start: 1 } })}</figure>
+      <p class="st-source" data-region="source"><span>Source X, monthly actives</span></p>`,
+    notes: 'Say what changed in April.', sources: [{ file: 'data/actives.csv' }], exportPolicy: 'final',
+  }],
+  script: '', // optional trusted script, runs after the player initializes
+};
+```
+
+Deck fields: `title`, `language` (BCP 47), `direction`, `width`/`height` (default
+1280×720), `readingMode` (`live|read|reference|hybrid`), `transition`
+(`none|fade|rise|push|zoom`), `labels` (override player chrome strings), `brand`,
+`draft`, `sample`, `css`, `script`, `slides`. Slide fields: `id` (stable, unique),
+`title` (accessible name — not automatically visible), `content` (HTML/SVG; no
+`<script>`), `className`, `language`, `direction`, `transition`, `notes`,
+`sources`, `exportPolicy`, `copyWaivers`, `widgets`.
+
+`draft:true` blocks a final build; preview with `--allow-draft` and clear it only
+after review. `sample:true` records teaching status; it adds no label — put
+"illustrative data" lines where they matter. Escape external text with `h()`;
+`states()`/`statesAttr()` encode state maps for attributes. Scope CSS by slide id
+or class.
+
+### Assets
+
+`{{asset:assets/photo.jpg}}` in content or CSS embeds a local file relative to the
+deck module (PNG, JPEG, WebP, SVG, MP4, WebM, WAV, MP3, VTT; ≤ 16 MiB each). Nothing
+is downloaded and no fonts are embedded. `svg(file, prefix)` loads a passive local
+SVG and namespaces its IDs. Inline SVG keeps geometry editable and animatable; an
+SVG in `<img>` is isolated but opaque to builds.
+
+### Library studies and templates
+
+```sh
+node "$SKILL_DIR/scripts/catalog.mjs" search "rank change over time" --limit 5
+node "$SKILL_DIR/scripts/catalog.mjs" show slope-comparison
+node "$SKILL_DIR/scripts/catalog.mjs" take slope-comparison ./deck/slope
+```
+
+Every catalog source is a data-driven slide module. `take` copies the module (data
+and code, not a snapshot), the runtime files it imports, its CSS with only the
+color system it uses, its media, a draft `deck.mjs` and `PROVENANCE.md`; it never
+overwrites an existing directory. Diagram studies also carry a standalone `.svg`
+with literal colors. Edit the data, headline and labels; remove `study: true`
+once the page is yours. Template packs (`assets/templates/<pack>/`) are complete
+art-directed page sets: data arrays at the top drive the geometry; `pack.css` is
+scoped to the pack class. `take tpl-<pack> DIR` copies the whole pack (all pages,
+`pack.css`, the engine) as one draft deck. Replace fictional names and synthetic numbers, keep the
+"illustrative data" line until real sources replace it, and never submit a pack
+unchanged. Several studies can live in one deck if their IDs and CSS scopes don't
+collide — namespace repeated instances.
+
+### Runtime API (browser)
+
+`SlideStudio.show(index, step, {animate})`, `next()`, `prev()`, `reset()`,
+`finish()`, `overview()`, `presenter()`, `blackout()`, `help()`, `setExport(bool)`,
+`prepareExport()`, `getState()`, `getWidgetState(id)` and `register(id, hooks)`.
+`studio:state` events carry slide, index, step, active, exporting and
+reducedMotion. `data-static="show"` elements appear only in export,
+`data-static="hide"` only live — give exports a meaningful fallback, not a blank.
+
+### Helpers
+
+- `figure.mjs` — charts, diagrams, fields, scales, text measurement, callouts
+  ([Figures](figures.md)).
+- `layout.mjs` — `allocate` (weighted regions), `dagLayers`, `labelRail`,
+  `routeOrthogonal`: explicit fit checks that throw instead of shrinking
+  (`examples/constraint-layout/deck.mjs` shows a full derivation).
+- `studio-kit.mjs` — `h`, `states`, `grid`, `position`, `port`, `connector`
+  (`via` puts the middle leg in a chosen gutter so it never crosses a box),
+  `scaleLinear`, `contrast`, `checkBounds`, `svg`.
+- `quant.mjs` and `semantic-graph.mjs` — units-checked arithmetic and relation
+  validation ([Evidence](evidence-and-diagrams.md)).
+
+`data-region="title|primary|support|source"` and `data-space-intent` are invisible
+review metadata. `copyWaivers` allow an exact, justified quotation of production
+language ([copy channels](writing-and-editing.md)). An approved `brand` object is
+validated and exposed as `--brand-*` variables. `build --strip-notes` writes the
+audience copy; `build` refuses to overwrite without `--force`. Run `validate`,
+`editorial.py` and `qa.py`, then look at the slides.
+
+---
+
 ## Structured authoring
 
 ### Commands and files
@@ -63,18 +184,44 @@ behind an interaction that the final PDF cannot expose.
 Run scripts using their absolute path. They do not rely on the skill being the working directory.
 
 - `studio.mjs list`: layout IDs and bundled theme IDs.
-- `studio.mjs init DIR --example executive`: copy one worked deck without overwriting.
+- `studio.mjs init DIR --example executive`: copy one worked deck (and the images it uses, into `DIR/media/`) without overwriting.
 - `studio.mjs validate deck.json`: check data, fit estimates, and bounds.
 - `studio.mjs build deck.json --out deck.html`: self-contained HTML plus `deck.scene.json`.
+- `export-pptx.mjs deck.html deck.pptx --mode editable`: native PowerPoint from the same scene (see below).
 - `studio.mjs brand "Company" --out theme.json --base neutral`: draft theme tokens.
 - `inspect-brand.py template.pptx --out brand-inspection.json`: inspect source theme/layout facts; no invented brand authority.
 - `lint.mjs deck.json`: writing/evidence/rhythm warnings.
 
 Use `--force` only when replacing generated output intentionally. Retain the editable JSON with the deliverable. Do not hand-edit the HTML and then expect editable PPTX export to reflect those edits.
 
+### What the engine decides, and what you decide
+
+The compiler owns the page: a 12-column grid (74 px columns, 24 px gutters, 64 px margins on
+1280×720), a headline at most two lines high, an evidence region of 1152×452 px under it, and one
+quiet footer line (source or sample note on the left, deck name and page number on the right).
+Type sizes belong to the layout and scale with the number of items, never with the length of
+the copy: headline 36–44 px (theme `titleSize`), body 20–26 px (`bodySize`), labels and axes
+16–18 px, footer 15 px. Copy that does not fit raises `text does not fit … Shorten or change
+layout` instead of shrinking or clipping; shorten it or choose another layout.
+
+You decide the claim and the emphasis. Write every content title as the specific claim the page
+proves. Colour follows that claim: ink and greys carry the page and the theme accent marks only
+the item the title is about. Set `highlight` (an index, a label, a list of either, or `null` for
+none); without it, data labels named in the title are accented. Numbers appear on steps and agenda
+rows only with `numbered: true`, for a sequence the audience must follow.
+
+Charts take round axis ticks from the figure engine (`niceDomain`/`ticks`), state the unit once
+(`unit`), label values directly and keep a zero baseline; bar and waterfall charts drop the value
+axis because every bar carries its label. Japanese copy wraps between phrases and keeps numbers
+with their units; put a deliberate `\n` in titles where the phrase breaks best.
+
 ### Start from a close example
 
-`assets/examples/`: executive (decision), talk (stage), casual (workshop), technical (engineering), editorial (self-read), training (practice), patterns (layout coverage). `commented-deck.mjs` shows how to generate JSON with explanatory comments. Node 20+ is the baseline; HTML generation has no package dependency.
+`assets/examples/`: executive (decision: month-end close), talk (stage, dark theme), casual
+(workshop, with a photo), technical (engineering: idempotent API), editorial (self-read),
+training (practice), patterns (all 25 layouts as one café-chain proposal). `commented-deck.mjs`
+shows how to generate JSON with explanatory comments. Node 20+ is the baseline; HTML generation
+has no package dependency.
 
 ```json
 {
@@ -83,12 +230,13 @@ Use `--force` only when replacing generated output intentionally. Retain the edi
   "language": "ja",
   "theme": "neutral",
   "sample": false,
-  "brand": { "footer": "Operations / September", "name": "Company" },
+  "brand": { "footer": "運用改善の提案", "name": "Company" },
   "slides": [{
     "id": "time-comparison",
     "layout": "bar",
     "title": "確認作業を月25時間に抑えた",
-    "unit": "時間 / 月",
+    "unit": "時間／月",
+    "highlight": "改善後",
     "data": [{"label":"改善前","value":40},{"label":"改善後","value":25}],
     "notes": "測定期間と対象範囲を口頭でも補足する。",
     "sources": [{"file":"user-report.xlsx","title":"対象部署、8月集計"}]
@@ -96,17 +244,25 @@ Use `--force` only when replacing generated output intentionally. Retain the edi
 }
 ```
 
-The numbers above illustrate the schema; they are not evidence for a real claim. Replace with source-backed data. Keep `sample:true` in fictional demonstration decks; a visible DEMO marker is added.
+The numbers above illustrate the schema; they are not evidence for a real claim. Replace with source-backed data. Keep `sample:true` in fictional demonstration decks; data pages then say so in the footer.
 
 ### Common fields
 
-`layout`, `title` required. Optional `id` (unique), `kicker`, `notes`, `sources`, and
-`chrome:false` to omit the title, kicker, logo, footer, page number and DEMO marker
-for a full-bleed page. `reveal:[elementId,…]` assigns builds 1, 2, … in that order;
-`build:'content'` reveals the whole content band at step 1 and `build:'sequential'`
-reveals it column by column. `theme` is a bundled name, an inline token object, or a JSON path relative to the deck. CLI `--theme path.json` is relative to the working directory. Local image paths are relative to the deck JSON. Assets are embedded; network fetches are not implicit.
+`layout`, `title` required. Optional `id` (unique; not `prev`, `next`, `overview`, `notes`,
+`full` or `announce`, which the player uses), `kicker` (a short label above the title in the deck
+language), `notes`, `sources` (strings or `{title, file, url}`; shown in the footer and the speaker
+notes), and `chrome:false` to omit the title, kicker, logo and footer for a full-bleed page.
+`reveal:[elementId,…]` assigns builds 1, 2, … in that order; `build:'content'` reveals everything
+below the title at step 1 and `build:'sequential'` reveals items (columns, steps, bars, points)
+one at a time. `theme` is a bundled name, an inline token object, or a JSON path relative to the
+deck. CLI `--theme path.json` is relative to the working directory. Local image paths are
+relative to the deck JSON. Assets are embedded; network fetches are not implicit.
 
-`brand.footer` changes the footer. `brand.logo` is a local image path with `brand.name` for alt text. The small standard logo frame is 120×42 px; for a brand requiring another placement/clear space, adapt the layout before calling it compliant.
+`brand.footer` replaces the deck title in the footer. `brand.logo` is a local image path with `brand.name` for alt text; the logo frame is 120×42 px at the top right, and titles narrow to make room. For a brand requiring another placement/clear space, adapt the layout before calling it compliant.
+
+Themes set `paper`, `ink`, `accent` (one), `secondary` (kept for compatibility), `font`,
+`headingFont`, `radius`, `titleSize`, `bodySize`. The compiler derives the rest: muted text at
+≥ 4.5:1, hairlines, the accent tint, and greys for marks that are not "this".
 
 ### Layout fields and intended use
 
@@ -114,27 +270,27 @@ reveals it column by column. `theme` is a bundled name, an inline token object, 
 |---|---|---|
 | cover | `body`, `kicker`, `byline` optional | Short title; purposeful line break |
 | statement | `body` optional | One big claim or question |
-| section | `number`, `body` optional | Chapter transition |
-| agenda | `items: string[]` | 1–5 items |
+| section | `number`, `body` optional | Chapter transition; the number is set small, as navigation |
+| agenda | `items: (string \| {title, body?})[]`, `numbered?` | 1–5 rows across the page; `body` for a duration or owner |
 | split | `leftTitle,leftBody,rightTitle,rightBody` | Two related arguments, not two unrelated piles |
-| metric | `value,label`, `body,baseline` optional | One primary number with context |
-| metrics | `items:[{value,label,note?}]` | 2–4 metrics |
-| quote | `attribution` | Exact sourced quote, or explicit sample |
-| comparison | `items:[{title,body}],highlight?` | 2–3 options; highlight is zero-based |
-| table | `columns,rows`, `widths,numericColumns,highlight` optional | 2–6 columns, 1–6 data rows; numeric columns right-align |
+| metric | `value,label`, `body,baseline` optional; `breakdown:[{label,value}]`, `breakdownUnit?`, `highlight?` | One primary number with context; a breakdown draws signed parts as bars |
+| metrics | `items:[{value,label,note?}]`, `highlight?` | 2–4 metrics; a unit after the figure (`84%`, `100時間`) is set smaller |
+| quote | `attribution` | Exact sourced quote, or explicit sample; quotation marks are added if absent |
+| comparison | `items:[{title,body?,facts?:[[label,value]]}]`, `highlight?` | 2–3 options; `facts` line up across options; the recommended one sits on a tinted panel |
+| table | `columns,rows`, `widths,numericColumns,highlight` optional | 2–6 columns, 1–6 data rows; a native table in PPTX |
 | bar | `data:[{label,value}],unit,highlight?` | 1–12 values; signed values supported; zero baseline |
-| line | `data:[{label,value}],unit` | Ordered observations; spacing is categorical/equal |
-| stacked | `data:[{label,values:[]}],series:[],unit` | 1–4 nonnegative series; consistent series length |
-| waterfall | `data:[{label,value,total?}],unit` | `total:true` resets total; other values are deltas |
-| donut | `data:[{label,value}],unit,center?` | 1–5 nonnegative parts; positive total; angular share computed |
-| scatter | `data:[{x,y,label?}],unit,xLabel?` | Numeric x/y; no causal claim by default |
-| timeline | `items:[{date,title,body?}]` | 2–5 milestones; equal spacing, not duration-proportional |
-| process | `items:[{title,body?}]` | 2–4 steps |
+| line | `data:[{label,value}],unit,highlight?` | Ordered observations; the latest value is "this" by default |
+| stacked | `data:[{label,values:[]}],series:[],unit,highlight?` | 1–4 nonnegative series; series named beside the last bar |
+| waterfall | `data:[{label,value,total?}],unit,highlight?` | `total:true` resets total; other values are signed deltas; totals in ink |
+| donut | `data:[{label,value}],unit,center?,centerLabel?,highlight?` | 1–6 parts; labels beside the ring; the centre states the total and what it counts |
+| scatter | `data:[{x,y,label?}],unit,xLabel?,highlight?` | Numeric x/y; every labelled point placed clear of the others; no causal claim by default |
+| timeline | `items:[{date,title,body?}]`, `highlight?` | 2–5 milestones; equal spacing, not duration-proportional |
+| process | `items:[{title,body?}]`, `numbered?` | 2–4 steps, set as a descending staircase |
 | matrix | `items:[{title,body}],xLabel,yLabel,highlight?` | Exactly four cells; top-left, top-right, bottom-left, bottom-right |
-| architecture | `nodes:[{id,x,y,w,h,label,accent?}],links:[{from,to,label?}]` | 1–12 nodes; manually place concise nodes in content area |
-| code | `code,explanation` | Short code excerpt; roughly 10 lines at default size |
+| architecture | `nodes:[{id,label,body?,accent?, x,y,w,h \| col,row}]`, `links:[{from,to,label?,dashed?,arrow?}]` | 1–12 nodes; omit coordinates and give `col`/`row` for automatic layout |
+| code | `code,explanation` | Short excerpt: 10 lines at 22 px, 13 lines at most |
 | equation | `equation,body?` | Unicode/plain equation; complex math: render TeX/SVG through an available math engine |
-| image | `src,alt,body,fit?` | Local PNG/JPEG/WebP/SVG; cover or contain |
+| image | `src,alt,body?,fit?` | Local PNG/JPEG/WebP/SVG; cover or contain; full width without `body` |
 | closing | `body,kicker` optional | Decision, action, or synthesis |
 | freeform | `elements:[]` | Deliberate custom composition using the scene primitives |
 
@@ -142,15 +298,29 @@ Keep titles brief enough for their allotted two lines. A large room may require 
 
 ### Scene primitives for custom work
 
-Each element uses `type,x,y,w,h`. Types: `text`, `rect`, `ellipse`, `line`, `image`, `svg`. Use stable unique `id` values to identify custom objects. All dimensions are px on a 1280×720 canvas.
+Each element uses `type,x,y,w,h` and an integer `step`. Types: `text`, `rect`, `ellipse`, `line`,
+`image`, `svg` (freeform accepts these); the compiler also emits `path` (chart lines, donut
+rings, staircase rules) and `table`. Use stable unique `id` values to identify custom objects.
+All dimensions are px on a 1280×720 canvas.
 
-- Text: `text,size,font,color,weight,align,lineHeight`. Use normal font names and #RRGGBB colors. Meaningful explicit newlines are retained.
+- Text: `text,size,font,color,weight,align,lineHeight`. Use normal font names and #RRGGBB colors. Meaningful explicit newlines are retained; a blank line starts a new paragraph with half a line of space (`paraGap`). Compiled text may carry `runs` (one line in several sizes, such as a figure and its unit), `numeric` (tabular figures) and `tracking` (em).
 - Shapes: `fill,stroke,strokeWidth,radius`. Set fill/stroke to `none` when absent.
-- Line: positive bounding size; optional `x1,y1,x2,y2` for direction. Keep connectors behind labels/nodes.
+- Colours are #RRGGBB, or a theme role (`ink`, `paper`, `muted`, `accent`, `line`, `grid`, `tint`, `context`, `series`) so the page follows a change of theme.
+- Line: positive bounding size; optional `x1,y1,x2,y2` for direction, `arrow:'end'|'start'|'both'` and `dash:true`. Keep connectors behind labels/nodes.
+- Path: `d` is a list of `['M',x,y]`, `['L',x,y]`, `['A',cx,cy,r,startDeg,endDeg]` (the pen is at the arc's start) and `['Z']`.
 - Image: local `src`, meaningful `alt`, `fit`. SVG: literal `svg` markup, `alt`; no scripts, active embeds, or external references.
-- Build: `step` integer 0+ (0 = visible from the start), or use the slide-level `reveal`/`build` fields above.
+- Every compiled element also carries `role` (`title`, `body`, `label`, `data`, `axis`, `mark`, `source`, …), used for HTML semantics (`h1`, `data-region`), build steps and PPTX shape names.
 
 The freeform layout keeps the standard header/footer unless the slide sets `chrome:false`; use that for a full-bleed native composition. Do not place a second title over an existing one.
+
+### Editable PowerPoint
+
+`export-pptx.mjs --mode editable` turns the scene into native objects: each slide title is a real
+title placeholder (outline view, accessibility checker), text boxes keep the measured line breaks
+as soft breaks (Shift+Enter) with exact line spacing and the deck language, tables are PowerPoint
+tables, chart lines and donut rings are freeform shapes, connectors carry arrowheads, and the
+theme fonts follow the deck. Nothing on a chart page is a picture; only `image`/`svg` nodes stay
+pictures. Render the PPTX (for example through LibreOffice to PDF) and look at it as well as the HTML.
 
 ### Iterating without losing control
 
@@ -161,112 +331,3 @@ The freeform layout keeps the standard header/footer unless the slide sets `chro
 5. Retain sources, notes, theme tokens, JSON, and exported files together.
 
 Supported does not mean unlimited: right-to-left shaping, native chart workbooks, embedded fonts, inherited PPTX masters, and arbitrary CSS-to-editable-PPTX conversion are outside this small engine. Use an appropriate native/library workflow when the user needs those capabilities.
-
----
-
-## Authoring API and project layout
-
-The creative `craft.mjs` API (the default original-HTML route), distinct from the
-structured `studio.mjs` workflow above.
-
-### The default authored module
-
-`craft.mjs` imports trusted local `.mjs`; this executes JavaScript. It is not a
-sandbox for downloaded modules. Author source in the project, not the installed skill.
-
-```js
-import {h, states} from './studio-kit.mjs';
-export default {
-  title: 'A specific explanatory title', language: 'en',
-  width: 1280, height: 720, direction: 'ltr', draft: false,
-  css: '.slide{background:#fff;color:#182b36} .result{padding:64px}',
-  slides: [{
-    id: 'result', title: 'Accessible title', className: 'result',
-    content: `<h1>${h('The content-specific claim')}</h1>
-      <p data-step="1">The qualification that belongs to it.</p>`,
-    notes: 'Presenter notes and scope.', sources: [], exportPolicy: 'final'
-  }],
-  script: '' // Optional trusted script executed after the player initializes.
-};
-```
-
-The accessible `title` is not automatically a visible heading. Author the page's
-actual content. No mandatory header, footer, watermark, grid or layout ID is imposed.
-The starter has `draft:true`; preview with `--allow-draft`. Replace it before marking
-the deck finished. `sample:true` records teaching status but does not insert a label:
-put visible synthetic/evidence labels where they matter.
-
-`content` is authored HTML/SVG. Script tags inside it are rejected; put code in
-`deck.script`. Escape external text with `h()`. `states()` encodes state JSON for
-HTML attributes. Styles are authored CSS; scope local exceptions by slide ID/class.
-
-### Assets
-
-`{{asset:assets/photo.jpg}}` in content or CSS embeds a local file relative to the
-deck module's directory. PNG/JPEG/WebP/SVG/MP4/WebM/WAV/MP3/VTT are supported. Each
-asset is bounded to 16 MiB. Large media should use an intentional local asset bundle.
-The tool does not download files or embed fonts. `svg(file,prefix)` loads inspected
-passive local SVG and namespaces IDs. Inline SVG exposes editable geometry; an SVG
-in an `<img>` is easier to isolate but cannot be animated by selecting its internals.
-
-### Studies and adaptation
-
-Template packs (`assets/templates/<pack>/`, catalog kind `templates`) are complete page
-sets with their own art direction. Each slide module is self-contained: data arrays at
-the top drive the SVG geometry, so edit the data and let labels and marks update together.
-`pack.css` is scoped to the pack class. Replace fictional names and synthetic numbers,
-and keep each page's visible "illustrative data" line until real sources replace it.
-
-`catalog.mjs search`, `show` and `take` help retrieve a small number of relevant
-examples. `take` writes a new directory with editable `.mjs`, CSS and required local
-media; it never overwrites an existing directory. It also writes provenance notes.
-The resulting `deck.mjs` is a draft: preview it with `build --allow-draft`. Built-in widgets depend on the
-installed runtime at build time, not on a network at viewing time.
-
-Every catalog source exports a slide object. It may be imported into an authored
-deck, but content, CSS and IDs must be coordinated. Copy and namespace repeated
-instances. Do not include duplicate slide or SVG IDs. Better results often come
-from changing the source substantially rather than combining entire finished slides.
-
-### Runtime
-
-`SlideStudio.show(index,step,{animate})`, `next()`, `prev()`, `reset()`, `finish()`,
-`overview()`, `setExport(bool)`, `prepareExport()`, `getState()`, `getWidgetState(id)`
-and `register(id,hooks)` are available in the browser. `register` returns an unregister
-function. The `studio:state` event includes slide, index, step, active, exporting and
-reducedMotion. It is for lifecycle-aware components, not a replacement for source data.
-
-`data-static="show"` is hidden during presentation and visible during export.
-`data-static="hide"` does the reverse. Provide a real meaningful fallback, not a
-blank rectangle. Custom media/Canvas must implement onExport and onLeave behavior.
-The default API does not magically convert WebGL into vector PDF.
-
-### Geometry helpers
-
-`grid` computes rectangles; `position` emits CSS bounds; `port` and `connector`
-calculate orthogonal endpoints; `scaleLinear` maps finite data; `contrast` computes
-opaque color contrast; `checkBounds` flags invalid rectangles. They are useful
-primitives, not an automatic layout optimizer or a visual quality scorer.
-
-`craft.mjs build` refuses to overwrite an existing `--out`; pass `--force` when
-rebuilding the same file intentionally. Run `craft.mjs validate` for schema and script parsing, `editorial.py` for story
-checks, and `qa.py` for browser measurements. Inspect actual output after all three.
-
-### Layout helpers, review metadata, brand and notes
-
-`craft.mjs init` also copies `layout.mjs`. Its `allocate`, `dagLayers`, `labelRail`
-and `routeOrthogonal` helpers calculate geometry with explicit fit checks. They
-never select a story or certify a pleasing composition. For a complete derivation
-see `examples/constraint-layout/deck.mjs`; region dimensions and node relationships
-come from data, not a selected template.
-
-`data-region="title|primary|support|source"` and `data-space-intent` are invisible
-review metadata. They must not become visible captions. Custom slides may use
-`copyWaivers` for exact, necessary quoted production language; see
-[copy channels](writing-and-editing.md). `study:true` belongs to teaching examples only.
-
-A deck may include an approved `brand` object; the build validates it and supplies
-`--brand-*` CSS variables. A draft identity requires an explicit draft preview.
-Custom CSS can override identity, so token validation does not replace visual review.
-Use `craft.mjs build ... --strip-notes` for distributable HTML without speaker notes.
-

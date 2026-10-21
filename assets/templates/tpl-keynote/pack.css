@@ -1,57 +1,62 @@
-/* Template pack: Conference keynote, cinematic dark (tpl-keynote). Every selector is scoped to .tpl-keynote. */
+/* Template pack: Stage keynote (tpl-keynote). Every selector is scoped to .tpl-keynote.
+   A dark hall, a big screen: Swiss poster discipline. Flat near-black paper, warm white ink,
+   two greys, and one signal colour that means "solar output" and nothing else.
+
+   Grid — "the day grid": 64 px margins on every side. The 1152 px measure is 24 modules of
+   48 px, one per hour: module n starts at x = 64 + 48n. A full-width chart puts 00:00 on
+   module 0 and 24:00 on module 24, so its hour lines are grid lines. Half panels use modules
+   0–11 and 13–24; a gutter is one module.
+
+   Type hangs from grid lines: each role's negative margin moves its first cap height to the
+   element's `top` (Inter: ascent .97em, descent .24em, cap .73em → offset = (lh/2 − .365)em).
+   Scale: 200 hero · 88 display · 64 statement · 40 headline · 28 lead · 20 label · 18 axis · 16 note. */
 .tpl-keynote{
-  --kn-bg:#07080d;--kn-bg-2:#0c1122;--kn-ink:#f4f1ea;--kn-ink-2:#c3c2c8;--kn-ink-3:#9a9cab;--kn-line:rgba(244,241,234,.16);
-  --kn-sun:#ffb547;--kn-sun-2:#ff7a3d;--kn-cool:#56d7e6;--kn-cool-2:#4f86ff;
-  --kn-sans:"Inter","Helvetica Neue","Segoe UI","Liberation Sans",Arial,sans-serif;
-  --kn-serif:"Georgia","Liberation Serif","Times New Roman",serif;
-  background:var(--kn-bg);color:var(--kn-ink);font-family:var(--kn-sans);
+  --kn-paper:#0D0D0E;--kn-ink:#F4F2ED;--kn-grey:#9C9A94;--kn-rule:#3A3936;--kn-grid:#262624;--kn-sun:#F5A623;
+  --kn-display:"Inter Display","Inter","Helvetica Neue",Arial,sans-serif;
+  --kn-text:"Inter","Helvetica Neue",Arial,sans-serif;
+  /* figure-engine tokens: charts and type share one palette */
+  --ss-paper:#0D0D0E;--ss-surface:#181817;--ss-ink:#F4F2ED;--ss-muted:#9C9A94;--ss-rule:#3A3936;--ss-grid:#262624;
+  --ss-accent:#F5A623;--ss-on-accent:#0D0D0E;--ss-highlight:#F5A623;--ss-context:#5E5D59;
+  --ss-positive:#8FCB9B;--ss-negative:#F08A73;
+  --ss-font-sans:var(--kn-text);--ss-font-serif:"Charter","Bitstream Charter","Iowan Old Style",Georgia,Caladea,serif;
+  --ss-font-mono:"JetBrains Mono","SFMono-Regular",Menlo,Consolas,monospace;
+  --ss-cat-1:#F5A623;--ss-cat-2:#F4F2ED;--ss-cat-3:#9C9A94;--ss-cat-4:#5E5D59;--ss-cat-5:#C98A1C;--ss-cat-6:#D8D5CE;
+  --ss-seq-1:#2A2213;--ss-seq-2:#4A3714;--ss-seq-3:#6E4F15;--ss-seq-4:#956A17;--ss-seq-5:#BE861B;--ss-seq-6:#F5A623;--ss-seq-7:#FFD27A;
+  --ss-div-1:#F5A623;--ss-div-2:#B47C22;--ss-div-3:#5E4A26;--ss-div-4:#3A3936;--ss-div-5:#5D5C58;--ss-div-6:#A7A49D;--ss-div-7:#F4F2ED;
+  background:var(--kn-paper);color:var(--kn-ink);font-family:var(--kn-text);
+  font-kerning:normal;-webkit-font-smoothing:antialiased;
 }
-.tpl-keynote .kn-page{position:absolute;inset:0;overflow:hidden}
-.tpl-keynote .kn-abs{position:absolute}
-.tpl-keynote .kn-deco{position:absolute;inset:0;pointer-events:none}
+.tpl-keynote .kn-at{position:absolute;margin:0}
 .tpl-keynote svg{display:block;overflow:visible}
-.tpl-keynote svg text{text-rendering:geometricPrecision}
-.tpl-keynote .kn-num{font-variant-numeric:tabular-nums}
-.tpl-keynote .kn-eyebrow{font:600 15px/1.2 var(--kn-sans);letter-spacing:.32em;text-transform:uppercase;color:var(--kn-ink-3)}
-.tpl-keynote .kn-eyebrow b{color:var(--kn-sun);font-weight:700}
-.tpl-keynote .kn-foot{position:absolute;left:72px;right:72px;bottom:30px;display:flex;justify-content:space-between;font:500 15px/1.2 var(--kn-sans);letter-spacing:.14em;text-transform:uppercase;color:var(--kn-ink-3)}
-.tpl-keynote .kn-source{position:absolute;left:72px;bottom:30px;font:400 15px/1.3 var(--kn-sans);color:var(--kn-ink-3)}
 
-/* 01 opener */
-.tpl-keynote .kn-open-h{font:800 118px/.9 var(--kn-sans);letter-spacing:-5px;color:var(--kn-ink);text-transform:uppercase}
-.tpl-keynote .kn-open-h span{display:block}
-.tpl-keynote .kn-open-h .kn-warm{color:var(--kn-sun)}
-.tpl-keynote .kn-open-sub{font:400 24px/1.4 var(--kn-serif);font-style:italic;color:var(--kn-ink-2)}
+/* Type roles. `top` on an element is the cap-height line of its first line. */
+.tpl-keynote .kn-hero{font:800 200px/.8 var(--kn-display);letter-spacing:-.03em;margin-top:-7px;white-space:nowrap}
+.tpl-keynote .kn-hero small{font-size:88px;letter-spacing:-.02em;margin-left:.2em}
+.tpl-keynote .kn-display{font:800 88px/.98 var(--kn-display);letter-spacing:-.03em;margin-top:-11px;text-wrap:balance}
+.tpl-keynote .kn-statement{font:800 64px/1.06 var(--kn-display);letter-spacing:-.022em;margin-top:-10.6px;text-wrap:balance}
+.tpl-keynote .kn-head{font:700 40px/1.15 var(--kn-display);letter-spacing:-.015em;margin-top:-8.4px;text-wrap:balance}
+.tpl-keynote .kn-lead{font:400 28px/1.36 var(--kn-text);letter-spacing:-.005em;margin-top:-8.8px;text-wrap:pretty}
+.tpl-keynote .kn-label{font:500 20px/1.35 var(--kn-text);margin-top:-6.2px}
+.tpl-keynote .kn-note{font:400 16px/1.4 var(--kn-text);color:var(--kn-grey);margin-top:-5.4px}
+.tpl-keynote .kn-grey{color:var(--kn-grey)}
 
-/* 02 chapter */
-.tpl-keynote .kn-chap-no{font:800 400px/.8 var(--kn-sans);letter-spacing:-22px;color:transparent;-webkit-text-stroke:2px rgba(255,181,71,.85)}
-.tpl-keynote .kn-chap-h{font:800 76px/1 var(--kn-sans);letter-spacing:-3px;color:var(--kn-ink)}
-.tpl-keynote .kn-chap-p{font:400 24px/1.45 var(--kn-serif);font-style:italic;color:var(--kn-ink-2)}
-.tpl-keynote .kn-chapters{display:flex;gap:28px;font:600 15px/1.2 var(--kn-sans);letter-spacing:.18em;text-transform:uppercase;color:#7d8092}
-.tpl-keynote .kn-chapters .is-on{color:var(--kn-sun)}
+/* Charts: SVG text inherits these unless a role class says otherwise. */
+.tpl-keynote .kn-fig text{font-family:var(--kn-text);font-kerning:normal}
+.tpl-keynote .kn-fig .kn-t-axis{font-size:18px;fill:var(--kn-grey);font-variant-numeric:tabular-nums}
+.tpl-keynote .kn-fig .kn-t-label{font-size:20px;font-weight:500;fill:var(--kn-ink)}
+.tpl-keynote .kn-fig .kn-t-strong{font-size:20px;font-weight:700;fill:var(--kn-ink);font-variant-numeric:tabular-nums}
+.tpl-keynote .kn-fig .kn-t-on-sun{font-size:20px;font-weight:600;fill:var(--kn-paper)}
 
-/* 03 giant number */
-.tpl-keynote .kn-giant{font:800 260px/.82 var(--kn-sans);letter-spacing:-14px;color:var(--kn-ink);white-space:nowrap}
-.tpl-keynote .kn-giant small{font-size:.36em;letter-spacing:-3px;color:var(--kn-sun);margin:0 26px 0 12px}
-.tpl-keynote .kn-giant small:last-child{margin-right:0}
-.tpl-keynote .kn-context{font:400 30px/1.35 var(--kn-serif);color:var(--kn-ink-2)}
-.tpl-keynote .kn-context em{font-style:italic;color:var(--kn-ink)}
+/* 02 chapter: the number is set like a word, not a monument. */
+.tpl-keynote .kn-chapter-no{color:var(--kn-grey);font-variant-numeric:tabular-nums}
 
-/* 04 then / now */
-.tpl-keynote .kn-half{position:absolute;top:0;bottom:0;width:640px;overflow:hidden}
-.tpl-keynote .kn-year{font:800 30px/1 var(--kn-sans);letter-spacing:.26em}
-.tpl-keynote .kn-state{font:800 60px/1.02 var(--kn-sans);letter-spacing:-2.4px;color:var(--kn-ink)}
-.tpl-keynote .kn-state-p{font:400 21px/1.45 var(--kn-serif);font-style:italic;color:var(--kn-ink-2)}
+/* 05 quote: the opening mark hangs outside the text edge so the words align on module 2. */
+.tpl-keynote .kn-quote{font-weight:600;text-wrap:balance}   /* someone else's voice: lighter than the speaker's statements */
+.tpl-keynote .kn-quote .kn-hang{position:absolute;right:100%;margin-right:.04em}
 
-/* 05 quote */
-.tpl-keynote .kn-quote{font:400 60px/1.2 var(--kn-serif);font-style:italic;letter-spacing:-.8px;color:var(--kn-ink)}
-.tpl-keynote .kn-quote b{font-weight:400;color:var(--kn-sun)}
-.tpl-keynote .kn-quote-by{font:600 15px/1.4 var(--kn-sans);letter-spacing:.24em;text-transform:uppercase;color:var(--kn-ink-3)}
-
-/* 06 closing */
-.tpl-keynote .kn-close-h{font:800 150px/.86 var(--kn-sans);letter-spacing:-7px;color:var(--kn-ink)}
-.tpl-keynote .kn-asks{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(3,1fr);gap:36px}
-.tpl-keynote .kn-asks li{padding-top:16px;border-top:1px solid var(--kn-line)}
-.tpl-keynote .kn-asks b{display:block;font:700 15px/1 var(--kn-sans);letter-spacing:.2em;color:var(--kn-sun)}
-.tpl-keynote .kn-asks p{margin-top:12px;font:700 27px/1.2 var(--kn-sans);letter-spacing:-.5px;color:var(--kn-ink)}
-.tpl-keynote .kn-asks span{display:block;margin-top:10px;font:400 19px/1.45 var(--kn-sans);color:var(--kn-ink-2)}
+/* 06 close: a reading list of asks — who, then what. Hairlines separate; whitespace groups. */
+.tpl-keynote .kn-asks{list-style:none;padding:0}
+.tpl-keynote .kn-asks li{display:grid;grid-template-columns:288px 1fr;padding:23px 0 25px;border-top:1px solid var(--kn-rule)}
+.tpl-keynote .kn-asks li:last-child{border-bottom:1px solid var(--kn-rule)}
+.tpl-keynote .kn-asks b{font:700 28px/1.36 var(--kn-display);letter-spacing:-.01em}
+.tpl-keynote .kn-asks span{font:400 28px/1.36 var(--kn-text);letter-spacing:-.005em;text-wrap:balance}

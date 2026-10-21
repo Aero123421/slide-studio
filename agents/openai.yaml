@@ -1,7 +1,7 @@
 interface:
   display_name: "Slide Studio"
-  short_description: "Author distinctive, interactive slides and verify exports"
-  default_prompt: "Use $slide-studio to create a source-grounded, deliberately designed presentation. Author and adapt the composition, then inspect the result and deliver the requested formats."
+  short_description: "Author data-driven, well-designed slides and verify the rendered result"
+  default_prompt: "Use $slide-studio to create a source-grounded, deliberately designed presentation: compute claims from the data, draw figures with the figure engine, compose each page, inspect the rendered result and deliver the requested formats."
   icon_small: "./assets/icon.svg"
   icon_large: "./assets/icon.svg"
 policy:

@@ -1,88 +1,72 @@
-// Template: 年次インパクトレポート · 予算の内訳（支出ドーナツ＋収入の積み上げ）. Synthetic example content; replace data and copy.
+// Template: 年次活動報告（寄付者・自治体向け）· 支出と一人あたりの費用. Synthetic example content; replace data and copy.
+// One proportional bar of spending (segments, labels, the classroom bracket and every share are
+// computed from `spend`), then the cost per child and per visit with their derivation.
+import { el, textLines, measureText } from '../../runtime/figure.mjs';
+
 const ID = 'tpl-impact-report-budget';
-// 単位：万円. field = true marks spending that directly reaches children (used in the headline).
-const spend = [
-  {name: '学習会の運営（人件費）', v: 2140, field: true, c: '#1E4652'},
-  {name: '拠点の賃料・光熱費', v: 980, field: true, c: '#2E6E72'},
-  {name: '教材・軽食', v: 720, field: true, c: '#5E9A93'},
-  {name: 'ボランティア研修・保険', v: 410, field: true, c: '#8DB3A5'},
-  {name: '広報・報告', v: 190, field: false, c: '#CDBF9F'},
-  {name: '管理費', v: 420, field: false, c: '#A89A7D'}
+const spend = [                       // 支出（万円）。room: true = 教室の運営に直接使った費用
+  {name: '学習支援スタッフの人件費', v: 3700, room: true},
+  {name: '会場費', v: 640, room: true},
+  {name: '教材・軽食', v: 600, room: true},
+  {name: 'ボランティア', v: 520, room: true},   // 研修・交通費・保険
+  {name: '事務局', v: 840, room: false},
 ];
-const income = [
-  {name: '個人からの寄付', v: 1650, c: '#D46E55'},
-  {name: '民間の助成金', v: 1480, c: '#E49A7E'},
-  {name: '自治体からの委託', v: 1240, c: '#EFC3A9'},
-  {name: '会費', v: 310, c: '#C9B99A'},
-  {name: '講座などの事業収入', v: 240, c: '#E6DCC6'}
+const income = [                      // 収入（万円）
+  {name: '寄付', v: 2890}, {name: '市の委託', v: 2250}, {name: '助成金', v: 1050}, {name: 'その他', v: 230},
 ];
-const sum = a => a.reduce((t, x) => t + x.v, 0);
-const S = sum(spend), I = sum(income), carry = I - S;                 // 4,860 / 4,920 / 60
-const field = sum(spend.filter(x => x.field)), fieldPct = field / S * 100;
-const fmt = n => Math.round(n).toLocaleString('ja-JP');
-const pct = (v, t) => (v / t * 100).toFixed(1);
-const roundedSum = spend.reduce((t, x) => t + +pct(x.v, S), 0);
+const kids = 486, visits = 34992;     // 参加した子ども（実人数）、延べ参加（他のページと同じ値）
 
-// Donut geometry from the same array (starts at 12 o'clock, clockwise).
-const C = 165, R = 150, r = 94;
-let a0 = -Math.PI / 2;
-const pt = (rad, ang) => `${(C + rad * Math.cos(ang)).toFixed(2)} ${(C + rad * Math.sin(ang)).toFixed(2)}`;
-const arcs = spend.map(x => { const a1 = a0 + x.v / S * Math.PI * 2, large = a1 - a0 > Math.PI ? 1 : 0;
-  const d = `M${pt(R, a0)} A${R} ${R} 0 ${large} 1 ${pt(R, a1)} L${pt(r, a1)} A${r} ${r} 0 ${large} 0 ${pt(r, a0)} Z`; a0 = a1;
-  return `<path d="${d}" fill="${x.c}" stroke="#F7F5EF" stroke-width="2"/>`; }).join('');
-// Bracket arc marking the "field" share on the outside of the donut.
-const fa1 = -Math.PI / 2 + field / S * Math.PI * 2;
-const bracket = `<path d="M${pt(R + 10, -Math.PI / 2 + .01)} A${R + 10} ${R + 10} 0 ${fa1 + Math.PI / 2 > Math.PI ? 1 : 0} 1 ${pt(R + 10, fa1 - .01)}" fill="none" stroke="#D46E55" stroke-width="3" stroke-linecap="round"/>`;
-const donut = `<svg viewBox="-12 -12 354 354" role="img" aria-labelledby="${ID}-d-t ${ID}-d-d">
-  <title id="${ID}-d-t">支出の内訳（合計${fmt(S)}万円）</title>
-  <desc id="${ID}-d-d">${spend.map(x => `${x.name} ${fmt(x.v)}万円（${pct(x.v, S)}%）`).join('、')}。</desc>
-  ${arcs}${bracket}
-  <text x="${C}" y="${C - 18}" text-anchor="middle" class="ir-svg-s">支出合計</text>
-  <text x="${C}" y="${C + 22}" text-anchor="middle" class="ir-svg-n" style="font-size:36px">${fmt(S)}</text>
-  <text x="${C}" y="${C + 46}" text-anchor="middle" class="ir-svg-s">万円</text>
-</svg>`;
+// ---- derived
+const sum = a => a.reduce((s, x) => s + x.v, 0);
+const total = sum(spend), roomTotal = sum(spend.filter(x => x.room)), inTotal = sum(income);
+const pct = v => Math.round(v / total * 100);
+const yen = total * 10000;
+const perChild = Math.round(yen / kids / 10) * 10;          // 129,630円（10円単位）
+const perVisit = Math.round(yen / visits / 100) * 100;      // 1,800円（100円単位）
+const n = v => v.toLocaleString('ja-JP');
+const approx = Math.round(perChild / 10000);                // 約13万円
 
-// Income: one stacked column, labels on a rail to the right (pushed apart, never overlapping).
-const colX = 24, colW = 96, colTop = 10, colH = 350, gapMin = 44;
-let yb = colTop + colH;
-const segs = income.map(x => { const h = x.v / I * colH, y = yb - h; yb = y; return {...x, y, h, mid: y + h / 2}; });
-const rail = segs.map(s => ({...s, ly: s.mid}));
-for (let it = 0; it < 50; it++) for (let i = 1; i < rail.length; i++) { const d = rail[i - 1].ly - rail[i].ly; if (d < gapMin) { const m = (gapMin - d) / 2; rail[i - 1].ly += m; rail[i].ly -= m; } }
-rail[rail.length - 1].ly = Math.max(rail[rail.length - 1].ly, 22);
-for (let i = rail.length - 2; i >= 0; i--) rail[i].ly = Math.max(rail[i].ly, rail[i + 1].ly + gapMin);
-const column = `<svg viewBox="0 0 416 370" role="img" aria-labelledby="${ID}-c-t">
-  <title id="${ID}-c-t">収入の内訳（合計${fmt(I)}万円）：${income.map(x => `${x.name} ${fmt(x.v)}万円`).join('、')}</title>
-  ${segs.map(s => `<rect x="${colX}" y="${s.y.toFixed(2)}" width="${colW}" height="${s.h.toFixed(2)}" fill="${s.c}" stroke="#F7F5EF" stroke-width="2"/>`).join('')}
-  ${rail.map(s => `<path d="M${colX + colW + 4} ${s.mid.toFixed(1)} L${colX + colW + 22} ${s.mid.toFixed(1)} L${colX + colW + 36} ${s.ly.toFixed(1)} L${colX + colW + 44} ${s.ly.toFixed(1)}" fill="none" stroke="#8A9A9E" stroke-width="1.2"/>
-    <text class="ir-svg-t" x="${colX + colW + 52}" y="${(s.ly - 2).toFixed(1)}" style="font-size:16px">${s.name}</text>
-    <text class="ir-svg-s" x="${colX + colW + 52}" y="${(s.ly + 18).toFixed(1)}"><tspan style="font:700 15px var(--ir-num);fill:#1F3440">${fmt(s.v)}</tspan> 万円・${pct(s.v, I)}%</text>`).join('')}
+// ---- geometry: bar across the full measure (figure at x=64, y=186; its first line hangs from y≈200)
+const W = 1152, barY = 54, barH = 56, gap = 2;
+let acc = 0;
+const segs = spend.map(s => { const x0 = acc / total * W; acc += s.v; return {...s, x0, x1: acc / total * W}; });
+const roomEnd = segs.filter(s => s.room).at(-1).x1;
+const rows = [[], []], rowY = [barY + barH + 30, barY + barH + 86];
+const labels = segs.map((s, i) => {
+  const last = i === segs.length - 1;
+  const w = Math.max(measureText(s.name, 16, {weight: 700}), measureText(`${n(s.v)}万円　${pct(s.v)}%`, 16)) + 4;
+  const a = last ? W - w : s.x0, b = last ? W : s.x0 + w;
+  const r = rows.findIndex(row => row.every(([p, q]) => b + 48 <= p || a >= q + 48)); // 同じ段のラベルは48px以上離す
+  const row = r < 0 ? 1 : r; rows[row].push([a, b]);
+  const lx = last ? W : s.x0, anchor = last ? 'end' : 'start', tick = last ? W - 1 : s.x0 + 1;
+  return el('line', {x1: tick, x2: tick, y1: barY + barH + 4, y2: rowY[row] - 18, stroke: 'var(--ir-muted)', 'stroke-width': 1})
+    + textLines([s.name], {x: lx, y: rowY[row], anchor, cls: 'sv-lb', attrs: {style: 'font-size:16px'}})
+    + textLines([`${n(s.v)}万円　${pct(s.v)}%`], {x: lx, y: rowY[row] + 22, anchor, cls: 'sv-s'});
+}).join('');
+const bar = segs.map((s, i) => el('rect', {x: s.x0 + (i ? gap / 2 : 0), y: barY, width: s.x1 - s.x0 - (i ? gap / 2 : 0) - (i < segs.length - 1 ? gap / 2 : 0), height: barH,
+  fill: s.room ? 'var(--ir-accent)' : 'var(--ir-context)'})).join('');
+const bracket = el('path', {d: `M0.5 ${barY - 8}V${barY - 16}H${roomEnd - 2}V${barY - 8}`, fill: 'none', stroke: 'var(--ir-ink)', 'stroke-width': 1})
+  + textLines([`教室の運営に使った費用　${n(roomTotal)}万円（${pct(roomTotal)}%）`], {x: 0, y: barY - 28, cls: 'sv-lb'});
+const H = rowY[1] + 30;
+
+const svg = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-labelledby="${ID}-t ${ID}-d">
+  <title id="${ID}-t">2025年度の支出の内訳（合計${n(total)}万円）</title>
+  <desc id="${ID}-d">${spend.map(s => `${s.name} ${n(s.v)}万円（${pct(s.v)}%）`).join('、')}。教室の運営に使った費用は${n(roomTotal)}万円で、支出の${pct(roomTotal)}%。</desc>
+  ${bracket}${bar}${labels}
 </svg>`;
 
 export default {
   study: true,
   id: ID,
-  title: '予算の内訳：支出と収入',
   language: 'ja',
-  notes: 'Purpose: お金の出入りを1枚で示し、支出のうち子どもと接する現場に使った割合を見出しで伝える。\nModify: spend と income（万円）を差し替える。合計・割合・ドーナツの角度・積み上げの高さ・ラベル位置・繰越額はすべて計算で出る。field: true の項目が見出しの「現場」の割合に入る。\nInvariant: ドーナツの中央の合計＝支出の各項目の合計、積み上げの高さ＝収入の合計。収入−支出＝繰越を下段で必ず示す。割合は小数1桁で四捨五入。\nStatic: 静的ページ。',
+  title: 'Spending and the cost per child',
+  notes: 'Purpose: 寄付と委託費がどこに使われたかを1本の帯で示し、子ども一人・1回あたりの費用に言い換えて実感できる大きさにする。\nModify: spend（万円、room: true が教室の運営費）と income、参加者数・延べ参加数を差し替える。帯の幅、割合、ラベルの段、一人あたりの費用、見出しの「約◯万円」は自動で計算される。\nInvariant: 帯の合計＝支出合計。一人あたり＝支出合計÷実人数、1回あたり＝支出合計÷延べ参加。割り算の式をページに残す。事務局の費用も隠さない。\nStatic: 静的ページ。',
   sources: [],
   exportPolicy: 'final',
-  className: 'tpl-impact-report ir-p-budget',
-  content: `<div class="ir">
-  <div class="ir-top"><span class="ir-brand">まちの学び舎ネットワーク　2025年度 年次報告</span><span class="ir-sec"><b>04</b>予算の内訳</span></div>
-  <h1 class="ir-h1" data-region="title">支出の${Math.round(fieldPct)}%を、子どもと接する現場に使いました</h1>
-  <p class="ir-panelh" style="left:64px;top:140px">支出<small>単位：万円</small></p>
-  <div class="ir-fig" style="left:64px;top:190px;width:330px;height:330px" data-region="primary">${donut}</div>
-  <div class="ir-legend" data-region="support"><table><tbody>
-    ${spend.filter(x => x.field).map(x => `<tr><td><i style="background:${x.c}"></i>${x.name}</td><td class="ir-num">${fmt(x.v)}</td><td class="ir-num">${pct(x.v, S)}%</td></tr>`).join('')}
-    <tr><td style="color:#A9492F;font-weight:700"><i style="background:#D46E55;height:3px;vertical-align:4px"></i>現場への支出 小計</td><td class="ir-num" style="color:#A9492F;font-weight:700">${fmt(field)}</td><td class="ir-num" style="color:#A9492F;font-weight:700">${pct(field, S)}%</td></tr>
-    ${spend.filter(x => !x.field).map(x => `<tr><td><i style="background:${x.c}"></i>${x.name}</td><td class="ir-num">${fmt(x.v)}</td><td class="ir-num">${pct(x.v, S)}%</td></tr>`).join('')}
-    <tr class="is-total"><td>支出合計</td><td class="ir-num">${fmt(S)}</td><td class="ir-num">100%</td></tr>
-  </tbody></table>${Math.abs(roundedSum - 100) > .05 ? '<p class="ir-note" style="margin-top:8px">割合は四捨五入のため、合計が100%にならない場合があります。</p>' : ''}</div>
-  <p class="ir-panelh" style="left:800px;top:140px">収入<small>合計 ${fmt(I)} 万円</small></p>
-  <div class="ir-fig" style="left:800px;top:190px;width:416px;height:370px" data-region="support">${column}</div>
-  <div class="ir-recon" data-region="support">
-    <span>収入</span><b>${fmt(I)}</b><span class="ir-op">−</span><span>支出</span><b>${fmt(S)}</b><span class="ir-op">＝</span><span>次年度への繰越</span><b style="color:#A9492F">${fmt(carry)}</b><span>万円</span>
-  </div>
-  <p class="ir-foot" data-region="source"><span>2025年度決算（例示用の架空データ）・ 単位：万円</span><span>4</span></p>
-</div>`
+  className: 'tpl-impact-report ir-budget',
+  content: `<h1 class="ir-h" data-region="title">子ども一人あたりの費用は、一年で<span class="ir-nw">約${approx}万円</span>でした</h1>
+<figure class="ir-fig" style="left:64px;top:186px;width:${W}px;height:${H}px" data-region="support">${svg}</figure>
+<div class="ir-cost" style="left:64px" data-region="primary"><p class="ir-n">${n(perChild)}<small>円</small></p><p class="ir-n-l">子ども一人あたりの年間費用</p><p class="ir-n-d">支出 <b>${n(total)}万円</b> ÷ 参加した子ども <b>${n(kids)}人</b></p></div>
+<div class="ir-cost" style="left:652px"><p class="ir-n">${n(perVisit)}<small>円</small></p><p class="ir-n-l">1回の参加あたり</p><p class="ir-n-d">支出 <b>${n(total)}万円</b> ÷ 延べ参加 <b>${n(visits)}人</b></p></div>
+<div class="ir-foot" data-region="source"><p>2025年度決算（万円）。収入は${n(inTotal)}万円：${income.map(x => `${x.name}${n(x.v)}`).join('・')}。<br>差額${n(inTotal - total)}万円は、2026年度の新しい教室の開設に充てる</p><p>ゆうがた教室　2025年度 活動報告<b>4</b></p></div>`,
 };

@@ -1,61 +1,27 @@
-// Template: Conference keynote · Typographic opener over a generative ridgeline backdrop. Synthetic example content; replace data and copy.
-// The backdrop is computed: seeded noise builds 24 ridgelines (the "mountain") with a low sun behind them.
-// Change SEED for a different range; keep the ridges below the title block (ridgeTop).
-const P = 'tpl-keynote-opener';
-const SEED = 20260924;
-const talk = { event: 'Solstice Grid Forum 2026', slot: 'Opening keynote', date: '24 September 2026', room: 'Main hall' };
+// Template: Stage keynote · Opener. Synthetic example content; replace data and copy.
+// A type poster on the day grid: title and premise hung from the top, speaker and event on the bottom line.
+const ID = 'tpl-keynote-opener';
+const M = n => 64 + 48 * n;            // x of module n (24 modules of 48 px = the hours of a day)
+const nb = s => s.replace(/(\d) (?=[A-Za-z%°])/g, '$1\u00a0');   // keep numbers with their units
 
-function rng(a) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
-const rand = rng(SEED);
-const g = (x, m, s) => Math.exp(-((x - m) ** 2) / (2 * s * s));
-
-const LINES = 24, ridgeTop = 380, gapY = 11, sunX = 1000;
-const waves = Array.from({ length: 4 }, (_, k) => ({ f: 0.006 + k * 0.007 + rand() * 0.004, a: 0.35 / (k + 1) + rand() * 0.1 }));
-const ridges = [];
-for (let i = 0; i < LINES; i++) {
-  const yb = ridgeTop + 92 + i * gapY, phase = rand() * 6.28, lift = 1 - i / LINES * 0.4;
-  const pts = [];
-  for (let x = -20; x <= 1300; x += 8) {
-    const n = waves.reduce((s, w, k) => s + w.a * (0.5 + 0.5 * Math.sin(x * w.f + phase * (k + 1) + i * 0.35)), 0);
-    const env = 0.95 * g(x, sunX - 60, 210) + 0.55 * g(x, 520, 170) + 0.18;
-    pts.push([x, yb - Math.min(yb - ridgeTop, 84 * env * n * lift + 5 * rand())]);
-  }
-  const d = `M${pts.map(p => `${p[0]} ${p[1].toFixed(1)}`).join(' L')}`;
-  const o = (0.28 + 0.7 * (i / LINES)).toFixed(2);
-  ridges.push(`<path d="${d} L1300 720 L-20 720 Z" fill="#07080d" fill-opacity=".94"/><path d="${d}" fill="none" stroke="url(#${P}-stroke)" stroke-width="${(1 + i * 0.03).toFixed(2)}" stroke-opacity="${o}"/>`);
-}
-const stars = Array.from({ length: 110 }, () => {
-  const x = rand() * 1280, y = rand() * 360, r = rand() < 0.1 ? 1.4 : 0.8;
-  if (x < 900 && y > 50 && y < 400) return ''; // keep the title field clean
-  return `<circle cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="${r}" fill="#f4f1ea" opacity="${(0.15 + rand() * 0.4).toFixed(2)}"/>`;
-}).join('');
-
-const bg = `<svg class="kn-deco" viewBox="0 0 1280 720" width="1280" height="720" aria-hidden="true">
-<defs>
-  <radialGradient id="${P}-sky" cx="${sunX}" cy="470" r="720" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#3a1d12"/><stop offset=".35" stop-color="#1a1230"/><stop offset=".75" stop-color="#0b0f20"/><stop offset="1" stop-color="#07080d"/></radialGradient>
-  <radialGradient id="${P}-cool" cx="140" cy="60" r="520" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#1d3b7a" stop-opacity=".55"/><stop offset="1" stop-color="#1d3b7a" stop-opacity="0"/></radialGradient>
-  <radialGradient id="${P}-sun" cx="${sunX}" cy="428" r="78" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffe3a3"/><stop offset=".55" stop-color="#ffb547"/><stop offset="1" stop-color="#ff7a3d"/></radialGradient>
-  <radialGradient id="${P}-halo" cx="${sunX}" cy="428" r="300" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ff9a3d" stop-opacity=".55"/><stop offset="1" stop-color="#ff9a3d" stop-opacity="0"/></radialGradient>
-  <linearGradient id="${P}-stroke" x1="0" y1="0" x2="1280" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#56d7e6"/><stop offset=".5" stop-color="#8e7bff"/><stop offset=".8" stop-color="#ffb547"/><stop offset="1" stop-color="#ff7a3d"/></linearGradient>
-</defs>
-<rect width="1280" height="720" fill="url(#${P}-sky)"/><rect width="1280" height="720" fill="url(#${P}-cool)"/>
-${stars}
-<circle cx="${sunX}" cy="428" r="300" fill="url(#${P}-halo)"/>
-<circle cx="${sunX}" cy="428" r="74" fill="url(#${P}-sun)"/>
-${ridges.join('')}
-</svg>`;
+const talk = {
+  title: 'Moving evening demand to midday',
+  // The problem and the size of the answer: one short sentence per line, two lines.
+  premise: ['Solar output peaks at 13:00 and demand at 19:00.', 'About 2 GW of the evening load could run at midday instead.'],
+  speaker: 'Maren Ekholm, system planning, Westmark Grid',
+  event: 'Lowland Energy Forum, Rotterdam, 24 September 2026',
+};
 
 export default {
   study: true,
-  id: 'tpl-keynote-opener',
-  title: 'Keynote opener: Move the hour, not the mountain',
-  notes: 'Purpose: Open a keynote with the whole argument in one line and a picture of it: the sun behind the mountain.\nModify: Change the two title lines, the italic subline and the event strings. Change SEED for another ridge pattern; keep ridgeTop below the title block.\nInvariant: The title is a claim the talk defends, not a topic label. The backdrop is decoration and carries no data.\nStatic: No builds; the opener reads at once.',
+  id: ID,
+  title: 'Keynote opener: Moving evening demand to midday',
+  notes: 'Purpose: Open a talk with its subject in the room\'s largest type, the premise in one plain sentence, and who is speaking where — nothing else competes.\nModify: Edit talk.title (two lines at 88 px; about 16 characters per line), talk.premise (two short sentences, one per line: a fact and the size of the answer, not a slogan), talk.speaker and talk.event.\nInvariant: Flat paper, ink only — the yellow is reserved for solar data later in the deck. Title hangs from the 64 px top line with the premise under it at y 286 (the upper part of the screen stays visible over the audience\'s heads); speaker and event share one baseline at 656, the event starting at the centre line (module 12).\nStatic: No builds; the page reads at once.',
   sources: [],
   exportPolicy: 'final',
   className: 'tpl-keynote kn-opener',
-  content: `<div class="kn-page">${bg}
-<p class="kn-abs kn-eyebrow" style="left:76px;top:74px"><b>${talk.slot}</b>　${talk.event}　·　${talk.date}</p>
-<h1 class="kn-abs kn-open-h" data-region="title" style="left:70px;top:132px;text-transform:none;font-size:112px;letter-spacing:-5px;color:#8f92a4"><span style="display:inline;color:var(--kn-ink)">Move the <span class="kn-warm" style="display:inline">hour,</span></span><br>not the mountain.</h1>
-<p class="kn-abs kn-open-sub" style="left:76px;top:360px;width:640px">Why the next decade of the grid is about timing, not tonnage.</p>
-</div>`
+  content: `<h1 class="kn-at kn-display" data-region="title" style="left:${M(0)}px;top:64px;width:${M(24) - M(0)}px">${talk.title}</h1>
+<p class="kn-at kn-lead" data-region="support" style="left:${M(0)}px;top:286px;width:${M(19) - M(0)}px">${talk.premise.map(nb).join('<br>')}</p>
+<p class="kn-at kn-label kn-grey" style="left:${M(0)}px;top:641px;width:${M(11) - M(0)}px">${talk.speaker}</p>
+<p class="kn-at kn-label kn-grey" style="left:${M(12)}px;top:641px;width:${M(24) - M(12)}px">${talk.event}</p>`,
 };

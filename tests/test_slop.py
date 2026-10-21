@@ -70,4 +70,53 @@ class SlopCheck(unittest.TestCase):
             subprocess.run(['node',str(ROOT/'scripts/studio.mjs'),'build',str(ROOT/f'assets/examples/{name}.json'),'--out',str(out)],check=True,capture_output=True)
             r=review(load_scene(self.dir/f'{name}.scene.json'),'scene')
             self.assertEqual(r['errors'],0,name)
+    def test_html_style_signals_of_the_machine_made_look(self):
+        try:
+            import playwright  # noqa: F401
+            from slop_check import load_html
+        except Exception:self.skipTest('Playwright is not installed')
+        decorated=('<section class="slide" id="decorated" style="position:relative;width:1280px;height:720px;background:#f4f1ea radial-gradient(circle at 1px 1px,#bbb 1px,transparent 1.2px) 0 0/24px 24px">'
+            '<h1 style="font-size:40px;color:#111">売上は計画を上回る一方、<em style="color:#d9442b;font-style:normal">新規ARRは未達</em></h1>'
+            '<p style="font:600 13px Inter;letter-spacing:.14em;text-transform:uppercase">quarterly review</p><p style="font:600 13px Inter;letter-spacing:.14em;text-transform:uppercase">kpi summary</p>'
+            + ''.join(f'<span style="display:inline-block;height:28px;line-height:28px;padding:0 12px;border-radius:14px;background:#e3f2ea">{t}</span>' for t in ['計画比 ▲ +2.2%','前年比','NEW'])
+            + '<p style="font-size:20px">✨ 今期のハイライト</p></section>')
+        anchored=('<section class="slide" id="anchored" style="position:relative;width:1280px;height:720px;background:#ffffff">'
+            '<h1 style="font-size:40px;color:#111">ARR grew fastest in <em style="color:#2457c5;font-style:normal">the enterprise tier</em></h1>'
+            '<svg width="600" height="200"><rect x="0" y="20" width="420" height="40" fill="#2457c5"/><rect x="0" y="80" width="300" height="40" fill="#9aa1ab"/></svg></section>')
+        page=self.dir/'styled.html';page.write_text('<!doctype html><meta charset="utf-8"><body style="margin:0">'+decorated+anchored+'</body>',encoding='utf-8')
+        try:slides=load_html(page)
+        except Exception as e:self.skipTest(f'Chromium unavailable: {e}')
+        r=review(slides,'html');sig=signals(r)
+        for name in ['ornamental-pattern','spaced-caps-labels','chips','emoji','headline-accent-unanchored','ja-triangle-for-increase']:
+            self.assertIn(name,sig,name)
+        unanchored=[f['slide'] for f in r['findings'] if f['signal']=='headline-accent-unanchored']
+        self.assertEqual(unanchored,['decorated'],'a colored phrase that names a same-colored mark is not flagged')
+        lined=('<section class="slide" id="lined" style="position:relative;width:1280px;height:720px;background:#fff">'
+            '<h1 style="font-size:40px;color:#111">Half the homes beat the <em style="color:#c2410c;font-style:normal">median of 2.9</em></h1>'
+            '<svg width="600" height="240"><line x1="300" x2="300" y1="10" y2="220" stroke="#c2410c" stroke-width="2"/><circle cx="200" cy="120" r="5" fill="#9aa1ab"/></svg></section>'
+            '<section class="slide" id="labelled" style="position:relative;width:1280px;height:720px;background:#fff">'
+            '<h1 style="font-size:40px;color:#111">The <em style="color:#1d4ed8;font-style:normal">new model</em> catches more</h1>'
+            '<svg width="600" height="240"><text x="20" y="40" font-size="20" fill="#1d4ed8">new model</text><path d="M0 200 L300 60" stroke="#9aa1ab" fill="none"/></svg></section>')
+        page2=self.dir/'lines.html';page2.write_text('<!doctype html><meta charset="utf-8"><body style="margin:0">'+lined+'</body>',encoding='utf-8')
+        r2=review(load_html(page2),'html')
+        self.assertFalse([f for f in r2['findings'] if f['signal']=='headline-accent-unanchored'],'a same-coloured vertical line or SVG label anchors the phrase')
+    def test_table_rules_are_typography_but_card_stripes_are_not(self):
+        try:
+            import playwright  # noqa: F401
+            from slop_check import load_html
+        except Exception:self.skipTest('Playwright is not installed')
+        table=('<section class="slide" id="table" style="position:relative;width:1280px;height:720px;background:#fff">'
+            '<h1 style="font-size:40px">Most teams need Growth</h1><table style="border-collapse:collapse;font-size:20px"><tr>'
+            + ''.join(f'<th style="width:260px;text-align:left;border-top:3px solid {c};padding:10px 0">{t}</th>' for t,c in [('Starter','#fff'),('Growth','#0b6b4a'),('Scale','#fff')])
+            + '</tr><tr><td>€49</td><td>€179</td><td>€490</td></tr></table></section>')
+        cards=('<section class="slide" id="cards" style="position:relative;width:1280px;height:720px;background:#fff">'
+            + ''.join(f'<div style="display:inline-block;width:300px;height:160px;margin:20px;background:#f3f5f8;border-left:4px solid #2457c5;border-radius:6px">{t}</div>' for t in ['Speed','Scale','Trust'])
+            + '</section>')
+        page=self.dir/'rules.html';page.write_text('<!doctype html><meta charset="utf-8"><body style="margin:0">'+table+cards+'</body>',encoding='utf-8')
+        try:slides=load_html(page)
+        except Exception as e:self.skipTest(f'Chromium unavailable: {e}')
+        r=review(slides,'html')
+        stripes={f['slide'] for f in r['findings'] if f['signal']=='accent-stripe'}
+        self.assertNotIn('table',stripes,'a coloured rule over a table column is typography')
+        self.assertIn('cards',stripes,'a coloured edge on tinted rounded cards is still flagged')
 if __name__=='__main__':unittest.main()

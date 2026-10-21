@@ -1,0 +1,212 @@
+/* Composition studies, batch C1 — page CSS the study grammar (study-frame.css) does not cover.
+   Every selector is scoped under one study class (.cmp-<study>). Colors are --ss-* tokens from the
+   slide's color system. Font stacks are set per study on `.st.cmp-<study>` so they win over the
+   color-system class, which comes later in the generated bundle.
+   Grid: 1280×720, 64 px side margins, 12 columns of 74 px with 24 px gutters
+   (column k starts at 64 + 98·(k−1)). Type scale: display 72–120 · headline 36–52 ·
+   lead 24–28 · body 20–22 · label 16–18 · note 15. */
+
+/* ── Editorial opener: one image and a dominant serif title ─────────────────────── */
+.st.cmp-editorial-open {
+  --ss-font-display: "Charter", "Bitstream Charter", "Iowan Old Style", Georgia, Caladea, serif;
+  --ss-font-serif: "Charter", "Bitstream Charter", "Iowan Old Style", Georgia, Caladea, serif;
+  --ss-font-sans: "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+.cmp-editorial-open .eo-series { position: absolute; left: 64px; top: 52px; font: 500 18px/1.3 var(--ss-font-sans); color: var(--ss-muted); }
+.cmp-editorial-open .eo-title { position: absolute; left: 58px; top: 104px; width: 560px; font: 400 108px/.98 var(--ss-font-display); letter-spacing: -.025em; color: var(--ss-ink); }
+.cmp-editorial-open .eo-title em { font-style: normal; color: var(--ss-accent); }
+.cmp-editorial-open .eo-dek { position: absolute; left: 64px; top: 452px; width: 456px; font: 400 25px/1.4 var(--ss-font-display); color: var(--ss-ink); text-wrap: pretty; }
+.cmp-editorial-open .eo-byline { position: absolute; left: 64px; top: 596px; font: 400 18px/1.45 var(--ss-font-sans); color: var(--ss-muted); }
+.cmp-editorial-open .eo-byline b { font-weight: 600; color: var(--ss-ink); }
+.cmp-editorial-open .eo-record { position: absolute; left: 656px; top: 0; width: 624px; height: 720px; margin: 0; }
+.cmp-editorial-open .eo-record > svg { display: block; width: 624px; height: 720px; }
+.cmp-editorial-open .eo-caption { position: absolute; left: 64px; bottom: 22px; width: 540px; font: 400 15px/1.3 var(--ss-font-sans); color: var(--ss-muted); }
+
+/* ── Image-led opener: the photograph first, text in its own dark field ────────────── */
+.st.cmp-image-led {
+  --ss-font-display: "Inter Display", "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --ss-font-sans: "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+.cmp-image-led .il-photo { position: absolute; right: 0; bottom: 0; display: block; }
+.cmp-image-led .il-title { position: absolute; left: 60px; top: 50px; width: 1100px; font: 500 60px/1.1 var(--ss-font-display); letter-spacing: -.022em; color: var(--ss-ink); }
+.cmp-image-led .il-dek { position: absolute; left: 64px; top: 158px; width: 330px; font: 400 21px/1.5 var(--ss-font-sans); color: var(--ss-ink); text-wrap: pretty; }
+.cmp-image-led .il-meta { position: absolute; left: 64px; top: 360px; width: 334px; font: 400 18px/1.5 var(--ss-font-sans); color: var(--ss-muted); }
+.cmp-image-led .il-meta b { font-weight: 600; color: var(--ss-ink); }
+.cmp-image-led .il-credit { position: absolute; left: 64px; bottom: 22px; width: 334px; font: 400 15px/1.35 var(--ss-font-sans); color: var(--ss-muted); }
+
+/* ── Type as the composition: a Swiss-grid service notice ─────────────────────────── */
+.st.cmp-swiss-type {
+  --ss-font-display: "Inter Display", "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --ss-font-sans: "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+.cmp-swiss-type .sw-route { position: absolute; left: 64px; top: 50px; display: flex; align-items: center; gap: 14px; font: 600 21px/1 var(--ss-font-sans); color: var(--ss-ink); }
+.cmp-swiss-type .sw-bullet { display: inline-grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: var(--ss-accent); color: var(--ss-on-accent); font: 600 25px/1 var(--ss-font-display); font-variant-numeric: lining-nums; }
+.cmp-swiss-type .sw-date { position: absolute; right: 64px; top: 61px; font: 400 21px/1 var(--ss-font-sans); color: var(--ss-ink); }
+.cmp-swiss-type .sw-display { position: absolute; left: 64px; top: 128px; width: 1152px; font: 500 96px/1.02 var(--ss-font-display); letter-spacing: -.03em; color: var(--ss-ink); font-variant-numeric: lining-nums; }
+.cmp-swiss-type .sw-display span { display: block; }
+.cmp-swiss-type .sw-times { position: absolute; left: 0; top: 462px; width: 1280px; }
+.cmp-swiss-type .sw-times::before { content: ""; position: absolute; left: 64px; right: 64px; top: 0; border-top: 1px solid var(--ss-rule); }
+.cmp-swiss-type .sw-head { margin: 0 0 14px 64px; padding-top: 20px; font: 400 18px/1.3 var(--ss-font-sans); color: var(--ss-muted); }
+.cmp-swiss-type .sw-row { position: relative; height: 38px; margin: 0; font: 400 24px/38px var(--ss-font-sans); font-variant-numeric: tabular-nums lining-nums; }
+.cmp-swiss-type .sw-label { position: absolute; left: 64px; font-size: 20px; }
+.cmp-swiss-type .sw-min { position: absolute; transform: translateX(-50%); }
+.cmp-swiss-type .sw-old { color: var(--ss-muted); }
+.cmp-swiss-type .sw-new { color: var(--ss-ink); font-weight: 600; }
+.cmp-swiss-type .sw-note { position: absolute; left: 64px; top: 614px; width: 1152px; font: 400 18px/1.4 var(--ss-font-sans); color: var(--ss-ink); }
+
+/* ── Geometric poster: shapes constructed from the subject's own proportions ─────── */
+.st.cmp-geometric-poster {
+  --ss-font-display: "Inter Display", "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --ss-font-sans: "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+.cmp-geometric-poster .gp-art { position: absolute; inset: 0; margin: 0; }
+.cmp-geometric-poster .gp-art > svg { display: block; width: 1280px; height: 720px; }
+.cmp-geometric-poster .gp-title { position: absolute; left: 58px; top: 44px; font: 300 128px/1 var(--ss-font-display); letter-spacing: -.035em; color: var(--ss-ink); }
+.cmp-geometric-poster .gp-line { position: absolute; left: 64px; top: 196px; width: 300px; font: 400 22px/1.4 var(--ss-font-sans); color: var(--ss-ink); text-wrap: pretty; }
+.cmp-geometric-poster .gp-meta { position: absolute; left: 64px; top: 336px; width: 280px; font: 400 18px/1.45 var(--ss-font-sans); color: var(--ss-muted); }
+.cmp-geometric-poster .gp-caption { position: absolute; left: 64px; top: 560px; width: 270px; font: 400 15px/1.4 var(--ss-font-sans); color: var(--ss-muted); text-wrap: pretty; }
+
+/* ── Research result: estimate, interval and conditions side by side (ja) ─────────── */
+.st.cmp-research-result {
+  --ss-font-sans: "Inter", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic UI", "Yu Gothic", Meiryo, "IPAPGothic", sans-serif;
+  --ss-font-display: var(--ss-font-sans);
+}
+.cmp-research-result .st-head, .cmp-research-result .rr-dek, .cmp-research-result .rr-rail { word-break: auto-phrase; line-break: strict; }
+.cmp-research-result .rr-dek { top: 150px; max-width: 1060px; font-size: 18px; }
+.cmp-research-result .rr-fig { position: absolute; left: 64px; top: 220px; width: 810px; height: 420px; margin: 0; }
+.cmp-research-result .rr-fig > svg { display: block; }
+.cmp-research-result .rr-rail { position: absolute; left: 904px; top: 214px; width: 312px; }
+.cmp-research-result .rr-rail-head { margin: 0 0 10px; padding-bottom: 8px; border-bottom: 1px solid var(--ss-rule); font: 700 18px/1.4 var(--ss-font-sans); color: var(--ss-ink); }
+.cmp-research-result .rr-item { display: grid; grid-template-columns: 5em 1fr; column-gap: 10px; margin: 0 0 8px; font: 400 16px/1.55 var(--ss-font-sans); color: var(--ss-ink); font-variant-numeric: tabular-nums lining-nums; }
+.cmp-research-result .rr-item b { font-weight: 600; color: var(--ss-muted); }
+.cmp-research-result .nw { white-space: nowrap; }
+
+/* ── Dense reference table: aligned figures without boxes (ja) ─────────────────────── */
+.st.cmp-dense-table {
+  --ss-font-sans: "Inter", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic UI", "Yu Gothic", Meiryo, "IPAPGothic", sans-serif;
+  --ss-font-display: var(--ss-font-sans);
+}
+.cmp-dense-table .st-head, .cmp-dense-table .dt-dek { word-break: auto-phrase; line-break: strict; }
+.cmp-dense-table .dt-dek { top: 150px; font-size: 18px; }
+.cmp-dense-table .dt-table { position: absolute; left: 64px; top: 198px; width: 1152px; table-layout: fixed; border-collapse: collapse; font: 400 17px/1.2 var(--ss-font-sans); color: var(--ss-ink); font-variant-numeric: tabular-nums lining-nums; }
+.cmp-dense-table .dt-c-name { width: 132px; }
+.cmp-dense-table th, .cmp-dense-table td { padding: 0 14px 0 0; text-align: right; white-space: nowrap; }
+.cmp-dense-table thead th { font: 600 15px/1.3 var(--ss-font-sans); color: var(--ss-muted); vertical-align: bottom; }
+.cmp-dense-table thead small { display: block; font: 400 15px/1.3 var(--ss-font-sans); }
+.cmp-dense-table .dt-group th { text-align: left; color: var(--ss-ink); }
+.cmp-dense-table .dt-nw { white-space: nowrap; }
+.cmp-dense-table .dt-group th[colspan] span { display: block; margin-left: 28px; padding-bottom: 6px; border-bottom: 1px solid var(--ss-rule); }
+.cmp-dense-table .dt-cols th { padding-top: 8px; padding-bottom: 8px; border-bottom: 1.5px solid var(--ss-ink); }
+.cmp-dense-table th:first-child, .cmp-dense-table td:first-child, .cmp-dense-table tbody th, .cmp-dense-table tfoot th { text-align: left; }
+.cmp-dense-table tbody th, .cmp-dense-table tfoot th { font-weight: 600; }
+.cmp-dense-table tbody tr { height: 33px; border-bottom: 1px solid var(--ss-rule); }
+.cmp-dense-table tbody tr:last-child { border-bottom: 0; }
+.cmp-dense-table .dt-key { font-weight: 600; }
+.cmp-dense-table .dt-below .dt-key { color: var(--ss-accent); }
+.cmp-dense-table .dt-total { height: 38px; border-top: 1.5px solid var(--ss-ink); font-weight: 600; }
+
+/* ── Annotated photograph: observations tied to the regions they describe (ja) ───── */
+.st.cmp-annotated-photo {
+  --ss-font-sans: "Inter", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic UI", "Yu Gothic", Meiryo, "IPAPGothic", sans-serif;
+  --ss-font-display: var(--ss-font-sans);
+}
+.cmp-annotated-photo .st-head, .cmp-annotated-photo .ap-dek, .cmp-annotated-photo .ap-note { word-break: auto-phrase; line-break: strict; }
+.cmp-annotated-photo .ap-dek { top: 108px; font-size: 18px; }
+.cmp-annotated-photo .ap-photo { position: absolute; display: block; }
+.cmp-annotated-photo .ap-marks { position: absolute; left: 0; top: 0; pointer-events: none; overflow: visible; }
+.cmp-annotated-photo .ap-halo { fill: none; stroke: var(--ss-paper); stroke-width: 4.5; opacity: .9; }
+.cmp-annotated-photo .ap-line { fill: none; stroke: var(--ss-ink); stroke-width: 1.5; }
+.cmp-annotated-photo .ap-ring { fill: none; stroke: var(--ss-ink); stroke-width: 2.2; }
+.cmp-annotated-photo .ap-hot { stroke: var(--ss-accent); }
+.cmp-annotated-photo .ap-note { position: absolute; left: 832px; width: 384px; font: 400 17px/1.6 var(--ss-font-sans); color: var(--ss-ink); }
+.cmp-annotated-photo .ap-note b { display: block; font: 700 19px/1.5 var(--ss-font-sans); }
+.cmp-annotated-photo .ap-fault b { color: var(--ss-accent); }
+
+/* ── Crop sequence: one source image, three declared crops ──────────────────────── */
+.st.cmp-crop-sequence {
+  --ss-font-display: "Inter Display", "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --ss-font-sans: "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+.cmp-crop-sequence .cq-dek { top: 150px; max-width: 1100px; }
+.cmp-crop-sequence .cq-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
+.cmp-crop-sequence .cq-row { position: absolute; left: 64px; top: 214px; display: flex; gap: 36px; }
+.cmp-crop-sequence .cq-cell { margin: 0; width: 360px; }
+.cmp-crop-sequence .cq-frame { display: block; width: 360px; height: 240px; outline: 1px solid var(--ss-rule); }
+.cmp-crop-sequence figcaption { display: grid; margin-top: 14px; }
+.cmp-crop-sequence .cq-key { font: 600 17px/1.3 var(--ss-font-sans); color: var(--ss-ink); }
+.cmp-crop-sequence figcaption b { margin-top: 10px; font: 600 52px/1 var(--ss-font-display); letter-spacing: -.02em; color: var(--ss-accent); font-variant-numeric: tabular-nums lining-nums; }
+.cmp-crop-sequence .cq-of { font: 400 16px/1.4 var(--ss-font-sans); color: var(--ss-muted); }
+.cmp-crop-sequence .cq-reads { margin-top: 10px; font: 400 18px/1.4 var(--ss-font-sans); color: var(--ss-ink); }
+.cmp-crop-sequence .cq-land { fill: var(--ss-surface); }
+.cmp-crop-sequence .cq-flood { fill: var(--ss-accent); fill-opacity: .2; }
+.cmp-crop-sequence .cq-flood-edge { fill: none; stroke: var(--ss-accent); stroke-width: 1; stroke-opacity: .75; }
+.cmp-crop-sequence .cq-road-fill { fill: none; stroke: var(--ss-paper); stroke-width: 9; stroke-linejoin: round; }
+.cmp-crop-sequence .cq-road { fill: none; stroke: var(--ss-context); stroke-width: .9; stroke-linejoin: round; }
+.cmp-crop-sequence .cq-river { fill: var(--ss-accent); }
+.cmp-crop-sequence .cq-river-line { fill: none; stroke: var(--ss-accent); stroke-width: 1.6; stroke-linejoin: round; }
+.cmp-crop-sequence .cq-house { fill: var(--ss-ink); }
+.cmp-crop-sequence .cq-dot { fill: none; stroke: var(--ss-ink); stroke-width: 2.2; stroke-linecap: round; stroke-opacity: .62; }
+.cmp-crop-sequence .cq-wet { fill: var(--ss-accent); stroke: var(--ss-accent); stroke-opacity: 1; }
+.cmp-crop-sequence .cq-dot.cq-wet { fill: none; }
+.cmp-crop-sequence .cq-crop { fill: none; stroke: var(--ss-ink); stroke-width: 1.5; }
+.cmp-crop-sequence .cq-crop-label { fill: var(--ss-ink); font-family: var(--ss-font-sans); font-weight: 700; }
+.cmp-crop-sequence .cq-name { fill: var(--ss-muted); stroke: var(--ss-surface); paint-order: stroke; stroke-linejoin: round; font-family: var(--ss-font-sans); font-weight: 500; }
+.cmp-crop-sequence .cq-name-town { fill: var(--ss-ink); font-weight: 600; }
+.cmp-crop-sequence .cq-name-river { fill: var(--ss-accent); font-style: italic; }
+
+/* ── Image pair: two photographs compared on one stated property ────────────────── */
+.st.cmp-image-pair {
+  --ss-font-display: "Inter Display", "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --ss-font-sans: "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+.cmp-image-pair .ip-dek { max-width: 1100px; }
+.cmp-image-pair .ip-row { position: absolute; left: 64px; top: 200px; display: flex; gap: 48px; }
+.cmp-image-pair .ip-cell { margin: 0; }
+.cmp-image-pair .ip-frame { position: relative; }
+.cmp-image-pair .ip-frame img { display: block; }
+.cmp-image-pair .ip-ring { position: absolute; width: 22px; height: 22px; margin: -11px 0 0 -11px; border: 2px solid var(--ss-paper); border-radius: 50%; box-sizing: border-box; outline: 1.5px solid var(--ss-ink); }
+.cmp-image-pair figcaption { display: flex; gap: 16px; align-items: flex-start; margin-top: 16px; }
+.cmp-image-pair .ip-swatch { display: flex; flex: none; gap: 10px; }
+.cmp-image-pair .ip-swatch > span { display: grid; gap: 4px; width: 52px; font: 400 15px/1.2 var(--ss-font-sans); color: var(--ss-muted); }
+.cmp-image-pair .ip-swatch i { display: block; width: 52px; height: 40px; outline: 1px solid var(--ss-rule); outline-offset: -1px; }
+.cmp-image-pair .ip-nw { white-space: nowrap; }
+.cmp-image-pair .ip-text { flex: 1; min-width: 0; display: grid; gap: 2px; font: 400 17px/1.4 var(--ss-font-sans); color: var(--ss-muted); }
+.cmp-image-pair .ip-text b { font: 600 19px/1.35 var(--ss-font-sans); color: var(--ss-ink); font-variant-numeric: tabular-nums lining-nums; }
+
+/* ── Declared duotone: an image treated for atmosphere, its source kept beside it ──── */
+.st.cmp-duotone-study {
+  --ss-font-display: "Inter Display", "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --ss-font-sans: "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+.cmp-duotone-study .dt-panel { position: absolute; left: 0; top: 0; display: block; }
+.cmp-duotone-study .dt-part { position: absolute; left: 652px; top: 52px; font: 500 18px/1.3 var(--ss-font-sans); color: var(--ss-muted); }
+.cmp-duotone-study .dt-title { position: absolute; left: 646px; top: 168px; font: 300 132px/1 var(--ss-font-display); letter-spacing: -.035em; color: var(--ss-ink); }
+.cmp-duotone-study .dt-num { position: absolute; left: 652px; top: 132px; font: 600 22px/1 var(--ss-font-sans); color: var(--ss-accent); font-variant-numeric: lining-nums; }
+.cmp-duotone-study .dt-line { position: absolute; left: 652px; top: 318px; width: 500px; font: 400 26px/1.4 var(--ss-font-sans); color: var(--ss-ink); text-wrap: pretty; }
+.cmp-duotone-study .dt-source { position: absolute; left: 652px; bottom: 40px; width: 564px; margin: 0; display: flex; gap: 18px; align-items: flex-start; padding-top: 18px; border-top: 1px solid var(--ss-rule); }
+.cmp-duotone-study .dt-source img { display: block; flex: none; }
+.cmp-duotone-study .dt-source figcaption { font: 400 15px/1.45 var(--ss-font-sans); color: var(--ss-muted); }
+.cmp-duotone-study .dt-source b { font-weight: 600; color: var(--ss-ink); }
+
+/* ── Illustration-led explainer: one precise drawing carries the mechanism ────────── */
+.st.cmp-illustration-led {
+  --ss-font-display: "Inter Display", "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --ss-font-sans: "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+.cmp-illustration-led .il2-fig { position: absolute; left: 64px; top: 164px; width: 1152px; height: 420px; margin: 0; }
+.cmp-illustration-led .il2-fig > svg { display: block; }
+.cmp-illustration-led .il2-steps { position: absolute; left: 64px; top: 606px; width: 1152px; margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; font: 400 18px/1.4 var(--ss-font-sans); color: var(--ss-muted); }
+.cmp-illustration-led .il2-steps li { display: flex; gap: 10px; }
+.cmp-illustration-led .il2-steps b { font-weight: 700; color: var(--ss-ink); font-variant-numeric: lining-nums; }
+.cmp-illustration-led .il2-now { color: var(--ss-ink); }
+.cmp-illustration-led .il2-now b { color: var(--ss-accent); }
+
+/* ── Image inside type: a picture seen through very large letters ─────────────────── */
+.st.cmp-image-in-type {
+  --ss-font-display: "Inter Display", "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --ss-font-sans: "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+.cmp-image-in-type .it-art { position: absolute; left: 0; top: 0; display: block; }
+.cmp-image-in-type .it-caption { position: absolute; left: 952px; top: 286px; width: 264px; font: 400 16px/1.45 var(--ss-font-sans); color: var(--ss-muted); }
+.cmp-image-in-type .it-head { position: absolute; left: 64px; top: 432px; width: 1000px; font: 600 42px/1.14 var(--ss-font-display); letter-spacing: -.015em; color: var(--ss-ink); text-wrap: balance; }
+.cmp-image-in-type .it-dek { position: absolute; left: 64px; top: 552px; width: 860px; font: 400 21px/1.45 var(--ss-font-sans); color: var(--ss-muted); text-wrap: pretty; }

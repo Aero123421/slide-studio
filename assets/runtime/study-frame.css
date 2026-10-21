@@ -1,0 +1,63 @@
+/* Slide Studio study frame — the shared page grammar of the diagram and motion
+   libraries. Each study is a finished example slide: a claim, the evidence at
+   working size, an annotation where the eye should land, a quiet source line.
+   Colors and fonts come from a color-system class on the slide (cs-<id>). */
+.st {
+  --st-x: 64px; --st-top: 48px; --st-fig-top: 176px; --st-bottom: 62px;
+  background: var(--ss-paper, #fff); color: var(--ss-ink, #17202b);
+  font-family: var(--ss-font-sans, Inter, "Helvetica Neue", "Segoe UI", "Hiragino Sans", "Noto Sans JP", sans-serif);
+  font-feature-settings: "kern" 1;
+}
+.st :where(h1, h2, h3, p, figure, ul, ol, dl, dd) { margin: 0; }
+
+/* Headline: the page's claim, in the deck's display face. */
+.st-head { position: absolute; left: var(--st-x); top: var(--st-top); max-width: 1040px; font: 650 38px/1.14 var(--ss-font-display, var(--ss-font-sans, Inter, sans-serif)); letter-spacing: -.012em; text-wrap: balance; }
+.st-head em { font-style: normal; color: var(--ss-accent, #2457c5); }
+.st-head .st-quiet { color: var(--ss-muted, #5a6676); font-weight: 500; }
+.st-dek { position: absolute; left: var(--st-x); top: calc(var(--st-top) + 98px); max-width: 900px; font: 400 20px/1.45 var(--ss-font-sans, Inter, sans-serif); color: var(--ss-muted, #5a6676); text-wrap: pretty; }
+.st-head.st-one + .st-dek { top: calc(var(--st-top) + 56px); }
+
+/* Evidence region: figures are authored at the region's size so labels render ~1:1. */
+.st-fig { position: absolute; left: var(--st-x); right: var(--st-x); top: var(--st-fig-top); bottom: var(--st-bottom); display: flex; align-items: center; justify-content: center; }
+.st-fig > svg { width: 100%; height: 100%; display: block; overflow: visible; }
+.st-fig.st-top { align-items: flex-start; }
+
+/* Layout variants */
+.st--rail .st-fig { right: calc(var(--st-x) + 352px); }
+.st-rail { position: absolute; right: var(--st-x); top: var(--st-fig-top); bottom: var(--st-bottom); width: 312px; display: flex; flex-direction: column; justify-content: center; gap: 26px; }
+.st--left .st-fig { left: calc(var(--st-x) + 352px); }
+.st--left .st-rail { left: var(--st-x); right: auto; }
+.st--full .st-fig { left: 0; right: 0; top: 0; bottom: 0; }
+.st--tall .st-fig { top: 132px; }
+
+/* Rail content: one number or short finding per block, never a card stack. */
+.st-kpi { display: grid; gap: 6px; }
+.st-kpi b { font: 650 54px/1 var(--ss-font-display, var(--ss-font-sans, Inter, sans-serif)); letter-spacing: -.02em; font-variant-numeric: tabular-nums lining-nums; color: var(--ss-ink, #17202b); }
+.st-kpi b.st-accent { color: var(--ss-accent, #2457c5); }
+.st-kpi span { font: 400 18px/1.4 var(--ss-font-sans, Inter, sans-serif); color: var(--ss-muted, #5a6676); }
+.st-text { font: 400 19px/1.5 var(--ss-font-sans, Inter, sans-serif); color: var(--ss-ink, #17202b); }
+.st-text strong { font-weight: 650; }
+.st-text.st-muted { color: var(--ss-muted, #5a6676); }
+.st-rule { height: 1px; background: var(--ss-rule, #d5dbe3); border: 0; margin: 0; }
+
+/* Big type */
+.st-num { font: 650 128px/.9 var(--ss-font-display, var(--ss-font-sans, Inter, sans-serif)); letter-spacing: -.035em; font-variant-numeric: tabular-nums lining-nums; }
+.st-num small { font-size: .38em; letter-spacing: 0; font-weight: 500; margin-left: .12em; color: var(--ss-muted, #5a6676); }
+.st-kpi .st-num, .st-kpi b.st-num { font: 650 128px/.9 var(--ss-font-display, var(--ss-font-sans, Inter, sans-serif)); letter-spacing: -.035em; } /* a hero number inside a KPI block keeps hero size */
+
+/* Source line: honest provenance, readable size. */
+.st-source { position: absolute; left: var(--st-x); right: var(--st-x); bottom: 22px; display: flex; justify-content: space-between; gap: 24px; font: 400 15px/1.3 var(--ss-font-sans, Inter, sans-serif); color: var(--ss-muted, #5a6676); }
+.st-source b { font-weight: 600; color: var(--ss-ink, #17202b); }
+
+/* Japanese and other CJK pages: looser leading, no negative tracking. */
+.st:lang(ja) .st-head, .st:lang(zh) .st-head, .st:lang(ko) .st-head { line-height: 1.32; letter-spacing: 0; font-weight: 700; font-size: 36px; }
+.st:lang(ja) .st-dek, .st:lang(ja) .st-text { line-height: 1.65; }
+
+/* Motion helpers: elements that move keep their geometry box as the origin. */
+.st [data-states], .st [data-motion] { transform-box: fill-box; }
+.st .st-origin-left { transform-origin: 0% 50%; }
+.st .st-origin-bottom { transform-origin: 50% 100%; }
+.st .st-origin-center { transform-origin: 50% 50%; }
+
+/* Japanese: break headlines and short text between phrases (Chromium; others fall back to normal breaking). */
+.st:lang(ja) .st-head, .st:lang(ja) .st-dek, .st:lang(ja) .st-text, .st:lang(ja) .st-kpi span { word-break: auto-phrase; line-break: strict; }

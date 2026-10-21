@@ -1,82 +1,72 @@
-// Template: Engineering design review / postmortem · Latency percentiles over time. Synthetic example content; replace data and copy.
-// Replace the generator below with your real per-bucket percentiles: [{t:'HH:MM', p50, p95, p99}, …].
+// Template: Incident review · Latency percentiles through the incident. Synthetic example content; replace data and copy.
+import { lineChart, rng } from '../../runtime/figure.mjs';
+
 const ID = 'tpl-architecture-latency';
-const C = { grid: '#1f2d40', axis: '#3a4c63', mute: '#8a9bb0', text2: '#b4c1d1', p50: '#256abf', p95: '#5598e7', p99: '#9ec5f4', crit: '#e66767', warn: '#fab219', bg: '#0b1119' };
-const SLO = 400, START = 12 * 60, BUCKET = 5, N = 97; // 12:00–20:00 UTC in 5-minute buckets
-const events = [
-  { t: '13:58', label: 'deploy v4.18' },
-  { t: '14:17', label: 'alert' },
-  { t: '16:10', label: 'rollback' }
+const SLO = 1.0, TIMEOUT = 2.0; // s, p99 objective and gateway timeout
+const events = [ // UTC; hairlines with a label above the plot. level 0 = top line, 1 = just above the plot
+  { t: '18:00', label: 'Sale starts, cache invalidated', level: 0 },
+  { t: '18:24', label: 'Reporting jobs paused', level: 1 },
+  { t: '18:38', label: 'Cache warmed', level: 0 },
 ];
-// --- synthetic generator (deterministic): baseline + incident envelope
-function rng(seed) { return () => { seed |= 0; seed = (seed + 0x6D2B79F5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
-const r = rng(2317);
-const mins = s => { const [h, m] = s.split(':').map(Number); return h * 60 + m; };
+// 1-minute percentiles of POST /checkout at the gateway, 17:40–19:00 UTC, in seconds.
+// Synthetic: replace `data` with your export [{t:'HH:MM', p50, p95, p99}, …]; everything below is derived from it.
+const mins = t => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
 const hhmm = m => `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
-const env = m => { // 0 → 1 incident intensity
-  if (m < mins('14:00') || m > mins('17:00')) return 0;
-  if (m < mins('14:30')) return (m - mins('14:00')) / 30;
-  if (m <= mins('16:10')) return 0.8 + 0.2 * Math.exp(-Math.pow((m - mins('15:30')) / 28, 2));
-  return 0.8 * Math.pow(1 - (m - mins('16:10')) / 50, 1.35);
+const r = rng(2611), jit = (v, k = 0.05) => v * (1 + (r() - 0.5) * 2 * k);
+const shape = m => { // [p50, p95, p99] for minute m, a smooth model of the incident
+  const t = m - mins('18:00');
+  if (t < 0) return [0.19, 0.42, 0.64];
+  if (t < 2) return [[0.24, 0.55, 0.78], [0.38, 0.74, 0.97]][t];
+  if (t < 24) return [0.93, 1.78, TIMEOUT];
+  if (t < 38) return [0.46, 1.12, 1.6];
+  if (t < 44) { const f = (t - 38) / 6; return [0.36 - f * 0.12, 0.95 - f * 0.36, 1.42 - f * 0.4]; }
+  const f = Math.exp(-(t - 44) / 5); return [0.19 + f * 0.06, 0.42 + f * 0.16, 0.64 + f * 0.3];
 };
-const raw = Array.from({ length: N }, (_, i) => {
-  const m = START + i * BUCKET, e = env(m), n = () => 1 + (r() - 0.5) * 0.12;
-  return { t: hhmm(m), p50: 92 * n() + e * 190, p95: 205 * n() + e * 900, p99: 285 * n() + e * 1600 };
+const data = Array.from({ length: 81 }, (_, i) => {
+  const m = mins('17:40') + i, [a, b, c] = shape(m);
+  return { t: hhmm(m), p50: +jit(a).toFixed(3), p95: +jit(b).toFixed(3), p99: c >= TIMEOUT ? TIMEOUT : +Math.min(jit(c, 0.04), TIMEOUT).toFixed(3) };
 });
-// scale the incident excess so the reported peak equals the incident record (1,940 ms)
-const PEAK = 1940, iPk = raw.reduce((b, d, i) => (d.p99 > raw[b].p99 ? i : b), 0), k = (PEAK - 285) / (raw[iPk].p99 - 285);
-const data = raw.map(d => ({ t: d.t, p50: Math.round(d.p50), p95: Math.round(d.p95), p99: Math.round(d.p99 > 400 ? 285 + (d.p99 - 285) * k : d.p99) }));
-// --- derived facts (used by the side panel and the description)
-const peak = data.reduce((b, d) => (d.p99 > b.p99 ? d : b), data[0]);
+
+// ---- derived facts
 const over = data.filter(d => d.p99 > SLO);
-const firstOver = over[0], lastOver = over.at(-1);
-const endOf = d => hhmm(mins(d.t) + BUCKET); // buckets are labelled by their start time
-const contiguous = data.indexOf(lastOver) - data.indexOf(firstOver) + 1 === over.length;
-const p50peak = Math.max(...data.map(d => d.p50));
-// --- geometry
-const W = 872, H = 470, P = { x0: 64, x1: 780, y0: 36, y1: 410 }, Y = { min: 50, max: 3000 };
-const x = t => P.x0 + (mins(t) - START) / (BUCKET * (N - 1)) * (P.x1 - P.x0);
-const y = v => P.y1 - (Math.log10(v) - Math.log10(Y.min)) / (Math.log10(Y.max) - Math.log10(Y.min)) * (P.y1 - P.y0);
-let grid = '';
-for (const v of [50, 100, 200, 500, 1000, 2000]) grid += `<line x1="${P.x0}" y1="${y(v)}" x2="${P.x1}" y2="${y(v)}" stroke="${C.grid}"/><text x="${P.x0 - 10}" y="${y(v) + 5}" text-anchor="end" class="t-axis">${v >= 1000 ? v / 1000 + 's' : v}</text>`;
-for (let h = 12; h <= 20; h++) { const t = hhmm(h * 60); grid += `<line x1="${x(t)}" y1="${P.y1}" x2="${x(t)}" y2="${P.y1 + 6}" stroke="${C.axis}"/><text x="${x(t)}" y="${P.y1 + 24}" text-anchor="middle" class="t-axis">${t}</text>`; }
-grid += `<line x1="${P.x0}" y1="${P.y1}" x2="${P.x1}" y2="${P.y1}" stroke="${C.axis}"/>`;
-const win = `<rect x="${x(firstOver.t) - 3}" y="${P.y0}" width="${x(endOf(lastOver)) - x(firstOver.t) + 3}" height="${P.y1 - P.y0}" fill="${C.warn}" fill-opacity=".07"/>`
-  + `<text x="${x(firstOver.t) + 6}" y="${P.y1 - 10}" class="t-mono-s">p99 over SLO · ${firstOver.t}–${endOf(lastOver)}</text>`;
-const slo = `<line x1="${P.x0}" y1="${y(SLO)}" x2="${P.x1}" y2="${y(SLO)}" stroke="${C.crit}" stroke-width="1.4" stroke-dasharray="6 4"/><text x="${P.x0 + 8}" y="${y(SLO) - 8}" class="t-crit">p99 SLO 400 ms</text>`;
-const ev = events.map(e => `<line x1="${x(e.t)}" y1="${P.y0 - 6}" x2="${x(e.t)}" y2="${P.y1}" stroke="${C.text2}" stroke-width="1" stroke-dasharray="2 3"/><circle cx="${x(e.t)}" cy="${P.y0 - 6}" r="3.5" fill="${C.text2}"/>`).join('')
-  + events.map((e, i) => `<text x="${x(e.t) + (i ? 8 : -8)}" y="${P.y0 - 14}" text-anchor="${i ? 'start' : 'end'}" class="t-mono">${e.t} ${e.label}</text>`).join('');
-const series = [['p50', C.p50, 1.8], ['p95', C.p95, 1.8], ['p99', C.p99, 2.4]];
-const lines = series.map(([k, c, w]) => `<polyline points="${data.map(d => `${x(d.t).toFixed(1)},${y(d[k]).toFixed(1)}`).join(' ')}" fill="none" stroke="${c}" stroke-width="${w}" stroke-linejoin="round" stroke-linecap="round"/>`).join('');
-const last = data.at(-1);
-const ends = series.map(([k, c]) => `<circle cx="${x(last.t)}" cy="${y(last[k])}" r="4" fill="${c}" stroke="${C.bg}" stroke-width="2"/><text x="${P.x1 + 12}" y="${y(last[k]) + 5}" class="t-mono-b">${k}</text><text x="${P.x1 + 50}" y="${y(last[k]) + 5}" class="t-mono-s">${last[k]}</text>`).join('');
-const pk = `<circle cx="${x(peak.t)}" cy="${y(peak.p99)}" r="5" fill="${C.p99}" stroke="${C.bg}" stroke-width="2"/><text x="${x(peak.t) + 10}" y="${y(peak.p99) - 8}" class="t-mono-b">${peak.p99.toLocaleString('en-US')} ms</text>`;
-const chart = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-labelledby="${ID}-t ${ID}-d">
-<title id="${ID}-t">Checkout latency percentiles, 12:00–20:00 UTC, log scale</title>
-<desc id="${ID}-d">p50, p95 and p99 latency of POST /checkout in 5-minute buckets on a logarithmic axis. Before the deploy at 13:58 p99 stays near 290 ms. In every bucket from ${firstOver.t} to ${endOf(lastOver)} p99 exceeds the 400 ms SLO, peaking at ${peak.p99} ms at ${peak.t}. p50 peaks at ${p50peak} ms. After the rollback at 16:10 all percentiles return to baseline by about 17:00.</desc>
-${grid}${win}${slo}${ev}${lines}${pk}${ends}
-<text x="${P.x0 - 10}" y="${P.y0 - 14}" text-anchor="end" class="t-mono-s">ms</text>
-<text x="${(P.x0 + P.x1) / 2}" y="${P.y1 + 50}" text-anchor="middle" class="t-mono-s">time, UTC · 12 Aug 2026 · 5-minute buckets</text>
-</svg>`;
+const capped = data.filter(d => d.p99 >= TIMEOUT);
+const first = over[0].t, last = over.at(-1).t, end = hhmm(mins(last) + 1); // buckets are labelled by their start
+const minutesOver = over.length, minutesCapped = capped.length;
+const NB = '\u00a0'; // never break a number from its unit
+const s2 = v => `${v.toFixed(1)}${NB}s`;
+
+const xs = data.map(d => mins(d.t));
+const fig = lineChart({
+  id: `${ID}-fig`, width: 1152, height: 412,
+  title: `Checkout latency percentiles, ${data[0].t}–${data.at(-1).t} UTC, 1-minute buckets`,
+  desc: `p99 rose above the ${s2(SLO)} SLO at ${first} and stayed above it until ${end} (${minutesOver} minutes); for ${minutesCapped} of those minutes it sat at the ${s2(TIMEOUT)} gateway timeout. p95 peaked near ${s2(Math.max(...data.map(d => d.p95)))} and p50 near ${s2(Math.max(...data.map(d => d.p50)))}. Pausing the reporting jobs at 18:24 brought p99 down to about 1.6 s; warming the cache at 18:38 ended the impact.`,
+  xType: 'linear', x: xs, xTicks: 5, xFormat: v => hhmm(v),
+  yDomain: [0, 2.5], yTicks: 5, format: { digits: 2, suffix: `${NB}s` }, tickFormat: v => (v ? s2(v) : '0'),
+  series: [
+    { name: 'p50', values: data.map(d => d.p50), color: '#a9aeb6' },
+    { name: 'p95', values: data.map(d => d.p95), color: '#6f757e' },
+    { name: 'p99', values: data.map(d => d.p99), color: 'var(--ar-ink)' },
+  ],
+  highlight: 'p99', strokeWidth: 2.6, markers: 'none',
+  bands: [{ from: mins(first), to: mins(end) }],
+  refLines: [{ y: SLO, label: `SLO: p99 under ${s2(SLO)}`, labelPos: 'end' }, { y: TIMEOUT, label: `Gateway timeout ${s2(TIMEOUT)}`, labelPos: 'end' }],
+  extra: ({ x, y, box }) => events.map(e => {
+    const ex = x(mins(e.t)), ty = box.y - 34 + e.level * 22;
+    return `<line x1="${ex}" y1="${ty - 14}" x2="${ex}" y2="${box.y + box.h}" stroke="var(--ar-ink)" stroke-width="1" opacity=".5"/>`
+      + `<text x="${ex + 7}" y="${ty}" class="t-note"><tspan class="t-strong t-num">${e.t}</tspan> ${e.label}</text>`;
+  }).join('') + `<text x="${x(mins(first)) + 8}" y="${y(0.08)}" class="t-strong t-red">Customer impact, ${minutesOver}${NB}min</text>`,
+});
 
 export default {
   study: true,
   id: ID,
-  title: 'Latency percentiles over time',
-  notes: 'Purpose: Show how far and for how long latency left its objective, with the change events that explain the shape.\nModify: Replace the generator with real per-bucket percentiles in data (t, p50, p95, p99), and edit events and SLO. The window, peak, side-panel numbers and description are derived from data.\nInvariant: Percentiles are computed per bucket from raw requests, never averaged across buckets. State the bucket size, population and log scale. p50/p95/p99 use one ordered hue; the SLO keeps the critical color.\nStatic: Static page.',
+  title: 'Latency percentiles through the incident',
+  notes: 'Purpose: Show how far and how long checkout latency left its objective, with the three changes that shaped the curve.\nModify: Replace `data` with your 1-minute percentiles (t, p50, p95, p99) and edit SLO, TIMEOUT and events. The impact window, minute counts, headline and description are computed from the data.\nInvariant: Percentiles are computed per bucket from raw requests, never averaged across buckets; requests cut off by the timeout count at the timeout, which caps p99 — say so. Linear time and latency axes from zero. Red only for the customer-impact window.\nStatic: Static page; no builds.',
   sources: [],
   exportPolicy: 'final',
   className: 'tpl-architecture ar-latency',
-  content: `<div class="ar-page">
-<div class="ar-bar"><span class="ar-crumb"><b>INC-2317</b><i>/</i>04 · Latency</span><span>POST /checkout · gateway-measured</span></div>
-<h1 class="ar-title" data-region="title">p99 broke the 400 ms SLO in every bucket from <em>${firstOver.t} to ${endOf(lastOver)}</em></h1>
-<figure class="ar-fig" style="left:48px;top:150px;width:${W}px;height:${H}px" data-region="primary">${chart}</figure>
-<div class="ar-side" data-region="support">
-  <div class="ar-stat"><div class="k">Peak p99</div><div class="v">${peak.p99.toLocaleString('en-US')}<small>ms</small></div><div class="n">at ${peak.t} UTC, ${(peak.p99 / SLO).toFixed(1)}× the objective</div></div>
-  <div class="ar-stat"><div class="k">Buckets over SLO</div><div class="v">${over.length}<small>× 5 min</small></div><div class="n">${firstOver.t}–${endOf(lastOver)} UTC${contiguous ? ', contiguous' : ', with gaps'}</div></div>
-  <div class="ar-stat"><div class="k">Peak p50</div><div class="v">${p50peak}<small>ms</small></div><div class="n">the median request slowed too</div></div>
-  <p class="ar-method">Percentiles are computed per 5-minute bucket from gateway access logs for every POST /checkout, including 504s counted at 2.0 s. Log scale.</p>
-</div>
-<footer class="ar-foot" data-region="source"><span>Illustrative data · synthetic series, replace with your metrics export</span><span class="ar-pg">04 / 06</span></footer>
-</div>`
+  content: `<p class="ar-run"><span>Incident review — checkout timeouts, 6 Oct 2026</span><span>4</span></p>
+<h1 class="ar-head" data-region="title">p99 sat on the ${s2(TIMEOUT)} timeout for ${minutesCapped} minutes and stayed above the ${s2(SLO)} objective for ${minutesOver}</h1>
+<figure class="ar-fig" style="left:64px;top:228px;--ss-surface:var(--ar-red-tint)" data-region="primary">${fig}</figure>
+<p class="ar-src" data-region="source"><span>Illustrative data. 1-minute percentiles of checkout requests at the gateway, UTC. Requests cut off at the timeout count as ${s2(TIMEOUT)}, which is why p99 flattens there.</span></p>`,
 };

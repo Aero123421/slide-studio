@@ -1,61 +1,81 @@
-// Template: 年次インパクトレポート · 地域別の活動（抽象タイル図）. Synthetic example content; replace data and copy.
-const ID = 'tpl-impact-report-regions';
-// col/row place each area on an abstract tile schema (not geography).
-const regions = [
-  {name: '中央', people: 402, sites: 5, col: 1, row: 1}, {name: '東部', people: 281, sites: 4, col: 2, row: 1},
-  {name: '北部', people: 236, sites: 3, col: 1, row: 0}, {name: '西部', people: 198, sites: 3, col: 0, row: 1},
-  {name: '南部', people: 167, sites: 2, col: 1, row: 2}
-].map(r => ({...r, perSite: r.people / r.sites}));
-const total = regions.reduce((a, r) => a + r.people, 0);
-const totalSites = regions.reduce((a, r) => a + r.sites, 0);
-const ranked = [...regions].sort((a, b) => b.people - a.people);
-const top2 = ranked.slice(0, 2), top2Share = top2.reduce((a, r) => a + r.people, 0) / total * 100;
-const busiest = regions.reduce((a, r) => r.perSite > a.perSite ? r : a);
-const fmt = n => Math.round(n).toLocaleString('ja-JP');
-const f1 = n => n.toFixed(1);
+// Template: 年次活動報告（寄付者・自治体向け）· 地区別の実績. Synthetic example content; replace data and copy.
+// Reach = children who came ÷ children who qualify for school-expense aid, by district. Rows are
+// sorted by reach; the district that needs attention takes the accent and a one-line explanation.
+import { el, textLines, linear, fmt } from '../../runtime/figure.mjs';
 
-// Sequential fill from light sage to deep teal by participants.
-const lo = [221, 234, 228], hi = [30, 70, 82];
-const pmin = Math.min(...regions.map(r => r.people)), pmax = Math.max(...regions.map(r => r.people));
-const fill = p => { const t = (p - pmin) / (pmax - pmin); return { t, c: `rgb(${lo.map((v, i) => Math.round(v + (hi[i] - v) * (0.15 + 0.85 * t))).join(',')})` }; };
-const S = 128, G = 12, OX = 70, OY = 14;
-const houseIcon = (x, y, c) => `<path d="M${x} ${y + 7} L${x + 7} ${y} L${x + 14} ${y + 7} V${y + 15} H${x} Z" fill="${c}"/>`;
-const tiles = regions.map(r => { const x = OX + r.col * (S + G), y = OY + r.row * (S + G), {t, c} = fill(r.people), light = t > .42, tc = light ? '#FFFFFF' : '#1F3440';
-  return `<rect x="${x}" y="${y}" width="${S}" height="${S}" rx="14" fill="${c}"/>
-  ${r === busiest ? `<rect x="${x - 5}" y="${y - 5}" width="${S + 10}" height="${S + 10}" rx="18" fill="none" stroke="#D46E55" stroke-width="3" stroke-dasharray="7 5"/>` : ''}
-  <text class="${light ? 'ir-svg-w' : 'ir-svg-t'}" x="${x + 16}" y="${y + 30}">${r.name}</text>
-  <text class="${light ? 'ir-svg-wn' : 'ir-svg-n'}" x="${x + 16}" y="${y + 78}">${fmt(r.people)}<tspan style="font:700 16px var(--ir-ja)" dx="3">人</tspan></text>
-  ${Array.from({length: r.sites}, (_, k) => houseIcon(x + 16 + k * 20, y + 104, light ? '#FFFFFF' : '#2E6E72')).join('')}`; }).join('');
-const dots = []; for (let i = 0; i < 12; i++) for (let j = 0; j < 10; j++) dots.push(`<circle cx="${20 + i * 50}" cy="${10 + j * 50}" r="1.6" fill="#8DB3A5" opacity=".5"/>`);
-const map = `<svg viewBox="0 0 600 480" role="img" aria-labelledby="${ID}-t ${ID}-d">
-  <title id="${ID}-t">5つの地域の参加者数と拠点数を示すタイル図（模式図）</title>
-  <desc id="${ID}-d">${regions.map(r => `${r.name}：${r.people}人、${r.sites}拠点`).join('。')}。タイルの配置は位置関係の目安で、実際の地図ではない。</desc>
-  ${dots.join('')}${tiles}
-  <text class="ir-svg-s" x="${OX}" y="${OY + 3 * S + 2 * G + 28}">色が濃いほど参加者が多い　⌂＝拠点1か所</text>
-  <text class="ir-svg-s" x="${OX}" y="${OY + 3 * S + 2 * G + 50}" style="fill:#A9492F">点線の枠：1拠点あたりの参加者が最も多い地域</text>
+const ID = 'tpl-impact-report-regions';
+const districts = [            // 教室数、参加した子ども（実人数）、対象の子ども（就学援助を受ける小中学生）
+  {name: '本町', rooms: 3, kids: 128, eligible: 610},
+  {name: '川西', rooms: 3, kids: 117, eligible: 540},
+  {name: '桜台', rooms: 2, kids: 96, eligible: 420},
+  {name: '港南', rooms: 2, kids: 82, eligible: 390},
+  {name: '緑ヶ丘', rooms: 2, kids: 63, eligible: 520,
+    note: '2教室とも駅の北側にあり、南部の団地からは歩いて30分かかる'},
+];
+
+// ---- derived
+const rows = districts.map(d => ({...d, reach: d.kids / d.eligible * 100})).sort((a, b) => b.reach - a.reach);
+const total = rows.reduce((t, d) => ({rooms: t.rooms + d.rooms, kids: t.kids + d.kids, eligible: t.eligible + d.eligible}), {rooms: 0, kids: 0, eligible: 0});
+const city = total.kids / total.eligible * 100;                 // 19.6
+const low = rows.at(-1);                                        // 最も届いていない地区
+const oneIn = Math.round(low.eligible / low.kids);              // 8人に1人
+const n = v => v.toLocaleString('ja-JP'), p1 = v => fmt(v, {digits: 1});
+
+// ---- geometry (figure at x=64, y=200; 1152 wide; bar track = columns 3–8)
+const W = 1152, head = 24, rowH = 58, noteH = 30;
+const X = {name: 0, rooms: 150, bar: 196, barEnd: 760, kids: 956, elig: 1152};
+const x = linear([0, 25], [X.bar, X.barEnd]);
+let y = head + 18;
+const lay = rows.map(d => { const top = y; y += rowH + (d.note ? noteH : 0); return {...d, top}; });
+const totTop = y + 10, H = totTop + rowH - 6;
+const header = [
+  textLines(['地区'], {x: X.name, y: 16, cls: 'sv-h'}),
+  textLines(['教室'], {x: X.rooms, y: 16, anchor: 'end', cls: 'sv-h'}),
+  textLines(['届いている割合（参加した子ども ÷ 対象の子ども）'], {x: X.bar, y: 16, cls: 'sv-h'}),
+  textLines(['参加した子ども'], {x: X.kids, y: 16, anchor: 'end', cls: 'sv-h'}),
+  textLines(['対象の子ども'], {x: X.elig, y: 16, anchor: 'end', cls: 'sv-h'}),
+  el('line', {x1: 0, x2: W, y1: head + 4.5, y2: head + 4.5, stroke: 'var(--ir-ink)', 'stroke-width': 1}),
+].join('');
+const marks = lay.map(d => {
+  const on = d.name === low.name, cy = d.top + rowH / 2 - 6;
+  return [
+    textLines([d.name], {x: X.name, y: cy + 7, cls: 'sv-lb'}),
+    textLines([String(d.rooms)], {x: X.rooms, y: cy + 8, anchor: 'end', cls: 'sv-n'}),
+    el('rect', {x: X.bar, y: cy - 11, width: x(d.reach) - X.bar, height: 22, fill: on ? 'var(--ir-accent)' : 'var(--ir-context)'}),
+    textLines([`${p1(d.reach)}%`], {x: x(d.reach) + 10, y: cy + 8, cls: on ? 'sv-n sv-a' : 'sv-n'}),
+    textLines([`${n(d.kids)}人`], {x: X.kids, y: cy + 8, anchor: 'end', cls: 'sv-n'}),
+    textLines([`${n(d.eligible)}人`], {x: X.elig, y: cy + 8, anchor: 'end', cls: 'sv-n', attrs: {style: 'fill:var(--ir-muted)'}}),
+    d.note ? textLines([d.note], {x: X.bar, y: cy + 44, cls: 'sv-l', attrs: {style: 'font-size:17px'}}) : '',
+    el('line', {x1: 0, x2: W, y1: d.top + rowH + (d.note ? noteH : 0) - 1, y2: d.top + rowH + (d.note ? noteH : 0) - 1, stroke: 'var(--ir-faint)', 'stroke-width': 1}),
+  ].join('');
+}).join('');
+const ref = el('line', {x1: x(city), x2: x(city), y1: head + 12, y2: totTop + 6, stroke: 'var(--ir-ink)', 'stroke-width': 1, 'stroke-dasharray': '2 4'});
+const tcy = totTop + rowH / 2 - 6;
+const totals = [
+  el('line', {x1: 0, x2: W, y1: totTop - 0.5, y2: totTop - 0.5, stroke: 'var(--ir-ink)', 'stroke-width': 1}),
+  textLines(['市全体'], {x: X.name, y: tcy + 7, cls: 'sv-lb'}),
+  textLines([String(total.rooms)], {x: X.rooms, y: tcy + 8, anchor: 'end', cls: 'sv-n'}),
+  textLines([`${p1(city)}%`], {x: x(city) + 10, y: tcy + 8, cls: 'sv-n'}),
+  textLines([`${n(total.kids)}人`], {x: X.kids, y: tcy + 8, anchor: 'end', cls: 'sv-n'}),
+  textLines([`${n(total.eligible)}人`], {x: X.elig, y: tcy + 8, anchor: 'end', cls: 'sv-n', attrs: {style: 'fill:var(--ir-muted)'}}),
+].join('');
+
+const svg = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-labelledby="${ID}-t ${ID}-d">
+  <title id="${ID}-t">地区別：支援が届いている割合（参加した子ども ÷ 就学援助を受ける小中学生）</title>
+  <desc id="${ID}-d">${rows.map(d => `${d.name} ${p1(d.reach)}%（${d.kids}人／${d.eligible}人、${d.rooms}教室）`).join('、')}。市全体 ${p1(city)}%（${total.kids}人／${n(total.eligible)}人）。${low.name}：${low.note}。</desc>
+  ${header}${marks}${ref}${totals}
 </svg>`;
-const maxP = ranked[0].people;
 
 export default {
   study: true,
   id: ID,
-  title: '地域別の活動：参加者数と拠点数',
   language: 'ja',
-  notes: 'Purpose: 地域ごとの参加者数・拠点数を、地理を捏造しない抽象的なタイル図と順位表で示し、次年度の拠点計画の根拠にする。\nModify: regions の人数・拠点数・タイル位置（col,row）を差し替える。見出しの割合、最も混み合う地域、表の並び・棒・合計はすべて計算で出る。実在の地名を使う場合も、正確な地図を用意できなければタイル図のままにする。\nInvariant: タイル図は位置関係の目安であり、面積や距離に意味はない（ページ上で明記する）。合計は表紙の参加者数・拠点数と一致させる。\nStatic: 静的ページ。',
+  title: 'Results by district: share of eligible children reached',
+  notes: 'Purpose: 地区ごとに「支援が必要な子どものうち、どれだけに届いているか」を比べ、次の教室をどこに開くかの根拠を示す。\nModify: districts の教室数・参加者数・対象者数を差し替える。割合、並び順、市全体の値、強調する地区（割合が最も低い地区）は自動で決まる。note には強調した地区の事情を一文で書く。見出しの改行は <br> で文や句の切れ目に入れる。\nInvariant: 割合の分母（対象の子ども）を必ず表に出す。参加者の合計は1ページ目の486人と一致させる。地図は使わない（位置関係を捏造しない）。\nStatic: 静的ページ。',
   sources: [],
   exportPolicy: 'final',
-  className: 'tpl-impact-report ir-p-regions',
-  content: `<div class="ir">
-  <div class="ir-top"><span class="ir-brand">まちの学び舎ネットワーク　2025年度 年次報告</span><span class="ir-sec"><b>02</b>地域別の活動</span></div>
-  <h1 class="ir-h1" data-region="title">参加者の${Math.round(top2Share)}%は${top2.map(r => r.name).join('・')}。1拠点あたりの利用は${busiest.name}が最多</h1>
-  <p class="ir-lead">${busiest.name}は${busiest.sites}拠点に${fmt(busiest.people)}人が通い、1拠点あたり${f1(busiest.perSite)}人と、いちばん混み合っています。</p>
-  <div class="ir-fig" style="left:64px;top:184px;width:600px;height:480px" data-region="primary">${map}</div>
-  <div class="ir-rank" data-region="support">
-    <table><thead><tr><th>地域</th><th colspan="2" style="text-align:left;padding-left:6px">参加者（人）</th><th>拠点</th><th>1拠点あたり</th></tr></thead>
-    <tbody>${ranked.map(r => `<tr><td>${r.name}</td><td class="ir-barcell"><span class="ir-bar" style="width:${(r.people / maxP * 180).toFixed(1)}px;${r === busiest ? 'background:#D46E55' : ''}"></span></td><td class="ir-num">${fmt(r.people)}</td><td class="ir-num">${r.sites}</td><td class="ir-num">${r === busiest ? `<b>${f1(r.perSite)}</b>` : f1(r.perSite)}</td></tr>`).join('')}
-    <tr class="is-total"><td>合計</td><td></td><td class="ir-num">${fmt(total)}</td><td class="ir-num">${totalSites}</td><td class="ir-num">${f1(total / totalSites)}</td></tr></tbody></table>
-    <p class="ir-note" style="margin-top:16px">参加者は年度内の実人数。棒の長さは参加者数に比例（0起点）。</p>
-  </div>
-  <p class="ir-foot" data-region="source"><span>タイルの配置は模式図で、実際の地図ではありません ・ 数値は例示用の架空データです</span><span>2</span></p>
-</div>`
+  className: 'tpl-impact-report ir-regions',
+  content: `<h1 class="ir-h" data-region="title">${low.name}地区では、<br>支援を必要とする子どもの<span class="ir-nw">${oneIn}人に1人</span>にしか届いていない</h1>
+<figure class="ir-fig" style="left:64px;top:200px;width:${W}px;height:${H}px" data-region="primary">${svg}</figure>
+<div class="ir-foot" data-region="source"><p>対象の子ども：就学援助を受けている市内の小中学生（2025年5月1日現在、市教育委員会）。参加した子どもは年度内の実人数</p><p>ゆうがた教室　2025年度 活動報告<b>2</b></p></div>`,
 };

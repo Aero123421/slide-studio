@@ -1,131 +1,99 @@
-/* Tallyleaf pitch pack — warm editorial investor deck.
-   Roles: paper (cream field), ink (warm near-black text), tomato (brand + emphasis),
-   herb (positive / growth), butter (highlight), blush (soft fills). Serif display + sans body. */
+/* Parwell seed memorandum — an investor memo set as slides.
+   Grid: 1280×720, margins 64, 12 columns of 74 px, 24 px gutters (column k starts at
+   64 + 98(k−1); n columns span 98n − 24). Running head 40–58, headline from 92,
+   evidence 236–632, source line ends at 680.
+   Type scale (px): Display 208 (cover wordmark only) · Headline 40/48 · Lead 26/36 · Body 20/30 · Label 17/24 ·
+   Note 15/20. Figures in Inter Display reuse the Headline (40) and Lead (26) steps.
+   Color: paper, ink, one grey for text, context grey for data, one vermilion accent for "this". */
 .tpl-pitch{
-  --tp-paper:#fbf5ea;--tp-paper-2:#f3ead9;--tp-ink:#1f1a16;--tp-ink-2:#4a4038;--tp-muted:#6e6358;
-  --tp-line:#e2d6c1;--tp-tomato:#d8432a;--tp-tomato-ink:#b3361f;--tp-tomato-deep:#a93220;--tp-blush:#f5d6c6;
-  --tp-herb:#2f6b4f;--tp-herb-soft:#d7e6d6;--tp-butter:#f2bf4b;--tp-butter-soft:#f8e6b8;
-  --tp-serif:"Georgia","Liberation Serif","DejaVu Serif",serif;
-  --tp-sans:"Inter","Helvetica Neue","Segoe UI","Liberation Sans",Arial,sans-serif;
-  background:var(--tp-paper);color:var(--tp-ink);font-family:var(--tp-sans);
+  --pp-paper:#F4F1EA;--pp-ink:#171614;--pp-grey:#5F5B54;--pp-context:#B4AEA3;--pp-rule:#CFC8BB;--pp-grid:#E3DED4;
+  --pp-accent:#D9442B;--pp-accent-ink:#B5361F;
+  --pp-serif:"Charter","Bitstream Charter","Iowan Old Style",Georgia,Caladea,serif;
+  --pp-sans:"Inter","Helvetica Neue",Arial,sans-serif;
+  --pp-figure:"Inter Display","Inter","Helvetica Neue",Arial,sans-serif;
+  /* figure-engine tokens: charts share the pack palette */
+  --ss-paper:var(--pp-paper);--ss-surface:#EBE7DE;--ss-ink:var(--pp-ink);--ss-muted:var(--pp-grey);
+  --ss-rule:var(--pp-rule);--ss-grid:var(--pp-grid);--ss-accent:var(--pp-accent);--ss-on-accent:#FFFFFF;
+  --ss-positive:#2F6B4F;--ss-negative:var(--pp-accent-ink);--ss-highlight:var(--pp-accent);--ss-context:var(--pp-context);
+  --ss-font-sans:var(--pp-sans);--ss-font-serif:var(--pp-serif);
+  --ss-font-mono:"SFMono-Regular",Menlo,Consolas,"DejaVu Sans Mono",monospace;
+  --ss-cat-1:#D9442B;--ss-cat-2:#171614;--ss-cat-3:#7D776D;--ss-cat-4:#B4AEA3;--ss-cat-5:#8A3A26;--ss-cat-6:#D8CDB9;
+  --ss-seq-1:#F6E4DD;--ss-seq-2:#EEC6B8;--ss-seq-3:#E6A28C;--ss-seq-4:#DE7B60;--ss-seq-5:#D9442B;--ss-seq-6:#A83521;--ss-seq-7:#742516;
+  --ss-div-1:#B5361F;--ss-div-2:#D9775F;--ss-div-3:#EDBBAA;--ss-div-4:#EFEBE3;--ss-div-5:#C9C3B8;--ss-div-6:#8E887E;--ss-div-7:#4A4640;
+  background:var(--pp-paper);color:var(--pp-ink);font:400 20px/30px var(--pp-serif);
+  font-kerning:normal;-webkit-font-smoothing:antialiased;
 }
-.tpl-pitch .tp-wrap{position:absolute;inset:0;overflow:hidden}
-.tpl-pitch .tp-abs{position:absolute}
 .tpl-pitch svg{display:block;overflow:visible}
 
-/* Running header: mark + wordmark left, section index right */
-.tpl-pitch .tp-head{position:absolute;left:64px;right:64px;top:34px;height:28px;display:flex;align-items:center;justify-content:space-between;
-  font:600 15px/1 var(--tp-sans);letter-spacing:.02em;color:var(--tp-ink-2)}
-.tpl-pitch .tp-head .tp-brand{display:flex;align-items:center;gap:10px;font:700 18px/1 var(--tp-serif);letter-spacing:-.01em;color:var(--tp-ink)}
-.tpl-pitch .tp-head .tp-brand svg{width:22px;height:22px}
-.tpl-pitch .tp-head .tp-sec{display:flex;align-items:center;gap:10px;font-variant-numeric:tabular-nums}
-.tpl-pitch .tp-head .tp-sec b{color:var(--tp-tomato-ink);font-weight:700}
-.tpl-pitch .tp-head .tp-sec i{display:inline-block;width:28px;height:2px;background:var(--tp-tomato)}
+/* ---- furniture ---- */
+.tpl-pitch .pp-run{position:absolute;left:64px;right:64px;top:40px;display:flex;justify-content:space-between;
+  font:400 15px/20px var(--pp-sans);color:var(--pp-grey);font-variant-numeric:tabular-nums}
+.tpl-pitch .pp-source{position:absolute;left:64px;right:64px;bottom:40px;font:400 15px/20px var(--pp-sans);color:var(--pp-grey)}
 
-/* Type roles */
-.tpl-pitch .tp-kicker{font:700 15px/1.2 var(--tp-sans);letter-spacing:.14em;text-transform:uppercase;color:var(--tp-tomato-ink)}
-.tpl-pitch .tp-title{font:400 46px/1.1 var(--tp-serif);letter-spacing:-.018em;color:var(--tp-ink)}
-.tpl-pitch .tp-title em{font-style:italic;color:var(--tp-tomato)}
-.tpl-pitch .tp-lede{font:400 21px/1.45 var(--tp-sans);color:var(--tp-ink-2)}
-.tpl-pitch .tp-body{font:400 18px/1.45 var(--tp-sans);color:var(--tp-ink-2)}
-.tpl-pitch .tp-label{font:700 15px/1.25 var(--tp-sans);letter-spacing:.08em;text-transform:uppercase;color:var(--tp-muted)}
-.tpl-pitch .tp-num{font:400 52px/1 var(--tp-serif);letter-spacing:-.02em;font-variant-numeric:lining-nums tabular-nums}
-.tpl-pitch .tp-source{position:absolute;left:64px;bottom:26px;font:400 15px/1.3 var(--tp-sans);color:var(--tp-muted)}
-.tpl-pitch .tp-source::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--tp-butter);margin-right:9px;vertical-align:1px}
+/* ---- type roles ---- */
+.tpl-pitch .pp-head{position:absolute;left:64px;top:92px;width:956px;font:400 40px/48px var(--pp-serif);
+  letter-spacing:-.01em;text-wrap:balance;font-variant-numeric:lining-nums}
+.tpl-pitch .pp-lead{font:400 26px/36px var(--pp-serif);text-wrap:pretty}
+.tpl-pitch .pp-body{font:400 20px/30px var(--pp-serif);text-wrap:pretty}
+.tpl-pitch .pp-ex{position:absolute;left:64px;top:236px;font:400 17px/24px var(--pp-sans);color:var(--pp-grey)}
+.tpl-pitch .pp-ex b{font-weight:600;color:var(--pp-ink);margin-right:.45em}
+.tpl-pitch .pp-num{font:600 40px/44px var(--pp-figure);letter-spacing:-.02em;font-variant-numeric:tabular-nums lining-nums}
 
-/* SVG text roles */
-.tpl-pitch .tp-sv-lab{font:600 15px var(--tp-sans);fill:var(--tp-ink-2)}
-.tpl-pitch .tp-sv-small{font:400 15px var(--tp-sans);fill:var(--tp-muted)}
-.tpl-pitch .tp-sv-num{font:400 22px var(--tp-serif);fill:var(--tp-ink)}
-.tpl-pitch .tp-sv-axis{font:400 15px var(--tp-sans);fill:var(--tp-muted);font-variant-numeric:tabular-nums}
-.tpl-pitch .tp-sv-hand{font:italic 400 19px var(--tp-serif);fill:var(--tp-ink)}
+/* ---- 01 cover: sentence top right, wordmark standing on the rule ---- */
+.tpl-pitch .pp-cover-line{position:absolute;left:652px;top:92px;width:564px}
+.tpl-pitch .pp-mark{position:absolute;left:56px;top:368px;font:400 208px/208px var(--pp-serif);letter-spacing:-.03em}
+.tpl-pitch .pp-cover-foot{position:absolute;left:64px;right:64px;top:584px;border-top:1px solid var(--pp-ink);padding-top:16px;
+  display:grid;grid-template-columns:564px 564px;column-gap:24px;font:400 17px/24px var(--pp-sans)}
+.tpl-pitch .pp-cover-foot b{display:block;font-weight:600}
+.tpl-pitch .pp-cover-foot span{color:var(--pp-grey)}
 
-/* ---------- 01 Cover ---------- */
-.tpl-pitch.tp-cover{background:var(--tp-paper)}
-.tpl-pitch .tp-cover-field{position:absolute;left:720px;top:0;width:560px;height:720px;background:var(--tp-tomato)}
-.tpl-pitch .tp-cover-field svg{width:560px;height:720px}
-.tpl-pitch .tp-cover-word{position:absolute;left:64px;top:56px;display:flex;align-items:center;gap:14px;font:700 30px/1 var(--tp-serif);letter-spacing:-.02em}
-.tpl-pitch .tp-cover-word svg{width:40px;height:40px}
-.tpl-pitch .tp-cover-h{position:absolute;left:64px;top:196px;width:610px;font:400 70px/1.02 var(--tp-serif);letter-spacing:-.03em}
-.tpl-pitch .tp-cover-h em{font-style:italic;color:var(--tp-tomato)}
-.tpl-pitch .tp-cover-sub{position:absolute;left:64px;top:452px;width:560px;font:400 22px/1.45 var(--tp-sans);color:var(--tp-ink-2)}
-.tpl-pitch .tp-cover-meta{position:absolute;left:64px;right:624px;bottom:52px;display:flex;justify-content:space-between;align-items:flex-end;border-top:1.5px solid var(--tp-ink);padding-top:16px}
-.tpl-pitch .tp-cover-meta p{font:600 16px/1.35 var(--tp-sans);color:var(--tp-ink)}
-.tpl-pitch .tp-cover-meta p span{display:block;font-weight:400;color:var(--tp-muted)}
+/* ---- 02 problem ---- */
+.tpl-pitch .pp-prob-fig{position:absolute;left:64px;top:276px;width:1152px;height:360px}
 
-/* ---------- 02 Problem ---------- */
-.tpl-pitch .tp-prob-title{position:absolute;left:64px;top:92px;width:1152px}
-.tpl-pitch .tp-prob-lede{position:absolute;left:64px;top:164px;width:860px}
-.tpl-pitch .tp-prob-scene{position:absolute;left:40px;top:262px;width:1200px;height:290px}
-.tpl-pitch .tp-prob-scene svg{width:1200px;height:290px}
-.tpl-pitch .tp-prob-stats{position:absolute;left:64px;right:64px;top:572px;display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:0;border-top:1.5px solid var(--tp-ink)}
-.tpl-pitch .tp-prob-stats div{padding:14px 24px 0 0;display:flex;gap:14px;align-items:baseline}
-.tpl-pitch .tp-prob-stats div + div{padding-left:24px;border-left:1px solid var(--tp-line)}
-.tpl-pitch .tp-prob-stats .tp-num{font-size:44px;color:var(--tp-tomato);white-space:nowrap}
-.tpl-pitch .tp-prob-stats p{font:400 17px/1.35 var(--tp-sans);color:var(--tp-ink-2)}
+/* ---- 03 market: a calculation table with one bar per row on a shared scale ---- */
+.tpl-pitch .pp-calc{position:absolute;left:64px;top:276px;width:1152px;table-layout:fixed;border-collapse:collapse;font:400 17px/24px var(--pp-sans)}
+.tpl-pitch .pp-calc th{font-weight:400;color:var(--pp-grey);text-align:right;padding:0 0 10px;vertical-align:bottom;white-space:nowrap}
+.tpl-pitch .pp-calc th:first-child,.tpl-pitch .pp-calc th:nth-child(2){text-align:left}
+.tpl-pitch .pp-calc td{padding:14px 0 0;vertical-align:top;text-align:right;font-variant-numeric:tabular-nums lining-nums}
+.tpl-pitch .pp-calc tbody tr:not(.barrow){border-top:1px solid var(--pp-rule)}
+.tpl-pitch .pp-calc thead tr{border-bottom:1px solid var(--pp-ink)}
+.tpl-pitch .pp-calc td.k{text-align:left;font-weight:600}
+.tpl-pitch .pp-calc td.who{text-align:left;font:400 20px/28px var(--pp-serif);padding-right:24px;text-wrap:balance}
+.tpl-pitch .pp-calc .op{color:var(--pp-grey);font:400 17px/24px var(--pp-sans);margin-right:.2em}
+.tpl-pitch .pp-calc td.v{font:600 26px/28px var(--pp-figure);letter-spacing:-.01em}
+.tpl-pitch .pp-calc td.bar{padding:10px 0 16px;text-align:left}
+.tpl-pitch .pp-calc .pp-bar{display:block;height:16px;background:var(--pp-context)}
+.tpl-pitch .pp-calc tr.is-this .pp-bar{background:var(--pp-accent)}
+.tpl-pitch .pp-calc tr.is-this td.v{color:var(--pp-accent-ink)}
+.tpl-pitch .pp-calc td.v .op{vertical-align:3px}
 
-/* ---------- 03 Market ---------- */
-.tpl-pitch .tp-mkt-title{position:absolute;left:64px;top:92px;width:560px}
-.tpl-pitch .tp-mkt-lede{position:absolute;left:64px;top:230px;width:500px}
-.tpl-pitch .tp-mkt-fig{position:absolute;left:380px;top:190px;width:500px;height:490px}
-.tpl-pitch .tp-mkt-fig svg{width:500px;height:490px}
-.tpl-pitch .tp-mkt-row{position:absolute;left:880px;width:340px}
-.tpl-pitch .tp-mkt-row .tp-label{display:flex;align-items:center;gap:10px;color:var(--tp-ink)}
-.tpl-pitch .tp-mkt-row .tp-label i{width:14px;height:14px;border-radius:50%;display:inline-block;border:1.5px solid var(--tp-ink)}
-.tpl-pitch .tp-mkt-row .tp-num{font-size:48px;margin:8px 0 6px}
-.tpl-pitch .tp-mkt-row p{font:400 16px/1.4 var(--tp-sans);color:var(--tp-ink-2)}
-.tpl-pitch .tp-mkt-row p b{font-weight:600;color:var(--tp-ink);font-variant-numeric:tabular-nums}
-.tpl-pitch .tp-mkt-method{position:absolute;left:64px;top:382px;width:420px;padding:18px 20px;background:var(--tp-paper-2)}
-.tpl-pitch .tp-mkt-method p{font:400 16px/1.45 var(--tp-sans);color:var(--tp-ink-2)}
-.tpl-pitch .tp-mkt-method p + p{margin-top:8px}
+/* ---- 04 unit economics: a P&L column beside the payback curve ---- */
+.tpl-pitch .pp-pl{position:absolute;left:64px;top:276px;width:368px;border-collapse:collapse;font:400 17px/24px var(--pp-sans)}
+.tpl-pitch .pp-pl td{padding:9px 0 9px;vertical-align:baseline}
+.tpl-pitch .pp-pl td+td{text-align:right;font-variant-numeric:tabular-nums lining-nums;white-space:nowrap}
+.tpl-pitch .pp-pl tr.sub td{padding-top:0;color:var(--pp-grey);font-size:15px;line-height:20px}
+.tpl-pitch .pp-pl tr.total td{border-top:1px solid var(--pp-ink);font-weight:600}
+.tpl-pitch .pp-pl tr.gap td{padding-top:28px}
+.tpl-pitch .pp-pl tr.is-this td{border-top:1px solid var(--pp-ink);padding-top:14px;font-weight:600;color:var(--pp-accent-ink)}
+.tpl-pitch .pp-pl tr.is-this td+td{font:600 26px/28px var(--pp-figure)}
+.tpl-pitch .pp-ue-fig{position:absolute;left:554px;top:236px;width:662px;height:400px}
 
-/* ---------- 04 Unit economics ---------- */
-.tpl-pitch .tp-ue-title{position:absolute;left:64px;top:92px;width:760px}
-.tpl-pitch .tp-ue-pl{position:absolute;left:64px;top:236px;width:760px}
-.tpl-pitch .tp-ue-pl svg{width:760px;height:92px}
-.tpl-pitch .tp-ue-chart{position:absolute;left:64px;top:346px;width:760px;height:300px}
-.tpl-pitch .tp-ue-chart svg{width:760px;height:300px}
-.tpl-pitch .tp-ue-rail{position:absolute;left:880px;top:92px;width:336px;bottom:64px;background:var(--tp-ink);color:var(--tp-paper);padding:30px 30px 0;border-radius:4px}
-.tpl-pitch .tp-ue-rail .tp-label{color:#cdbfae}
-.tpl-pitch .tp-ue-kpi{display:grid;grid-template-columns:1fr auto;align-items:baseline;padding:13px 0;border-bottom:1px solid #4a4038}
-.tpl-pitch .tp-ue-kpi:last-child{border-bottom:0}
-.tpl-pitch .tp-ue-kpi p{font:400 17px/1.3 var(--tp-sans);color:#e9dfd0}
-.tpl-pitch .tp-ue-kpi p span{display:block;font-size:15px;color:#b8aa98}
-.tpl-pitch .tp-ue-kpi strong{font:400 36px/1 var(--tp-serif);letter-spacing:-.02em;color:var(--tp-paper);font-variant-numeric:tabular-nums}
-.tpl-pitch .tp-ue-kpi.is-key strong{color:var(--tp-butter)}
+/* ---- 05 traction ---- */
+.tpl-pitch .pp-tr-fig{position:absolute;left:64px;top:276px;width:760px;height:356px}
+.tpl-pitch .pp-rail{position:absolute;left:946px;top:276px;width:270px}
+.tpl-pitch .pp-rail .pp-metric+.pp-metric{margin-top:28px;padding-top:24px;border-top:1px solid var(--pp-rule)}
+.tpl-pitch .pp-rail .pp-num{display:block;margin-bottom:8px}
 
-/* ---------- 05 Traction ---------- */
-.tpl-pitch .tp-tr-title{position:absolute;left:64px;top:92px;width:800px}
-.tpl-pitch .tp-tr-chart{position:absolute;left:44px;top:214px;width:840px;height:440px}
-.tpl-pitch .tp-tr-chart svg{width:840px;height:440px}
-.tpl-pitch .tp-tr-rail{position:absolute;left:920px;top:214px;width:296px}
-.tpl-pitch .tp-tr-stat{padding:0 0 20px;margin-bottom:20px;border-bottom:1px solid var(--tp-line)}
-.tpl-pitch .tp-tr-stat:last-child{border-bottom:0}
-.tpl-pitch .tp-tr-stat .tp-num{font-size:50px;color:var(--tp-herb)}
-.tpl-pitch .tp-tr-stat .tp-num small{font-size:26px;margin-left:2px}
-.tpl-pitch .tp-tr-stat p{font:400 17px/1.4 var(--tp-sans);color:var(--tp-ink-2);margin-top:6px}
-
-/* ---------- 06 Team & ask ---------- */
-.tpl-pitch .tp-ask-left{position:absolute;left:64px;top:92px;width:600px}
-.tpl-pitch .tp-team{position:absolute;left:64px;top:262px;width:620px;display:grid;grid-template-columns:1fr 1fr;gap:30px 30px}
-.tpl-pitch .tp-person{display:grid;grid-template-columns:74px 1fr;gap:16px;align-items:start}
-.tpl-pitch .tp-person svg{width:74px;height:74px}
-.tpl-pitch .tp-person h3{font:700 19px/1.2 var(--tp-sans);color:var(--tp-ink)}
-.tpl-pitch .tp-person .tp-role{font:700 15px/1.3 var(--tp-sans);color:var(--tp-tomato-ink);letter-spacing:.04em;text-transform:uppercase;margin:4px 0 6px}
-.tpl-pitch .tp-person p{font:400 16px/1.4 var(--tp-sans);color:var(--tp-ink-2)}
-.tpl-pitch .tp-advisors{position:absolute;left:64px;top:604px;width:620px;font:400 16px/1.4 var(--tp-sans);color:var(--tp-muted);border-top:1px solid var(--tp-line);padding-top:12px}
-.tpl-pitch .tp-advisors b{color:var(--tp-ink);font-weight:600}
-.tpl-pitch .tp-ask{position:absolute;left:736px;top:0;width:544px;height:720px;background:var(--tp-ink);color:var(--tp-paper)}
-.tpl-pitch .tp-ask .tp-kicker{position:absolute;left:52px;top:92px;color:var(--tp-butter)}
-.tpl-pitch .tp-ask-amt{position:absolute;left:52px;top:124px;font:400 88px/1 var(--tp-serif);letter-spacing:-.035em}
-.tpl-pitch .tp-ask-amt small{font-size:40px;letter-spacing:-.01em;margin-left:10px;color:#e9dfd0}
-.tpl-pitch .tp-ask-sub{position:absolute;left:52px;top:232px;width:440px;font:400 18px/1.45 var(--tp-sans);color:#e3d8c8}
-.tpl-pitch .tp-ask-fig{position:absolute;left:40px;top:300px;width:470px;height:250px}
-.tpl-pitch .tp-ask-fig svg{width:470px;height:250px}
-.tpl-pitch .tp-ask-fig .tp-sv-lab{fill:#f3ead9}
-.tpl-pitch .tp-ask-fig .tp-sv-small{fill:#c7b9a6}
-.tpl-pitch .tp-ask-fig .tp-sv-num{fill:#fbf5ea}
-.tpl-pitch .tp-ask-miles{position:absolute;left:52px;right:44px;top:572px;display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:1px solid #5a4f45;padding-top:14px}
-.tpl-pitch .tp-ask-miles div + div{padding-left:16px;border-left:1px solid #5a4f45}
-.tpl-pitch .tp-ask-miles strong{display:block;font:400 30px/1 var(--tp-serif);color:var(--tp-butter);font-variant-numeric:tabular-nums}
-.tpl-pitch .tp-ask-miles p{font:400 15px/1.35 var(--tp-sans);color:#d9cdbd;margin-top:6px}
+/* ---- 06 team and ask ---- */
+.tpl-pitch .pp-funds{position:absolute;left:64px;top:268px;width:1152px;height:92px}
+.tpl-pitch .pp-buys{position:absolute;left:64px;top:404px;width:466px;border-collapse:collapse;font:400 17px/24px var(--pp-sans)}
+.tpl-pitch .pp-buys th{font-weight:400;color:var(--pp-grey);text-align:right;padding:0 0 8px;white-space:nowrap}
+.tpl-pitch .pp-buys th:first-child{text-align:left;color:var(--pp-ink);font-weight:600}
+.tpl-pitch .pp-buys thead tr{border-bottom:1px solid var(--pp-ink)}
+.tpl-pitch .pp-buys td{padding:10px 0;border-bottom:1px solid var(--pp-rule);text-align:right;font-variant-numeric:tabular-nums lining-nums}
+.tpl-pitch .pp-buys td:first-child{text-align:left}
+.tpl-pitch .pp-buys td.goal{font:600 26px/28px var(--pp-figure);padding-left:24px}
+.tpl-pitch .pp-team{position:absolute;left:652px;top:404px;width:564px}
+.tpl-pitch .pp-team h2{font:600 17px/24px var(--pp-sans);padding-bottom:8px;border-bottom:1px solid var(--pp-ink)}
+.tpl-pitch .pp-team p{padding:9px 0 9px;border-bottom:1px solid var(--pp-rule);font:400 17px/24px var(--pp-sans);color:var(--pp-grey)}
+.tpl-pitch .pp-team p b{display:block;font-weight:600;color:var(--pp-ink)}

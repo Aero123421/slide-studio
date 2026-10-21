@@ -1,128 +1,102 @@
-/* Template pack: プロジェクト定例・進捗報告 (tpl-project-status). Every selector is scoped to .tpl-project-status. */
+/* tpl-project-status — 基幹システム移行プロジェクト 月次状況報告（ステアリングコミッティ）.
+   A tidy PMO report: paper, ink, greys, ONE teal accent (forecast, and what needs a decision today).
+   Status colours appear only on status, always with the word: 順調 green · 注意 amber · 遅延 red.
+   Grid: 1280×720, side margins 64, 12 columns × 74 px, gutter 24.
+   Place any block with class "g" and style="--c:<start column>;--s:<span>".
+   Type scale: Display 64 · Headline 32 · Lead 22 · Body 18 · Label 16 · Note 15. */
 .tpl-project-status{
-  --ps-ink:#1b2433;--ps-ink-2:#465264;--ps-ink-3:#5f6b7c;--ps-paper:#ffffff;--ps-surface:#f3f5f8;--ps-line:#d8dee6;--ps-line-2:#e8ecf1;
-  --ps-navy:#1d3a5f;--ps-teal:#0c7478;--ps-teal-soft:#e0f1f1;
-  --ps-g:#2b7a4b;--ps-g-bg:#e2f2e8;--ps-a:#946000;--ps-a-dot:#e0a100;--ps-a-bg:#fff2d2;--ps-r:#b8372a;--ps-r-bg:#fbe3df;
-  --ps-jp:"Hiragino Sans","Noto Sans JP","Yu Gothic","Meiryo","IPAGothic","IPAPGothic",sans-serif;
-  --ps-num:"Inter","Helvetica Neue","Segoe UI","Liberation Sans",Arial,"IPAGothic",sans-serif;
-  background:var(--ps-paper);color:var(--ps-ink);font-family:var(--ps-jp);word-break:auto-phrase;line-break:strict;
+  --paper:#ffffff; --ink:#1c2024; --muted:#5c6269; --context:#8f969e; --rule:#d6d9dd; --grid:#edeff1;
+  --teal:#0b6870; --teal-tint:#e7f1f2;
+  --ok:#2e7d3e; --warn:#b98000; --late:#b3261e;
+  --sans:"Inter","Helvetica Neue",Arial,"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic UI","Yu Gothic",Meiryo,"IPAGothic",sans-serif;
+  /* figure-engine tokens */
+  --ss-paper:var(--paper); --ss-surface:#f4f5f6; --ss-ink:var(--ink); --ss-muted:var(--muted); --ss-rule:var(--rule); --ss-grid:var(--grid);
+  --ss-accent:var(--teal); --ss-on-accent:#ffffff; --ss-highlight:var(--teal); --ss-context:var(--context);
+  --ss-positive:var(--ok); --ss-negative:var(--late);
+  --ss-font-sans:var(--sans); --ss-font-serif:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP","IPAMincho",serif; --ss-font-mono:Menlo,Consolas,monospace;
+  --ss-cat-1:var(--teal); --ss-cat-2:var(--ink); --ss-cat-3:var(--context); --ss-cat-4:#4c8a90; --ss-cat-5:#b7bcc2; --ss-cat-6:var(--muted);
+  --ss-seq-1:#f4f5f6; --ss-seq-2:#e9ebed; --ss-seq-3:#dcdfe2; --ss-seq-4:#c9cdd2; --ss-seq-5:#a9afb6; --ss-seq-6:#7c838b; --ss-seq-7:#50565d;
+  --ss-div-1:var(--late); --ss-div-2:#d27a70; --ss-div-3:#efc9c4; --ss-div-4:#f2f3f5; --ss-div-5:#bcd8da; --ss-div-6:#5e9ba0; --ss-div-7:var(--teal);
+  background:var(--paper); color:var(--ink); font:400 18px/1.65 var(--sans);
+  word-break:auto-phrase; line-break:strict; font-kerning:normal;
 }
-.tpl-project-status .ps-page{position:absolute;inset:0;overflow:hidden}
-.tpl-project-status .ps-abs{position:absolute}
-.tpl-project-status .ps-deco{position:absolute;pointer-events:none}
-.tpl-project-status svg{display:block;overflow:visible}
-.tpl-project-status svg text{text-rendering:geometricPrecision}
-.tpl-project-status .ps-num{font-family:var(--ps-num);font-variant-numeric:tabular-nums}
+.tpl-project-status .g{position:absolute; left:calc(64px + (var(--c, 1) - 1) * 98px); width:calc(var(--s, 12) * 98px - 24px)}
+.tpl-project-status svg{display:block; overflow:visible}
+.tpl-project-status svg text{font-variant-numeric:tabular-nums}
+.tpl-project-status .num{font-variant-numeric:tabular-nums lining-nums}
+.tpl-project-status .nw{white-space:nowrap}
+.tpl-project-status .accent{color:var(--teal)}
 
-/* running header shared by every page */
-.tpl-project-status .ps-bar{position:absolute;left:0;right:0;top:0;height:46px;display:flex;align-items:center;gap:14px;padding:0 56px;border-bottom:1px solid var(--ps-line);background:#fff}
-.tpl-project-status .ps-bar::before{content:"";position:absolute;left:0;top:0;bottom:-1px;width:8px;background:linear-gradient(180deg,var(--ps-teal),var(--ps-navy))}
-.tpl-project-status .ps-bar svg{width:24px;height:24px}
-.tpl-project-status .ps-bar p{font:700 15px/1 var(--ps-jp);color:var(--ps-navy);letter-spacing:.04em}
-.tpl-project-status .ps-bar p span{font-weight:400;color:var(--ps-ink-3);margin-left:10px}
-.tpl-project-status .ps-bar .ps-meta{margin-left:auto;font:400 15px/1 var(--ps-jp);color:var(--ps-ink-3);letter-spacing:.02em}
-.tpl-project-status .ps-bar .ps-meta b{font-weight:700;color:var(--ps-ink-2);margin-right:12px}
-.tpl-project-status .ps-sec{font:700 15px/1 var(--ps-jp);color:var(--ps-teal);letter-spacing:.12em}
-.tpl-project-status .ps-title{margin-top:10px;font:700 31px/1.38 var(--ps-jp);letter-spacing:.01em;color:var(--ps-ink)}
-.tpl-project-status .ps-source{position:absolute;left:56px;bottom:18px;font:400 15px/1.3 var(--ps-jp);color:var(--ps-ink-3)}
+/* Page frame: running head (top), 結論 headline, note line (bottom) where data is shown */
+.tpl-project-status .p-run{position:absolute; left:64px; right:64px; top:40px; display:flex; justify-content:space-between; gap:48px; font:400 15px/1.4 var(--sans); color:var(--muted)}
+.tpl-project-status .p-head{position:absolute; left:64px; top:92px; width:1054px; font:700 32px/1.4 var(--sans); text-wrap:balance}
+.tpl-project-status .p-note{position:absolute; left:64px; right:64px; bottom:40px; font:400 15px/1.4 var(--sans); color:var(--muted)}
 
-/* RAG chip: color + shape + word, never color alone */
-.tpl-project-status .ps-rag{display:inline-flex;align-items:center;gap:7px;padding:5px 11px 5px 9px;border-radius:6px;font:700 15px/1 var(--ps-jp);white-space:nowrap}
-.tpl-project-status .ps-rag svg{width:13px;height:13px}
-.tpl-project-status .ps-rag.is-g{background:var(--ps-g-bg);color:var(--ps-g)}
-.tpl-project-status .ps-rag.is-a{background:var(--ps-a-bg);color:var(--ps-a)}
-.tpl-project-status .ps-rag.is-r{background:var(--ps-r-bg);color:var(--ps-r)}
+/* Text roles */
+.tpl-project-status .p-label{font:400 16px/1.5 var(--sans); color:var(--muted)}
+.tpl-project-status .p-lead{font:700 22px/1.5 var(--sans)}
+.tpl-project-status .p-body{font:400 18px/1.65 var(--sans)}
+.tpl-project-status .p-fig{font:600 64px/1.1 var(--sans); letter-spacing:-.02em; font-variant-numeric:tabular-nums lining-nums}
+.tpl-project-status .p-fig small{font:400 20px/1 var(--sans); letter-spacing:0; color:var(--muted); margin-left:6px}
+
+/* Status: a dot in the status colour, then the word in ink. Never colour alone. */
+.tpl-project-status .st{display:inline-flex; align-items:center; gap:.4em; white-space:nowrap}
+.tpl-project-status .st::before{content:""; width:.62em; height:.62em; border-radius:50%; background:currentColor; flex:none}
+.tpl-project-status .st > b{font-weight:inherit; color:var(--ink)}
+.tpl-project-status .st.ok{color:var(--ok)} .tpl-project-status .st.warn{color:var(--warn)} .tpl-project-status .st.late{color:var(--late)}
+
+/* Hairline lists and the commentary rail (rules separate, space groups; no boxes) */
+.tpl-project-status .p-rail > div{padding:16px 0 18px; border-top:1px solid var(--rule)}
+.tpl-project-status .p-rail > div:first-child{border-top:1.5px solid var(--ink)}
+.tpl-project-status .p-pairs{display:grid; grid-template-columns:1fr auto; column-gap:16px; align-items:baseline}
+.tpl-project-status .p-pairs dt{font:400 16px/2.2 var(--sans); color:var(--muted)}
+.tpl-project-status .p-pairs dd{margin:0; font:600 22px/1.6 var(--sans); text-align:right; font-variant-numeric:tabular-nums lining-nums}
+.tpl-project-status .p-pairs dd small{font:400 16px/1 var(--sans); color:var(--muted); margin-left:4px}
+
+/* Ruled tables (RACI, risks, decisions) */
+.tpl-project-status .p-table{border-collapse:collapse; table-layout:fixed}
+.tpl-project-status .p-table th{font:400 16px/1.35 var(--sans); color:var(--muted); text-align:left; vertical-align:bottom; padding:0 0 9px 16px; border-bottom:1.5px solid var(--ink)}
+.tpl-project-status .p-table td{font:400 18px/1.5 var(--sans); padding:11px 0 11px 16px; border-bottom:1px solid var(--rule); vertical-align:top}
+.tpl-project-status .p-table tr > :first-child{padding-left:0}
+.tpl-project-status .p-table tbody tr:last-child td{border-bottom:1.5px solid var(--ink)}
+.tpl-project-status .p-table .c{text-align:center}
+.tpl-project-status .p-table .r{text-align:right}
+.tpl-project-status .p-table small{display:block; font:400 16px/1.45 var(--sans); color:var(--muted)}
 
 /* 01 summary */
-.tpl-project-status .ps-hero{position:absolute;left:56px;top:176px;width:392px;bottom:130px;border-radius:14px;background:linear-gradient(160deg,#fff8e6 0%,#fff2d2 100%);border:1px solid #f0d99a;padding:28px 30px}
-.tpl-project-status .ps-hero-top{display:flex;align-items:center;gap:18px}
-.tpl-project-status .ps-hero-top svg{width:56px;height:136px;flex:none}
-.tpl-project-status .ps-hero-top p{font:700 15px/1 var(--ps-jp);color:var(--ps-a);letter-spacing:.1em}
-.tpl-project-status .ps-hero-top strong{display:block;margin-top:10px;font:700 46px/1 var(--ps-jp);color:#7a4f00}
-.tpl-project-status .ps-hero-top em{display:block;margin-top:10px;font:400 15px/1.4 var(--ps-jp);font-style:normal;color:#7a5a17}
-.tpl-project-status .ps-hero blockquote{margin:24px 0 0;padding:18px 0 0;border-top:1px solid #ecd28c;font:700 21px/1.6 var(--ps-jp);color:var(--ps-ink)}
-.tpl-project-status .ps-areas{position:absolute;left:478px;right:56px;top:176px;border-collapse:collapse;table-layout:fixed}
-.tpl-project-status .ps-areas th{font:700 15px/1.2 var(--ps-jp);color:var(--ps-ink-3);text-align:left;padding:0 10px 10px 0;border-bottom:1.5px solid var(--ps-ink)}
-.tpl-project-status .ps-areas td{padding:13px 10px 13px 0;border-bottom:1px solid var(--ps-line);vertical-align:middle;font:400 16px/1.5 var(--ps-jp);color:var(--ps-ink-2)}
-.tpl-project-status .ps-areas td:first-child{font:700 17px/1.3 var(--ps-jp);color:var(--ps-ink)}
-.tpl-project-status .ps-trend{display:inline-flex;align-items:center;gap:6px;font:400 15px/1 var(--ps-jp);color:var(--ps-ink-3)}
-.tpl-project-status .ps-trend svg{width:18px;height:18px}
-.tpl-project-status .ps-kpis{position:absolute;left:56px;right:56px;bottom:54px;height:52px;display:grid;grid-template-columns:repeat(4,1fr);gap:28px}
-.tpl-project-status .ps-kpi{display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;column-gap:14px;align-items:end}
-.tpl-project-status .ps-kpi p{grid-column:1/3;font:400 15px/1.2 var(--ps-jp);color:var(--ps-ink-3)}
-.tpl-project-status .ps-kpi strong{font:700 26px/1 var(--ps-num);color:var(--ps-ink);white-space:nowrap}
-.tpl-project-status .ps-kpi strong small{font:400 15px/1 var(--ps-jp);color:var(--ps-ink-3);margin-left:3px}
-.tpl-project-status .ps-kpi svg{width:100%;height:22px}
-
-/* 02 milestones / 03 burndown / 05 risks: full-width figure areas */
-.tpl-project-status .ps-fig{position:absolute}
-.tpl-project-status .ps-rail{position:absolute;display:flex;flex-direction:column;gap:0}
-.tpl-project-status .ps-rail > div{padding:14px 0 14px;border-top:1px solid var(--ps-line)}
-.tpl-project-status .ps-rail > div:first-child{border-top:1.5px solid var(--ps-ink)}
-.tpl-project-status .ps-rail p{font:400 15px/1.3 var(--ps-jp);color:var(--ps-ink-3)}
-.tpl-project-status .ps-rail strong{display:block;margin-top:6px;font:700 28px/1.05 var(--ps-num);color:var(--ps-ink)}
-.tpl-project-status .ps-rail strong small{font:400 16px/1 var(--ps-jp);color:var(--ps-ink-2);margin-left:4px}
-.tpl-project-status .ps-rail .is-bad strong{color:var(--ps-r)}
-.tpl-project-status .ps-rail .ps-rail-note{margin-top:6px;font:400 15px/1.45 var(--ps-jp);color:var(--ps-ink-2)}
+.tpl-project-status.p-summary .p-overall{display:flex; gap:18px; margin:6px 0 2px; font:700 64px/1.15 var(--sans)}
+.tpl-project-status.p-summary .p-overall::before{width:28px; height:28px}
+.tpl-project-status.p-summary .p-areas li{display:flex; justify-content:space-between; padding:7px 0; border-top:1px solid var(--rule); font:400 18px/1.5 var(--sans)}
+.tpl-project-status.p-summary .p-areas{list-style:none; margin:20px 0 0; padding:0; border-bottom:1px solid var(--rule)}
+.tpl-project-status.p-summary .p-msgs{list-style:none; margin:0; padding:0}
+.tpl-project-status.p-summary .p-msgs li{position:relative; padding:12px 0 14px 34px; border-top:1px solid var(--rule)}
+.tpl-project-status.p-summary .p-msgs li:first-child{border-top:1.5px solid var(--ink)}
+.tpl-project-status.p-summary .p-msgs b{position:absolute; left:0; top:12px; font:600 22px/1.5 var(--sans); color:var(--muted)}
+.tpl-project-status.p-summary .p-msgs p + p{margin-top:2px; font:400 18px/1.6 var(--sans); color:var(--muted)}
+.tpl-project-status.p-summary .p-asks{padding-top:12px; border-top:1.5px solid var(--ink)}
+.tpl-project-status.p-summary .p-asks li{display:grid; grid-template-columns:1fr auto; column-gap:24px; padding:6px 0; font:400 18px/1.5 var(--sans)}
+.tpl-project-status.p-summary .p-asks ol{list-style:none; margin:4px 0 0; padding:0}
+.tpl-project-status.p-summary .p-asks .due{font-weight:700; text-align:right}
 
 /* 04 RACI */
-.tpl-project-status .ps-raci{position:absolute;left:56px;top:162px;width:900px;border-collapse:separate;border-spacing:0;table-layout:fixed}
-.tpl-project-status .ps-raci th{font:700 15px/1.3 var(--ps-jp);color:var(--ps-ink-2);padding:0 4px 10px;text-align:center;vertical-align:bottom;border-bottom:1.5px solid var(--ps-ink)}
-.tpl-project-status .ps-raci th:first-child{text-align:left;padding-left:0}
-.tpl-project-status .ps-raci td{height:38px;padding:0 4px;text-align:center;border-bottom:1px solid var(--ps-line-2);font:400 16px/1.3 var(--ps-jp)}
-.tpl-project-status .ps-raci td:first-child{text-align:left;padding-left:0;font:400 16px/1.3 var(--ps-jp);color:var(--ps-ink)}
-.tpl-project-status .ps-raci td:first-child b{display:inline-block;width:26px;font:700 15px/1 var(--ps-num);color:var(--ps-ink-3)}
-.tpl-project-status .ps-raci tr.is-key td{background:#f1f8f8}
-.tpl-project-status .ps-raci tfoot td{height:40px;border-bottom:0;border-top:1.5px solid var(--ps-ink);font:700 15px/1 var(--ps-num);color:var(--ps-ink-2)}
-.tpl-project-status .ps-raci tfoot td:first-child{font:700 15px/1 var(--ps-jp);color:var(--ps-ink-2)}
-.tpl-project-status .ps-raci tfoot td.is-hot{color:var(--ps-r)}
-.tpl-project-status .ps-cell{display:inline-grid;place-items:center;min-width:32px;height:28px;padding:0 6px;border-radius:6px;font:700 15px/1 var(--ps-num);letter-spacing:.02em}
-.tpl-project-status .ps-cell.is-A{background:var(--ps-navy);color:#fff}
-.tpl-project-status .ps-cell.is-R{background:var(--ps-teal);color:#fff}
-.tpl-project-status .ps-cell.is-AR{background:linear-gradient(135deg,var(--ps-navy) 50%,var(--ps-teal) 50%);color:#fff}
-.tpl-project-status .ps-cell.is-C{background:#fff;color:var(--ps-teal);box-shadow:inset 0 0 0 1.5px var(--ps-teal)}
-.tpl-project-status .ps-cell.is-I{color:var(--ps-ink-3);font-weight:400}
-.tpl-project-status .ps-none{display:inline-block;width:10px;height:2px;border-radius:1px;background:#c9d1db;vertical-align:middle}
-.tpl-project-status .ps-check{display:inline-flex;align-items:center;gap:4px;font:700 15px/1 var(--ps-num);color:var(--ps-g)}
-.tpl-project-status .ps-legend{position:absolute;left:992px;right:56px;top:162px}
-.tpl-project-status .ps-legend dl{margin:0}
-.tpl-project-status .ps-legend div{display:grid;grid-template-columns:42px 1fr;gap:10px;align-items:start;padding:12px 0;border-top:1px solid var(--ps-line)}
-.tpl-project-status .ps-legend div:first-child{border-top:1.5px solid var(--ps-ink)}
-.tpl-project-status .ps-legend dt{padding-top:1px}
-.tpl-project-status .ps-legend dd{margin:0;font:400 15px/1.45 var(--ps-jp);color:var(--ps-ink-2)}
-.tpl-project-status .ps-legend dd b{display:block;font:700 16px/1.3 var(--ps-jp);color:var(--ps-ink)}
-.tpl-project-status .ps-callout{margin-top:18px;padding:14px 16px;border-radius:10px;background:var(--ps-r-bg);font:400 15px/1.55 var(--ps-jp);color:#6d231b}
-.tpl-project-status .ps-callout b{display:block;margin-bottom:4px;font:700 16px/1.3 var(--ps-jp);color:var(--ps-r)}
+.tpl-project-status.p-raci .p-table td{font-size:20px; line-height:1.2; padding-top:8px; padding-bottom:8px}
+.tpl-project-status.p-raci .p-table td:first-child{font-size:18px; line-height:1.35; padding-top:7px; padding-bottom:6px}
+.tpl-project-status.p-raci .p-table th.c{text-align:center; padding-left:0}
+.tpl-project-status.p-raci .p-table td.c{padding-left:0}
+.tpl-project-status.p-raci .a{font-weight:700}
+.tpl-project-status.p-raci .ci{color:var(--muted)}
+.tpl-project-status.p-raci td.focus{background:var(--teal-tint); color:var(--teal); font-weight:700}
 
-/* 05 risks */
-.tpl-project-status .ps-risks{position:absolute;left:520px;right:56px;top:170px;border-collapse:collapse;table-layout:fixed}
-.tpl-project-status .ps-risks th{font:700 15px/1.2 var(--ps-jp);color:var(--ps-ink-3);text-align:left;padding:0 10px 9px 0;border-bottom:1.5px solid var(--ps-ink)}
-.tpl-project-status .ps-risks td{padding:10px 10px 10px 0;border-bottom:1px solid var(--ps-line);vertical-align:top;font:400 15px/1.5 var(--ps-jp);color:var(--ps-ink-2)}
-.tpl-project-status .ps-risks td b{font-weight:700;color:var(--ps-ink)}
-.tpl-project-status .ps-risks .ps-id{display:inline-grid;place-items:center;width:40px;height:26px;border-radius:13px;font:700 15px/1 var(--ps-num);color:#fff}
-.tpl-project-status .ps-risks .ps-score{font:700 20px/1 var(--ps-num)}
-.tpl-project-status .ps-risks .ps-score small{display:block;margin-top:5px;font:400 15px/1 var(--ps-num);color:var(--ps-ink-3)}
-.tpl-project-status .ps-risks .ps-kind{display:inline-block;margin-right:6px;padding:2px 6px;border-radius:4px;font:700 15px/1.2 var(--ps-jp);background:var(--ps-surface);color:var(--ps-ink-2)}
-.tpl-project-status .ps-risks .ps-kind.is-issue{background:var(--ps-r-bg);color:var(--ps-r)}
-
-/* 06 decisions and actions */
-.tpl-project-status .ps-dec{position:absolute;left:56px;top:170px;width:470px}
-.tpl-project-status .ps-dec article{position:relative;padding:16px 0 16px 64px;border-top:1px solid var(--ps-line)}
-.tpl-project-status .ps-dec article:first-of-type{border-top:1.5px solid var(--ps-ink)}
-.tpl-project-status .ps-dec .ps-dno{position:absolute;left:0;top:17px;font:700 15px/1.2 var(--ps-num);color:var(--ps-teal)}
-.tpl-project-status .ps-dec p{margin-top:5px;font:400 15px/1.45 var(--ps-jp);color:var(--ps-ink-3)}
-.tpl-project-status .ps-dec p.ps-dtext{margin-top:0;font:700 18px/1.55 var(--ps-jp);color:var(--ps-ink)}
-.tpl-project-status .ps-act{position:absolute;left:566px;right:56px;top:170px;border-collapse:collapse;table-layout:fixed}
-.tpl-project-status .ps-act th{font:700 15px/1.2 var(--ps-jp);color:var(--ps-ink-3);text-align:left;padding:0 8px 9px 0;border-bottom:1.5px solid var(--ps-ink)}
-.tpl-project-status .ps-act td{padding:11px 8px 11px 0;border-bottom:1px solid var(--ps-line);vertical-align:top;font:400 16px/1.45 var(--ps-jp);color:var(--ps-ink)}
-.tpl-project-status .ps-act td.ps-due{font:700 16px/1.3 var(--ps-num);white-space:nowrap}
-.tpl-project-status .ps-act td.ps-due small{display:block;margin-top:3px;font:400 15px/1.2 var(--ps-jp);color:var(--ps-ink-3)}
-.tpl-project-status .ps-act tr.is-late td.ps-due small{color:var(--ps-r);font-weight:700}
-.tpl-project-status .ps-state{display:inline-block;padding:4px 8px;border-radius:5px;font:700 15px/1 var(--ps-jp);white-space:nowrap}
-.tpl-project-status .ps-state.is-new{background:var(--ps-teal-soft);color:var(--ps-teal)}
-.tpl-project-status .ps-state.is-cont{background:var(--ps-surface);color:var(--ps-ink-2)}
-.tpl-project-status .ps-state.is-late{background:var(--ps-r-bg);color:var(--ps-r)}
-.tpl-project-status .ps-next{position:absolute;left:56px;right:56px;bottom:22px;height:62px;display:flex;align-items:center;gap:22px;padding:0 24px;border-radius:12px;background:var(--ps-navy);color:#fff}
-.tpl-project-status .ps-next p{font:700 15px/1 var(--ps-jp);letter-spacing:.1em;color:#9fd3d3}
-.tpl-project-status .ps-next strong{font:700 19px/1.3 var(--ps-jp)}
-.tpl-project-status .ps-next span{margin-left:auto;font:400 15px/1.4 var(--ps-jp);color:#d5deea}
+/* 06 decisions */
+.tpl-project-status.p-decide section + section{margin-top:18px}
+.tpl-project-status.p-decide .p-q{display:flex; justify-content:space-between; align-items:baseline; gap:24px; padding-bottom:6px}
+.tpl-project-status.p-decide .p-q h2{font:700 22px/1.4 var(--sans)}
+.tpl-project-status.p-decide .p-q p{font:400 18px/1.4 var(--sans); white-space:nowrap}
+.tpl-project-status.p-decide .p-q p b{font-weight:700}
+.tpl-project-status.p-decide .p-table td{padding-top:7px; padding-bottom:7px}
+.tpl-project-status.p-decide .p-table th{padding-bottom:7px}
+.tpl-project-status.p-decide tr.rec td{font-weight:700}
+.tpl-project-status.p-decide tr.rec .opt{color:var(--teal)}
+.tpl-project-status.p-decide tr.rec small{font-weight:400}
+.tpl-project-status.p-decide .p-why{margin-top:6px; font:400 16px/1.5 var(--sans); color:var(--muted)}
+.tpl-project-status .p-table small.inline{display:inline; font-size:16px}

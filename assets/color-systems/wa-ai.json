@@ -25,9 +25,9 @@
     "context": "#c1ccd3"
   },
   "type": {
-    "display": "\"Hiragino Sans\",\"Noto Sans JP\",\"Yu Gothic\",\"Meiryo\",\"IPAGothic\",\"Helvetica Neue\",sans-serif",
+    "display": "\"Hiragino Sans\",\"Noto Sans JP\",\"Yu Gothic\",\"Meiryo\",\"IPAPGothic\",\"Helvetica Neue\",sans-serif",
     "body": "\"Helvetica Neue\",\"Segoe UI\",\"Liberation Sans\",Arial,sans-serif",
-    "ja": "\"Hiragino Sans\",\"Noto Sans JP\",\"Yu Gothic\",\"Meiryo\",\"IPAGothic\",sans-serif"
+    "ja": "\"Hiragino Sans\",\"Noto Sans JP\",\"Yu Gothic\",\"Meiryo\",\"IPAPGothic\",sans-serif"
   },
   "ratios": {"paperAndSurface": 0.86, "ink": 0.11, "accentMax": 0.04},
   "rules": [

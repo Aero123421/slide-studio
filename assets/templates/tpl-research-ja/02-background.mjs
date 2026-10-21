@@ -1,84 +1,125 @@
-// Template: 学会・研究発表 · 背景と問い（概念図）. Synthetic example content; replace data and copy.
+// Template: 学会発表（日本語） · 背景（なぜラベルが足りないか＋タスクの図）. Synthetic example content; replace data and copy.
+// The patch (a) and the mask (b) are rasterised from ONE crack geometry, pixel by pixel, so the
+// mask is exactly what an annotator would have to paint. It is a schematic, and the page says so.
+import { el, fmt } from '../../runtime/figure.mjs';
+
 const ID = 'tpl-research-ja-background';
-// One source of truth for every number on the page
-const data = { unlabeled: 12000, labeled: 50, fullLabeled: 2400, perTile: 50, minutesPerImage: 40, bridges: 3 };
-const hoursFor = n => Math.round((n * data.minutesPerImage) / 60);
-const fmt = n => n.toLocaleString('ja-JP');
+const cost = {
+  unlabeled: 18000,      // images from routine inspections of 3 bridges over 2 years
+  bridges: 3, years: 2,
+  minutesPerMask: 30,    // average time to paint one pixel-level crack mask
+  labeled: 50,           // masks made for this study
+  hoursPerYear: 2000,    // one person's working hours per year
+};
+// Crack centreline in patch pixels (0–50) with local width in pixels: [x, y, width]
+const crack = {
+  size: 50,
+  main: [[-1, 11, 2.7], [6, 13, 2.6], [12, 16, 2.5], [17, 16.5, 2.3], [22, 20, 2.1], [27, 23, 1.8], [31, 27, 1.6], [36, 29, 1.3], [41, 33, 1.1], [46, 38, 1.0], [51, 40, 0.9]],
+  branch: [[22, 20, 1.3], [24, 26, 1.1], [23, 32, 1.0], [26, 38, 0.9], [28, 44, 0.8], [30, 51, 0.8]],
+};
+const px = 6;            // drawn size of one image pixel, in slide px
 
-// (a) one square = 50 images
-const cols = 20, tiles = data.unlabeled / data.perTile, rows = Math.ceil(tiles / cols), ts = 14, tg = 3;
-const ax = 0, ay = 52;
-let grid = '';
-for (let i = 0; i < tiles; i++) {
-  const c = i % cols, r = Math.floor(i / cols);
-  grid += `<rect x="${ax + c * (ts + tg)}" y="${ay + r * (ts + tg)}" width="${ts}" height="${ts}" fill="#c9d6e6"/>`;
-}
-const gw = cols * (ts + tg) - tg, gh = rows * (ts + tg) - tg;
-// labeled images are a separate set, drawn next to the unlabeled pool
-const lx = ax, ly = ay + gh + 28;
-
-// (b) pixel view: ground truth vs. a baseline prediction with breaks
-const pc = 15, pr = 7, cs = 15;
-const gtCells = [];
-for (let c = 0; c < pc; c++) { const r0 = Math.round(1 + c * 0.25 + (c % 5 === 2 ? 1 : 0)); gtCells.push([c, r0], [c, r0 + 1]); }
-const breaks = [5, 6, 11];              // columns where the baseline prediction loses the line
-const predCells = gtCells.filter(([c]) => !breaks.includes(c));
-function pixelPanel(x, y, cells, label, marks) {
-  let s = `<rect x="${x}" y="${y}" width="${pc * cs}" height="${pr * cs}" fill="#fbfaf5" stroke="#1c2433" stroke-width="1"/>`;
-  for (let k = 1; k < pc; k++) s += `<line x1="${x + k * cs}" y1="${y}" x2="${x + k * cs}" y2="${y + pr * cs}" stroke="#e2dccd" stroke-width=".8"/>`;
-  for (let k = 1; k < pr; k++) s += `<line x1="${x}" y1="${y + k * cs}" x2="${x + pc * cs}" y2="${y + k * cs}" stroke="#e2dccd" stroke-width=".8"/>`;
-  s += cells.map(([c, r]) => `<rect x="${x + c * cs + 1}" y="${y + r * cs + 1}" width="${cs - 2}" height="${cs - 2}" fill="#1c2433"/>`).join('');
-  if (marks) {
-    const groups = [[5, 6], [11]];
-    s += groups.map(g => {
-      const cx = x + (g[0] + g.length / 2) * cs, ys = gtCells.filter(([c]) => g.includes(c)).map(([, r]) => r);
-      const cy = y + ((Math.min(...ys) + Math.max(...ys) + 1) / 2) * cs, rx = g.length * cs / 2 + 6, ry = (Math.max(...ys) - Math.min(...ys) + 1) * cs / 2 + 6;
-      return `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="none" stroke="#b2432a" stroke-width="2" stroke-dasharray="4 3"/>`;
-    }).join('');
+// ---- rasterise: distance from each pixel centre to the centreline
+const N = crack.size;
+const segs = [crack.main, crack.branch].flatMap(line => line.slice(1).map((p, i) => [line[i], p]));
+function nearest(x, y) {
+  let best = { gap: Infinity, w: 0, d: Infinity };
+  for (const [[x0, y0, w0], [x1, y1, w1]] of segs) {
+    const vx = x1 - x0, vy = y1 - y0, t = Math.max(0, Math.min(1, ((x - x0) * vx + (y - y0) * vy) / (vx * vx + vy * vy)));
+    const d = Math.hypot(x - (x0 + t * vx), y - (y0 + t * vy)), w = w0 + t * (w1 - w0);
+    if (d - w / 2 < best.gap) best = { gap: d - w / 2, w, d };
   }
-  s += `<text x="${x}" y="${y - 10}" class="s-lab-b">${label}</text>`;
-  return s;
+  return best;
 }
-const bx = 432, p2y = 84 + pr * cs + 42;
-const fig = `<svg viewBox="0 0 760 360" role="img" aria-labelledby="${ID}-t ${ID}-d">
-<title id="${ID}-t">ラベルの偏りと細線の途切れを示す概念図</title>
-<desc id="${ID}-d">(a) 未ラベル画像${fmt(data.unlabeled)}枚を1マス50枚の格子${tiles}マスで示し、ラベル付き画像${data.labeled}枚は1マスに相当する。(b) 幅2画素のひび割れの正解マスクと、従来法の予測で3か所の画素が欠けて線が2か所で途切れる様子を画素格子で示す。</desc>
-<text x="0" y="18" class="s-head">(a) ラベルの偏り</text>
-<text x="0" y="42" class="s-lab-s">1マス＝画像${data.perTile}枚</text>
-${grid}
-<rect x="${lx}" y="${ly - 12}" width="${ts}" height="${ts}" fill="#c9d6e6"/>
-<text x="${lx + ts + 10}" y="${ly}" class="s-lab"><tspan class="s-num-b">${fmt(data.unlabeled)}</tspan> 枚　未ラベル（${data.bridges}橋の点検画像）</text>
-<rect x="${lx}" y="${ly + 14}" width="${ts}" height="${ts}" fill="#b2432a"/>
-<text x="${lx + ts + 10}" y="${ly + 26}" class="s-lab"><tspan class="s-num-b">${data.labeled}</tspan> 枚　ラベル付き（同じ${data.bridges}橋から抽出）</text>
-<text x="${lx}" y="${ly + 54}" class="s-lab-s">ラベル付きは未ラベルの${fmt(data.unlabeled / data.labeled)}分の1</text>
-<line x1="${bx - 32}" y1="0" x2="${bx - 32}" y2="330" stroke="#cfc6b2" stroke-width=".75"/>
-<text x="${bx}" y="18" class="s-head">(b) 細線の途切れ</text>
-<text x="${bx}" y="42" class="s-lab-s">1マス＝1画素・幅2画素のひび割れ</text>
-${pixelPanel(bx, 84, gtCells, '正解マスク', false)}
-${pixelPanel(bx, p2y, predCells, '少数ラベルでの従来法の予測', true)}
-<text x="${bx + pc * cs + 14}" y="${p2y + pr * cs / 2 - 2}" class="s-lab-b">途切れ</text>
-<text x="${bx + pc * cs + 14}" y="${p2y + pr * cs / 2 + 18}" class="s-lab-s">2か所</text>
+// Deterministic integer hash → [0,1) for the concrete texture (no randomness between builds)
+const hash = (i, j) => { let h = (i * 374761393 + j * 668265263) ^ 0x5bd1e995; h = Math.imul(h ^ (h >>> 13), 1274126177); return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };
+const smooth = (x, y) => { // value noise, 4-pixel cells
+  const i = Math.floor(x), j = Math.floor(y), fx = x - i, fy = y - j, s = t => t * t * (3 - 2 * t);
+  const a = hash(i, j), b = hash(i + 1, j), c = hash(i, j + 1), d = hash(i + 1, j + 1);
+  return a + (b - a) * s(fx) + (c - a) * s(fy) + (a - b - c + d) * s(fx) * s(fy);
+};
+const grey = [], mask = [];
+for (let j = 0; j < N; j++) {
+  grey.push([]); mask.push([]);
+  for (let i = 0; i < N; i++) {
+    const n = nearest(i + 0.5, j + 0.5);
+    const cover = Math.max(0, Math.min(1, n.w / 2 - n.d + 0.5));        // share of the pixel the crack covers
+    const ground = 0.76 + 0.07 * (smooth(i / 3, j / 3) - 0.5) + 0.05 * (hash(i + 97, j + 31) - 0.5);
+    const depth = 0.18 + 0.16 * Math.min(n.w, 3);                        // wide cracks are darker
+    grey[j].push(Math.max(0, Math.min(1, ground - cover * depth)));
+    mask[j].push(n.d <= Math.max(n.w / 2, 0.5) ? 1 : 0);               // ≥ 1 px wide, 8-connected
+  }
+}
+const crackPixels = mask.flat().reduce((a, b) => a + b, 0);
+const share = crackPixels / (N * N);
+const widths = [...crack.main, ...crack.branch].map(p => p[2]);
+const wMin = Math.max(1, Math.round(Math.min(...widths))), wMax = Math.round(Math.max(...widths));
+
+// ---- derived cost figures
+const hoursAll = cost.unlabeled * cost.minutesPerMask / 60;
+const hoursOurs = cost.labeled * cost.minutesPerMask / 60;
+const years = hoursAll / cost.hoursPerYear;
+const yearsText = Number.isInteger(years) ? `${years}年` : Math.abs(years % 1 - 0.5) < 0.01 ? `${Math.floor(years)}年半` : `${years.toFixed(1)}年`;
+const n0 = v => fmt(v, { locale: 'ja', digits: 0 });
+
+// ---- drawing: runs of equal quantised grey become one rect (keeps the SVG small)
+const W = 662, H = 404, P = N * px, gap = W - 2 * P, top = 34;
+const levels = 40, toHex = v => { const k = Math.round(v * 255).toString(16).padStart(2, '0'); return `#${k}${k}${k}`; };
+// runs of equal quantised grey become one rect, grouped by grey (keeps the SVG small)
+function runs(value, x0) {
+  const groups = {};
+  for (let j = 0; j < N; j++) for (let i = 0; i < N;) {
+    const q = value(i, j); let k = i + 1;
+    while (k < N && value(k, j) === q) k++;
+    if (q !== null) (groups[q] ||= []).push(`<rect x="${x0 + i * px}" y="${top + j * px}" width="${(k - i) * px}" height="${px}"/>`);
+    i = k;
+  }
+  return groups;
+}
+function patch(x0) {
+  const g = runs((i, j) => Math.round(grey[j][i] * (levels - 1)), x0);
+  return Object.entries(g).map(([q, r]) => `<g fill="${toHex(q / (levels - 1))}">${r.join('')}</g>`).join('');
+}
+function maskPanel(x0) {
+  const out = [el('rect', { x: x0, y: top, width: P, height: P, fill: '#ffffff' })];
+  out.push(el('path', { d: Array.from({ length: N - 1 }, (_, k) => `M${x0 + (k + 1) * px} ${top}V${top + P}M${x0} ${top + (k + 1) * px}H${x0 + P}`).join(''), stroke: 'var(--rj-grid)', 'stroke-width': 1 }));
+  out.push(el('g', { fill: 'var(--rj-ink)' }, (runs((i, j) => (mask[j][i] ? 1 : null), x0)[1] || []).join('')));
+  out.push(el('rect', { x: x0 + 0.5, y: top + 0.5, width: P - 1, height: P - 1, fill: 'none', stroke: 'var(--rj-base2)', 'stroke-width': 1 }));
+  return out.join('');
+}
+const bx = P + gap;
+const caption = (x, y, lines) => el('text', { x, y, class: 's-lab' }, lines.map((l, k) => el('tspan', { x, dy: k ? 22 : null }, l)).join(''));
+const fig = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" shape-rendering="crispEdges" role="img" aria-labelledby="${ID}-t ${ID}-d">
+<title id="${ID}-t">ひび割れを含む画像の一部と、その正解マスク（模式図）</title>
+<desc id="${ID}-d">(a) ${N}×${N}画素の点検画像。幅${wMax}画素から${wMin}画素へ細くなるひび割れが枝分かれして走り、細い部分は背景とほぼ同じ濃さになる。(b) 同じ範囲の正解マスク。ひび割れの画素に1を付けると${n0(N * N)}画素のうち${crackPixels}画素（${(share * 100).toFixed(1)}%）になる。</desc>
+<text x="0" y="18" class="s-panel">(a) 点検画像の一部<tspan class="s-lab" dx="10">${N}×${N}画素</tspan></text>
+<text x="${bx}" y="18" class="s-panel">(b) 正解マスク<tspan class="s-lab" dx="10">ひび割れの画素＝1</tspan></text>
+${patch(0)}
+${maskPanel(bx)}
+${caption(0, top + P + 30, [`幅${wMax}画素の幹から幅${wMin}画素の枝まで。`, '細い部分は背景とほとんど同じ濃さ'])}
+${caption(bx, top + P + 30, [`1を付けるのは${crackPixels}画素（${(share * 100).toFixed(1)}%）。`, '1画素ずつ塗って決める'])}
 </svg>`;
 
 export default {
   study: true,
   id: ID,
-  title: '背景と問い：細いひび割れほどラベルが足りない',
   language: 'ja',
-  notes: 'Purpose: 研究の動機（データの偏りと細線の途切れ）を概念図で示し、検証する問いを一文で置く。\nModify: data オブジェクトの枚数・作業時間を実データに合わせる。格子は 1マス＝perTile 枚で自動生成される。(b) の画素図は研究対象の典型的な失敗に描き替える。\nInvariant: 概念図の格子は枚数に比例させる（1マスの単位を明記）。問いは検証可能な条件（枚数・比較対象・指標）を含める。\nStatic: 静的ページ。',
+  title: 'Background: pixel-level crack masks are too slow to make for every inspection image',
+  notes: 'Purpose: なぜラベルが足りないのかを、作業の単位（1画素）と作業時間の掛け算で示し、研究の問いを置く。\nModify: cost の枚数・橋の数・1枚あたりの時間・正解を付けた枚数を実際の値にする（右の計算と時間は自動で再計算）。crack の座標と幅を変えると (a)(b) とその説明文の画素数・割合が再計算される。実画像を使う場合は (a) を画像に替え、(b) は実際の正解マスクにする。\nInvariant: (a) と (b) は同じ範囲・同じ縮尺。模式図であることを図の下に書く。右の計算は 枚数 × 時間 = 合計 の順で、単位を省かない。\nStatic: 静的ページ。',
   sources: [],
   exportPolicy: 'final',
   className: 'tpl-research-ja rj-background',
-  content: `<div class="rj-page">
-<header class="rj-head"><span class="rj-sec"><span class="rj-secno">§1</span><b>背景と問い</b></span><span>構造物画像解析シンポジウム 2026　口頭発表 B-3</span></header>
-<h1 class="rj-title" data-region="title">細いひび割れほど、画素単位のラベルが足りない</h1>
-<ol class="rj-points" data-region="support">
-  <li><strong>未ラベル画像は十分にある</strong>${data.bridges}橋の定期点検だけで、<span class="rj-num">${fmt(data.unlabeled)}</span>枚の画像が集まった。</li>
-  <li><strong>画素単位のラベルは高くつく</strong>1枚あたり平均<span class="rj-num">${data.minutesPerImage}</span>分。<span class="rj-num">${data.labeled}</span>枚なら約<span class="rj-num">${hoursFor(data.labeled)}</span>時間、<span class="rj-num">${fmt(data.fullLabeled)}</span>枚では約<span class="rj-num">${fmt(hoursFor(data.fullLabeled))}</span>時間かかる。</li>
-  <li><strong>細線は途切れやすい</strong>幅1〜3画素のひび割れは予測が分断されやすく、本数や長さの集計を誤らせる。</li>
-</ol>
-<figure class="rj-fig" style="left:456px;top:170px;width:760px;height:360px" data-region="primary">${fig}</figure>
-<p class="rj-question" data-region="primary">ラベル<em>${data.labeled}枚</em>と未ラベル画像${fmt(data.unlabeled)}枚から、全${fmt(data.fullLabeled)}枚で学習したモデルに近い<em>精度と連結性</em>を得られるか。</p>
-<footer class="rj-foot" data-region="source"><span>図中の枚数・作業時間は説明用の架空データ</span><span class="rj-folio">2 / 6</span></footer>
-</div>`
+  content: `<h1 class="rj-h" data-region="title">正解マスクは画素単位で<span class="nw">1枚${cost.minutesPerMask}分</span>。<span class="nw">${n0(cost.unlabeled)}枚</span>すべてには付けられない</h1>
+<figure class="rj-fig" style="left:64px;top:186px" data-region="primary">${fig}</figure>
+<p class="rj-note" style="left:64px;top:596px;width:662px" data-region="source">模式図。ひび割れの形と画素の濃さは説明のために作図したもので、実測画像ではない</p>
+<div class="rj-rail" data-region="support">
+<div class="rj-calc">
+  <div><i></i><b>${n0(cost.unlabeled)}<small>枚</small></b><span>${cost.bridges}橋・${cost.years}年分の点検画像</span></div>
+  <div><i>×</i><b>${cost.minutesPerMask}<small>分</small></b><span>正解マスク1枚の作業</span></div>
+  <div class="rj-total"><i>=</i><b>${n0(hoursAll)}<small>時間</small></b><span>1人で約${yearsText}</span></div>
+</div>
+<p class="rj-ours">本研究の正解マスクは<b class="nw">${cost.labeled}枚</b><span class="nw">（作業${n0(hoursOurs)}時間）</span></p>
+<p class="rj-q">正解${cost.labeled}枚と未ラベル<span class="nw">${n0(cost.unlabeled)}枚</span>から、どこまで正確にひび割れを抜き出せるか。</p>
+</div>
+<footer class="rj-foot"><span>ラベル50枚で学ぶひび割れ検出</span><b>2</b></footer>`,
 };

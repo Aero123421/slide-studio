@@ -1,19 +1,20 @@
 {
-  "version": "3.4.0",
-  "recorded": "2026-09-07",
+  "version": "4.0.0",
+  "recorded": "2026-10-19",
   "nodeTests": {
-    "passed": 69,
+    "passed": 99,
     "failed": 0
   },
   "pythonTests": {
-    "passed": 53,
-    "failed": 0
+    "passed": 68,
+    "failed": 0,
+    "skipped": 0
   },
   "browserSuites": [
     {
       "suite": "integrity",
       "passed": true,
-      "browser": "151.0.7922.34",
+      "browser": "141.0.7390.37",
       "checks": [
         {
           "name": "inherited white text on a pale card is a blocking defect",
@@ -92,6 +93,18 @@
           "passed": true
         },
         {
+          "name": "visually hidden screen-reader text neither covers nor is covered",
+          "passed": true
+        },
+        {
+          "name": "an empty, unpainted container over text is not an occlusion",
+          "passed": true
+        },
+        {
+          "name": "white text on a painted sibling shape is left to pixel review, not failed",
+          "passed": true
+        },
+        {
           "name": "QA uses the same CSS preflight as the build gate",
           "passed": true
         },
@@ -101,6 +114,34 @@
         },
         {
           "name": "syntactically broken stylesheet fails real QA even without pageerror",
+          "passed": true
+        },
+        {
+          "name": "text clipped by a nested SVG viewport or an SVG clip path is not off-slide",
+          "passed": true
+        },
+        {
+          "name": "the same text without a clip is still reported off-slide",
+          "passed": true
+        },
+        {
+          "name": "a tight-leaded hero numeral is measured by its line box, not its font box",
+          "passed": true
+        },
+        {
+          "name": "text that really overlaps is still reported",
+          "passed": true
+        },
+        {
+          "name": "PDF export keeps figures and punctuation searchable when a font maps alternates to private use",
+          "passed": true
+        },
+        {
+          "name": "PDF text stays searchable when a widget redraws its figure while the page prints",
+          "passed": true
+        },
+        {
+          "name": "PDF export writes ideographs, not radical code points, so Japanese text can be searched",
           "passed": true
         },
         {
@@ -119,37 +160,23 @@
           "name": "real final-review CLI rejects changed CSS with unchanged HTML",
           "passed": true
         }
-      ],
-      "limits": [
-        "Synthetic Chromium regressions, not a new multi-model generation batch.",
-        "No factual, photographic, artistic or full accessibility certification."
       ]
     },
     {
       "suite": "browser",
-      "browser": "151.0.7922.34",
-      "loadMode": "file-url",
-      "viewportChecks": [
-        [
-          1280,
-          780
-        ],
-        [
-          390,
-          844
-        ]
-      ],
+      "passed": true,
+      "browser": "141.0.7390.37",
       "checks": [
         {
           "name": "page identity, content and registered 24 widgets",
           "passed": true
         },
         {
-          "name": "range keyboard changes parameter without advancing slide; reset",
+          "name": "range keyboard changes parameter without advancing slide; reset; peak matches the model",
           "passed": true
         },
         {
-          "name": "threshold counts recomputed exactly from 20 observations",
+          "name": "threshold counts recomputed exactly from the study's scores",
           "passed": true
         },
         {
@@ -157,7 +184,7 @@
           "passed": true
         },
         {
-          "name": "registered image comparison changes clipping, not source identity",
+          "name": "registered image comparison changes clipping, not source identity; regions measured",
           "passed": true
         },
         {
@@ -189,7 +216,7 @@
           "passed": true
         },
         {
-          "name": "toy ablation computes from selected components",
+          "name": "ablation looks up the measured score of the selected components",
           "passed": true
         },
         {
@@ -201,7 +228,7 @@
           "passed": true
         },
         {
-          "name": "graph recomputes reachability when edges change",
+          "name": "graph recomputes reachability when links open or close",
           "passed": true
         },
         {
@@ -217,11 +244,11 @@
           "passed": true
         },
         {
-          "name": "real audio duration, deliberate playback and leave-pause",
+          "name": "real audio duration, measured pitch, deliberate playback and leave-pause",
           "passed": true
         },
         {
-          "name": "mesh vertex rendering responds to yaw and keyboard without slide leakage",
+          "name": "mesh vertex rendering responds to yaw and keyboard without slide leakage; parts labelled; posts in view counted",
           "passed": true
         },
         {
@@ -245,6 +272,10 @@
           "passed": true
         },
         {
+          "name": "richer config: hidden controls, templates, readouts, plain numbers, named classes",
+          "passed": true
+        },
+        {
           "name": "overview is keyboard-operable and restores slide structure",
           "passed": true
         },
@@ -257,11 +288,15 @@
           "passed": true
         },
         {
-          "name": "project-owned data overrides toy fixture and recomputes actual counts",
+          "name": "project-owned data overrides the study data and recomputes actual counts",
           "passed": true
         },
         {
-          "name": "offline workshop index filters actual source catalog",
+          "name": "default fixtures keep the original behaviour when a deck passes no data",
+          "passed": true
+        },
+        {
+          "name": "gallery index lists every study and filters by search, kind and language",
           "passed": true
         },
         {
@@ -280,18 +315,12 @@
           "name": "no page errors, player warnings or external network requests",
           "passed": true
         }
-      ],
-      "passed": true,
-      "errors": [],
-      "blockedNetwork": [],
-      "limits": [
-        "Chromium only.",
-        "Tests validate behavior, not artistic quality, native-speaker fluency or external-agent performance.",
-        "Screenshots used for frame-change comparisons were held in memory."
       ]
     },
     {
       "suite": "navigation",
+      "passed": true,
+      "browser": "141.0.7390.37",
       "checks": [
         {
           "name": "ArrowRight still works after clicking Next",
@@ -373,81 +402,495 @@
           "name": "no errors player warnings or unexpected network",
           "passed": true
         }
-      ],
-      "passed": true,
-      "browser": "151.0.7922.34",
-      "errors": [],
-      "loadMode": "self-contained inline fixture",
-      "limits": [
-        "Chromium only.",
-        "Synthetic regression scenarios; user-authored choreography requires separate review."
       ]
     },
     {
       "suite": "rendered",
-      "browser": "151.0.7922.34",
+      "passed": true,
+      "browser": "141.0.7390.37",
       "checks": [
         {
           "name": "runtime stage cue is blocked",
-          "passed": true,
-          "observedBlocking": true
+          "passed": true
         },
         {
           "name": "valid condition labels are not blocked",
-          "passed": true,
-          "observedBlocking": false
+          "passed": true
         },
         {
           "name": "speaker notes stay outside visible copy",
-          "passed": true,
-          "observedBlocking": false
+          "passed": true
         },
         {
           "name": "exact reviewed quotation is not blocked",
-          "passed": true,
-          "observedBlocking": false
+          "passed": true
         },
         {
           "name": "quiet whitespace is diagnostic, never an automatic failure",
-          "passed": true,
-          "observedBlocking": false
+          "passed": true
         }
-      ],
+      ]
+    },
+    {
+      "suite": "field",
       "passed": true,
-      "limits": [
-        "Heuristics are tested against explicit fixtures, not all languages or production phrasing."
+      "browser": null,
+      "checks": [
+        {
+          "name": "actual print faces satisfy reviewed CJK contract",
+          "passed": true
+        },
+        {
+          "name": "font used only on second print page is actually inspected",
+          "passed": true
+        },
+        {
+          "name": "CDP inspection preserves print emulation",
+          "passed": true
+        },
+        {
+          "name": "CDP inspection preserves reduced motion",
+          "passed": true
+        },
+        {
+          "name": "every print page has an expected text baseline",
+          "passed": true
+        },
+        {
+          "name": "two-page mixed-face PDF preserves text and page count",
+          "passed": true
+        },
+        {
+          "name": "lost text is rejected rather than silently accepted",
+          "passed": true
+        },
+        {
+          "name": "unexpected PDF page count is rejected",
+          "passed": true
+        },
+        {
+          "name": "missing first CSS family produces an actual-face warning",
+          "passed": true
+        },
+        {
+          "name": "matching CSS declaration cannot satisfy a missing actual font contract",
+          "passed": true
+        },
+        {
+          "name": "small top-heavy text is reported for live reading",
+          "passed": true
+        },
+        {
+          "name": "readable dense reference text is not condemned by a live-size rule",
+          "passed": true
+        },
+        {
+          "name": "text hidden behind an overflow clip is reported",
+          "passed": true
+        },
+        {
+          "name": "fixture runs without network requests",
+          "passed": true
+        },
+        {
+          "name": "period 12: title rank marks and conditions agree (including reverse selection)",
+          "passed": true
+        },
+        {
+          "name": "period 36: title rank marks and conditions agree (including reverse selection)",
+          "passed": true
+        },
+        {
+          "name": "period 60: title rank marks and conditions agree (including reverse selection)",
+          "passed": true
+        },
+        {
+          "name": "period 12: title rank marks and conditions agree (including reverse selection)",
+          "passed": true
+        },
+        {
+          "name": "local period selector keeps native keyboard behavior",
+          "passed": true
+        },
+        {
+          "name": "static period output preserves selected values and removes dead controls",
+          "passed": true
+        },
+        {
+          "name": "font mismatch blocks export before replacing the old PDF",
+          "passed": true
+        },
+        {
+          "name": "approved contract passes the real export command",
+          "passed": true
+        },
+        {
+          "name": "export retains no standalone PNG review files",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "suite": "player",
+      "passed": true,
+      "browser": null,
+      "checks": [
+        {
+          "name": "count preset animates and ends on the committed number",
+          "passed": true
+        },
+        {
+          "name": "data-stagger delays siblings and completes",
+          "passed": true
+        },
+        {
+          "name": "slide transition runs on animated navigation",
+          "passed": true
+        },
+        {
+          "name": "figure build: grow-x bars end at full length",
+          "passed": true
+        },
+        {
+          "name": "figure build: draw preset leaves complete lines",
+          "passed": true
+        },
+        {
+          "name": "number + Enter jumps to a slide",
+          "passed": true
+        },
+        {
+          "name": "black screen toggles with B and Escape",
+          "passed": true
+        },
+        {
+          "name": "shortcut sheet opens with ?",
+          "passed": true
+        },
+        {
+          "name": "presenter window mirrors and drives the deck",
+          "passed": true
+        },
+        {
+          "name": "reduced motion commits states without animating",
+          "passed": true
+        },
+        {
+          "name": "data-until on its own, and data-delay on data-states",
+          "passed": true
+        },
+        {
+          "name": "switching reduced motion mid-build",
+          "passed": true
+        },
+        {
+          "name": "no page errors or player warnings",
+          "passed": true
+        }
       ]
     }
   ],
-  "executedRegressionChecks": 208,
+  "executedRegressionChecks": 301,
+  "passedRegressionChecks": 301,
+  "alsoRun": [
+    "tests/browser.py with SLIDE_STUDIO_INLINE=1",
+    "integrity, field and Python unit tests with pypdf 5.9.0 (requirements.txt)"
+  ],
+  "galleryQA": [
+    {
+      "gallery": "diagrams",
+      "pages": 104,
+      "states": 208,
+      "qaFailures": 0,
+      "smallTextWarnings": 0,
+      "slopErrors": 0,
+      "slopWarnings": 0
+    },
+    {
+      "gallery": "motion",
+      "pages": 64,
+      "states": 256,
+      "qaFailures": 0,
+      "smallTextWarnings": 0,
+      "slopErrors": 0,
+      "slopWarnings": 0
+    },
+    {
+      "gallery": "interactions",
+      "pages": 24,
+      "states": 48,
+      "qaFailures": 0,
+      "smallTextWarnings": 0,
+      "slopErrors": 0,
+      "slopWarnings": 0
+    },
+    {
+      "gallery": "compositions",
+      "pages": 36,
+      "states": 72,
+      "qaFailures": 0,
+      "smallTextWarnings": 0,
+      "slopErrors": 0,
+      "slopWarnings": 0
+    },
+    {
+      "gallery": "templates",
+      "pages": 72,
+      "states": 148,
+      "qaFailures": 0,
+      "smallTextWarnings": 0,
+      "slopErrors": 0,
+      "slopWarnings": 0
+    },
+    {
+      "gallery": "research",
+      "pages": 10,
+      "states": 24,
+      "qaFailures": 0,
+      "smallTextWarnings": 0,
+      "slopErrors": 0,
+      "slopWarnings": 0
+    },
+    {
+      "gallery": "from-scratch",
+      "pages": 4,
+      "states": 9,
+      "qaFailures": 0,
+      "smallTextWarnings": 0,
+      "slopErrors": 0,
+      "slopWarnings": 0
+    },
+    {
+      "gallery": "constraint-layout",
+      "pages": 3,
+      "states": 6,
+      "qaFailures": 0,
+      "smallTextWarnings": 0,
+      "slopErrors": 0,
+      "slopWarnings": 2
+    },
+    {
+      "gallery": "languages",
+      "pages": 10,
+      "states": 20,
+      "qaFailures": 0,
+      "smallTextWarnings": 0,
+      "slopErrors": 0,
+      "slopWarnings": 0
+    },
+    {
+      "gallery": "images",
+      "pages": 12,
+      "states": 24,
+      "qaFailures": 0,
+      "smallTextWarnings": 0,
+      "slopErrors": 0,
+      "slopWarnings": 0
+    },
+    {
+      "gallery": "repair-lab",
+      "pages": 24,
+      "states": 60,
+      "qaFailures": 0,
+      "smallTextWarnings": 9,
+      "slopErrors": 0,
+      "slopWarnings": 0
+    },
+    {
+      "gallery": "transfer-talk",
+      "pages": 3,
+      "states": 6,
+      "qaFailures": 0,
+      "smallTextWarnings": 0,
+      "slopErrors": 0,
+      "slopWarnings": 0
+    },
+    {
+      "gallery": "period-comparison",
+      "pages": 1,
+      "states": 2,
+      "qaFailures": 0,
+      "smallTextWarnings": 0,
+      "slopErrors": 0,
+      "slopWarnings": 0
+    },
+    {
+      "gallery": "brand",
+      "pages": 6,
+      "states": 12,
+      "qaFailures": 0,
+      "smallTextWarnings": 0,
+      "slopErrors": 0,
+      "slopWarnings": 0
+    }
+  ],
+  "determinism": {
+    "files": 125,
+    "node": [
+      "20.20.2 (ICU 78.2)",
+      "22.22.0 (ICU 77.1)"
+    ],
+    "identical": true
+  },
+  "export": {
+    "pdf": [
+      {
+        "deck": "research",
+        "pages": 10,
+        "postflightPassed": true,
+        "nonEmbedded": 0,
+        "textLayerFallback": true,
+        "radicalsRepaired": 0,
+        "privateUse": 0
+      },
+      {
+        "deck": "period-comparison",
+        "pages": 1,
+        "postflightPassed": true,
+        "nonEmbedded": 0,
+        "textLayerFallback": true,
+        "radicalsRepaired": 0,
+        "privateUse": 0
+      },
+      {
+        "deck": "transfer-talk",
+        "pages": 3,
+        "postflightPassed": true,
+        "nonEmbedded": 0,
+        "textLayerFallback": true,
+        "radicalsRepaired": 0,
+        "privateUse": 0
+      },
+      {
+        "deck": "brand",
+        "pages": 6,
+        "postflightPassed": true,
+        "nonEmbedded": 0,
+        "textLayerFallback": false,
+        "radicalsRepaired": 0,
+        "privateUse": 0
+      },
+      {
+        "deck": "repair-lab",
+        "pages": 24,
+        "postflightPassed": true,
+        "nonEmbedded": 0,
+        "textLayerFallback": true,
+        "radicalsRepaired": 0,
+        "privateUse": 0
+      },
+      {
+        "deck": "templates",
+        "pages": 72,
+        "postflightPassed": true,
+        "nonEmbedded": 0,
+        "textLayerFallback": true,
+        "radicalsRepaired": 19,
+        "privateUse": 0
+      }
+    ],
+    "nativePptx": [
+      {
+        "deck": "casual",
+        "slides": 6,
+        "shapes": 35,
+        "textFrames": 28,
+        "pictures": 1,
+        "libreOfficePages": 6
+      },
+      {
+        "deck": "editorial",
+        "slides": 4,
+        "shapes": 16,
+        "textFrames": 14,
+        "pictures": 0,
+        "libreOfficePages": 4
+      },
+      {
+        "deck": "executive",
+        "slides": 8,
+        "shapes": 107,
+        "textFrames": 75,
+        "pictures": 0,
+        "libreOfficePages": 8
+      },
+      {
+        "deck": "patterns",
+        "slides": 25,
+        "shapes": 370,
+        "textFrames": 253,
+        "pictures": 1,
+        "libreOfficePages": 25
+      },
+      {
+        "deck": "talk",
+        "slides": 5,
+        "shapes": 34,
+        "textFrames": 27,
+        "pictures": 0,
+        "libreOfficePages": 5
+      },
+      {
+        "deck": "technical",
+        "slides": 5,
+        "shapes": 34,
+        "textFrames": 25,
+        "pictures": 0,
+        "libreOfficePages": 5
+      },
+      {
+        "deck": "training",
+        "slides": 4,
+        "shapes": 37,
+        "textFrames": 28,
+        "pictures": 0,
+        "libreOfficePages": 4
+      }
+    ],
+    "picturePptx": [
+      {
+        "deck": "research",
+        "exit": 0,
+        "exists": true,
+        "slides": 10,
+        "pictures": 10
+      }
+    ]
+  },
+  "audit": {
+    "files": 950,
+    "issues": [],
+    "warnings": []
+  },
   "environment": {
-    "os": "macOS 26.6.2 arm64",
-    "node": "22.23.1",
-    "python": "3.12.14",
+    "os": "Linux 6.18 x86_64",
+    "node": "22.22.0",
+    "node20": "20.20.2",
+    "python": "3.13.16",
     "playwright": "1.57.0",
-    "chromium": "151.0.7922.34",
+    "chromium": "141.0.7390.37",
     "pillow": "12.3.0",
     "pythonPptx": "1.0.2",
-    "pypdf": "5.9.0"
+    "pypdf": [
+      "6.17.0",
+      "5.9.0"
+    ],
+    "libreoffice": "24.2.7.2"
   },
-  "fieldRecheck": {
-    "decks": 17,
-    "pages": 227,
-    "scope": "read-only final live states; six selected visual checks; two selected full-QA commands; two stale-report checks",
-    "cssDefectiveDecks": 1,
-    "severeContrastTextRuns": 10,
-    "unpaintedMarkWarnings": 10
-  },
-  "notRerun": [
+  "fixedDuringVerification": [
+    "CI: the native PPTX test needed pptxgenjs, which CI did not install; CI now runs npm ci, and elsewhere the test reports itself unrun when the package is missing.",
+    "Player: a late reduced-motion change event (switching it off) settled a running delayed build; now only switching it on settles motion.",
+    "PDF export: figures a widget redraws while the page prints now get the text-layer fallback (33 private-use characters in the research example, 3 in the template gallery)."
+  ],
+  "notRun": [
     "External-model generation",
-    "CJK field/font browser suite",
-    "Strict-font PDF and native Office export rendering",
-    "All-page manual gallery review",
-    "Other browsers and operating systems"
+    "macOS and Windows fonts",
+    "Native-speaker review",
+    "Browsers other than Chromium; PowerPoint and Keynote"
   ],
   "deliveryApproved": false,
   "limits": [
-    "Regression passes do not establish factual accuracy or artistic quality.",
-    "Private benchmark source, prompts, logs and screenshots are not shipped."
+    "Regression passes do not establish factual accuracy, fluency or artistic quality.",
+    "Visual review was the author's own art direction, not an independent review."
   ]
 }

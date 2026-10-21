@@ -63,24 +63,44 @@ titles, decorative ordinals, one eyebrow + card-row skeleton repeated across the
 English eyebrows in a CJK deck, an identity color reused for unrelated items,
 near-duplicate pages, text set in many hues, colors outside a declared system
 (`--palette`), a high share of small live text, status words ("登壇用ドラフト",
-"draft") on the canvas and tool metadata in speaker notes. See SKILL.md §3 G for the
-repair of each. Warnings are review prompts: fix them or record a one-line reason the
+"draft") on the canvas and tool metadata in speaker notes. On HTML it also reads
+computed styles for decoration: tiled dot/grid backgrounds, glows, blurs and radial
+washes, gradient text, frosted glass, soft shadows on several boxes, letter-spaced
+caps labels, `·`/`|` separator chains, emoji, pill chips, giant faded numerals,
+stacked letters, a colored headline phrase that matches no mark on the page, and ▲
+used for increases in Japanese pages. See SKILL.md
+"Strip the machine-made look" for the repair of each. Warnings are review prompts: fix them or record a one-line reason the
 pattern carries meaning on that page. `--check` exits 2 only for errors (production
 copy, tool metadata in notes). It is a geometry/text heuristic, not a taste score, and
 it does not see pixels inside images. HTML input needs Playwright; `.pptx` needs
 python-pptx; `.scene.json` needs only the standard library.
+Numbers drawn inside a figure (cell counts, node degrees) are data, not ordinals; a
+slide's `copyWaivers` excuse the exact quote they name. A workshop gallery (`mode:
+'workshop'`) is a set of independent studies, so the deck-level consistency signals
+(skeleton, card rows, identity colors, text hues, near-duplicates) are skipped for it;
+a deck you deliver gets all of them.
 
 ### Visual inspection routine
 
-First inspect the contact view for deck rhythm and repeated mistakes. Then inspect
-each final page at readable size. For animated material inspect all meaningful
-states and actual timing on representative transitions. For media confirm playback
-and a changed frame/time, not merely an available control. For 3D confirm rotation
-changes the geometry and test import errors. For translated content inspect glyph
-coverage and shaping in the actual output environment.
+```sh
+python scripts/qa-summary.py project/.studio-review/current/report.json      # findings only
+python scripts/contact-sheet.py project/deck.html --out project/.studio-review/sheet.png --final --label
+python scripts/contact-sheet.py project/deck.html --out project/.studio-review/steps.png --steps
+python scripts/contact-sheet.py project/deck.html --out project/.studio-review/sheet.png --final --frames project/.studio-review/frames
+```
 
-Write a specific defect ledger: slide/state, symptom, cause, change, retest. Avoid
-vague self-ratings like “10/10 premium”. Use a narrow waiver only for intentional
+Keep contact sheets outside the QA output directory (`current/` is owned by
+`qa.py`). First read the whole-deck sheet for rhythm: identical skeletons, pages
+that are mostly empty or all text, a figure drawn too small, accidental dark/light
+alternation. Then open each full-size frame and read every label. For motion,
+read the `--steps` sheet build by build — each intermediate page must be true and
+readable — and watch representative transitions at real speed. For media confirm
+playback and a changed frame/time, not merely a control. For 3D confirm rotation
+changes the geometry. For translated content inspect glyph coverage and shaping
+in the actual output environment.
+
+Write a specific defect ledger: slide/build, symptom, cause, change, retest. Avoid
+vague self-ratings like "10/10 premium". Use a narrow waiver only for intentional
 overlap/bleed, and keep the reason next to the affected element.
 
 ### Environmental limitations
@@ -278,6 +298,22 @@ not rejected merely for its type. Text comparison ignores whitespace, case, comp
 Unicode forms and text order. It detects loss, not logical reading order or truth.
 A legitimate PDF encoding may still make extraction fail: investigate and document,
 not silently disable the check. Always render the PDF and inspect the difficult pages.
+
+Some fonts — Inter among them — give their alternate glyphs private-use code points
+(punctuation set for figures by contextual alternates, tabular figures, character
+variants such as `cv08`). Chromium writes those code points into the PDF text layer, so
+"18:00" or "1,234" cannot be searched or copied. When the postflight finds that, the
+export renders the PDF once more with those substitutions turned off (layout features
+such as Japanese `palt`, kerning and ligatures stay) and reports
+`textLayerFallback` in its result. The fallback also covers elements drawn while the page
+prints (a widget's `onExport` runs on `beforeprint`). Look at the PDF: figures may be
+proportional instead of tabular. A font with standard mappings (Helvetica Neue, Hiragino, Noto) avoids the
+fallback. Screen-reader-only text is not expected in the PDF, because it is never painted.
+CJK fonts that draw a radical and its ideograph with one glyph make Chromium name the
+radical in the text layer (⽉ for 月, ⻑ for 長), so "店長" cannot be found. The export
+rewrites those ToUnicode entries to the ideograph (Kangxi radicals by Unicode
+normalization, the supplement by its equivalence table) and reports `radicalsRepaired`;
+glyphs and layout are untouched.
 
 Actual DOM text inspection does not see text painted into Canvas, images or opaque
 embedded frames. Those regions need visual inspection and an accessible alternative.

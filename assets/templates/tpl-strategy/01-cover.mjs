@@ -1,48 +1,33 @@
-// Template: 戦略提案（コンサル型）· 表紙. Synthetic example content; replace data and copy.
-// The square field is the pack motif: many candidate moves (outlines), a few prioritised (filled), one recommended (ochre).
-const P = 'tpl-strategy-cover';
-const from = 2.0, to = 6.1, year = 2029;
-const cols = 5, rows = 7, size = 64, gap = 14, ox = 58, oy = 64;
-const chosen = new Set(['1-1', '3-1', '1-2', '2-3', '3-3', '2-4', '4-5']);   // shortlisted moves
-const rec = '3-4';                                         // the recommended combination
-const cells = [];
-for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
-  const k = `${c}-${r}`, x = ox + c * (size + gap), y = oy + r * (size + gap);
-  if (k === rec) cells.push(`<rect x="${x}" y="${y}" width="${size}" height="${size}" fill="#c98a12"/>`);
-  else if (chosen.has(k)) cells.push(`<rect x="${x}" y="${y}" width="${size}" height="${size}" fill="#3d8878"/>`);
-  else cells.push(`<rect x="${x + 0.5}" y="${y + 0.5}" width="${size - 1}" height="${size - 1}" fill="none" stroke="#3d8878" stroke-width="1"/>`);
-}
-const cxr = ox + 3 * (size + gap) + size / 2, cyr = oy + 4 * (size + gap) + size / 2;
+// Template: 戦略提案（経営会議向け）· 表紙. Synthetic example content; replace data and copy.
+// Type only: client, title, one-line scope, then date and team below a single accent hairline.
+const ID = 'tpl-strategy-cover';
+const deck = {
+  client: '株式会社青柳リビング',              // 提出先（御中を付ける）
+  kind: '最終報告',                            // 資料の種類
+  meeting: '経営会議',                         // 提出する場
+  title: 'EC事業の収益改善に向けた戦略提案',
+  target: {year: 2029, margin: 6},              // 到達目標：営業利益率（%）
+  date: '2026年11月18日',
+  firm: '白峰パートナーズ',
+  team: ['井上 遼', '高田 美咲', '森 健太郎'],  // 担当チーム
+  classification: '社外秘',
+};
 
 export default {
   study: true,
-  id: 'tpl-strategy-cover',
-  title: 'EC物流事業の収益改善に向けた戦略提案 — 表紙',
+  id: ID,
   language: 'ja',
-  notes: 'Purpose: 提案の対象・問い・到達目標を表紙で明示する。\nModify: 宛先、題名、目標値（from・to・year）、日付と提案者を差し替える。右の正方形の配置は chosen と rec で変えられる。\nInvariant: 副題は「何を・いつまでに・どこからどこへ」を1文で言う。表紙に結論を詰め込みすぎない。\nStatic: Already static.',
+  title: 'Strategy proposal cover: improving the profitability of the e-commerce business',
+  notes: 'Purpose: 誰に、何の提案を、いつ・どの場で出すのかを一目で伝える。結論は次のページから。\nModify: deck の提出先・題名・到達目標（年度と利益率）・日付・会社名・担当者・機密区分を差し替える。題名は2行以内に収める。\nInvariant: 表紙に図や飾りを置かない。到達目標の数字は推奨案のページ（2029年度 6.0%）と一致させる。\nStatic: 静的ページ。',
   sources: [],
   exportPolicy: 'final',
-  className: 'tpl-strategy s-cover',
-  content: `<div class="s-wrap">
-  <p class="s-cv-client" data-region="support">東雲ロジスティクス株式会社 御中</p>
-  <p class="s-cv-label">最終報告</p>
-  <h1 class="s-cv-h" data-region="title">EC物流事業の<br>収益改善に向けた戦略提案</h1>
-  <p class="s-cv-sub" data-region="primary">営業利益率を${year}年度までに<b>${from.toFixed(1)}%</b>から<b>${to.toFixed(1)}%</b>へ引き上げる道筋と、最初の18か月で着手すべきこと</p>
-  <div class="s-cv-meta" data-region="support">
-    <p>2026年9月30日<span>経営会議 提出資料</span></p>
-    <p>北辰コンサルティング<span>物流・サプライチェーン部門</span></p>
-    <p>社外秘<span>数値は例示</span></p>
-  </div>
-  <div class="s-cv-art">
-    <svg viewBox="0 0 520 720" role="img" aria-labelledby="${P}-t ${P}-d">
-      <title id="${P}-t">選択と集中を表す正方形のフィールド</title>
-      <desc id="${P}-d">輪郭だけの正方形が検討した打ち手、塗りつぶしが詳しく評価した打ち手、黄土色の一つが推奨案を表す。</desc>
-      <defs><linearGradient id="${P}-sh" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0a4a3f" stop-opacity="0"/><stop offset="1" stop-color="#0a4a3f" stop-opacity=".55"/></linearGradient></defs>
-      ${cells.join('')}
-      <circle cx="${cxr}" cy="${cyr}" r="${size * 0.95}" fill="none" stroke="#f3d9a4" stroke-width="1.2" stroke-dasharray="3 5"/>
-      <rect x="0" y="480" width="520" height="240" fill="url(#${P}-sh)"/>
-    </svg>
-    <p class="s-cv-cap">検討した打ち手 ${cols * rows} ・ 評価 ${chosen.size + 1} ・ 推奨 1</p>
-  </div>
-</div>`
+  className: 'tpl-strategy st-cover',
+  content: `<p class="st-client" data-region="support">${deck.client}　御中</p>
+<p class="st-kind">${deck.kind}</p>
+<h1 data-region="title">${deck.title}</h1>
+<p class="st-lead" data-region="primary">${deck.target.year}年度に営業利益率${deck.target.margin}%を実現するための<span class="st-nw">打ち手と実行計画</span></p>
+<div class="st-line" aria-hidden="true"></div>
+<p class="st-meta" style="left:64px">${deck.date}<span>${deck.meeting}</span></p>
+<p class="st-meta" style="left:456px">${deck.firm}<span>${deck.team.join('・')}</span></p>
+<p class="st-meta" style="left:946px">${deck.classification}<span>無断での複製・転送を禁じます</span></p>`,
 };

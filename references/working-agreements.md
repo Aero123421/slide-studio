@@ -86,11 +86,15 @@ A library of entrances cannot replace these contracts.
 
 ### Autonomy without randomness
 
-The agent decides reversible visual choices, makes two meaningful prototypes,
-uses actual rendering to discover failure, and repairs the cause. More questions,
-more decorations or more drafts are not automatic signs of quality. It should ask
-when evidence, audience or an irreversible choice cannot be determined safely.
-It should not ask the user to choose a template because the library exists.
+The agent asks once at the start, in a few short multiple-choice questions, about what
+changes the whole deck and is still open — use, files, presenter control, starting
+point, look, writing style ([intake](intake.md)) — with a recommendation for each.
+After that it decides reversible visual choices itself, makes two meaningful
+prototypes, uses actual rendering to discover failure, and repairs the cause. More
+questions, more decorations or more drafts are not automatic signs of quality. Later it
+asks only when evidence, audience or an irreversible choice cannot be determined
+safely. A template is offered because it fits the occasion (recommended by name), never
+as a menu of everything the library holds.
 
 A small model benefits from a limited number of retrieved studies, explicit repair
 orders, executable helpers, shape/data bounds, examples of good and weak copy, and
@@ -165,7 +169,9 @@ an unavailable tier; skip its steps and report them as unrun.
 Everything build- and browser-related stays unrun.
 
 **Tier 1 — Node 20+ and/or Python 3.10+ standard library, no installs.**
-`catalog.mjs`, `craft.mjs` (init/build), `studio.mjs` (list/init/validate/build),
+`catalog.mjs`, `craft.mjs` (init/build), `preview.mjs`, `build-studies.mjs`,
+`color-systems.mjs`, the figure engine (`assets/runtime/figure.mjs`),
+`studio.mjs` (list/init/validate/build),
 `lint.mjs`, `svg-edit.py`, `editorial.py`, `evidence.py`, `audit.py`,
 `slop_check.py` (on `.scene.json`),
 `brand-capture.py`, `inspect-brand.py`, plus `clean.py`/`verify-review.py` on existing
@@ -174,8 +180,9 @@ review output. The CSS preflight (`css-check.mjs`) runs inside build and QA.
 opens directly. This tier builds and statically checks a deck.
 
 **Tier 2 — `pip install -r requirements.txt` plus Playwright Chromium.**
-`qa.py`, `qa-navigation.py`, `font_audit.py`, `export.py` (PDF and screenshot
-PPTX), `brand-template.py` (.potx), `slop_check.py` on HTML or `.pptx`. This tier renders, reviews, and exports.
+`qa.py` (+ `qa-summary.py`), `contact-sheet.py`, `qa-navigation.py`, `font_audit.py`,
+`export.py` (PDF and screenshot PPTX), `brand-template.py` (.potx), `slop_check.py` on
+HTML or `.pptx`. This tier renders, reviews, and exports.
 
 **Tier 3 — `npm install` (pptxgenjs).** `export-pptx.mjs` native editable route.
 `export-pdf-office.mjs` additionally needs LibreOffice `soffice`.
@@ -184,9 +191,10 @@ PPTX), `brand-template.py` (.potx), `slop_check.py` on HTML or `.pptx`. This tie
 
 ```sh
 node scripts/catalog.mjs search "comparison"
-node scripts/catalog.mjs take motion-focal-reveal ./smoke-study
+node scripts/catalog.mjs take dumbbell ./smoke-study
 node scripts/craft.mjs build ./smoke-study/deck.mjs --out ./smoke-study/deck.html --allow-draft
 python scripts/qa.py ./smoke-study/deck.html --out ./smoke-study/.studio-review/current --check
+python scripts/contact-sheet.py ./smoke-study/deck.html --out ./smoke-study/sheet.png --final
 ```
 
 Use an actual catalog ID returned by search if a particular example ID changes.

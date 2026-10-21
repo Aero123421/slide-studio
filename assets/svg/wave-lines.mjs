@@ -1,17 +1,54 @@
-// Original editable study. Read notes for purpose, modifications, and invariants.
-// Asset placeholders are embedded by scripts/craft-core.mjs. Change content and geometry freely.
+// Diagram study · Wave lines — noise-displaced lines spaced in perspective to read as a calm sea.
+// Lines crowd toward the horizon and swell toward the viewer; one seeded noise field keeps them coherent.
+import { svgRoot, el, g, theme as makeTheme, noise2D, pathFromPoints, fmt } from '../runtime/figure.mjs';
+
+// Seagrass replanted by the trust, hectares, and next season's plan (illustrative).
+const meadow = [{ year: 2025, hectares: 1.4 }, { year: 2026, hectares: 3.2 }];
+const plan = { year: 2027, hectares: 6.4, from: '2027-05-01', to: '2027-09-30', contact: 'dives@keldabay.example' };
+const lastYear = meadow.at(-1);
+const ratio = plan.hectares / lastYear.hectares;
+const times = { 2: 'twice', 3: 'three times', 4: 'four times' }[Math.round(ratio * 10) / 10] ?? `${fmt(ratio, { digits: 1 })} times`;
+// Volunteer dives run every Saturday of the season: count them from the calendar.
+const saturdays = [];
+for (let d = new Date(`${plan.from}T00:00Z`); d <= new Date(`${plan.to}T00:00Z`); d.setUTCDate(d.getUTCDate() + 1)) if (d.getUTCDay() === 6) saturdays.push(new Date(d));
+const day = d => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', timeZone: 'UTC' });
+
+// Sea: `count` lines from the horizon down; spacing and amplitude grow toward the viewer (power law).
+const W = 1280, H = 720;
+const motif = { horizon: 384, bottom: 648, count: 32, spread: 1.85, swell: 1.1, freq: [11, 2.1], drift: 0.045, seed: 12 };   // swell: amplitude in units of the local line gap; drift: phase step per line
+
+export function figure(theme = 'css') {
+  const t = makeTheme(theme), noise = noise2D(motif.seed), { horizon, bottom, count } = motif;
+  const depth = k => (k / (count - 1)) ** motif.spread;                  // 0 at the horizon, 1 nearest the viewer
+  const lines = Array.from({ length: count }, (_, k) => {
+    const z = depth(k), base = horizon + (bottom - horizon) * z;
+    // Amplitude follows the local gap between lines, so neighbouring lines never cross.
+    const gap = (bottom - horizon) * (k ? z - depth(k - 1) : depth(1));
+    const amp = motif.swell * gap * 0.5, freq = motif.freq[0] + (motif.freq[1] - motif.freq[0]) * z;
+    const pts = Array.from({ length: 121 }, (_, s) => {
+      const u = s / 120, calm = 0.6 + 0.4 * noise(u * 2.2, 7.3);                 // slow variation: calmer and rougher stretches
+      const swell = Math.sin(2 * Math.PI * (u * freq + k * motif.drift)), chop = (noise.fbm(u * freq * 1.7, k * 0.05, 3) - 0.5) * 2;
+      return [u * W, base + amp * calm * (0.7 * swell + 0.3 * chop)];
+    });
+    return el('path', { d: pathFromPoints(pts), stroke: t.mix('muted', 'paper', 0.16 + 0.56 * z), 'stroke-width': 0.7 + 1.9 * z });
+  });
+  return svgRoot({ id: 'wave-lines-fig', width: W, height: H, theme: t,
+    title: 'Wave lines receding to a horizon',
+    desc: `${count} noise-displaced lines, crowded and calm at the horizon and wider and heavier toward the viewer, suggest the surface of a bay. They are decoration, not a measured waveform.` },
+  el('line', { x1: 0, y1: horizon, x2: W, y2: horizon, stroke: t.mix('muted', 'paper', 0.3), 'stroke-width': 1 }),
+  g({ fill: 'none', 'stroke-linecap': 'round' }, lines));
+}
+
 export default {
   study: true,
-  "id": "wave-lines",
-  "title": "Wave-line texture",
-  "notes": "Purpose: Introduce directional flow as a low-detail motif\nModify: Rewrite labels, recompute geometry from source data, adapt framing and orientation.\nInvariant: Clearly decorative; do not imply a measured waveform.\nStatic: Already static; preserve semantic labels and readable strokes.",
-  "sources": [
-    {
-      "type": "original-example",
-      "file": "assets/svg/wave-lines.svg"
-    }
-  ],
-  "exportPolicy": "final",
-  "className": "",
-  "content": "<h1 class=\"g-title\">Wave-line texture</h1><p class=\"g-purpose\">Introduce directional flow as a low-detail motif</p><div class=\"g-demo\"><svg aria-labelledby=\"g-wave-lines-wave-lines-title g-wave-lines-wave-lines-desc\" role=\"img\" viewbox=\"0 0 800 440\" xmlns=\"http://www.w3.org/2000/svg\"><title id=\"g-wave-lines-wave-lines-title\">Wave-line texture</title><desc id=\"g-wave-lines-wave-lines-desc\">Introduce directional flow as a low-detail motif. Original schematic. Values are illustrative, not measured.</desc><g data-part=\"drawing\"><path d=\"M100 95C260 20 490 355 705 110\" fill=\"none\" stroke=\"#718594\" stroke-width=\"2\"></path><path d=\"M100 123C260 55 490 345 705 138\" fill=\"none\" stroke=\"#28617b\" stroke-width=\"2\"></path><path d=\"M100 151C260 90 490 335 705 166\" fill=\"none\" stroke=\"#718594\" stroke-width=\"2\"></path><path d=\"M100 179C260 125 490 325 705 194\" fill=\"none\" stroke=\"#28617b\" stroke-width=\"2\"></path><path d=\"M100 207C260 160 490 315 705 222\" fill=\"none\" stroke=\"#718594\" stroke-width=\"2\"></path><path d=\"M100 235C260 195 490 305 705 250\" fill=\"none\" stroke=\"#28617b\" stroke-width=\"2\"></path><path d=\"M100 263C260 230 490 295 705 278\" fill=\"none\" stroke=\"#718594\" stroke-width=\"2\"></path><path d=\"M100 291C260 265 490 285 705 306\" fill=\"none\" stroke=\"#28617b\" stroke-width=\"2\"></path></g></svg>\n</div><div class=\"g-footer\">Original instructional study · schematic / synthetic content <code>assets/svg/wave-lines.svg</code></div>"
+  id: 'wave-lines',
+  title: 'Wave lines: a calm directional field for a closing page',
+  className: 'st st--full cs-sustainability-moss',
+  notes: 'Purpose: Close a talk with a quiet, directional sea that sets the subject without competing with the closing line.\nModify: Replace `meadow` and `plan`; the area, the ratio word, the season dates and the number of dives recompute from the calendar. Change `motif.horizon/bottom` to move the band, `spread` for stronger perspective, `swell` for rougher water (keep it ≤ 1.6 so lines never cross), `drift` to turn the swell, `seed` for a different sea.\nInvariant: Lines are decoration, not a waveform: no axis, no units, no peaks to read. Text stays above the horizon; the sea stops above the source line. No accent colour: nothing on the page is a mark to point at.\nStatic: Already static. The art comes first in the markup so the text paints above it.',
+  sources: [{ type: 'original-example', file: 'assets/svg/wave-lines.mjs' }],
+  exportPolicy: 'final',
+  content: `<figure class="st-fig" data-region="decoration">${figure()}</figure>
+<h1 class="st-head" style="top:72px;max-width:900px;font-size:50px;line-height:1.1">Next spring we replant ${fmt(plan.hectares, { digits: 1 })} hectares of seagrass, ${times} this year's meadow</h1>
+<p class="st-dek" style="top:228px;max-width:820px">Volunteer dives run every Saturday from ${day(saturdays[0])} to ${day(saturdays.at(-1))}: ${saturdays.length} dives in all.<br>Sign up at <strong style="color:var(--ss-ink);font-weight:600">${plan.contact}</strong></p>
+<p class="st-source" data-region="source"><span>Illustrative data · Kelda Bay Seagrass Trust; the waves are decorative</span><span>Wave lines</span></p>`,
 };

@@ -1,94 +1,78 @@
-// Template: Tallyleaf investor pitch · Business model & unit economics. Synthetic example content; replace data and copy.
-// Inputs below drive the price bar, the payback curve and every KPI in the rail.
-const P = 'tpl-pitch-unit-economics';
-const price = 750;                                    // USD per location per month
-const costs = [                                       // cost to serve per location per month
-  {name: 'POS & data fees', v: 70}, {name: 'Support', v: 60}, {name: 'Hosting', v: 35}
-];
-const cac = 6300;                                     // blended acquisition + onboarding cost per location
-const churn = 0.016;                                  // monthly logo churn
-const cost = costs.reduce((s, c) => s + c.v, 0);
-const gp = price - cost, gm = gp / price;
-const q = 1 - churn;
-const cum = m => gp * (1 - Math.pow(q, m)) / churn - cac;   // survival-weighted cumulative GP minus CAC
-const payback = Math.log(1 - cac * churn / gp) / Math.log(q);
-const ltv = gp / churn;
+// Template: Parwell seed memorandum · Unit economics. Synthetic example content; replace data and copy.
+// Left: one kitchen's monthly P&L and its acquisition cost. Right: expected cumulative
+// contribution per signed kitchen against that cost, month by month; the payback month is
+// where the line crosses. The table, the curve, the marker and the headline share `unit`.
+import { lineChart, fmt } from '../../runtime/figure.mjs';
 
-// --- price bar (one month, one location) ---
-const bw = 760, bx = 0, sx = v => v / price * bw;
-let acc = 0;
-const segs = [{name: 'Gross profit', v: gp, fill: '#2f6b4f', ink: '#fbf5ea'}, ...costs.map((c, i) => ({...c, fill: ['#e2a58f', '#ecc2b1', '#f5dccf'][i], ink: '#1f1a16'}))];
-const bar = segs.map((s, i) => {
-  const x = bx + sx(acc); acc += s.v; const w = sx(s.v);
-  const label = i === 0
-    ? `<text x="${x + 14}" y="62" style="font:700 17px var(--tp-sans);fill:${s.ink}">Gross profit $${s.v}</text>`
-    : '';
-  return `<rect x="${x.toFixed(1)}" y="34" width="${w.toFixed(1)}" height="44" fill="${s.fill}"/>${label}`;
-}).join('');
-const costStart = bx + sx(gp);
-const barSvg = `<svg viewBox="0 0 760 92" role="img" aria-labelledby="${P}-bt ${P}-bd"><title id="${P}-bt">Monthly price per location split into gross profit and cost to serve</title>
-  <desc id="${P}-bd">$${price} price: $${gp} gross profit, then ${costs.map(c => `${c.name} $${c.v}`).join(', ')}.</desc>
-  <text x="0" y="22" class="tp-sv-lab" style="letter-spacing:.08em">$${price} / LOCATION / MONTH</text>
-  ${bar}
-  <text x="${bw}" y="22" text-anchor="end" class="tp-sv-small">Cost to serve $${cost}: ${costs.map(c => `${c.name} $${c.v}`).join(' · ')}</text>
-</svg>`;
+const ID = 'tpl-pitch-unit-economics';
+const unit = {
+  price: 300,                                    // USD per kitchen per month (list price)
+  costs: [                                       // USD per kitchen per month, cost to serve
+    { name: 'data feeds', v: 26 },               // POS and distributor connections
+    { name: 'compute', v: 12 },                  // forecasting and hosting
+    { name: 'support', v: 22 },
+  ],
+  cac: 2400,                                     // USD per new kitchen: sales $1,650 + onboarding $750
+  churn: 0.012,                                  // monthly logo churn, Oct 2025 – Sep 2026 (traction page)
+  ramp: [0.6, 0.85],                             // share of full contribution in months 1–2 (onboarding credit)
+  horizon: 24,                                   // months shown
+};
+const cost = unit.costs.reduce((s, c) => s + c.v, 0);
+const contribution = unit.price - cost;
+const margin = contribution / unit.price;
+// Expected contribution of one signed kitchen in month m: ramp share × survival to month m.
+const cum = [0];
+for (let m = 1; m <= unit.horizon; m++) cum.push(cum[m - 1] + contribution * (unit.ramp[m - 1] ?? 1) * (1 - unit.churn) ** (m - 1));
+const payback = cum.findIndex(v => v >= unit.cac);
+const multiple = cum[unit.horizon] / unit.cac;
+const usd = v => `$${fmt(Math.round(v), { digits: 0 })}`;
 
-// --- payback curve ---
-const W = 760, H = 300, L = 64, Rr = 736, T = 26, B = 262;
-const months = 36, yMin = -8000, yMax = 12000;
-const x = m => L + m / months * (Rr - L), y = v => B - (v - yMin) / (yMax - yMin) * (B - T);
-const pts = Array.from({length: months + 1}, (_, m) => [x(m), y(cum(m))]);
-const line = pts.map((p, i) => `${i ? 'L' : 'M'}${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join('');
-const area = `${line}L${x(months)} ${y(0)}L${x(0)} ${y(0)}Z`;
-const yt = [-5000, 0, 5000, 10000].map(v => `<line x1="${L}" x2="${Rr}" y1="${y(v)}" y2="${y(v)}" stroke="${v === 0 ? '#1f1a16' : '#e2d6c1'}" stroke-width="${v === 0 ? 1.5 : 1}"/>
-  <text x="${L - 10}" y="${y(v) + 5}" text-anchor="end" class="tp-sv-axis">${v < 0 ? '−' : ''}$${Math.abs(v / 1000)}k</text>`).join('');
-const xt = [0, 6, 12, 18, 24, 30, 36].map(m => `<text x="${x(m)}" y="${B + 24}" text-anchor="middle" class="tp-sv-axis">${m}</text>`).join('');
-const px = x(payback), py = y(0);
-const chartSvg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-labelledby="${P}-ct ${P}-cd"><title id="${P}-ct">Cumulative gross profit per location after acquisition cost</title>
-  <desc id="${P}-cd">Starts at minus $${cac.toLocaleString('en-US')}, crosses zero at month ${payback.toFixed(1)} and reaches $${(cum(36) / 1000).toFixed(1)}k by month 36, net of ${(churn * 100).toFixed(1)}% monthly churn.</desc>
-  <defs>
-    <clipPath id="${P}-neg"><rect x="${L}" y="${y(0)}" width="${Rr - L}" height="${B - y(0) + 2}"/></clipPath>
-    <clipPath id="${P}-pos"><rect x="${L}" y="${T - 4}" width="${Rr - L}" height="${y(0) - T + 4}"/></clipPath>
-  </defs>
-  ${yt}
-  <path d="${area}" fill="#f5d6c6" clip-path="url(#${P}-neg)"/>
-  <path d="${area}" fill="#d7e6d6" clip-path="url(#${P}-pos)"/>
-  <path d="${line}" fill="none" stroke="#1f1a16" stroke-width="2.6" stroke-linejoin="round"/>
-  <line x1="${px}" x2="${px}" y1="${T + 6}" y2="${B}" stroke="#1f1a16" stroke-dasharray="3 4"/>
-  <circle cx="${px}" cy="${py}" r="7" fill="#f2bf4b" stroke="#1f1a16" stroke-width="2"/>
-  <text x="${px + 12}" y="${T + 20}" style="font:700 17px var(--tp-sans);fill:#1f1a16">Payback · month ${payback.toFixed(1)}</text>
-  <text x="${x(3)}" y="${y(-5600)}" style="font:600 15px var(--tp-sans);fill:#a93220">CAC $${(cac / 1000).toFixed(1)}k</text>
-  <text x="${x(35.5)}" y="${y(cum(36)) - 14}" text-anchor="end" style="font:600 15px var(--tp-sans);fill:#2f6b4f">+$${(cum(36) / 1000).toFixed(1)}k by month 36</text>
-  ${xt}
-  <text x="${Rr}" y="${B + 46}" text-anchor="end" class="tp-sv-small">Months since signing →</text>
-  <text x="${L - 54}" y="${T - 2}" class="tp-sv-small">Cumulative gross profit − CAC</text>
-</svg>`;
+const figure = lineChart({
+  id: `${ID}-fig`, width: 662, height: 400, fontSize: 17,
+  title: 'Expected cumulative contribution per signed kitchen against acquisition cost, by month',
+  desc: `Contribution of ${usd(contribution)} a month, ramped in months 1–2 and reduced by ${fmt(unit.churn * 100, { digits: 1 })}% monthly churn, passes the ${usd(unit.cac)} acquisition cost in month ${payback} and reaches ${usd(cum[unit.horizon])} by month ${unit.horizon}.`,
+  // Months as ordered categories so the axis can tick every six months (x(i) = month i).
+  x: cum.map((_, m) => String(m)), xEvery: 6,
+  series: [{ name: 'Cumulative contribution', values: cum, color: 'var(--ss-ink)' }],
+  endLabels: false, markers: 'none', strokeWidth: 2.5,
+  refLines: [{ y: unit.cac, label: `Acquisition cost ${usd(unit.cac)}`, labelPos: 'start' }],
+  yDomain: [0, 6000], yTicks: 6, unit: 'Cumulative contribution per kitchen, $',
+  xLabel: 'Months since the kitchen signed',
+  format: { digits: 0, prefix: '$' },
+  extra: ({ x, y }) => {
+    const px = x(payback), py = y(cum[payback]), base = y(0);
+    const ex = x(unit.horizon), ey = y(cum[unit.horizon]);
+    return `<g class="pp-payback">
+      <line x1="${px}" x2="${px}" y1="${py}" y2="${base}" stroke="var(--ss-accent)" stroke-width="1.5"/>
+      <circle cx="${px}" cy="${py}" r="6" fill="var(--ss-accent)" stroke="var(--ss-paper)" stroke-width="2"/>
+      <text x="${px + 14}" y="${py + 44}" font-size="17" font-weight="600" style="fill:var(--pp-accent-ink)">Paid back in month ${payback}</text>
+      <circle cx="${ex}" cy="${ey}" r="4.5" fill="var(--ss-ink)"/>
+      <text x="${ex}" y="${ey - 16}" font-size="17" text-anchor="end" style="fill:var(--ss-ink)">${usd(cum[unit.horizon])} by month ${unit.horizon}: ${fmt(multiple, { digits: 1 })}× the acquisition cost</text>
+    </g>`;
+  },
+});
 
-const kpis = [
-  {k: 'Price', s: 'per location, billed annually', v: `$${price}`},
-  {k: 'Gross margin', s: `after $${cost} cost to serve`, v: `${Math.round(gm * 100)}%`},
-  {k: 'CAC', s: 'sales + onboarding, blended', v: `$${(cac / 1000).toFixed(1)}k`},
-  {k: 'Payback', s: 'churn-adjusted', v: `${payback.toFixed(1)} mo`, key: true},
-  {k: 'LTV / CAC', s: `LTV $${(ltv / 1000).toFixed(1)}k at ${(churn * 100).toFixed(1)}% churn`, v: `${(ltv / cac).toFixed(1)}×`, key: true}
-];
-
+const row = (label, value, cls = '') => `<tr class="${cls}"><td>${label}</td><td>${value}</td></tr>`;
 export default {
   study: true,
-  id: 'tpl-pitch-unit-economics',
-  title: 'Business model and unit economics',
-  notes: 'Purpose: Show how one location makes money and how fast it repays its acquisition cost.\nModify: Edit price, costs, cac and churn at the top; the bar, curve, payback marker and KPI rail recompute.\nInvariant: Payback and LTV use the same churn; the curve starts at −CAC; margins derive from the listed costs.\nStatic: Already static.',
+  id: ID,
+  title: 'Unit economics: payback on acquisition cost',
+  notes: `Purpose: Show how one customer makes money and how long it takes to repay what it cost to win.\nModify: Edit \`unit\` (price, cost lines, CAC, churn, onboarding ramp). The P&L column, the curve, the payback marker, the 24-month multiple and the headline recompute. Use the churn you report on the traction page.\nInvariant: The curve is cumulative and churn-adjusted; the CAC line and the curve share one axis that starts at zero; the payback month is computed, not typed; the P&L lines add up.\nStatic: Already static.`,
   sources: [],
   exportPolicy: 'final',
-  className: 'tpl-pitch tp-unit',
-  content: `<div class="tp-wrap">
-  <div class="tp-head"><div class="tp-brand"><svg viewBox="-6 -6 112 118" role="img" aria-labelledby="${P}-mk"><title id="${P}-mk">Tallyleaf mark</title><g transform="rotate(-36 50 50)"><path d="M50 3 C84 26 84 74 50 97 C16 74 16 26 50 3Z" fill="#2f6b4f"/><g stroke="#fbf5ea" stroke-width="6" stroke-linecap="round"><line x1="37" y1="33" x2="37" y2="67"/><line x1="45.5" y1="31" x2="45.5" y2="69"/><line x1="54.5" y1="31" x2="54.5" y2="69"/><line x1="63" y1="33" x2="63" y2="67"/><line x1="30" y1="62" x2="70" y2="38"/></g></g></svg>tallyleaf</div><div class="tp-sec"><b>03</b><i></i>Business model</div></div>
-  <h1 class="tp-title tp-ue-title" data-region="title">Each new location repays its acquisition cost in <em>under a year</em>.</h1>
-  <div class="tp-ue-pl" data-region="support">${barSvg}</div>
-  <div class="tp-ue-chart" data-region="primary">${chartSvg}</div>
-  <aside class="tp-ue-rail" data-region="support">
-    <p class="tp-label">Per location</p>
-    ${kpis.map(k => `<div class="tp-ue-kpi${k.key ? ' is-key' : ''}"><p>${k.k}<span>${k.s}</span></p><strong>${k.v}</strong></div>`).join('')}
-  </aside>
-  <p class="tp-source" data-region="source">Illustrative data · cohort of locations signed in the last 12 months</p>
-</div>`
+  className: 'tpl-pitch pp-unit',
+  content: `<div class="pp-run"><span>Parwell — Seed memorandum, October 2026</span><span>4</span></div>
+<h1 class="pp-head" data-region="title">A new kitchen pays back its ${usd(unit.cac)} acquisition cost in month ${payback}</h1>
+<p class="pp-ex" data-region="support"><b>Exhibit 3</b>One kitchen: monthly economics and payback</p>
+<table class="pp-pl" data-region="support">
+  ${row('Price', usd(unit.price))}
+  ${row('Cost to serve', `−${usd(cost)}`)}
+  <tr class="sub"><td colspan="2">${unit.costs.map(c => `${c.name} ${usd(c.v)}`).join(', ').replace(/^./, c => c.toUpperCase())}</td></tr>
+  ${row(`Contribution, ${fmt(margin * 100, { digits: 0 })}% margin`, usd(contribution), 'total')}
+  ${row('Acquisition cost, once', usd(unit.cac), 'gap')}
+  ${row('Monthly churn', `${fmt(unit.churn * 100, { digits: 1 })}%`)}
+  ${row('Payback', `month ${payback}`, 'is-this')}
+</table>
+<figure class="pp-ue-fig" data-region="primary">${figure}</figure>
+<p class="pp-source" data-region="source">Model: list price, 2026 cost to serve, onboarding credit in months 1–2 (${unit.ramp.map(r => `${r * 100}%`).join(', ')} of contribution), ${fmt(unit.churn * 100, { digits: 1 })}% monthly churn as observed Oct 2025 – Sep 2026.</p>`,
 };

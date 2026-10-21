@@ -1,17 +1,43 @@
-// Original editable study. Read notes for purpose, modifications, and invariants.
-// Asset placeholders are embedded by scripts/craft-core.mjs. Change content and geometry freely.
+// Diagram study · Waterfall — how signed contributions move one total to another.
+// The closing total is not typed in: the engine computes the running sum, so the bridge always adds up.
+import { waterfallChart, fmt } from '../runtime/figure.mjs';
+
+const opening = { label: 'FY2024 operating profit', value: 42.0, total: true };
+const drivers = [ // change in operating profit, $ million, FY2024 → FY2025 (illustrative)
+  { label: 'Volume', value: 12.4 },
+  { label: 'Price', value: 8.1 },
+  { label: 'Product mix', value: -3.2 },
+  { label: 'Input costs', value: -11.6 },
+  { label: 'Freight', value: -2.7 },
+  { label: 'Productivity programme', value: 6.3 },
+  { label: 'Currency', value: -1.9 },
+];
+const closing = { label: 'FY2025 operating profit', total: true }; // value = running sum, computed by the chart
+const end = opening.value + drivers.reduce((s, d) => s + d.value, 0);
+const growthDrivers = ['Volume', 'Price']; // the commercial drivers the headline groups together
+const growth = drivers.filter(d => growthDrivers.includes(d.label)).reduce((s, d) => s + d.value, 0);
+const worst = [...drivers].sort((a, b) => a.value - b.value)[0];
+const m = v => fmt(v, { prefix: '$', suffix: 'M', digits: 1 });
+
+export function figure(theme = 'css') {
+  return waterfallChart({
+    id: 'waterfall-fig', theme, width: 1152, height: 470, fontSize: 16, format: { digits: 1 },
+    title: 'Operating profit bridge from FY2024 to FY2025, $ million',
+    desc: `Operating profit moved from ${m(opening.value)} to ${m(end)}. Volume and price added ${m(growth)}; ${worst.label.toLowerCase()} took away ${m(-worst.value)}, the largest reduction.`,
+    data: [opening, ...drivers, closing], unit: '$ million',
+    annotate: [{ at: worst.label, text: 'Resin and steel contracts repriced in March', dx: 70, dy: -10, width: 210, marker: 'none' }],
+  });
+}
+
 export default {
   study: true,
-  "id": "waterfall",
-  "title": "Additive bridge",
-  "notes": "Purpose: Explain how contributions change a total\nModify: Rewrite labels, recompute geometry from source data, adapt framing and orientation.\nInvariant: Cumulative positions must equal the algebraic sum of labeled contributions.\nStatic: Already static; preserve semantic labels and readable strokes.",
-  "sources": [
-    {
-      "type": "original-example",
-      "file": "assets/svg/waterfall.svg"
-    }
-  ],
-  "exportPolicy": "final",
-  "className": "",
-  "content": "<h1 class=\"g-title\">Additive bridge</h1><p class=\"g-purpose\">Explain how contributions change a total</p><div class=\"g-demo\"><svg aria-labelledby=\"g-waterfall-waterfall-title g-waterfall-waterfall-desc\" role=\"img\" viewbox=\"0 0 800 440\" xmlns=\"http://www.w3.org/2000/svg\"><title id=\"g-waterfall-waterfall-title\">Additive bridge</title><desc id=\"g-waterfall-waterfall-desc\">Explain how contributions change a total. Original schematic. Values are illustrative, not measured.</desc><g data-part=\"drawing\"><line stroke=\"#17252d\" stroke-width=\"2\" x1=\"90\" x2=\"720\" y1=\"350\" y2=\"350\"></line><line stroke=\"#17252d\" stroke-width=\"2\" x1=\"90\" x2=\"90\" y1=\"70\" y2=\"350\"></line><rect fill=\"#28617b\" height=\"110\" rx=\"0\" stroke=\"none\" stroke-width=\"2\" width=\"80\" x=\"130\" y=\"240\"></rect><rect fill=\"#28617b\" height=\"70\" rx=\"0\" stroke=\"none\" stroke-width=\"2\" width=\"80\" x=\"260\" y=\"170\"></rect><rect fill=\"#ae4f31\" height=\"45\" rx=\"0\" stroke=\"none\" stroke-width=\"2\" width=\"80\" x=\"390\" y=\"170\"></rect><rect fill=\"#28617b\" height=\"90\" rx=\"0\" stroke=\"none\" stroke-width=\"2\" width=\"80\" x=\"520\" y=\"125\"></rect><rect fill=\"#17252d\" height=\"225\" rx=\"0\" stroke=\"none\" stroke-width=\"2\" width=\"55\" x=\"650\" y=\"125\"></rect><line stroke=\"#718594\" stroke-dasharray=\"5 4\" stroke-width=\"2\" x1=\"210\" x2=\"260\" y1=\"240\" y2=\"240\"></line><line stroke=\"#718594\" stroke-dasharray=\"5 4\" stroke-width=\"2\" x1=\"340\" x2=\"390\" y1=\"170\" y2=\"170\"></line><line stroke=\"#718594\" stroke-dasharray=\"5 4\" stroke-width=\"2\" x1=\"470\" x2=\"520\" y1=\"215\" y2=\"215\"></line></g></svg>\n</div><div class=\"g-footer\">Original instructional study · schematic / synthetic content <code>assets/svg/waterfall.svg</code></div>"
+  id: 'waterfall',
+  title: 'Waterfall: an additive bridge between two totals',
+  className: 'st cs-finance-ledger',
+  notes: 'Purpose: Explain how signed contributions move one total to another, in the order a finance reader expects.\nModify: Replace `opening` and `drivers`. Leave the closing total without a value: the chart computes the running sum (and refuses a typed total that does not add up). The headline sums and the annotated driver recompute.\nInvariant: Every floating bar starts where the previous one ended; totals start at zero; signs are printed; the closing total equals the opening total plus the labelled contributions.\nStatic: Already static. For a build, pass build:{by:"mark"} to add one driver per click.',
+  sources: [{ type: 'original-example', file: 'assets/svg/waterfall.mjs' }],
+  exportPolicy: 'final',
+  content: `<h1 class="st-head">Operating profit rose ${m(end - opening.value)} to ${m(end)}: ${growthDrivers.join(' and ').toLowerCase()} added ${m(growth)}, more than the ${m(-worst.value)} lost to ${worst.label.toLowerCase()}</h1>
+<figure class="st-fig" data-region="primary">${figure()}</figure>
+<p class="st-source" data-region="source"><span>Illustrative data · group operating profit, fiscal years to 31 March</span><span>Waterfall chart</span></p>`,
 };

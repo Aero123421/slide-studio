@@ -1,10 +1,70 @@
-// Original composition study. The notes explain the design; the canvas demonstrates it.
+// Composition study · Continuous handoff — one band carries the quantity from stage to stage.
+// Its thickness is the mass that remains; each loss peels off downward and is named where it
+// lands, and each state above the band hands its number to the next. Geometry comes from `steps`.
+import { svgRoot, el, textLines, theme as makeTheme, fmt } from '../runtime/figure.mjs';
+
+const ID = 'composition-continuous-handoff';
+// Washed process at a smallholder cooperative's wet mill, per tonne of ripe cherries (illustrative).
+const start = { state: 'Ripe cherries', kg: 1000 };
+const steps = [ // each step removes `loss` kg and hands on the rest as `state`
+  { state: 'Pulped', loss: 410, what: 'skin, pulp' },
+  { state: 'Washed', loss: 150, what: 'mucilage' },
+  { state: 'Dried', loss: 222, what: 'water' },
+  { state: 'Green coffee', loss: 39, what: 'husk' },
+  { state: 'Export grade', loss: 13, what: 'defects' },
+  { state: 'Roasted', loss: 27, what: 'roast loss' },
+];
+const doseG = 18; // grams of roasted coffee in a double espresso
+
+// derived values: every remaining mass is the previous one minus its loss
+const masses = steps.reduce((acc, s) => [...acc, acc.at(-1) - s.loss], [start.kg]);
+const roasted = masses.at(-1), green = masses[masses.length - 2];
+const cups = Math.round((roasted * 1000) / doseG / 100) * 100;
+const kg = v => `${fmt(v, { digits: 0 })} kg`;
+
+export function figure(theme = 'css') {
+  const t = makeTheme(theme), W = 960, H = 372;
+  const top = 96, s = 0.22;             // band top edge; px per kg (1,000 kg → 220 px)
+  const gx = i => 112 + i * 146;        // x of the step that turns state i into state i + 1
+  const endX = gx(steps.length - 1) + 110, ease = 20;
+  const T = masses.map(m => m * s);
+  // the band: a flat top edge; the lower edge eases up at every step by the mass removed there
+  let d = `M0 ${top}H${endX}V${top + T.at(-1)}`;
+  for (let i = steps.length - 1; i >= 0; i--) {
+    const x = gx(i);
+    d += `H${x + ease}C${x} ${top + T[i + 1]} ${x} ${top + T[i]} ${x - ease} ${top + T[i]}`;
+  }
+  d += 'H0Z';
+  const parts = [el('path', { d, fill: t.c('ink') })];
+  // what each step removes, named in the notch where it left the band
+  steps.forEach((st, i) => {
+    const x = gx(i) + 12, y = top + T[i + 1] + 14;
+    parts.push(textLines([`−${kg(st.loss)}`], { x, y, size: 17, valign: 'top', fill: t.c('ink'), weight: 650, attrs: { 'font-variant-numeric': 'tabular-nums' } }));
+    parts.push(textLines([st.what], { x, y: y + 24, size: 16, valign: 'top', fill: t.c('muted') }));
+  });
+  // states above the band: what is handed on, and how much
+  const states = [start.state, ...steps.map(st => st.state)];
+  states.forEach((name, i) => {
+    const x = i === 0 ? 0 : gx(i - 1) + 10;
+    parts.push(textLines([name], { x, y: top - 50, size: 16, valign: 'bottom', fill: t.c('muted') }));
+    parts.push(textLines([kg(masses[i])], { x, y: top - 14, size: i === 0 || i === states.length - 1 ? 24 : 21, valign: 'bottom', fill: t.c('ink'), weight: 650, attrs: { 'font-variant-numeric': 'tabular-nums' } }));
+  });
+  return svgRoot({ id: `${ID}-fig`, width: W, height: H, theme: t,
+    title: 'Mass balance from one tonne of ripe coffee cherries to roasted coffee',
+    desc: `${states.map((n, i) => `${n} ${kg(masses[i])}`).join(', ')}. Removed along the way: ${steps.map(st => `${st.what} ${kg(st.loss)}`).join(', ')}.` },
+  parts);
+}
+
 export default {
-  "id": "composition-continuous-handoff",
-  "title": "Build a continuous explanatory path",
-  "study": true,
-  "content": "<h1 data-region=\"title\" class=\"x-title\" style=\"left:64px;top:55px;width:1130px;font-size:52px\">Follow the transformation, not the boxes.</h1><div data-region=\"primary\" class=\"\" style=\"position:absolute;left:60px;top:220px;width:1145px;height:350px\"><svg preserveAspectRatio=\"xMinYMin meet\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"25 30 950 310\" role=\"img\" aria-label=\"Show where a value came from\"><title>Show where a value came from</title><line x1=\"240\" y1=\"170\" x2=\"410\" y2=\"95\" stroke=\"#245B72\" stroke-width=\"2.5\"/><path d=\"M410 95 L397.0027853482434 95.26909347105087 L401.0391874140063 104.41827148678018Z\" fill=\"#245B72\" stroke=\"#245B72\" stroke-width=\"1\" stroke-linejoin=\"round\"/><line x1=\"240\" y1=\"170\" x2=\"410\" y2=\"265\" stroke=\"#245B72\" stroke-width=\"2.5\"/><path d=\"M410 265 L401.9637850026775 254.78142629733438 L397.08557142602814 263.510861118707Z\" fill=\"#245B72\" stroke=\"#245B72\" stroke-width=\"1\" stroke-linejoin=\"round\"/><line x1=\"580\" y1=\"95\" x2=\"745\" y2=\"170\" stroke=\"#245B72\" stroke-width=\"2.5\"/><path d=\"M745 170 L736.1446169919546 160.48253228107276 L732.0065875489428 169.58619705569882Z\" fill=\"#245B72\" stroke=\"#245B72\" stroke-width=\"1\" stroke-linejoin=\"round\"/><line x1=\"580\" y1=\"265\" x2=\"745\" y2=\"170\" stroke=\"#245B72\" stroke-width=\"2.5\"/><path d=\"M745 170 L732.1057082931752 171.65446105403248 L737.0953527418446 180.3206856227742Z\" fill=\"#245B72\" stroke=\"#245B72\" stroke-width=\"1\" stroke-linejoin=\"round\"/><rect x=\"40\" y=\"130\" width=\"200\" height=\"80\" rx=\"4\" fill=\"#F7F5EF\" stroke=\"#245B72\" stroke-width=\"2\"/><text x=\"140.0\" y=\"178.0\" font-family=\"Arial, sans-serif\" font-size=\"26.84\" text-anchor=\"middle\" fill=\"#172B38\">Source</text><rect x=\"410\" y=\"60\" width=\"170\" height=\"70\" rx=\"4\" fill=\"#F7F5EF\" stroke=\"#245B72\" stroke-width=\"2\"/><text x=\"495.0\" y=\"103.0\" font-family=\"Arial, sans-serif\" font-size=\"26.84\" text-anchor=\"middle\" fill=\"#172B38\">Clean</text><rect x=\"410\" y=\"230\" width=\"170\" height=\"70\" rx=\"4\" fill=\"#F7F5EF\" stroke=\"#245B72\" stroke-width=\"2\"/><text x=\"495.0\" y=\"273.0\" font-family=\"Arial, sans-serif\" font-size=\"26.84\" text-anchor=\"middle\" fill=\"#172B38\">Validate</text><rect x=\"745\" y=\"130\" width=\"215\" height=\"80\" rx=\"4\" fill=\"#F7F5EF\" stroke=\"#245B72\" stroke-width=\"2\"/><text x=\"852.5\" y=\"178.0\" font-family=\"Arial, sans-serif\" font-size=\"26.84\" text-anchor=\"middle\" fill=\"#172B38\">Derived table</text></svg></div><div data-region=\"support\" class=\"\" style=\"position:absolute;left:82px;top:592px;width:1090px;height:40px\"><p>Every derived value should retain a route back to its source.</p></div><div class=\"x-source\" data-region=\"source\">Illustrative composition study · no measured result</div>",
-  "notes": "Purpose: Build a continuous explanatory path\nModify: Choose this reading relationship only when it fits the actual content. Measure real titles and labels; sources and caveats stay near their claim.\nInvariant: Preserve the stated relationship, labels, units and evidence scope.\nStatic: Review the final state and any information lost from intermediate states.",
-  "exportPolicy": "final",
-  "className": "x-slide"
+  study: true,
+  id: ID,
+  title: 'Continuous handoff: one band carries the quantity through every stage',
+  className: 'st cs-food-market cmp-handoff',
+  notes: 'Purpose: Use for any process where a quantity is transformed step by step (a harvest to a product, applicants to hires, raw rows to a reported figure). The reader follows one continuous band instead of jumping between boxes; each state names what it hands on, each loss is named where it leaves, and every number can be traced back to the start.\nModify: Replace `start` and `steps` (state handed on, loss, what the loss is); the masses, the thickness of the band at every step and the labels recompute, and the totals always reconcile. Keep five to seven steps; more becomes a table. Swap the photograph for the real end product or drop it.\nInvariant: Thickness is proportional to quantity on one scale; the band never breaks or changes scale; every loss is taken from the same edge and named in the notch it leaves; the state label sits at the start of its segment so each number reads as handed on to the next.\nStatic: Already static. A build can grow the band left to right, one step per click.',
+  sources: [{ type: 'original-example', file: `assets/compositions/${ID}.mjs` }, { type: 'image', file: 'assets/media/study-01.jpg', license: 'CC0' }],
+  exportPolicy: 'final',
+  content: `<h1 class="st-head" data-region="title">A tonne of ripe cherries becomes ${kg(roasted).replace(' ', '&nbsp;')} of roasted coffee, about ${fmt(cups)} double espressos</h1>
+<figure class="cmp-ho-fig" data-region="primary">${figure()}</figure>
+<figure class="cmp-ho-cup" data-region="support"><img src="{{asset:assets/media/study-01.jpg}}" alt="An espresso in a red cup on a red saucer, on a wooden table, seen from above" data-qa-focus="[0.28,0.03,0.43,0.75]"><figcaption><b>≈ ${fmt(cups)} doubles</b><span>at ${doseG} g of roasted coffee each</span></figcaption></figure>
+<p class="st-source" data-region="source"><span>Illustrative mass balance, washed process · photograph: espresso from above, CC0</span><span>Continuous handoff · single-band flow</span></p>`,
 };

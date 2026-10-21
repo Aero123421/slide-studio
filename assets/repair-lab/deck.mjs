@@ -1,95 +1,812 @@
-/** Contrastive authoring source. Inputs below are synthetic, not user evaluation data.
- * Learn the transformation, then author a different composition for the real subject.
- * This workshop intentionally contains flawed BEFORE pages. Never submit unchanged.
+/**
+ * Repair lab: twelve before/after pairs and a three-page transfer talk (Japanese).
+ *
+ * Each pair is ONE page function drawn twice. `v === 'before'` switches on exactly
+ * one realistic failure (named in `failure`) and adds a diagnosis mark that appears
+ * on the first click; `v === 'after'` is the repaired page, finished enough to ship.
+ * The difference between the two branches of a page function IS the repair.
+ *
+ * Everything shown is synthetic: fictional organisations, places and people. Each
+ * pair keeps its data at the top of its section and computes every number on the
+ * page from it (quant.mjs for amounts, rates and paired differences; the figure
+ * engine for charts and diagrams; semantic-graph.mjs to validate branch meaning).
+ *
+ * Built by scripts/build-repair-lab.mjs into gallery/repair-lab.html (`lab`) and
+ * gallery/transfer-talk.html (`talk`). The repairs are documented in
+ * references/repair.md. Workshop material: never submit these pages unchanged.
  */
-import {quantity,change,paired,totalCost,segments} from '../runtime/quant.mjs';
-import {branches} from '../runtime/semantic-graph.mjs';
-import {h} from '../runtime/kit.mjs';
-export const css=`
-.slide{padding:64px;background:#fafaf7;color:#152c36;font-family:'Noto Sans CJK JP',Arial,sans-serif}
-h1{font-size:46px;line-height:1.24;font-weight:650;max-width:1140px;letter-spacing:-.025em}
-p{font-size:27px;line-height:1.5}.sub{margin-top:20px!important;color:#3b5660;max-width:1060px}
-.main{position:absolute;left:64px;right:64px;top:210px;bottom:70px}.source{position:absolute;left:64px;bottom:26px;font-size:17px;color:#52676f}
-.side{position:absolute;right:0;top:0;width:30%}.big{font-size:72px;line-height:1.1;font-weight:600}.quiet{color:#2b7370}.split{display:grid;grid-template-columns:1.5fr 1fr;gap:56px;height:100%}
-svg{width:100%;height:100%;font-family:inherit}.small{font-size:16px;line-height:1.4}.before h1{font-size:38px}.before .tiny{font-size:15px;line-height:1.6}
-.lab-phase{position:absolute;left:64px;top:22px;font-size:15px;letter-spacing:.06em;color:#52676f}.main.split{height:auto}.split>div{min-width:0;min-height:0}
-.cards{display:flex;gap:18px}.card{flex:1;border:1px solid #c6ccca;border-radius:14px;padding:22px;background:#fff}
-.dark{background:#112832;color:#f5f3e7}.dark .sub,.dark .source{color:#c0d4d4}.dark .card{color:#152c36}
-table{border-collapse:collapse;width:100%;font-size:24px;line-height:1.5}th,td{padding:21px 16px;text-align:left;border-bottom:1px solid #b8c9cd}th{font-size:20px;background:#163f4b;color:#fff;font-weight:500}td:first-child{font-weight:650}
-img{object-fit:cover}.image-wide{position:absolute;left:0;top:0;width:100%;height:100%;max-width:none!important}.image-panel{position:absolute;left:66px;top:230px;width:460px;height:300px;object-fit:cover}
+import fs from 'node:fs/promises';
+import { quantity, change, paired, totalCost, segments } from '../runtime/quant.mjs';
+import { validateGraph } from '../runtime/semantic-graph.mjs';
+import {
+  waterfallChart, lineChart, flowDiagram, columnChart, barChart, stackedBarChart, slopeChart,
+  svgRoot, el, textLines, wrapText, linear, band, axis, barPath, legend, fmt, sum, extent, niceDomain,
+} from '../runtime/figure.mjs';
+import { offers, planNames, cheapestRuns } from './period.mjs';
+
+// ── CSS: the page grammar + one color system, read from the repo at build time ──
+const read = p => fs.readFile(new URL(p, import.meta.url), 'utf8');
+const frame = await read('../runtime/study-frame.css');
+const systems = await read('../color-systems/color-systems.css');
+const waAi = systems.match(/\/\*[^*]*\*\/\n\.cs-wa-ai\{[^}]*\}/)?.[0];
+if (!waAi) throw Error('color-systems.css has no cs-wa-ai block');
+
+export const css = `${frame}\n${waAi}\n
+/* ── Repair lab rules (lab + talk). Indigo accent = "this"; red = the editor's mark and worsening values. ──
+   Type scale: headline 36 · second clause 28 · KPI 54 · body 20 · labels 16–18 · source 15.
+   Grid: 64 px margins; evidence 1152×482 from y 176; rail 312 px (figure 800). */
+.lab {
+  --ss-font-sans: "Inter","Helvetica Neue","Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic UI","Yu Gothic",Meiryo,"IPAPGothic","IPAGothic",sans-serif;
+  --ss-font-display: var(--ss-font-sans);
+  word-break: auto-phrase; line-break: strict;
+}
+.lab .st-head { max-width: 1110px; font: 700 36px/1.4 var(--ss-font-display); letter-spacing: .02em; font-feature-settings: "palt" 1; }
+.lab .st-head .st-quiet { display: block; margin-top: 4px; font-size: 28px; line-height: 1.45; font-weight: 500; letter-spacing: .02em; }
+.lab .nw { white-space: nowrap; }
+.lab .st-kpi b small { margin-left: .12em; font-size: .4em; font-weight: 600; letter-spacing: 0; color: var(--ss-muted); }
+.lab .st-kpi b.is-accent { color: var(--ss-accent); }
+.lab .st-kpi span { font-size: 18px; line-height: 1.6; color: var(--ss-ink); }
+.lab .st-text { font-size: 20px; line-height: 1.7; }
+.lab .st-source .lab-tag { text-align: right; }
+.lab .lab-tag b { margin-right: .8em; font-weight: 700; color: var(--ss-ink); }
+.lab .lab-tag b.is-before { color: var(--ss-negative); }
+
+/* Diagnosis mark (BEFORE pages): a ring on the faulty element and one short note, revealed at build 1. */
+.lab .lab-fault { position: relative; }
+.lab .lab-ring { position: absolute; inset: -5px -9px; border: 2.5px solid var(--ss-negative); border-radius: 10px; pointer-events: none; }
+.lab .lab-note { position: absolute; z-index: 2; margin: 0; padding: 10px 16px 12px; background: var(--ss-paper); border: 2px solid var(--ss-negative); border-radius: 8px;
+  font: 600 18px/1.6 var(--ss-font-sans); color: var(--ss-negative); }
+.lab .lab-note span { display: block; font-weight: 400; color: var(--ss-ink); }
+.lab svg .lab-svg-ring { fill: none; stroke: var(--ss-negative); stroke-width: 2.5; }
+.lab .lab-wf { --ss-positive: var(--ss-ink); }   /* waterfall: delta bars take the accent, their labels stay ink */
+
+/* Reading tables (pair 9, talk page 3). Hairlines, tabular figures, units in the header. */
+.lab .lab-table { position: absolute; left: 64px; top: 196px; width: 1152px; border-collapse: collapse; font-size: 22px; line-height: 1.5; font-variant-numeric: tabular-nums; }
+.lab .lab-table th { padding: 0 20px 12px 0; border-bottom: 1.5px solid var(--ss-ink); font: 600 16px/1.4 var(--ss-font-sans); color: var(--ss-muted); text-align: left; vertical-align: bottom; }
+.lab .lab-table td { padding: 18px 20px 18px 0; border-bottom: 1px solid var(--ss-rule); vertical-align: top; }
+.lab .lab-table td:last-child, .lab .lab-table th:last-child { padding-right: 0; }
+.lab .lab-table .n { text-align: right; }
+.lab .lab-table .is-best { color: var(--ss-accent); font-weight: 700; }
+.lab .lab-table .is-open { font-weight: 700; }
+
+/* The flawed card pattern some BEFORE pages show (not used on AFTER pages). */
+.lab .lab-cards { position: absolute; left: 64px; right: 64px; top: 188px; display: flex; gap: 18px; }
+.lab .lab-card { flex: 1; padding: 16px 18px; background: var(--ss-paper); border: 1px solid var(--ss-rule); border-radius: 14px; }
+.lab .lab-card h3 { margin: 0 0 6px; font-size: 17px; }
+.lab .lab-card p { margin: 0; font-size: 14px; line-height: 1.6; color: var(--ss-muted); }
+
+/* Under-figure line for conditions and checks (pairs 6 and 12). */
+.lab .lab-under { position: absolute; left: 64px; right: 64px; margin: 0; font-size: 20px; line-height: 1.6; }
+.lab .lab-under b { font-weight: 700; }
+.lab .lab-tiny { position: absolute; left: 64px; margin: 0; font-size: 12px; color: var(--ss-muted); }
 `;
-const footer=(text='説明用の架空データ。実際の測定・見積もりではありません。')=>`<p class="source" data-region="source">${text}</p>`;
-const title=(t,sub='')=>`<h1 data-region="title">${t}</h1>${sub?`<p class="sub">${sub}</p>`:''}`;
-const svg=(body,w=1000,hg=360,alt='説明図')=>`<svg xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${h(alt)}" viewBox="0 0 ${w} ${hg}">${body}</svg>`;
-const text=(x,y,s,size=26,fill='#152c36',anchor='start')=>`<text x="${x}" y="${y}" font-size="${size}" fill="${fill}" text-anchor="${anchor}">${h(s)}</text>`;
-const line=(x1,y1,x2,y2,color='#2b7370',width=3)=>`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-width="${width}"/>`;
-const records=[];
-function pair(id,before,after,reason,{beforeClass='',afterClass='',readingMode='live'}={}){
- records.push({study:true,id:id+'-before',title:'Before · '+id,className:'before '+beforeClass,readingMode,content:'<p class="lab-phase">BEFORE · 意図的な不良例</p>'+before,notes:'Intentional failure. '+reason,exportPolicy:'final'});
- records.push({study:true,id:id+'-after',title:'After · '+id,className:afterClass,readingMode,content:'<p class="lab-phase">AFTER · 修正例</p>'+after,notes:'Repair operation: '+reason+' All example values are synthetic; do not copy them into real work.',exportPolicy:'final'});
+
+// ── Shared helpers ──────────────────────────────────────────────────────────
+const num = (v, digits = 0, o = {}) => fmt(v, { locale: 'ja', digits, ...o });
+const signed = (v, digits = 1) => num(v, digits, { sign: true });
+const nw = s => `<span class="nw">${s}</span>`;
+const SYNTH = '架空のデータ';
+
+/** One lab page: claim (+ muted second clause), evidence, one source line. */
+function labPage({ head, quiet = '', body, source, tag = '' }) {
+  return `<h1 class="st-head" data-region="title">${head}${quiet ? `<span class="st-quiet">${quiet}</span>` : ''}</h1>
+${body}
+<p class="st-source" data-region="source"><span>${source}</span>${tag ? `<span class="lab-tag">${tag}</span>` : ''}</p>`;
 }
-const amounts=change(quantity(500,'百万円'),quantity(650,'百万円'));
-const bars=(colorA='#a2afb1',colorB='#2b7370')=>svg(text(20,65,'前期')+text(20,205,'当期')+`<rect x="110" y="25" width="${amounts.before.value}" height="64" fill="${colorA}"/><rect x="110" y="165" width="${amounts.after.value}" height="64" fill="${colorB}"/>`+text(630,65,'500')+text(780,205,'650')+text(110,290,'単位：百万円',23));
-pair('amount-and-rate',title('売上は30百万円増。成長の正体をつかむ。','500から650へ。数字の先に、新しい可能性が見えます。')+`<div class="main">${bars()}</div>`+footer(),
- title(`売上は${amounts.delta.value}百万円増、前年比${amounts.percent.toFixed(0)}%`)+`<div class="main" data-region="primary">${bars()}</div>`+footer(),
- 'Separate amount from percentage. Recompute both from one source, retain unit and comparator, remove the unsupported rhetorical conclusion.');
-// Here before/after encode the fixed measurement order: condition A, then B.
-const rows=[{id:1,before:12,after:10},{id:2,before:11,after:10},{id:3,before:14,after:12},{id:4,before:13,after:14},{id:5,before:15,after:null},{id:6,before:16,after:14}];
-const result=paired(rows,{units:'°C'});
-function diffPlot(reverse=false){return svg(line(450,20,450,310,'#849fa7',1)+result.rows.map((r,i)=>{
- const v=(reverse?-1:1)*r.difference,y=46+i*53;return text(15,y+8,'試料 '+r.id,22)+line(450,y,450+v*120,y,v>0?'#a24b31':'#2b7370',12)+text(450+v*120+(v>0?15:-15),y+8,(v>0?'+':'')+v.toFixed(1),22,'#152c36',v>0?'start':'end');}).join('')+text(450,354,reverse?'条件A − 条件B（℃）':'条件B − 条件A（℃）',24,'#152c36','middle'),800,380);}
-pair('paired-sign',title('平均差 −1.2℃。差の意味を確かめる。')+`<div class="main split"><div>${diffPlot(true)}</div><div><p class="big">−1.2℃</p><p class="sub">平均差</p></div></div>`+footer(),
- title(`5試料の平均差は${result.mean.toFixed(1)}℃。1試料は上昇した。`)+`<div class="main split" data-region="primary"><div>${diffPlot()}</div><div><p class="big quiet">${result.mean.toFixed(1)}℃</p><p class="sub">条件B − 条件A</p><p style="margin-top:35px">差の標本標準偏差 ${result.sampleSD.toFixed(1)}℃<br>全6試料のうち1試料は欠測</p></div></div>`+footer(),
- 'Use the same subtraction direction for every row, axis and summary. Preserve the worsening pair and missingness. Sample SD is calculated with n−1.');
-const points=[{x:150,y:140},{x:325,y:100},{x:500,y:null},{x:675,y:160},{x:850,y:80}];
-function missingPlot(gap=true){const groups=gap?segments(points):[points.filter(p=>p.y!=null)];return svg(groups.map(g=>`<polyline points="${g.map(p=>p.x+','+p.y).join(' ')}" fill="none" stroke="#2b7370" stroke-width="5"/>`).join('')+points.filter(p=>p.y!=null).map(p=>`<circle cx="${p.x}" cy="${p.y}" r="8" fill="#2b7370"/>`).join('')+points.map((p,i)=>text(p.x,260,(i+1)+'月',25,'#152c36','middle')).join('')+(gap?text(500,150,'欠測',28,'#a24b31','middle'):''),1000,320,'月別の観測値。3月は欠測');}
-pair('missing-is-not-a-line',title('変化の流れを、一本の線で。')+`<div class="main">${missingPlot(false)}</div>`+footer(),
- title('3月は欠測。前後の変化は分からない。')+`<div class="main" data-region="primary">${missingPlot()}</div>`+footer(),
- 'Break the line at the missing observation instead of implying an observed transition. Do not replace it with zero.');
-pair('conditional-outcomes',title('検査後は、返却・修理・交換へ。')+`<div class="main">${svg(text(80,140,'返却',38)+line(240,126,380,126)+text(310,110,'→',34)+text(430,140,'修理',38)+line(580,126,720,126)+text(650,110,'→',34)+text(780,140,'交換',38))}</div>`+footer('架空の検査手順。'),
- title('検査の結果に応じて、行き先を分ける。')+`<div class="main" data-region="primary">${branches({id:'repair-branch',origin:'検査結果',outcomes:[{condition:'適合',label:'返却'},{condition:'不適合・修理可',label:'修理'},{condition:'不適合・修理不可',label:'交換'}],height:440})}</div>`+footer('架空の検査手順。'),
- 'These are alternatives, not stages in a sequence. Preserve conditions and directly connect the origin to each alternative.');
-const encodings=[{name:'A',value:25,color:'#277275'},{name:'B',value:37,color:'#b66b32'},{name:'C',value:29,color:'#657388'}];
-function encodedBars(correct){return svg(encodings.map((s,i)=>text(100,80+i*100,s.name,28)+`<rect x="160" y="40" width="${s.value*17}" height="56" fill="${correct?s.color:'#142c35'}" transform="translate(0 ${i*100})"/>`+text(175+s.value*17,80+i*100,String(s.value),28)).join(''),1000,360);}
-pair('encoding-map',title('系列ごとに色分けしました。')+`<p class="sub"><span style="color:#277275">■ A</span>　<span style="color:#b66b32">■ B</span>　<span style="color:#657388">■ C</span></p><div class="main">${encodedBars(false)}</div>`+footer(),
- title('Bが37件で最多。')+`<div class="main" data-region="primary">${encodedBars(true)}</div>`+footer(),
- 'Use one encoding map for names and mark colors. Direct labels keep the comparison readable without relying on color alone.');
-pair('proposal-scope',title('週1回、追加の手間なく回収できます。','日々の仕事に、余裕を。')+`<div class="main"><p class="big">負担ゼロ</p></div>`+footer('架空の案。所要時間と必要人数は未測定。'),
- title('回収を週1回とする案。作業時間は試行で測る。')+`<div class="main"><div class="split"><div><p style="font-size:38px">決めた条件</p><p class="sub">週1回の回収を試す。</p></div><div><p style="font-size:38px">まだ確認すること</p><p class="sub">置き場、担当人数、<br>受け付けから保管までの時間。</p></div></div></div>`+footer('説明用の架空案。運用実績ではありません。'),
- 'Move proposal status and uncertainty into the main statement. A tiny footnote cannot undo a bold workload guarantee.');
-pair('literal-before-clever',title('窓口をつなぐ。可能性をひらく。','一つの接点が、無限の価値を生み出します。')+`<div class="main"><div class="cards"><div class="card">つながり</div><div class="card">安心</div><div class="card">未来</div></div></div>`+footer('説明用の架空案。'),
- title('試行案：申請の受付を1か所にまとめる。')+`<div class="main">${svg(text(100,110,'申請者',36)+line(250,100,470,100)+text(345,82,'→',32)+text(500,110,'受付',36)+line(615,100,850,100)+text(710,82,'→',32)+text(885,110,'担当者',36,'#152c36','middle')+text(500,235,'受付で担当を確認し、書類を渡す。',29,'#152c36','middle'),1000,330)}</div>`+footer('説明用の架空案。処理時間の改善は未検証。'),
- 'State the proposed operation and show its actual handoff. Do not invent trust, speed or benefit claims to fill matching cards.');
-const steps=[['受付','書類を受け取り、受付番号を付ける。'],['確認','記入漏れを確認し、担当を決める。'],['通知','結果と次に必要な手続きを伝える。']];
-pair('small-top-heavy',title('手続きを見える化し、価値ある体験へ。')+`<div class="main" style="top:185px"><div class="cards">${steps.map(([a,b])=>`<div class="card"><p style="font-size:18px">${a}</p><p class="tiny">${b}</p></div>`).join('')}</div></div>`+footer('架空の手続き。'),
- title('受付から通知まで、3つの工程を通る。')+`<div class="main">${svg(steps.map(([a,b],i)=>`<circle cx="80" cy="${55+i*125}" r="24" fill="#2b7370"/>`+text(80,64+i*125,String(i+1),24,'#fff','middle')+text(145,65+i*125,a,32)+text(350,65+i*125,b,26)+(i<2?line(80,82+i*125,80,154+i*125,'#8fb6b3'):'' )).join(''),1060,380)}</div>`+footer('架空の手続き。'),
- 'Keep the same concrete information but use the available height and larger aligned labels. Empty space is not fixed by inventing more text.');
-const suppliers=[['A','120','8','4か月','CSV'],['B','60','11','2か月','API・CSV'],['C','200','5','6か月','未確認'],['D','100','9','3か月','CSV']];
-const cols=['案','初期費用','月額','導入期間','データ出力'];
-pair('dense-reference',title('4案それぞれに、選ぶ理由があります。')+`<div class="main"><div class="cards">${suppliers.map(r=>`<div class="card"><p>${r[0]}案</p><p class="tiny">初期${r[1]}万円<br>月額${r[2]}万円<br>${r[3]}<br>出力：${r[4]}</p></div>`).join('')}</div></div>`+footer(),
- title('導入は2〜6か月。C案の出力方法は未確認。')+`<div class="main" data-region="primary"><table><thead><tr>${cols.map(v=>`<th>${v}</th>`).join('')}</tr></thead><tbody>${suppliers.map(row=>`<tr>${row.map(v=>`<td>${v}</td>`).join('')}</tr>`).join('')}</tbody></table><p style="font-size:22px;margin-top:24px">費用は万円。C案のデータ出力は、確認してから判断する。</p></div>`+footer(),
- 'Reference density is appropriate. Keep every required field aligned and preserve unknown entries instead of inventing a verdict.',{readingMode:'reference'});
-pair('image-evidence',title('一杯が生む、新しい価値。','心をつなぐ体験を、ここから。')+`<img class="image-panel" src="{{asset:assets/media/photo.jpg}}" alt="コーヒーカップの写真"><div style="position:absolute;left:640px;top:260px;width:380px"><p>小さな一杯から、<br>新しい物語が始まります。</p></div>`+footer('写真：Rachel Michetti / CC0。'),
- `<img src="{{asset:assets/media/photo.jpg}}" alt="写真のカップと影を観察する" style="position:absolute;left:0;top:0;width:810px;height:720px;object-fit:cover"><div style="position:absolute;left:858px;top:118px;width:355px"><h1 style="font-size:43px">器の縁と、<br>落ちる影。</h1><p class="sub">写真の形と明暗を<br>具体的に観察する。</p></div>`+`<p class="source" style="left:858px;width:355px;font-size:16px">写真：Rachel Michetti / CC0。<br>構図の検討用に切り取り。</p>`,
- 'Let the actual photograph do visual work. Replace an unrelated promise with a concrete viewing task; preserve photographic rights and crop disclosure.');
-pair('source-before-font',title('観測記録のमापनを確認する。')+`<div class="main"><p style="font-size:38px">09:00　6.4℃<br>09:10　6.9℃</p></div>`+footer('文字列の混入を示す、意図的な不良例。'),
- title('観測記録の測定値を確認する。')+`<div class="main"><p style="font-size:38px">09:00　6.4℃<br>09:10　6.9℃</p></div>`+footer('説明用の架空の記録。実際の測定ではありません。'),
- 'A source-language fragment cannot be fixed by merely swapping fonts. Verify the intended language/word and preserve deliberate multilingual content.');
-pair('export-note',title('3年間の総額で比較する。')+`<div class="main"><p style="font-size:42px">A案 408万円　B案 456万円</p><p class="sub">配布用メモ：印刷・PDFでは3年表示が残ります。</p></div>`+footer(),
- title('3年間の総額は、A案が48万円低い。')+`<div class="main"><p style="font-size:58px">A案 <strong>${totalCost({initial:120,monthly:8,months:36,units:'万円'}).value}</strong>万円</p><p style="font-size:58px;margin-top:40px">B案 <strong>${totalCost({initial:60,monthly:11,months:36,units:'万円'}).value}</strong>万円</p><p class="sub">表示条件：36か月。追加作業費と税は含まない。</p></div>`+footer(),
- 'Show the selected horizon and exclusions. Put export behavior in a runbook, not in the audience explanation. Values come from the same cost function.');
-export const lab={title:'Editing and design repair lab',language:'ja',mode:'workshop',readingMode:'live',css,slides:records};
-function pairedPlot(){
- const min=8,max=17,yy=v=>345-(v-min)/(max-min)*290;
- const counts=new Map();for(const r of result.rows)counts.set(r.after,(counts.get(r.after)||0)+1);
- const seen=new Map();
- const marks=result.rows.map(r=>{const col=r.after>r.before?'#ae593b':'#2b7370';const k=seen.get(r.after)||0;seen.set(r.after,k+1);const x=770+(counts.get(r.after)>1?(k-.5)*16:0);
- return line(200,yy(r.before),x,yy(r.after),col,3)+`<circle cx="200" cy="${yy(r.before)}" r="7" fill="${col}"/><circle cx="${x}" cy="${yy(r.after)}" r="7" fill="${col}"/>`+text(168,yy(r.before)+8,String(r.before),24,col,'end');}).join('');
- const labels=[...counts].map(([value,count])=>text(802,yy(value)+8,String(value)+(count>1?'（'+count+'試料）':''),24)).join('');
- return svg(line(200,30,200,355,'#c1cecf',2)+line(770,30,770,355,'#c1cecf',2)+marks+labels+text(200,403,'条件A',27,'#152c36','middle')+text(770,403,'条件B',27,'#152c36','middle'),1000,440,'同じ試料の条件Aと条件Bの温度を結ぶ。Bの値は4試料で低く、1試料で高い。');
+/** BEFORE only: ring the faulty words. The ring appears at build 1, with the note. */
+const fault = text => `<span class="lab-fault">${text}<i class="lab-ring" data-step="1" data-motion="reveal" aria-hidden="true"></i></span>`;
+/** BEFORE only: a ring around a whole positioned container (put it inside the container). */
+const ringBox = '<i class="lab-ring" data-step="1" data-motion="reveal" aria-hidden="true"></i>';
+/** BEFORE only: the diagnosis note (what is wrong · the fix), placed in free space. */
+const note = (what, fix, style) => `<p class="lab-note" data-step="1" data-motion="reveal" data-qa-overlap="diagnosis note drawn over the page on purpose" style="${style}">${what}<span>${fix}</span></p>`;
+/** BEFORE only: a ring drawn inside a figure, in the figure's own coordinates. */
+const svgRing = (x, y, w, h, r = 12) => el('rect', { x, y, width: w, height: h, rx: r, class: 'lab-svg-ring', 'data-step': 1, 'data-motion': 'reveal', 'aria-hidden': 'true' });
+
+const labSlides = [];
+/**
+ * Register a pair. `page(v, tag)` returns the page for v = 'before' | 'after'; `tag` is the
+ * lab line for the right half of the source row. `failure` names the one failure, `repair`
+ * the operation that fixes it, `lesson` the notes an agent reads (failure, repair, what must remain).
+ */
+function pair(id, { failure, repair, page, lesson, className = '', readingMode, copyWaivers }) {
+  const base = { study: true, className: `st cs-wa-ai lab ${className}`.trim(), exportPolicy: 'final', ...(readingMode ? { readingMode } : {}) };
+  labSlides.push({ ...base, id: `${id}-before`, title: `修正前：${failure}`, ...(copyWaivers ? { copyWaivers } : {}),
+    content: page('before', `<b class="is-before">修正前</b>${failure}`),
+    notes: `Intentional failure (one): ${lesson.failure}\nClick once to reveal the diagnosis mark; the final build shows it.\nDo not copy this page.` });
+  labSlides.push({ ...base, id: `${id}-after`, title: `修正後：${repair}`,
+    content: page('after', `<b>修正後</b>${repair}`),
+    notes: `Repair: ${lesson.repair}\nMust remain: ${lesson.keep}\nAll values are synthetic; replace them, do not reuse them.` });
 }
-export const talk={title:'A complete small measurement story',language:'ja',mode:'workshop',readingMode:'live',css,slides:[
- {study:true,id:'protocol',title:'何を比べたか',content:title('同じ試料を、条件Aと条件Bで測る。')+`<div class="main">${svg(text(120,120,'条件A',40)+line(300,107,650,107)+text(475,87,'→',40)+text(710,120,'条件B',40)+text(475,235,'全6試料。A、Bの順で測定。',30,'#152c36','middle'),1000,340)}</div>`+footer('説明用の架空実験。'),notes:'Protocol before interpretation. No efficacy claim.'},
- {study:true,id:'paired-result',title:'5試料の結果',content:title('5試料中4試料で、条件Bの温度が低い。','平均差 −1.2℃（条件B − 条件A）。1試料は欠測。')+`<div class="main" style="top:218px" data-region="primary">${pairedPlot()}</div>`+footer('説明用の架空実験。差の標本標準偏差は1.3℃。'),notes:'All plotted values, sample count, mean and sample SD come from the same synthetic paired result. One pair worsens; this remains visible.'},
- {study:true,id:'next-measurement',title:'次に確認すること',content:title('条件Bの効果とまでは、まだ言い切れない。')+`<div class="main"><table><thead><tr><th>今回の制約</th><th>次の測定で変えること</th></tr></thead><tbody><tr><td>測定順序が固定</td><td>順序を無作為化して比較する</td></tr><tr><td>1試料に欠測</td><td>欠測の理由も記録する</td></tr><tr><td>対象はこの6試料だけ</td><td>条件を増やし、再現性を確かめる</td></tr></tbody></table></div>`+footer('説明用の架空実験。次の測定案であり、実施済みではありません。'),notes:'Limitations stay next to concrete changes; no invented sample-size guarantee or inspirational conclusion.'}
-]};
+
+// ════════════════════════════════════════════════════════════════════════════
+// 1 · 金額と率 — a 500 → 650 change reported as "30百万円"
+// ════════════════════════════════════════════════════════════════════════════
+const sales = { prior: 500, current: 650 };            // 百万円・首都圏12店舗とEC、税抜。2025→2026年度
+const salesDrivers = [                                  // 増減の内訳（百万円）
+  { label: '新店3店', value: 90 },
+  { label: 'EC', value: 45 },
+  { label: '既存店', value: 15 },
+];
+const growth = change(quantity(sales.prior, '百万円'), quantity(sales.current, '百万円'));
+if (sum(salesDrivers.map(d => d.value)) !== growth.delta.value) throw Error('sales drivers must add up to the change');
+const newStoreShare = salesDrivers[0].value / growth.delta.value;
+
+pair('amount-and-rate', {
+  failure: '伸び率の数字を、金額の差として書いた',
+  repair: '差額と伸び率を別々に計算し、見出しと図で同じ値を使う',
+  className: 'st--rail',
+  lesson: {
+    failure: 'the headline reports the growth rate (30) with the amount unit (百万円); the chart and rail say +150.',
+    repair: 'compute change() once; headline, rail and waterfall read delta (150 百万円) and percent (30%) from the same object.',
+    keep: 'amount and rate both visible, the unit, the two fiscal years and the source scope.',
+  },
+  page: (v, tag) => labPage({
+    head: `首都圏の売上は前年度から${v === 'before'
+      ? fault(nw(`${num(growth.percent)}百万円`))                       // the failure: the rate, typed with the amount's unit
+      : nw(`${num(growth.delta.value)}百万円`)}増えた${v === 'after' ? nw(`（+${num(growth.percent)}%）`) : ''}`,
+    quiet: `増えた分の${num(newStoreShare * 10)}割は、春に開いた新店3店による`,
+    body: `<figure class="st-fig" data-region="primary">${waterfallChart({
+      id: `sales-${v}`, width: 800, height: 482, fontSize: 18, locale: 'ja', format: { digits: 0 },
+      title: '首都圏の売上の増減（百万円）',
+      desc: `${sales.prior}百万円から${sales.current}百万円へ。増加${growth.delta.value}百万円の内訳は${salesDrivers.map(d => `${d.label}${d.value}`).join('、')}。`,
+      data: [{ label: '2025年度', value: sales.prior, total: true }, ...salesDrivers, { label: '2026年度', value: sales.current, total: true }],
+      positiveColor: 'var(--ss-accent)', className: 'lab-wf',
+      extra: ({ x, y }) => textLines([`増加分の${num(newStoreShare * 100)}%`], { x: x.center(salesDrivers[0].label), y: y(sales.prior) + 30, size: 17, anchor: 'middle', fill: 'var(--ss-accent)', weight: 600 }),
+    })}</figure>
+<div class="st-rail" data-region="support">
+  <div class="st-kpi"><b>+${num(growth.delta.value)}<small>百万円</small></b><span>増加額　${sales.current} − ${sales.prior}</span></div>
+  <hr class="st-rule">
+  <div class="st-kpi"><b>+${num(growth.percent)}<small>%</small></b><span>伸び率　${growth.delta.value} ÷ ${sales.prior}</span></div>
+</div>
+${v === 'before' ? note('「30」は伸び率（%）の数字。', `金額の差は ${sales.current} − ${sales.prior} ＝ ${growth.delta.value}百万円。`, 'left:660px;top:116px;width:380px') : ''}`,
+    source: `${SYNTH}・首都圏12店舗とECの税抜売上。2025年度と2026年度`,
+    tag,
+  }),
+});
+
+// ════════════════════════════════════════════════════════════════════════════
+// 2 · 差の向き — bars use 従来−新, the summary uses 新−従来
+// ════════════════════════════════════════════════════════════════════════════
+// 温度上昇（℃）＝最高セル温度 − 室温。2C放電30分、室温25℃、冷却水20℃。M5は新プレートで熱電対が断線。
+export const modules = [
+  { id: 'M1', old: 12.4, new: 10.5 },
+  { id: 'M2', old: 11.0, new: 10.2 },
+  { id: 'M3', old: 14.2, new: 12.1 },
+  { id: 'M4', old: 13.1, new: 14.0 },
+  { id: 'M5', old: 15.3, new: null },
+  { id: 'M6', old: 16.0, new: 14.3 },
+];
+export const cooling = paired(modules, { before: 'old', after: 'new', units: '℃' });   // 新 − 従来 for every output
+const worse = cooling.rows.filter(r => r.difference > 0);
+const missingIds = cooling.missing.map(i => modules[i].id);
+
+/** Paired differences per module on one axis. `flip` reproduces the BEFORE bug (従来 − 新). */
+function differenceChart({ id, flip = false, width = 800, height = 482 }) {
+  const size = 18, rows = modules.map((m, i) => ({ id: m.id, d: cooling.rows.find(r => r.index === i)?.difference ?? null }));
+  const plot = d => (flip ? -d : d);
+  const lim = niceDomain([0, Math.max(...rows.filter(r => r.d != null).map(r => Math.abs(r.d)))], 4)[1];
+  const top = flip ? 20 : 54, bottom = 84, left = 70, right = 70;
+  const x = linear([-lim, lim], [left, width - right]);
+  const y = band(rows.map(r => r.id), [top, height - bottom], { inner: 0.36, outer: 0.08 });
+  const tick = v => (v === 0 ? '0' : signed(v, 0));
+  const parts = [axis(x, { orient: 'bottom', at: height - bottom + 10, grid: [top - 6, height - bottom + 4], size: 16, format: tick, count: 4 })];
+  for (const r of rows) {
+    const yy = y(r.id);
+    parts.push(textLines([r.id], { x: left - 18, y: yy + y.bw / 2, size, anchor: 'end', valign: 'middle', fill: 'var(--ss-ink)', weight: 600 }));
+    if (r.d == null) {
+      parts.push(textLines(['欠測（熱電対の断線）'], { x: x(0) + 14, y: yy + y.bw / 2, size: 17, valign: 'middle', fill: 'var(--ss-muted)' }));
+      continue;
+    }
+    const v = plot(r.d), x0 = x(0), x1 = x(v), better = r.d < 0;
+    parts.push(el('path', { d: barPath(Math.min(x0, x1), yy, Math.abs(x1 - x0), y.bw, 3, v >= 0 ? 'right' : 'left'), fill: better ? 'var(--ss-accent)' : 'var(--ss-negative)' }));
+    parts.push(textLines([signed(v)], { x: x1 + (v >= 0 ? 10 : -10), y: yy + y.bw / 2, size, anchor: v >= 0 ? 'start' : 'end', valign: 'middle', fill: 'var(--ss-ink)', weight: 700, attrs: { 'font-variant-numeric': 'tabular-nums' } }));
+  }
+  if (!flip) {                                           // which side means what, stated where the eye starts
+    parts.push(textLines(['← 新プレートで小さい'], { x: x(0) - 12, y: 22, size: 17, anchor: 'end', fill: 'var(--ss-accent)', weight: 600 }));
+    parts.push(textLines(['新プレートで大きい →'], { x: x(0) + 12, y: 22, size: 17, fill: 'var(--ss-negative)', weight: 600 }));
+  }
+  parts.push(textLines([flip ? '温度上昇の差（℃）' : '温度上昇の差（新プレート − 従来プレート、℃）'], { x: (left + width - right) / 2, y: height - 18, size: 17, anchor: 'middle', fill: 'var(--ss-muted)' }));
+  return svgRoot({ id, width, height, title: '電池モジュール別の温度上昇の差', desc: flip
+    ? '棒は従来プレート−新プレートで描かれている。'
+    : `新プレート−従来プレート。${cooling.below}台で負、${cooling.above}台で正、${missingIds.join('・')}は欠測。` }, ...parts);
+}
+
+pair('paired-sign', {
+  failure: '図の棒と平均で、差の引き算の向きが逆',
+  repair: '差は「新 − 従来」に統一し、棒・軸・平均をそろえる',
+  className: 'st--rail',
+  lesson: {
+    failure: 'the bars plot old − new (mostly positive) while the rail reports the mean of new − old (−1.1 ℃).',
+    repair: 'one subtraction order (paired(..., after − before)) feeds the bars, the axis title, the side labels and the summary.',
+    keep: 'the module that got worse (M4), the missing pair (M5) and the n−1 standard deviation.',
+  },
+  page: (v, tag) => labPage({
+    head: `新プレートで温度上昇が小さくなったのは、${nw(`${cooling.n}台中${cooling.below}台`)}`,
+    quiet: `平均の差は${num(cooling.mean, 1)}℃（新 − 従来）。${worse.map(r => `${r.id}だけは逆に${num(r.difference, 1)}℃大きい`).join('')}`,
+    body: `<figure class="st-fig" data-region="primary">${differenceChart({ id: `paired-${v}`, flip: v === 'before' })}</figure>
+<div class="st-rail" data-region="support">
+  <div class="st-kpi">${v === 'before' ? fault(`<b class="is-accent">${num(cooling.mean, 1)}<small>℃</small></b>`) : `<b class="is-accent">${num(cooling.mean, 1)}<small>℃</small></b>`}<span>平均の差（新 − 従来、${cooling.n}台）</span></div>
+  <hr class="st-rule">
+  <div class="st-kpi"><b>${num(cooling.sampleSD, 1)}<small>℃</small></b><span>差の標準偏差（n − 1）。ばらつきは平均の差と同じ程度</span></div>
+  <hr class="st-rule">
+  <p class="st-text">${missingIds.join('・')}は新プレートの測定中に熱電対が断線。平均は残る${cooling.n}台で計算</p>
+</div>
+${v === 'before' ? note('棒は「従来 − 新」、<br>平均は「新 − 従来」で計算。', '図ではほとんどが＋なのに、<br>平均は−になる。', 'left:132px;top:192px;width:316px') : ''}`,
+    source: `${SYNTH}・電池モジュール6台、2C放電30分、室温25℃。温度上昇＝最高セル温度 − 室温`,
+    tag,
+  }),
+});
+
+// ════════════════════════════════════════════════════════════════════════════
+// 3 · 欠測 — a line drawn straight across a month that was never measured
+// ════════════════════════════════════════════════════════════════════════════
+const turbidity = [3.1, 2.8, 4.0, 5.2, 6.8, 11.4, null, 12.9, 8.1, 5.6, 3.9, 3.3];  // 度・中川橋、毎月第1水曜に採水（2025年）
+const turbidityGap = { month: 7, reason: '増水で採水を中止' };
+const turbidityLimit = 10;                                 // 度・浄水場が取水を絞る目安（架空の運用基準）
+const turbidityPoints = turbidity.map((y, i) => ({ x: i + 1, y }));
+const overLimit = turbidityPoints.filter(p => p.y != null && p.y > turbidityLimit).map(p => `${p.x}月`);
+const observedRuns = segments(turbidityPoints).map(r => `${r[0].x}〜${r.at(-1).x}月`);   // stretches actually measured
+if (turbidity[turbidityGap.month - 1] !== null) throw Error('the gap month must be null in the data');
+
+pair('missing-is-not-a-line', {
+  failure: '欠測した7月を、線でつないで描いた',
+  repair: '欠測の月で線を切り、理由を書き添える',
+  lesson: {
+    failure: 'June and August are joined by a straight line, so the unmeasured flood month reads as an observed transition.',
+    repair: 'keep July as null: lineChart breaks the line there (segments() in quant.mjs gives the same observed stretches for the description), and a band names the gap and its reason.',
+    keep: 'every observed value, the threshold, the reason for the gap; missing is neither zero nor an average of neighbours.',
+  },
+  page: (v, tag) => {
+    const kept = v === 'before' ? turbidityPoints.filter(p => p.y != null) : turbidityPoints;  // BEFORE: missing month filtered out, so one line bridges it
+    const chart = lineChart({
+      id: `turbidity-${v}`, width: 1152, height: 482, fontSize: 19, locale: 'ja', xType: 'linear',
+      title: '中川橋の濁度（月1回の採水、2025年）',
+      desc: `濁度は${overLimit.join('と')}に${turbidityLimit}度を超えた。観測は${observedRuns.join('と')}で、${turbidityGap.month}月は${turbidityGap.reason}のため欠測。`,
+      series: [{ name: '中川橋', points: kept.map(p => [p.x, p.y]) }],
+      xTicks: 12, xFormat: m => `${m}月`, xDomain: [1, 12], yDomain: [0, 15], yTicks: 3, unit: '濁度（度）',
+      markers: 'all', endLabels: false, format: { digits: 1 },
+      refLines: [{ y: turbidityLimit, label: `取水を絞る目安 ${turbidityLimit}度`, labelPos: 'start' }],
+      bands: v === 'after' ? [{ from: turbidityGap.month - 0.42, to: turbidityGap.month + 0.42 }] : [],
+      extra: ({ x, y }) => v === 'after'
+        ? textLines(['欠測', turbidityGap.reason], { x: x(turbidityGap.month), y: y(7.2), size: 19, anchor: 'middle', fill: 'var(--ss-ink)', weight: 600, lineHeight: 1.35 })
+        : svgRing(x(6) - 22, y(13.5), x(8) - x(6) + 44, y(10.4) - y(13.5)),
+    });
+    return labPage({
+      head: `中川橋の濁度は、${overLimit.join('と')}に${turbidityLimit}度を超えた`,
+      quiet: `${turbidityGap.month}月は${turbidityGap.reason}したため、値は分からない`,
+      body: `<figure class="st-fig" data-region="primary">${chart}</figure>
+${v === 'before' ? note('7月は測っていないのに、線が6月と8月をつないでいる。', '観測した変化のように見えてしまう。', 'left:120px;top:228px;width:520px') : ''}`,
+      source: `${SYNTH}・中川橋の定点、毎月第1水曜に採水（2025年）。${v === 'before' ? '7月は欠測' : '取水の目安は架空の運用基準'}`,
+      tag,
+    });
+  },
+});
+
+// ════════════════════════════════════════════════════════════════════════════
+// 4 · 分かれ道 — three alternative outcomes drawn as a sequence
+// ════════════════════════════════════════════════════════════════════════════
+const returns = {                                          // 電動工具の返品、2026年9月受付分。日数は受付から発送までの営業日
+  received: 412,
+  outcomes: [
+    { id: 'back', label: '返却', condition: '不具合なし', count: 255, days: 2 },
+    { id: 'fix', label: '修理', condition: '修理できる不具合', count: 119, days: 9 },
+    { id: 'swap', label: '交換', condition: '修理できない不具合', count: 38, days: 4 },
+  ],
+};
+if (sum(returns.outcomes.map(o => o.count)) !== returns.received) throw Error('outcomes must add up to the returns received');
+const share = o => o.count / returns.received;
+// The meaning first: inspection leads to exactly one of three outcomes, each under a stated condition.
+const branchGraph = {
+  kind: 'alternatives', origin: 'inspect', outcomes: returns.outcomes.map(o => o.id),
+  nodes: [{ id: 'inspect', label: '検査' }, ...returns.outcomes.map(o => ({ id: o.id, label: o.label }))],
+  edges: returns.outcomes.map(o => ({ from: 'inspect', to: o.id, kind: 'condition', label: o.condition })),
+};
+validateGraph(branchGraph);
+// The BEFORE drawing as a graph: validateGraph() refuses it, which is the point.
+const chainEdges = returns.outcomes.slice(1).map((o, i) => ({ from: returns.outcomes[i].id, to: o.id, kind: 'sequence' }));
+let chainRejected = '';
+try { validateGraph({ ...branchGraph, edges: [{ ...branchGraph.edges[0] }, ...chainEdges] }); } catch (e) { chainRejected = e.message; }
+
+pair('conditional-outcomes', {
+  failure: '検査後の分かれ道を、一本の順路として描いた',
+  repair: '検査から3つの行き先へ、条件を書いて直接分ける',
+  lesson: {
+    failure: `returned items appear to go 返却 → 修理 → 交換 in sequence. validateGraph() rejects that drawing: "${chainRejected}".`,
+    repair: 'declare the alternatives graph, validate it, then draw one conditional edge from the inspection to each outcome.',
+    keep: 'the three outcomes, their conditions, counts that add up to 412, and that outcomes exclude each other.',
+  },
+  page: (v, tag) => {
+    const nodes = [
+      { id: 'in', label: '返品受付', sub: `9月 ${num(returns.received)}件`, kind: 'terminal' },
+      { id: 'inspect', label: '全数検査', kind: 'decision' },
+      ...returns.outcomes.map(o => ({ id: o.id, label: o.label, sub: `${o.count}件（${num(share(o) * 100)}%）\n発送まで平均${o.days}日`, emphasis: o === returns.outcomes[0] })),
+    ];
+    const edges = v === 'before'
+      ? [{ from: 'in', to: 'inspect' }, { from: 'inspect', to: 'back' }, ...chainEdges.map(e => ({ from: e.from, to: e.to }))]
+      : [{ from: 'in', to: 'inspect' }, ...branchGraph.edges.map(e => ({ from: e.from, to: e.to, label: e.label }))];
+    const diagram = flowDiagram({
+      id: `returns-${v}`, width: 1152, height: 482, fontSize: 22, nodeMaxWidth: 230, nodeMinWidth: 130, gap: 40,
+      title: '返品の検査と、その後の行き先',
+      desc: v === 'before' ? '返却、修理、交換が順番につながって描かれている。'
+        : `検査の結果で、${returns.outcomes.map(o => `${o.condition}なら${o.label}`).join('、')}に分かれる。`,
+      nodes, edges,
+      extra: ctx => (v === 'before' ? svgRing(ctx.nodes.back.x - 16, ctx.nodes.back.y - 16, ctx.nodes.swap.x + ctx.nodes.swap.w - ctx.nodes.back.x + 32, ctx.nodes.back.h + 32) : ''),
+    });
+    const top = returns.outcomes[0];
+    return labPage({
+      head: `返品は検査の結果で、${returns.outcomes.map(o => o.label).join('・')}のどれか1つに進む`,
+      quiet: `9月の${num(returns.received)}件では、${num(share(top) * 100)}%が${top.condition}で${top.label}`,
+      body: `<figure class="st-fig" data-region="primary">${diagram}</figure>
+${v === 'before' ? note('返却・修理・交換は順番ではない。', '検査の結果で、どれか1つに分かれる。', 'left:690px;top:520px;width:420px') : ''}`,
+      source: `${SYNTH}・電動工具の返品（2026年9月受付分）。日数は受付から発送までの営業日`,
+      tag,
+    });
+  },
+});
+
+// ════════════════════════════════════════════════════════════════════════════
+// 5 · 色の対応 — a three-colour legend over three identical ink lines
+// ════════════════════════════════════════════════════════════════════════════
+const weeks = ['7/7', '7/14', '7/21', '7/28', '8/4', '8/11', '8/18', '8/25', '9/1', '9/8', '9/15', '9/22'];
+const queues = [                                           // 平均待ち時間（分）・区民課の受付窓口、平日9〜17時
+  { name: '本庁舎', values: [18, 17, 19, 18, 17, 18, 19, 18, 17, 18, 18, 17] },
+  { name: '北支所', values: [16, 17, 16, 18, 17, 22, 25, 27, 29, 31, 33, 34] },
+  { name: '南支所', values: [12, 13, 12, 12, 14, 13, 12, 13, 13, 12, 13, 12] },
+];
+const queueChange = { week: '8/11', text: '8/11、窓口を3席から2席に減らす' };
+const north = queues.find(q => q.name === '北支所');
+const othersRange = extent(queues.filter(q => q !== north).flatMap(q => q.values));
+
+pair('encoding-map', {
+  failure: '凡例の色と、線の色が対応していない',
+  repair: '色の対応を1つにし、線の端に名前を直接書く',
+  lesson: {
+    failure: 'a three-colour legend sits over three lines drawn in the same ink; no line can be identified.',
+    repair: 'one encoding map: the highlighted series takes the accent, the others context grey, and every line is named at its end.',
+    keep: 'all three series on one scale, the week axis, the event that explains the change.',
+  },
+  page: (v, tag) => {
+    const legendItems = queues.map((q, i) => ({ label: q.name, color: `var(--ss-cat-${i + 1})` }));
+    const chart = lineChart({
+      id: `queues-${v}`, width: 1152, height: 482, fontSize: 19, locale: 'ja',
+      title: '窓口別の平均待ち時間（分、週ごと）',
+      desc: `北支所だけが8月から伸び、${north.values.at(-1)}分。本庁舎と南支所は${othersRange[0]}〜${othersRange[1]}分。`,
+      x: weeks, unit: '平均待ち時間（分）', yDomain: [0, 40], yTicks: 4, xEvery: 1,
+      series: v === 'before' ? queues.map(q => ({ ...q, color: 'var(--ss-ink)' })) : queues,
+      highlight: v === 'after' ? north.name : null, endLabels: v === 'after', markers: v === 'after' ? 'last' : 'none',
+      format: { digits: 0, suffix: '分' },
+      annotate: v === 'after' ? [{ series: north.name, at: queueChange.week, text: queueChange.text, dx: -40, dy: -70, size: 19, width: 340 }] : [],
+      after: v === 'before'                                  // the template's legend, top right; the ring encloses it
+        ? legend(legendItems, { x: 760, y: 14, size: 17, gap: 28 }) + svgRing(744, -6, 392, 40)
+        : '',
+    });
+    return labPage({
+      head: `${v === 'after' ? '<em>北支所</em>' : '北支所'}の待ち時間だけが8月から伸び、${north.values.at(-1)}分になった`,
+      quiet: `本庁舎と南支所は${othersRange[0]}〜${othersRange[1]}分で、ほぼ横ばい`,
+      body: `<figure class="st-fig" data-region="primary">${chart}</figure>
+${v === 'before' ? note('凡例は3色なのに、線はすべて同じ色。', 'どの線が北支所なのか、読み取れない。', 'left:130px;top:530px;width:400px') : ''}`,
+      source: `${SYNTH}・区民課の受付窓口、平日9〜17時の平均待ち時間（週ごと、2026年）`,
+      tag,
+    });
+  },
+});
+
+// ════════════════════════════════════════════════════════════════════════════
+// 6 · 試算の範囲 — an estimate asserted in the headline, qualified in 12 px
+// ════════════════════════════════════════════════════════════════════════════
+const closeTasks = [                                       // 月次決算の工程（営業日）。now＝2026年上期の実績平均、est＝ベンダー試算
+  { name: '仕訳の締め', now: 1.5, est: 1.0 },
+  { name: '売掛金の照合', now: 2.0, est: 0.5 },
+  { name: '固定資産・引当金', now: 1.0, est: 1.0 },
+  { name: '連結とレビュー', now: 1.5, est: 1.5 },
+];
+const closeNow = sum(closeTasks.map(t => t.now)), closeEst = sum(closeTasks.map(t => t.est));
+const changedTasks = closeTasks.filter(t => t.est !== t.now).map(t => t.name);
+const trial = { period: '2027年1〜3月', checks: ['締めまでの営業日数', '手作業で残る照合の件数', '旧システムとの差異'] };
+
+pair('proposal-scope', {
+  failure: '試算を言い切りの見出しにし、注記を小さくした',
+  repair: '「試算」と確かめる方法を、見出しと図に書く',
+  lesson: {
+    failure: 'the headline states a vendor estimate as a fact; the only qualification is a 12 px note under the chart.',
+    repair: 'name the status (vendor estimate) in the headline and the bar label, mark the estimated bar, and state how it will be measured.',
+    keep: 'the current measured close, the estimated tasks, the size of the claimed saving.',
+  },
+  page: (v, tag) => {
+    const rows = v === 'before' ? ['現在', '新システム'] : ['現在（2026年上期の実績）', '新システム（ベンダー試算）'];
+    const chart = stackedBarChart({
+      id: `close-${v}`, width: 1152, height: 330, fontSize: 19, locale: 'ja', labelWidth: 260,
+      title: '月次決算にかかる営業日（工程別）',
+      desc: `現在${num(closeNow, 1)}営業日、新システムは試算で${num(closeEst, 1)}営業日。変わるのは${changedTasks.join('と')}。`,
+      categories: rows, series: closeTasks.map(t => ({ name: t.name, values: [t.now, t.est] })),
+      highlight: changedTasks, format: { digits: 1, suffix: '日' }, axis: true, rowHeight: 92,
+      extra: ({ x, y }) => v === 'after'
+        ? el('rect', { x: x(0) - 4, y: y(rows[1]) - 4, width: x(closeEst) - x(0) + 8, height: y.bw + 8, rx: 4, fill: 'none', stroke: 'var(--ss-ink)', 'stroke-width': 1.5, 'stroke-dasharray': '6 5' })
+        : '',
+    });
+    return labPage({
+      head: v === 'before'
+        ? `新システムで、月次決算は${num(closeNow - closeEst)}営業日早く締まる`
+        : `ベンダー試算では、月次決算は${num(closeNow)}営業日から${num(closeEst)}営業日に縮む`,
+      quiet: v === 'before' ? '売掛金の照合が自動になり、手作業が減る' : `社内での実測はまだない。${trial.period}の並行稼働で確かめる`,
+      body: `<figure class="st-fig st-top" data-region="primary" style="top:200px;bottom:auto;height:330px">${chart}</figure>
+${v === 'before'
+    ? `<p class="lab-tiny" style="top:556px">${fault('※ベンダー提示の試算値です。当社の環境での実測ではありません。')}</p>`
+    : `<p class="lab-under" style="top:572px"><b>並行稼働で測ること</b>　${trial.checks.join('、')}。点線の枠は試算の値</p>`}
+${v === 'before' ? note('見出しは実測のように言い切り、', '「試算」は12pxの注記にしか書かれていない。', 'left:640px;top:584px;width:420px') : ''}`,
+      source: `${SYNTH}・経理部の月次決算（営業日）。${v === 'before' ? '' : '新システムの値はベンダー提示の試算'}`,
+      tag,
+    });
+  },
+});
+
+// ════════════════════════════════════════════════════════════════════════════
+// 7 · 指示を先に — a slogan where the traveller needs an instruction
+// ════════════════════════════════════════════════════════════════════════════
+const journey = [                                          // 架空の路線。乗換駅には中間改札がある
+  { station: '東浜駅', role: '乗車', act: 'きっぷを改札に入れる', result: '取り出して持っておく' },
+  { station: '中央駅', role: '乗り換え', act: '乗換改札にもう一度入れる', result: 'また戻ってくる' },
+  { station: '北山駅', role: '降車', act: '出口の改札に入れる', result: 'ここで回収される' },
+];
+const lines = ['みなと線', '北山線'];
+
+/** A route strip: stations at equal steps, what the traveller does under each. Geometry from `journey`. */
+function journeyStrip(id, { width = 1152, height = 400 } = {}) {
+  const x = i => 150 + i * ((width - 300) / (journey.length - 1)), trackY = 120, last = journey.length - 1;
+  const parts = [el('line', { x1: x(0), x2: x(last), y1: trackY, y2: trackY, stroke: 'var(--ss-ink)', 'stroke-width': 9, 'stroke-linecap': 'round' })];
+  lines.forEach((name, i) => parts.push(textLines([name], { x: (x(i) + x(i + 1)) / 2, y: trackY - 22, size: 19, anchor: 'middle', fill: 'var(--ss-muted)', weight: 600 })));
+  journey.forEach((s, i) => {
+    const end = i === last, c = end ? 'var(--ss-accent)' : 'var(--ss-ink)';
+    parts.push(el('circle', { cx: x(i), cy: trackY, r: 19, fill: end ? c : 'var(--ss-paper)', stroke: c, 'stroke-width': 7 }));
+    parts.push(textLines([`${s.station}（${s.role}）`], { x: x(i), y: 40, size: 26, anchor: 'middle', fill: 'var(--ss-ink)', weight: 700 }));
+    parts.push(textLines([s.act], { x: x(i), y: 196, size: 22, anchor: 'middle', fill: 'var(--ss-ink)' }));
+    parts.push(textLines(['↓'], { x: x(i), y: 240, size: 22, anchor: 'middle', fill: c }));
+    parts.push(textLines([s.result], { x: x(i), y: 286, size: 26, anchor: 'middle', fill: c, weight: 700 }));
+  });
+  parts.push(textLines([`途中で捨てると、${journey[last].station}で${journey[0].station}からの運賃をもう一度払うことになる。`], { x: width / 2, y: 372, size: 21, anchor: 'middle', fill: 'var(--ss-muted)' }));
+  return svgRoot({ id, width, height, title: 'きっぷの扱い：乗車から降車まで', desc: journey.map(s => `${s.station}：${s.act}。${s.result}`).join('。') + '。' }, ...parts);
+}
+
+pair('literal-before-clever', {
+  failure: 'すべき行動の代わりに、うたい文句を見出しにした',
+  repair: '利用者がすることを、そのまま見出しに書く',
+  lesson: {
+    failure: 'the headline promises "smoothness" and never says what to do; the instruction is buried in the diagram.',
+    repair: 'write the direct instruction first (keep the ticket until the last gate); keep a friendly tone only after the meaning works.',
+    keep: 'the three gates, what happens to the ticket at each, the consequence of losing it.',
+  },
+  page: (v, tag) => labPage({
+    head: v === 'before' ? fault('3つのステップで、乗り換えをもっとスムーズに。') : 'きっぷは、最後の改札を出るまで捨てずに持っておく',
+    quiet: v === 'before' ? 'はじめての方も、安心してご利用いただけます' : '乗換駅の改札に入れたきっぷは、もう一度戻ってくる',
+    body: `<figure class="st-fig" data-region="primary" style="top:216px">${journeyStrip(`journey-${v}`)}</figure>
+${v === 'before' ? note('何をすればよいかが書かれていない。', '要点（きっぷを最後まで持つ）を見出しに書く。', 'left:780px;top:62px;width:400px') : ''}`,
+    source: `${SYNTH}・架空の路線の乗り換え案内（はじめての利用者向け）`,
+    tag,
+  }),
+});
+
+// ════════════════════════════════════════════════════════════════════════════
+// 8 · 余白の配分 — small cards crowd the top while half the page is empty
+// ════════════════════════════════════════════════════════════════════════════
+const checkupSteps = [                                     // 健診の受診から結果の到着まで（営業日）。2026年4〜9月の受診者1,240人の平均
+  { label: '受診・採血', days: 0.5, note: '受診の当日。尿と血液の検体を採る' },
+  { label: '検体検査', days: 1, note: '提携の検査センターで測定する' },
+  { label: '医師の判定', days: 3, note: '所見がある人は、2人の医師が確認する' },
+  { label: '印刷・郵送', days: 1.5, note: '判定の翌営業日に発送する' },
+];
+const checkupTotal = sum(checkupSteps.map(s => s.days));
+const slowest = [...checkupSteps].sort((a, b) => b.days - a.days)[0];
+
+/** Steps as rows, durations as bars on one day axis (a small Gantt). */
+function stepTimeline(id, { width = 1152, height = 470 } = {}) {
+  const textW = 470, x = linear([0, Math.ceil(checkupTotal)], [textW + 40, width - 70]);
+  const y = band(checkupSteps.map(s => s.label), [8, height - 56], { inner: 0.3, outer: 0.05 });
+  const parts = [axis(x, { orient: 'bottom', at: height - 46, grid: [0, height - 52], size: 16, format: d => `${d}日`, count: 6 })];
+  let start = 0;
+  for (const s of checkupSteps) {
+    const yy = y(s.label), hl = s === slowest, fill = hl ? 'var(--ss-accent)' : 'var(--ss-context)';
+    parts.push(textLines([s.label], { x: 0, y: yy + 30, size: 22, fill: 'var(--ss-ink)', weight: 700 }));
+    parts.push(textLines(wrapText(s.note, textW, 19), { x: 0, y: yy + 64, size: 19, fill: 'var(--ss-muted)', lineHeight: 1.45 }));
+    parts.push(el('rect', { x: x(start), y: yy + 14, width: x(start + s.days) - x(start) - 2, height: y.bw - 28, rx: 3, fill }));
+    parts.push(textLines([`${num(s.days, s.days % 1 ? 1 : 0)}日`], { x: x(start + s.days) + 10, y: yy + y.bw / 2, size: 20, valign: 'middle', fill: hl ? 'var(--ss-accent)' : 'var(--ss-ink)', weight: 700 }));
+    start += s.days;
+  }
+  return svgRoot({ id, width, height, title: '健診の受診から結果が届くまでの工程と日数', desc: `合計${checkupTotal}営業日。${slowest.label}が${slowest.days}日で最も長い。` }, ...parts);
+}
+
+pair('small-top-heavy', {
+  failure: '小さな枠4つが上に詰まり、下半分が空いている',
+  repair: '日数を長さで描き、説明を読める大きさにする',
+  lesson: {
+    failure: 'four boxed steps with 14 px text sit in the top third; the lower half of the page is empty.',
+    repair: 'allocate the page to the evidence: one row per step at reading size, durations drawn as lengths on a shared day axis.',
+    keep: 'every step, its explanation and its duration; the total and the slowest step.',
+  },
+  page: (v, tag) => labPage({
+    head: `健診の結果は、受診から平均${checkupTotal}営業日で届く`,
+    quiet: `いちばん長いのは${v === 'after' ? `<em>${slowest.label}</em>` : slowest.label}で、${slowest.days}日かかる`,
+    body: v === 'before'
+      ? `<div class="lab-cards" data-region="primary">${checkupSteps.map(s => `<div class="lab-card"><h3>${s.label}</h3><p>${s.note}</p><p>${num(s.days, s.days % 1 ? 1 : 0)}日</p></div>`).join('')}${ringBox}</div>
+${note('14pxの文字が上に詰まり、下半分が空いている。', '工程と日数を、ページ全体を使って描く。', 'left:64px;top:356px;width:430px')}`
+      : `<figure class="st-fig" data-region="primary" style="top:188px;bottom:50px">${stepTimeline(`checkup-${v}`)}</figure>`,
+    source: `${SYNTH}・2026年4〜9月の受診者1,240人の平均（営業日）`,
+    tag,
+  }),
+});
+
+// ════════════════════════════════════════════════════════════════════════════
+// 9 · 比べる表 — a comparison split into cards, fields dropped to fit
+// ════════════════════════════════════════════════════════════════════════════
+const sites = [                                            // 移転候補。賃料は共益費込み・税抜（2026年10月時点の仲介資料）
+  { name: '川端ビル', rent: 486, area: 180, walk: 4, from: '2027年4月', quake: '新耐震', rooms: 3 },
+  { name: '新港テラス', rent: 412, area: 172, walk: 9, from: '2027年1月', quake: '新耐震', rooms: 2 },
+  { name: '北浜第2ビル', rent: 538, area: 205, walk: 2, from: '2027年6月', quake: null, rooms: 4 },
+  { name: '中町スクエア', rent: 365, area: 140, walk: 7, from: '2026年12月', quake: '旧耐震・補強済み', rooms: 1 },
+];
+const perTsubo = s => Math.round((s.rent * 10000) / s.area);    // 円／坪
+const budget = 500, nearWalk = 5;                          // 万円／月と、駅からの徒歩分（総務部の条件）
+const inBudget = sites.filter(s => s.rent <= budget), nearAndInBudget = inBudget.filter(s => s.walk <= nearWalk);
+const cheapest = [...sites].sort((a, b) => perTsubo(a) - perTsubo(b))[0];
+const unconfirmed = sites.filter(s => s.quake == null);
+
+pair('dense-reference', {
+  failure: '比べるための表をカードに分け、項目を削った',
+  repair: '全項目を1つの表にそろえ、未確認の欄も残す',
+  readingMode: 'reference',
+  lesson: {
+    failure: 'four cards in 15 px, each listing only four of seven fields; 耐震基準 and the unknown entry disappear.',
+    repair: 'one aligned table: same columns, units in the header, a computed comparable (yen per tsubo), the unknown kept as 確認中.',
+    keep: 'all four sites and all seven fields, units, the date of the quotes, the open question.',
+  },
+  page: (v, tag) => labPage({
+    head: `坪単価がもっとも低いのは${cheapest.name}`,
+    quiet: `${unconfirmed.map(s => s.name).join('・')}は耐震基準を確認中。回答は11月末`,
+    body: v === 'before'
+      ? `<div class="lab-cards" data-region="primary" style="top:200px">${sites.map(s => `<div class="lab-card"><h3>${s.name}</h3><p>賃料 ${s.rent}万円／月<br>${s.area}坪・駅から${s.walk}分<br>入居 ${s.from}〜</p></div>`).join('')}${ringBox}</div>
+${note('カードに分けたので、横に並べて比べられない。', '耐震基準と会議室、坪単価の3項目も消えた。', 'left:64px;top:364px;width:440px')}`
+      : `<table class="lab-table" data-region="primary">
+  <thead><tr><th>物件</th><th class="n">賃料（万円／月）</th><th class="n">面積（坪）</th><th class="n">坪単価（円）</th><th class="n">駅から</th><th>入居できる時期</th><th>耐震基準</th><th class="n">会議室</th></tr></thead>
+  <tbody>${sites.map(s => `<tr><td><b>${s.name}</b></td><td class="n">${num(s.rent)}</td><td class="n">${num(s.area)}</td><td class="n${s === cheapest ? ' is-best' : ''}">${num(perTsubo(s))}</td><td class="n">徒歩${s.walk}分</td><td>${s.from}</td><td${s.quake ? '' : ' class="is-open"'}>${s.quake ?? '確認中（11月末に回答）'}</td><td class="n">${s.rooms}室</td></tr>`).join('')}</tbody>
+</table>
+<p class="lab-under" style="top:556px"><b>条件で絞ると</b>　月${budget}万円以内は${inBudget.length}件。そのうち駅から徒歩${nearWalk}分以内は${nearAndInBudget.map(s => s.name).join('・')}だけ</p>`,
+    source: `${SYNTH}・仲介会社の資料（2026年10月時点）。賃料は共益費込み、税抜。坪単価＝賃料÷面積`,
+    tag,
+  }),
+});
+
+// ════════════════════════════════════════════════════════════════════════════
+// 10 · 写真の扱い — the photograph shrunk into a rounded card
+// ════════════════════════════════════════════════════════════════════════════
+const photo = { src: '{{asset:assets/media/photo.jpg}}', w: 600, h: 400, credit: 'Rachel Michetti（Pikolo Espresso Bar 提供、CC0）' };
+const crop = { x: 130, y: 0, w: 400, h: 370, scale: 1.3 };   // 原画の切り取り範囲（px）と表示倍率
+const cremaNotes = [                                       // 原画の座標で指す。写真で確かめられることだけを書く
+  { at: [292, 150], title: '色', text: 'むらのないヘーゼルナッツ色。薄い黄色なら抽出不足、黒っぽければ抽出しすぎ' },
+  { at: [300, 101], title: '縁', text: 'カップの壁に沿って少し濃い。表面の色むらとは別に見る' },
+];
+
+/** The cropped photograph with leader lines to notes on its right. Geometry from `crop` and `cremaNotes`. */
+function cremaFigure(id, { width = 1152, height = 482 } = {}) {
+  const pw = crop.w * crop.scale, ph = crop.h * crop.scale, noteX = pw + 96;
+  const toFig = ([px, py]) => [(px - crop.x) * crop.scale, (py - crop.y) * crop.scale];
+  const parts = [
+    el('defs', {}, el('clipPath', { id: `${id}-clip` }, el('rect', { x: 0, y: 0, width: pw, height: ph }))),
+    el('image', { href: photo.src, x: -crop.x * crop.scale, y: -crop.y * crop.scale, width: photo.w * crop.scale, height: photo.h * crop.scale, 'clip-path': `url(#${id}-clip)`, preserveAspectRatio: 'none' }),
+  ];
+  let nextY = 0;                                          // notes stack in the order of their targets, so leaders never cross
+  [...cremaNotes].sort((a, b) => a.at[1] - b.at[1]).forEach(n => {
+    const [x, y] = toFig(n.at), ty = Math.max(y, nextY);
+    nextY = ty + 170;
+    parts.push(el('circle', { cx: x, cy: y, r: 7, fill: 'var(--ss-paper)', stroke: 'var(--ss-ink)', 'stroke-width': 2.5 }));
+    parts.push(el('path', { d: `M${x + 7} ${y}H${pw + 24}L${noteX - 16} ${ty}H${noteX - 8}`, fill: 'none', stroke: 'var(--ss-ink)', 'stroke-width': 1.5 }));
+    parts.push(textLines([n.title], { x: noteX, y: ty, size: 24, valign: 'middle', fill: 'var(--ss-ink)', weight: 700 }));
+    parts.push(textLines(wrapText(n.text, width - noteX, 20), { x: noteX, y: ty + 44, size: 20, fill: 'var(--ss-ink)', lineHeight: 1.6 }));
+  });
+  return svgRoot({ id, width, height, title: 'エスプレッソのクレマ（真上から）', desc: cremaNotes.map(n => `${n.title}：${n.text}`).join('。') }, ...parts);
+}
+
+pair('image-evidence', {
+  failure: '写真を小さなカードに入れ、説明と切り離した',
+  repair: '写真を大きく切り取り、説明を指す場所に添える',
+  lesson: {
+    failure: 'the photograph is a 270 px thumbnail in a rounded, shadowed card; the notes beside it cannot point at anything.',
+    repair: 'crop to the subject, show it at ≤ 1.3× native size, and attach each note with a leader to the place it describes.',
+    keep: 'the actual photograph, the credit and licence, and a statement of the crop and scale.',
+  },
+  page: (v, tag) => labPage({
+    head: '抽出がうまくいったかは、まずクレマの色とむらで見る',
+    quiet: 'この一杯は色がそろっていて、適正な抽出の例',
+    body: v === 'before'
+      ? `<div style="position:absolute;left:64px;top:206px">${fault(`<img src="${photo.src}" alt="エスプレッソのカップ" style="display:block;width:270px;height:180px;object-fit:cover;border-radius:18px">`)}</div>
+<ul class="st-text" data-region="primary" style="position:absolute;left:380px;top:206px;width:520px;margin:0;padding-left:1.2em">${cremaNotes.map(n => `<li>${n.title}：${n.text}</li>`).join('')}</ul>
+${note('写真が小さなカードに収まっている。', '説明が写真のどこを指すのか、読み取れない。', 'left:64px;top:420px;width:420px')}`
+      : `<figure class="st-fig" data-region="primary" style="bottom:56px">${cremaFigure(`crema-${v}`)}</figure>`,
+    source: `写真：${photo.credit}${v === 'after' ? `。原画${photo.w}×${photo.h}を切り取り、${crop.scale}倍で表示` : ''}`,
+    tag,
+  }),
+});
+
+// ════════════════════════════════════════════════════════════════════════════
+// 11 · 文字種の混入 — an untranslated Hindi word left in a Japanese headline
+// ════════════════════════════════════════════════════════════════════════════
+const defectRate = [                                       // 不良率（%）＝不良数÷検査数。プネ工場の月次品質報告（英語版）から
+  { label: '4月', value: 2.8 }, { label: '5月', value: 2.7 }, { label: '6月', value: 2.6 },
+  { label: '7月', value: 1.9 }, { label: '8月', value: 1.4 }, { label: '9月', value: 1.1 },
+];
+const inspectionChange = { month: '6月', text: '6月中旬、外観検査を画像検査に切り替え' };
+const firstRate = defectRate[0], lastRate = defectRate.at(-1);
+const switchRate = defectRate.find(d => d.label === inspectionChange.month);
+const afterSwitch = defectRate.length - 1 - defectRate.indexOf(switchRate);     // か月
+const sourceWord = { found: 'दर', intended: '率' };        // दर = "rate" (Hindi), left over from the source report
+
+pair('source-before-font', {
+  failure: '訳し漏れたヒンディー語が、見出しに残った',
+  repair: '原文に戻って訳語を直す。意図した表記（Pune）は残す',
+  lesson: {
+    failure: `the headline contains "${sourceWord.found}" (Hindi for "rate") from the source report; it renders in a fallback face.`,
+    repair: `fix the text at its source ("${sourceWord.intended}"), then check the rendered font. Swapping fonts would only hide the error.`,
+    keep: 'intentional multilingual names such as プネ（Pune）, and the definition of the rate.',
+  },
+  page: (v, tag) => labPage({
+    head: `プネ工場の不良${v === 'before' ? fault(sourceWord.found) : sourceWord.intended}は、${nw(`${firstRate.label}の${num(firstRate.value, 1)}%`)}から${nw(`${lastRate.label}の${num(lastRate.value, 1)}%`)}に下がった`,
+    quiet: `画像検査に切り替えた${inspectionChange.month}からの${afterSwitch}か月で、${num(switchRate.value - lastRate.value, 1)}ポイント下がった`,
+    body: `<figure class="st-fig" data-region="primary">${columnChart({
+      id: `defects-${v}`, width: 1152, height: 482, fontSize: 18, locale: 'ja',
+      title: 'プネ工場の不良率（%、月別）', desc: `${firstRate.label}${firstRate.value}%から${lastRate.label}${lastRate.value}%へ。`,
+      data: defectRate, format: { digits: 1, suffix: '%' }, highlight: lastRate.label, unit: '不良率（%）',
+      annotate: [{ at: inspectionChange.month, text: inspectionChange.text, dx: 0, dy: -64, size: 17, width: 340 }],
+    })}</figure>
+${v === 'before' ? note(`「${sourceWord.found}」はヒンディー語で「率」。`, '訳し漏れなので、フォントを替えても直らない。', 'left:800px;top:216px;width:410px') : ''}`,
+    source: `${SYNTH}・プネ（Pune）工場の月次品質報告（英語版）から翻訳。不良率＝不良数÷検査数`,
+    tag,
+  }),
+});
+
+// ════════════════════════════════════════════════════════════════════════════
+// 12 · 操作メモ — an export note printed on the audience's page
+// ════════════════════════════════════════════════════════════════════════════
+const horizon = 36;                                        // か月。period.mjs は同じ3案を12・36・60か月で比べる
+const planTotals = offers.map(o => ({ ...o, total: totalCost({ ...o, months: horizon, units: '万円' }).value }));
+const cheapestPlan = [...planTotals].sort((a, b) => a.total - b.total)[0];
+const runnerUp = [...planTotals].sort((a, b) => a.total - b.total)[1];
+const shortWinner = cheapestRuns()[0];                     // 短い期間でもっとも安い案と、その境目（か月）
+const exportMemo = `配布用メモ：印刷・PDFでは${horizon}か月表示が残ります。`;   // the operator note the BEFORE page leaks
+
+pair('export-note', {
+  failure: '出力のための操作メモが、スライドの本文に出ている',
+  repair: '表示している条件を書き、操作メモは台本に移す',
+  copyWaivers: [
+    { rule: 'ja-export-production-cue', quote: '配布用メモ：', reason: 'Repair-lab BEFORE page quoting the production note it teaches readers to remove.' },
+    { rule: 'ja-export-production-cue', quote: `印刷・PDFでは${horizon}か月表示が残`, reason: 'Repair-lab BEFORE page quoting the production note it teaches readers to remove.' },
+  ],
+  lesson: {
+    failure: 'an operator note about printing and PDF export is set on the canvas where the audience reads it; the comparison condition is missing.',
+    repair: 'print the condition the numbers depend on (horizon, formula, exclusions); move export behaviour to notes or a runbook.',
+    keep: 'the three plans on one scale, the horizon and formula, what the totals exclude.',
+  },
+  page: (v, tag) => {
+    const chart = barChart({
+      id: `plans-${v}`, width: 1152, height: 330, fontSize: 20, locale: 'ja', rowHeight: 96,
+      title: `${horizon}か月の総額（万円）`, desc: `${planTotals.map(p => `${p.id}案${p.total}万円`).join('、')}。`,
+      data: planTotals.map(p => ({ label: `${p.id}案　${planNames[p.id]}`, value: p.total })),
+      highlight: `${cheapestPlan.id}案　${planNames[cheapestPlan.id]}`, format: { digits: 0, suffix: '万円' }, domain: [0, 600], labelWidth: 330,
+      extra: ({ x, y, data }) => data.map(d => {                // the formula inside its bar: 初期費用 ＋ 月額 × 期間
+        const p = planTotals[d.i], on = p.id === cheapestPlan.id;
+        return textLines([`初期${p.initial} ＋ 月額${p.monthly} × ${horizon}`], { x: x(0) + 16, y: y.center(d.label), size: 18, valign: 'middle', fill: on ? 'var(--ss-on-accent)' : 'var(--ss-ink)', weight: 600 });
+      }).join(''),
+    });
+    return labPage({
+      head: `${horizon}か月の総額は、${v === 'after' ? `<em>${cheapestPlan.id}案</em>` : `${cheapestPlan.id}案`}がもっとも低く${num(cheapestPlan.total)}万円`,
+      quiet: `${runnerUp.id}案との差は${num(runnerUp.total - cheapestPlan.total)}万円。${num(shortWinner.to)}か月未満で使い終えるなら${shortWinner.id}案が安い`,
+      body: `<figure class="st-fig st-top" data-region="primary" style="top:200px;bottom:auto;height:330px">${chart}</figure>
+${v === 'before'
+    ? `<p class="lab-under" style="top:572px;color:var(--ss-muted)">${fault(exportMemo)}</p>
+${note('出力の操作は、聴き手に関係がない。', '代わりに表示条件を書き、メモは台本へ。', 'left:700px;top:556px;width:400px')}`
+    : `<p class="lab-under" style="top:572px"><b>表示条件</b>　${horizon}か月。総額＝初期費用＋月額×${horizon}。税と追加作業費は含まない</p>`}`,
+      source: `${SYNTH}・受発注システム更新の3案の見積もり（2026年9月時点、税抜）`,
+      tag,
+    });
+  },
+});
+
+export const lab = { title: '修正ラボ：12組の修正前と修正後', language: 'ja', mode: 'workshop', readingMode: 'read', css, slides: labSlides };
+
+// ════════════════════════════════════════════════════════════════════════════
+// Transfer talk — the same repairs applied to a three-page interim report
+// (data: `modules` / `cooling` from pair 2; no new numbers are typed by hand)
+// ════════════════════════════════════════════════════════════════════════════
+const rig = { cells: 12, thermocouples: [1, 2, 4, 5, 7, 8, 10, 11], coolant: '冷却水20℃・毎分4L', discharge: '2C放電30分', room: '室温25℃' };
+const protocol = [
+  { step: '従来プレートで測る', detail: `${rig.discharge}。8点の最高温度を記録` },
+  { step: '2時間置き、プレートを交換', detail: 'セルが室温に戻ったことを確かめる' },
+  { step: '新プレートで同じ条件を測る', detail: '順序は6台とも「従来→新」で同じ' },
+];
+
+/** Side view of one module on its cooling plate, labelled on the right. Cell and sensor positions come from `rig`. */
+function moduleSection(id, { width = 700, height = 450 } = {}) {
+  const cellW = 34, gap = 6, x0 = 14, cellTop = 96, cellH = 200, plateH = 48, plateY = cellTop + cellH + 4;
+  const cx = i => x0 + i * (cellW + gap), right = cx(rig.cells - 1) + cellW, labelX = right + 52;
+  const sensorY = cellTop + 30, lastSensor = cx(rig.thermocouples.at(-1)) + cellW / 2;
+  const parts = [
+    // cells, with a bracket that counts them
+    ...Array.from({ length: rig.cells }, (_, i) => el('rect', { x: cx(i), y: cellTop, width: cellW, height: cellH, rx: 4, fill: 'var(--ss-surface)', stroke: 'var(--ss-muted)', 'stroke-width': 1.5 })),
+    el('path', { d: `M${x0} ${cellTop - 14}V${cellTop - 24}H${right}V${cellTop - 14}`, fill: 'none', stroke: 'var(--ss-muted)', 'stroke-width': 1.5 }),
+    textLines([`セル ${rig.cells}本`], { x: (x0 + right) / 2, y: cellTop - 40, size: 22, anchor: 'middle', fill: 'var(--ss-ink)', weight: 700 }),
+    // thermocouples on the cells they sit on
+    ...rig.thermocouples.map(i => el('circle', { cx: cx(i) + cellW / 2, cy: sensorY, r: 7, fill: 'var(--ss-accent)' })),
+    el('path', { d: `M${lastSensor + 9} ${sensorY}H${labelX - 10}`, fill: 'none', stroke: 'var(--ss-accent)', 'stroke-width': 1.5 }),
+    textLines([`熱電対 ${rig.thermocouples.length}点`], { x: labelX, y: sensorY, size: 22, valign: 'middle', fill: 'var(--ss-accent)', weight: 700 }),
+    textLines(['最高値を記録'], { x: labelX, y: sensorY + 34, size: 22, valign: 'middle', fill: 'var(--ss-muted)' }),
+    // the plate that is swapped, with its coolant channels
+    el('rect', { x: x0 - 8, y: plateY, width: right - x0 + 16, height: plateH, rx: 4, fill: 'var(--ss-ink)' }),
+    ...Array.from({ length: 6 }, (_, k) => el('circle', { cx: x0 + 28 + k * ((right - x0 - 56) / 5), cy: plateY + plateH / 2, r: 9, fill: 'var(--ss-paper)' })),
+    el('path', { d: `M${right + 12} ${plateY + plateH / 2}H${labelX - 10}`, fill: 'none', stroke: 'var(--ss-ink)', 'stroke-width': 1.5 }),
+    textLines(['冷却プレート'], { x: labelX, y: plateY + plateH / 2 - 14, size: 22, valign: 'middle', fill: 'var(--ss-ink)', weight: 700 }),
+    textLines(['交換して比べる', rig.coolant], { x: labelX, y: plateY + plateH / 2 + 16, size: 22, valign: 'top', fill: 'var(--ss-muted)', lineHeight: 1.45 }),
+  ];
+  return svgRoot({ id, width, height, title: '電池モジュールと冷却プレートの断面（模式図）', desc: `${rig.cells}本のセルが冷却プレートの上に並び、${rig.thermocouples.length}点の熱電対で温度を測る。` }, ...parts);
+}
+
+const sampleNeed = (() => {                                // 平均差を検出力80%・両側5%で見分ける台数（正規近似）
+  const z = 1.96 + 0.8416, n = Math.ceil(((z * cooling.sampleSD) / Math.abs(cooling.mean)) ** 2);
+  return { n, planned: n + 2 };                            // 欠測に備えて2台を足す
+})();
+const nextSteps = [
+  { limit: '測る順序が全台「従来→新」', why: '2回目のほうが温度が低く出る癖があっても、プレートの差と区別できない', change: '半数の台は「新 → 従来」の順で測る' },
+  { limit: `${missingIds.join('・')}が欠測（熱電対の断線）`, why: `差を${cooling.n}台だけで計算している`, change: '各セルに予備の熱電対を2点付ける' },
+  { limit: `台数が${modules.length}台`, why: `差のばらつき（標準偏差${num(cooling.sampleSD, 1)}℃）に対して少ない`, change: `${sampleNeed.planned}台に増やす（必要な${sampleNeed.n}台＋予備2台）` },
+];
+
+const talkSlide = (id, title, className, content, notes) => ({ id, title, className: `st cs-wa-ai lab talk ${className}`.trim(), content, notes, exportPolicy: 'final', study: true });
+export const talk = {
+  title: '新しい冷却プレートの評価（中間報告）', language: 'ja', mode: 'workshop', readingMode: 'live', css: css + `
+/* Talk pages: live reading, so body text is one step larger. */
+.talk .talk-steps { position: absolute; left: 812px; right: 64px; top: 196px; margin: 0; padding: 0; list-style: none; counter-reset: step; }
+.talk .talk-steps li { position: relative; padding: 0 0 22px 48px; margin-bottom: 22px; border-bottom: 1px solid var(--ss-rule); counter-increment: step; }
+.talk .talk-steps li::before { content: counter(step); position: absolute; left: 0; top: 0; font: 700 26px/1.3 var(--ss-font-sans); color: var(--ss-accent); }
+.talk .talk-steps b { display: block; font-size: 24px; line-height: 1.45; }
+.talk .talk-steps span { display: block; margin-top: 4px; font-size: 22px; line-height: 1.55; color: var(--ss-muted); }
+.talk .st-kpi span, .talk .st-text, .talk .lab-under { font-size: 22px; line-height: 1.55; }
+.talk .lab-table { font-size: 22px; line-height: 1.55; }
+.talk .lab-table td { padding: 22px 28px 22px 0; }
+.talk .lab-table td:first-child { width: 330px; font-weight: 700; }
+.talk .lab-table td:nth-child(2) { width: 430px; }
+`,
+  slides: [
+    talkSlide('protocol', '何を比べたか', '', labPage({
+      head: `${modules.length}台のモジュールを、従来プレートと新プレートの両方で測った`,
+      quiet: `比べるのは温度上昇（最高セル温度 − 室温）。${rig.discharge}、${rig.room}でそろえた`,
+      body: `<figure class="st-fig" data-region="primary" style="right:auto;width:700px;top:200px;bottom:70px">${moduleSection('rig-section')}</figure>
+<ol class="talk-steps" data-region="support">${protocol.map(p => `<li><b>${p.step}</b><span>${p.detail}</span></li>`).join('')}</ol>`,
+      source: `${SYNTH}・試験室B、2026年9月。図は模式図で、寸法は実物と異なる`,
+    }), 'Protocol before interpretation: what was compared, on which units, under which fixed conditions, in which order. The fixed order is stated here because page 3 lists it as a limitation.'),
+    talkSlide('paired-result', '結果：5台の差', 'st--rail', labPage({
+      head: `${cooling.n}台中${cooling.below}台で、新プレートの温度上昇が小さかった`,
+      quiet: `平均の差は${num(cooling.mean, 1)}℃（新 − 従来）。${worse.map(r => `${r.id}は${num(r.difference, 1)}℃大きく`).join('、')}、${missingIds.join('・')}は欠測`,
+      body: `<figure class="st-fig" data-region="primary">${slopeChart({
+        id: 'cooling-slope', width: 800, height: 482, fontSize: 22, locale: 'ja', format: { digits: 1 },
+        title: 'モジュール別の温度上昇（℃）、従来プレートと新プレート',
+        desc: `${cooling.n}台のうち${cooling.below}台で新プレートの温度上昇が小さい。${worse.map(r => r.id).join('・')}は大きくなった。`,
+        data: cooling.rows.map(r => ({ label: r.id, a: r.before, b: r.after, color: r.difference > 0 ? 'var(--ss-negative)' : 'var(--ss-accent)' })),
+        aLabel: '従来プレート（℃）', bLabel: '新プレート（℃）', highlight: () => true,
+      })}</figure>
+<div class="st-rail" data-region="support">
+  <div class="st-kpi"><b class="is-accent">${num(cooling.mean, 1)}<small>℃</small></b><span>平均の差（新 − 従来、${cooling.n}台）</span></div>
+  <hr class="st-rule">
+  <div class="st-kpi"><b>${num(cooling.sampleSD, 1)}<small>℃</small></b><span>差の標準偏差（n − 1）</span></div>
+  <hr class="st-rule">
+  <p class="st-text">${missingIds.join('・')}は新プレートの測定中に熱電対が断線し、差から除いた</p>
+</div>`,
+      source: `${SYNTH}・${rig.discharge}、${rig.room}。差はすべて「新 − 従来」で計算`,
+    }), 'All plotted values, the count, the mean and the n−1 SD come from paired() with one subtraction order. The worse module stays visible in the negative colour with its label; the missing module is named.'),
+    talkSlide('next-measurement', '次に確かめること', '', labPage({
+      head: '効果と言い切るには、測り方を3点変えて測り直す',
+      quiet: `次の測定は${sampleNeed.planned}台、11月に行う`,
+      body: `<table class="lab-table" data-region="primary">
+  <thead><tr><th>今回の制約</th><th>なぜ問題か</th><th>次の測定で変えること</th></tr></thead>
+  <tbody>${nextSteps.map(s => `<tr><td>${s.limit}</td><td>${s.why}</td><td>${s.change}</td></tr>`).join('')}</tbody>
+</table>
+<p class="lab-under" style="top:584px"><b>採用の基準</b>　${sampleNeed.planned}台の平均の差が0℃を下回り、その95%信頼区間も0を含まなければ、新プレートを採用する</p>`,
+      source: `${SYNTH}・必要台数は平均の差${num(Math.abs(cooling.mean), 1)}℃、標準偏差${num(cooling.sampleSD, 1)}℃から正規近似で計算（検出力80%、両側5%）`,
+    }), 'Limitations sit next to the concrete change that addresses each one. The sample size is computed from the observed mean and SD, not typed; it is a planning estimate, not a promise.'),
+  ],
+};

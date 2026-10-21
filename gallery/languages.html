@@ -1,159 +1,869 @@
-<!doctype html><html lang="en" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="generator" content="Slide Studio 3.4.0"><title>Languages studies</title><style>/* Infrastructure only. Composition, typography and image use belong to the author. */
-:root{--studio-w:1280px;--studio-h:720px;--studio-scale:1;--studio-bar:52px;color-scheme:light}
-*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:Arial,'Noto Sans',sans-serif}body{background:#181b20;color:#17252d}
-.studio-stage{position:fixed;inset:0 0 var(--studio-bar);display:grid;place-items:center;overflow:hidden}
-.slide{position:absolute;display:none;width:var(--studio-w);height:var(--studio-h);overflow:hidden;background:white;transform:scale(var(--studio-scale));transform-origin:center}
-.slide.is-current{display:block}.slide h1,.slide h2,.slide h3,.slide p,.slide figure{margin:0}.slide img,.slide svg,.slide video,.slide canvas{max-width:100%}
-[data-studio-hidden="true"]{visibility:hidden!important;pointer-events:none!important}[data-motion],[data-states]{transform-box:fill-box}
-/* Scaled slides: hinted SVG text can be drawn at stale positions in Chromium; unhinted metrics keep labels on their geometry. */
-:where(.slide) svg text{text-rendering:geometricPrecision}
-.studio-controls{position:fixed;inset:auto 0 0;min-height:52px;padding:8px 12px;display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;background:#12171e;color:#fff;z-index:100;font:14px/1.2 Arial,sans-serif;direction:ltr}
-.studio-controls button,.studio-controls select{background:transparent;color:inherit;border:1px solid #8996a3;border-radius:3px;padding:6px 10px;font:inherit;cursor:pointer}
-.studio-controls option{color:#17252d;background:white}.studio-controls button:disabled{opacity:.4;cursor:default}.studio-controls button:hover:not(:disabled){background:#344355}
-:focus-visible{outline:3px solid #d28b13;outline-offset:4px}.studio-position{min-width:110px;text-align:center}
-.studio-notes{display:none;position:fixed;inset:auto 16px 70px auto;max-height:65vh;width:min(560px,calc(100vw - 32px));background:#fff;color:#1c2730;padding:26px;overflow:auto;white-space:pre-wrap;z-index:120;font:17px/1.6 sans-serif;border:1px solid #687985}
-.studio-notes.open{display:block}.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(100%)}
-[data-static="show"]{display:none!important}body[data-export="true"] [data-static="hide"]{display:none!important}body[data-export="true"] [data-static="show"]{display:revert!important;visibility:visible!important}
-body[data-export="true"] *{animation:none!important;transition:none!important;caret-color:transparent!important}
-body.overview .studio-stage{position:relative;inset:auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:22px;padding:24px 24px 100px;overflow:visible}
-.studio-thumb{position:relative;aspect-ratio:var(--studio-ratio);overflow:hidden;border:2px solid #8c99a6;cursor:pointer}
-body.overview .slide{display:block;transform-origin:top left;transform:scale(var(--thumb-scale,.25));pointer-events:none}
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}}
-@media print{@page{size:13.333333in 7.5in;margin:0}html,body{margin:0!important;background:white}.studio-stage{position:static;display:block;overflow:visible}.studio-thumb{display:contents!important}.slide{position:relative!important;display:block!important;transform:none!important;margin:0!important;break-after:page;print-color-adjust:exact;-webkit-print-color-adjust:exact}.slide:last-child{break-after:auto}.studio-controls,.studio-notes,.studio-announcer{display:none!important}}
+<!doctype html><html lang="en" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="generator" content="Slide Studio 4.0.0"><title>One page in ten languages</title><style>/* Slide Studio player — infrastructure only. Composition, typography and
+   image use belong to the author's CSS. */
+:root { --studio-w: 1280px; --studio-h: 720px; --studio-scale: 1; --studio-bar: 52px; color-scheme: light; }
+* { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; font-family: Inter, "Helvetica Neue", "Segoe UI", "Hiragino Sans", "Noto Sans JP", Arial, sans-serif; }
+body { background: #15181d; color: #17252d; }
 
-.studio-controls select{max-width:min(300px,40vw);text-overflow:ellipsis}.studio-controls{flex-wrap:wrap}
+.studio-stage { position: fixed; inset: 0 0 var(--studio-bar); display: grid; place-items: center; overflow: hidden; touch-action: pan-y pinch-zoom; }
+.slide { position: absolute; display: none; width: var(--studio-w); height: var(--studio-h); overflow: hidden; background: white; transform: scale(var(--studio-scale)); transform-origin: center; }
+.slide.is-current { display: block; }
+.slide h1, .slide h2, .slide h3, .slide p, .slide figure { margin: 0; }
+.slide img, .slide svg, .slide video, .slide canvas { max-width: 100%; }
+[data-studio-hidden="true"] { visibility: hidden !important; pointer-events: none !important; }
+[data-motion], [data-states] { transform-box: fill-box; }
+/* Scaled slides: hinted SVG text can be drawn at stale positions in Chromium; unhinted metrics keep labels on their geometry. */
+:where(.slide) svg text { text-rendering: geometricPrecision; }
+
+/* Control strip */
+.studio-controls { position: fixed; inset: auto 0 0; min-height: 52px; padding: 8px 12px; display: flex; gap: 8px; align-items: center; justify-content: center; flex-wrap: wrap; background: #101419; color: #fff; z-index: 100; font: 14px/1.2 Inter, "Helvetica Neue", Arial, sans-serif; direction: ltr; transition: opacity .25s ease; }
+.studio-controls button, .studio-controls select { background: transparent; color: inherit; border: 1px solid #5d6976; border-radius: 6px; padding: 6px 10px; font: inherit; cursor: pointer; }
+.studio-controls option { color: #17252d; background: white; }
+.studio-controls button:disabled { opacity: .4; cursor: default; }
+.studio-controls button:hover:not(:disabled) { background: #2b3542; }
+.studio-controls select { max-width: min(300px, 40vw); text-overflow: ellipsis; }
+:focus-visible { outline: 3px solid #d28b13; outline-offset: 4px; }
+.studio-position { min-width: 110px; text-align: center; font-variant-numeric: tabular-nums; }
+
+/* Fullscreen: the stage takes the whole screen; controls float and hide when idle. */
+body.studio-fullscreen .studio-stage { inset: 0; }
+body.studio-fullscreen .studio-controls { background: rgba(16, 20, 25, .86); }
+body.studio-fullscreen.studio-idle .studio-controls { opacity: 0; pointer-events: none; }
+body.studio-fullscreen.studio-idle { cursor: none; }
+
+/* Notes panel */
+.studio-notes { display: none; position: fixed; inset: auto 16px 70px auto; max-height: 65vh; width: min(560px, calc(100vw - 32px)); background: #fff; color: #1c2730; padding: 26px; overflow: auto; white-space: pre-wrap; z-index: 120; font: 17px/1.6 Inter, "Helvetica Neue", "Hiragino Sans", sans-serif; border: 1px solid #687985; border-radius: 10px; box-shadow: 0 18px 50px rgba(0, 0, 0, .35); }
+.studio-notes.open { display: block; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(100%); }
+
+/* Black screen, shortcuts, toast */
+.studio-blackout { position: fixed; inset: 0; background: #000; z-index: 150; display: none; cursor: none; }
+.studio-blackout.on { display: block; }
+.studio-help { position: fixed; inset: 0; z-index: 160; display: none; place-items: center; background: rgba(8, 10, 14, .55); }
+.studio-help.open { display: grid; }
+.studio-help-card { background: #fff; color: #17202b; border-radius: 14px; padding: 26px 30px; min-width: min(460px, 92vw); box-shadow: 0 24px 60px rgba(0, 0, 0, .4); font: 16px/1.4 Inter, "Helvetica Neue", "Hiragino Sans", sans-serif; }
+.studio-help-card h2 { margin: 0 0 14px; font-size: 19px; }
+.studio-help-card dl { display: grid; grid-template-columns: max-content 1fr; gap: 9px 22px; margin: 0; }
+.studio-help-card dt { font: 600 14px/1.5 "JetBrains Mono", Menlo, Consolas, monospace; color: #3b4756; }
+.studio-help-card dd { margin: 0; }
+.studio-toast { position: fixed; left: 50%; top: 18px; translate: -50% 0; z-index: 170; background: rgba(16, 20, 25, .92); color: #fff; padding: 8px 14px; border-radius: 8px; font: 600 15px/1.2 Inter, "Helvetica Neue", sans-serif; opacity: 0; pointer-events: none; transition: opacity .2s ease; }
+.studio-toast.on { opacity: 1; }
+
+/* Static export */
+[data-static="show"] { display: none !important; }
+body[data-export="true"] [data-static="hide"] { display: none !important; }
+body[data-export="true"] [data-static="show"] { display: revert !important; visibility: visible !important; }
+body[data-export="true"] * { animation: none !important; transition: none !important; caret-color: transparent !important; }
+
+/* Overview grid */
+body.overview .studio-stage { position: relative; inset: auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 22px; padding: 24px 24px 100px; overflow: visible; }
+.studio-thumb { position: relative; aspect-ratio: var(--studio-ratio); overflow: hidden; border: 2px solid #5d6976; border-radius: 6px; cursor: pointer; }
+.studio-thumb:hover { border-color: #d28b13; }
+body.overview .slide { display: block; transform-origin: top left; transform: scale(var(--thumb-scale, .25)); pointer-events: none; }
+
+/* Presenter window (styles travel with the deck into the pop-up) */
+.pv-body { background: #0f1216; color: #e9edf2; margin: 0; height: 100vh; display: grid; grid-template-rows: auto 1fr auto; font: 16px/1.4 Inter, "Helvetica Neue", "Hiragino Sans", sans-serif; overflow: hidden; }
+.pv-bar { display: flex; gap: 18px; align-items: center; padding: 12px 18px; border-bottom: 1px solid #252c35; font-variant-numeric: tabular-nums; }
+.pv-title { flex: 1; color: #aab4c0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.pv-time { display: flex; gap: 14px; align-items: center; font: 600 22px/1 "JetBrains Mono", Menlo, Consolas, monospace; }
+.pv-main { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(280px, 1fr); gap: 18px; padding: 18px; min-height: 0; }
+.pv-current-wrap { display: flex; align-items: center; min-width: 0; }
+.pv-frame { position: relative; width: 100%; aspect-ratio: var(--studio-ratio, 16 / 9); overflow: hidden; border-radius: 6px; background: #000; color: #17252d; }
+.pv-frame .slide { position: absolute; left: 0; top: 0; display: block; transform-origin: top left; transform: scale(var(--pv-scale, .5)); }
+.pv-side { display: grid; grid-template-rows: auto auto auto 1fr; gap: 8px; min-height: 0; }
+.pv-label { margin: 6px 0 0; color: #8d99a7; font-size: 13px; text-transform: uppercase; letter-spacing: .06em; }
+.pv-notes { overflow: auto; background: #161b22; border-radius: 6px; padding: 16px 18px; white-space: pre-wrap; font-size: 21px; line-height: 1.5; color: #f3f5f8; min-height: 0; }
+.pv-foot { display: flex; justify-content: center; gap: 12px; padding: 10px 18px 14px; }
+.pv-btn { background: #1d2430; color: #e9edf2; border: 1px solid #3a4553; border-radius: 8px; padding: 8px 18px; font: inherit; cursor: pointer; }
+.pv-btn:hover { background: #283141; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
+}
+@media print {
+  @page { size: 13.333333in 7.5in; margin: 0; }
+  html, body { margin: 0 !important; background: white; }
+  .studio-stage { position: static; display: block; overflow: visible; }
+  .studio-thumb { display: contents !important; }
+  .slide { position: relative !important; display: block !important; transform: none !important; translate: none !important; scale: none !important; margin: 0 !important; break-after: page; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  .slide:last-child { break-after: auto; }
+  .studio-controls, .studio-notes, .studio-announcer, .studio-blackout, .studio-help, .studio-toast { display: none !important; }
+}
 
 :root{--studio-w:1280px;--studio-h:720px;--studio-ratio:1280/720}@media print{@page{size:13.333333333333334in 7.5in}}
-:root{--slide-w:1280px;--slide-h:720px;--paper:#f6f4ed;--ink:#172521;--muted:#4b5b54;--accent:#145f53;--line:#c1cbc4;--surface:#e5ebe4;--font:Arial,"Noto Sans",sans-serif;--serif:Georgia,"Noto Serif",serif;--mono:ui-monospace,"DejaVu Sans Mono",monospace;--ease:cubic-bezier(.2,.7,.2,1)}
-.supplemental{background:var(--paper);color:var(--ink);font-family:var(--font)}
-h1,h2,h3,p,figure,blockquote,pre{margin:0}.supplemental h1{font-size:68px;line-height:1.04;font-weight:650;letter-spacing:-2.1px}.supplemental h2{font-size:46px;line-height:1.12;font-weight:650;letter-spacing:-1px}.supplemental h3{font-size:28px;line-height:1.2}.supplemental p{font-size:26px;line-height:1.42}.supplemental .small{font-size:19px;line-height:1.4}.supplemental .caption{font-size:16px;line-height:1.4;color:var(--muted)}.supplemental .mono{font-family:var(--mono);font-size:18px;line-height:1.5}.supplemental .serif{font-family:var(--serif);font-weight:400;letter-spacing:-1.8px}.supplemental .muted{color:var(--muted)}.supplemental .accent{color:var(--accent)}.supplemental .pad{padding:54px 60px}.supplemental img,.supplemental video{display:block;max-width:100%}.supplemental svg{overflow:visible}.supplemental svg text{font-family:var(--font);fill:var(--ink)}.supplemental [data-step]{transition:opacity .3s var(--ease),translate .3s var(--ease)}.supplemental .unbuilt{opacity:0!important;visibility:hidden;translate:0 10px}.supplemental button,.supplemental select{font-size:18px;min-height:42px;padding:8px 15px;border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:4px}.supplemental input[type=range]{accent-color:var(--accent);min-height:42px;max-width:100%}.supplemental input[type=checkbox]{width:21px;height:21px;accent-color:var(--accent)}.supplemental output{font-variant-numeric:tabular-nums}.supplemental label{font-size:19px}.toolbar{display:flex;align-items:center;gap:14px;flex-wrap:wrap}.toolbar label{display:flex;align-items:center;gap:12px}.sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;overflow:hidden!important;clip-path:inset(50%);white-space:nowrap!important}.demo-label{position:absolute;inset:auto 24px 18px auto;font:12px var(--font);letter-spacing:1.2px;color:var(--muted);max-width:75%;text-align:end}.export-only{display:none}
-:lang(ja),:lang(zh),:lang(ko){--font:"Noto Sans CJK JP","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;--serif:"Noto Serif CJK JP","Yu Mincho",serif}:lang(zh-Hans){--font:"Noto Sans CJK SC","Microsoft YaHei",sans-serif}:lang(zh-Hant){--font:"Noto Sans CJK TC","Microsoft JhengHei",sans-serif}:lang(ko){--font:"Noto Sans CJK KR","Malgun Gothic",sans-serif}:lang(ar){--font:"Noto Sans Arabic","DejaVu Sans",sans-serif}:lang(hi){--font:"Noto Sans Devanagari",sans-serif}
-:lang(ja) h1,:lang(zh) h1,:lang(ko) h1{line-height:1.24;letter-spacing:0}:lang(ar) h1,:lang(hi) h1{line-height:1.45;letter-spacing:0}:lang(ja) p,:lang(zh) p,:lang(ko) p{line-height:1.65;line-break:strict}:lang(ar) p,:lang(hi) p{line-height:1.65}
+/* Slide Studio study frame — the shared page grammar of the diagram and motion
+   libraries. Each study is a finished example slide: a claim, the evidence at
+   working size, an annotation where the eye should land, a quiet source line.
+   Colors and fonts come from a color-system class on the slide (cs-<id>). */
+.st {
+  --st-x: 64px; --st-top: 48px; --st-fig-top: 176px; --st-bottom: 62px;
+  background: var(--ss-paper, #fff); color: var(--ss-ink, #17202b);
+  font-family: var(--ss-font-sans, Inter, "Helvetica Neue", "Segoe UI", "Hiragino Sans", "Noto Sans JP", sans-serif);
+  font-feature-settings: "kern" 1;
+}
+.st :where(h1, h2, h3, p, figure, ul, ol, dl, dd) { margin: 0; }
 
-.supplemental [data-box]>svg{width:100%;height:100%;display:block}
-</style></head><body><main class="studio-stage"><section class="slide supplemental" id="language-en" role="group" aria-roledescription="slide" aria-label="Read the relation, not just the words." aria-hidden="true" lang="en" dir="ltr"><div data-box="" style="position:absolute;left:62px;top:43px;width:1147px;height:49px;"><p class="small" dir="ltr">en · LTR · LANGUAGE FIXTURE</p></div><div data-box="" style="position:absolute;left:65px;top:143px;width:1143px;height:196px;"><h1 style="font-size:55px;letter-spacing:0;line-height:1.35">Read the relation, not just the words.</h1></div><div data-box="" style="position:absolute;left:69px;top:342px;width:1130px;height:81px;"><p>Typography must preserve meaning across languages.</p></div><div data-box="" style="position:absolute;left:68px;top:486px;width:1132px;height:107px;"><div style="display:flex;justify-content:space-between;gap:28px;direction:ltr"><div style="min-width:25%;border-top:2px solid var(--ink);padding-top:20px"><span dir="ltr" style="font-size:21px;display:block;margin-bottom:12px">01</span><h3>Observe</h3></div><div style="min-width:25%;border-top:2px solid var(--ink);padding-top:20px"><span dir="ltr" style="font-size:21px;display:block;margin-bottom:12px">02</span><h3>Compare</h3></div><div style="min-width:25%;border-top:2px solid var(--ink);padding-top:20px"><span dir="ltr" style="font-size:21px;display:block;margin-bottom:12px">03</span><h3>Explain</h3></div></div></div><div data-box="" style="position:absolute;left:69px;top:641px;width:1090px;height:23px;"><p class="caption" dir="ltr"><bdi dir="ltr">1280 × 720</bdi> · 12,345.67</p></div><span class="demo-label">DESIGN STUDY · SYNTHETIC CONTENT</span></section>
-<section class="slide supplemental" id="language-ja" role="group" aria-roledescription="slide" aria-label="文字だけでなく、関係を伝える。" aria-hidden="true" lang="ja" dir="ltr"><div data-box="" style="position:absolute;left:62px;top:43px;width:1147px;height:49px;"><p class="small" dir="ltr">ja · LTR · LANGUAGE FIXTURE</p></div><div data-box="" style="position:absolute;left:65px;top:143px;width:1143px;height:196px;"><h1 style="font-size:55px;letter-spacing:0;line-height:1.35">文字だけでなく、関係を伝える。</h1></div><div data-box="" style="position:absolute;left:69px;top:342px;width:1130px;height:81px;"><p>翻訳後に文字組みと図の配置を見直します。</p></div><div data-box="" style="position:absolute;left:68px;top:486px;width:1132px;height:107px;"><div style="display:flex;justify-content:space-between;gap:28px;direction:ltr"><div style="min-width:25%;border-top:2px solid var(--ink);padding-top:20px"><span dir="ltr" style="font-size:21px;display:block;margin-bottom:12px">01</span><h3>観察する</h3></div><div style="min-width:25%;border-top:2px solid var(--ink);padding-top:20px"><span dir="ltr" style="font-size:21px;display:block;margin-bottom:12px">02</span><h3>比較する</h3></div><div style="min-width:25%;border-top:2px solid var(--ink);padding-top:20px"><span dir="ltr" style="font-size:21px;display:block;margin-bottom:12px">03</span><h3>説明する</h3></div></div></div><div data-box="" style="position:absolute;left:69px;top:641px;width:1090px;height:23px;"><p class="caption" dir="ltr"><bdi dir="ltr">1280 × 720</bdi> · 12,345.67</p></div><span class="demo-label">DESIGN STUDY · SYNTHETIC CONTENT</span></section>
-<section class="slide supplemental" id="language-zh-Hans" role="group" aria-roledescription="slide" aria-label="不只读文字，还要看见关系。" aria-hidden="true" lang="zh-Hans" dir="ltr"><div data-box="" style="position:absolute;left:62px;top:43px;width:1147px;height:49px;"><p class="small" dir="ltr">zh-Hans · LTR · LANGUAGE FIXTURE</p></div><div data-box="" style="position:absolute;left:65px;top:143px;width:1143px;height:196px;"><h1 style="font-size:55px;letter-spacing:0;line-height:1.35">不只读文字，还要看见关系。</h1></div><div data-box="" style="position:absolute;left:69px;top:342px;width:1130px;height:81px;"><p>翻译之后，需要重新检查排版和图形布局。</p></div><div data-box="" style="position:absolute;left:68px;top:486px;width:1132px;height:107px;"><div style="display:flex;justify-content:space-between;gap:28px;direction:ltr"><div style="min-width:25%;border-top:2px solid var(--ink);padding-top:20px"><span dir="ltr" style="font-size:21px;display:block;margin-bottom:12px">01</span><h3>观察</h3></div><div style="min-width:25%;border-top:2px solid var(--ink);padding-top:20px"><span dir="ltr" style="font-size:21px;display:block;margin-bottom:12px">02</span><h3>比较</h3></div><div style="min-width:25%;border-top:2px solid var(--ink);padding-top:20px"><span dir="ltr" style="font-size:21px;display:block;margin-bottom:12px">03</span><h3>解释</h3></div></div></div><div data-box="" style="position:absolute;left:69px;top:641px;width:1090px;height:23px;"><p class="caption" dir="ltr"><bdi dir="ltr">1280 × 720</bdi> · 12,345.67</p></div><span class="demo-label">DESIGN STUDY · SYNTHETIC CONTENT</span></section>
-<section class="slide supplemental" id="language-zh-Hant" role="group" aria-roledescription="slide" aria-label="不只讀文字，還要看見關係。" aria-hidden="true" lang="zh-Hant" dir="ltr"><div data-box="" style="position:absolute;left:62px;top:43px;width:1147px;height:49px;"><p class="small" dir="ltr">zh-Hant · LTR · LANGUAGE FIXTURE</p></div><div data-box="" style="position:absolute;left:65px;top:143px;width:1143px;height:196px;"><h1 style="font-size:55px;letter-spacing:0;line-height:1.35">不只讀文字，還要看見關係。</h1></div><div data-box="" style="position:absolute;left:69px;top:342px;width:1130px;height:81px;"><p>翻譯之後，需要重新檢查排版和圖形配置。</p></div><div data-box="" style="position:absolute;left:68px;top:486px;width:1132px;height:107px;"><div style="display:flex;justify-content:space-between;gap:28px;direction:ltr"><div style="min-width:25%;border-top:2px solid var(--ink);padding-top:20px"><span dir="ltr" style="font-size:21px;display:block;margin-bottom:12px">01</span><h3>觀察</h3></div><div style="min-width:25%;border-top:2px solid var(--ink);padding-top:20px"><span dir="ltr" style="font-size:21px;display:block;margin-bottom:12px">02</span><h3>比較</h3></div><div style="min-width:25%;border-top:2px solid var(--ink);padding-top:20px"><span dir="ltr" style="font-size:21px;display:block;margin-bottom:12px">03</span><h3>解釋</h3></div></div></div><div data-box="" style="position:absolute;left:69px;top:641px;width:1090px;height:23px;"><p class="caption" dir="ltr"><bdi dir="ltr">1280 × 720</bdi> · 12,345.67</p></div><span class="demo-label">DESIGN STUDY · SYNTHETIC CONTENT</span></section>
-<section class="slide supplemental" id="language-ko" role="group" aria-roledescription="slide" aria-label="글자뿐 아니라 관계를 전달합니다." aria-hidden="true" lang="ko" dir="ltr"><div data-box="" style="position:absolute;left:62px;top:43px;width:1147px;height:49px;"><p class="small" dir="ltr">ko · LTR · LANGUAGE FIXTURE</p></div><div data-box="" style="position:absolute;left:65px;top:143px;width:1143px;height:196px;"><h1 style="font-size:55px;letter-spacing:0;line-height:1.35">글자뿐 아니라 관계를 전달합니다.</h1></div><div data-box="" style="position:absolute;left:69px;top:342px;width:1130px;height:81px;"><p>번역한 뒤에는 글자 배치와 도표를 다시 확인합니다.</p></div><div data-box="" style="position:absolute;left:68px;top:486px;width:1132px;height:107px;"><div style="display:flex;justify-content:space-between;gap:28px;direction:ltr"><div style="min-width:25%;border-top:2px solid var(--ink);padding-top:20px"><span dir="ltr" style="font-size:21px;display:block;margin-bottom:12px">01</span><h3>관찰</h3></div><div style="min-width:25%;border-top:2px solid var(--ink);padding-top:20px"><span dir="ltr" style="font-size:21px;display:block;margin-bottom:12px">02</span><h3>비교</h3></div><div style="min-width:25%;border-top:2px solid var(--ink);padding-top:20px"><span dir="ltr" style="font-size:21px;display:block;margin-bottom:12px">03</span><h3>설명</h3></div></div></div><div data-box="" style="position:absolute;left:69px;top:641px;width:1090px;height:23px;"><p class="caption" dir="ltr"><bdi dir="ltr">1280 × 720</bdi> · 12,345.67</p></div><span class="demo-label">DESIGN STUDY · SYNTHETIC CONTENT</span></section>
-<section class="slide supplemental" id="language-ar" role="group" aria-roledescription="slide" aria-label="وضّح العلاقة، لا الكلمات فقط." aria-hidden="true" lang="ar" dir="rtl"><div data-box="" style="position:absolute;left:62px;top:43px;width:1147px;height:49px;"><p class="small" dir="ltr">ar · RTL · LANGUAGE FIXTURE</p></div><div data-box="" style="position:absolute;left:65px;top:143px;width:1143px;height:196px;"><h1 style="font-size:51px;letter-spacing:0;line-height:1.35">وضّح العلاقة، لا الكلمات فقط.</h1></div><div data-box="" style="position:absolute;left:69px;top:342px;width:1130px;height:81px;"><p>راجع تنسيق النص والرسوم بعد الترجمة.</p></div><div data-box="" style="position:absolute;left:68px;top:486px;width:1132px;height:107px;"><div style="display:flex;justify-content:space-between;gap:28px;direction:rtl"><div style="min-width:25%;border-top:2px solid var(--ink);padding-top:20px"><span dir="ltr" style="font-size:21px;display:block;margin-bottom:12px">01</span><h3>لاحظ</h3></div><div style="min-width:25%;border-top:2px solid var(--ink);padding-top:20px"><span dir="ltr" style="font-size:21px;display:block;margin-bottom:12px">02</span><h3>قارن</h3></div><div style="min-width:25%;border-top:2px solid var(--ink);padding-top:20px"><span dir="ltr" style="font-size:21px;display:block;margin-bottom:12px">03</span><h3>اشرح</h3></div></div></div><div data-box="" style="position:absolute;left:69px;top:641px;width:1090px;height:23px;"><p class="caption" dir="rtl"><bdi dir="ltr">1280 × 720</bdi> · 12,345.67</p></div><span class="demo-label">DESIGN STUDY · SYNTHETIC CONTENT</span></section>
-<section class="slide supplemental" id="language-hi" role="group" aria-roledescription="slide" aria-label="केवल शब्द नहीं, संबंध भी दिखाएँ।" aria-hidden="true" lang="hi" dir="ltr"><div data-box="" style="position:absolute;left:62px;top:43px;width:1147px;height:49px;"><p class="small" dir="ltr">hi · LTR · LANGUAGE FIXTURE</p></div><div data-box="" style="position:absolute;left:65px;top:143px;width:1143px;height:196px;"><h1 style="font-size:51px;letter-spacing:0;line-height:1.35">केवल शब्द नहीं, संबंध भी दिखाएँ।</h1></div><div data-box="" style="position:absolute;left:69px;top:342px;width:1130px;height:81px;"><p>अनुवाद के बाद पाठ और आरेख का विन्यास फिर जाँचें।</p></div><div data-box="" style="position:absolute;left:68px;top:486px;width:1132px;height:107px;"><div style="display:flex;justify-content:space-between;gap:28px;direction:ltr"><div style="min-width:25%;border-top:2px solid var(--ink);padding-top:20px"><span dir="ltr" style="font-size:21px;display:block;margin-bottom:12px">01</span><h3>देखें</h3></div><div style="min-width:25%;border-top:2px solid var(--ink);padding-top:20px"><span dir="ltr" style="font-size:21px;display:block;margin-bottom:12px">02</span><h3>तुलना करें</h3></div><div style="min-width:25%;border-top:2px solid var(--ink);padding-top:20px"><span dir="ltr" style="font-size:21px;display:block;margin-bottom:12px">03</span><h3>समझाएँ</h3></div></div></div><div data-box="" style="position:absolute;left:69px;top:641px;width:1090px;height:23px;"><p class="caption" dir="ltr"><bdi dir="ltr">1280 × 720</bdi> · 12,345.67</p></div><span class="demo-label">DESIGN STUDY · SYNTHETIC CONTENT</span></section>
-<section class="slide supplemental" id="language-de" role="group" aria-roledescription="slide" aria-label="Nicht nur Worte. Zusammenhänge." aria-hidden="true" lang="de" dir="ltr"><div data-box="" style="position:absolute;left:62px;top:43px;width:1147px;height:49px;"><p class="small" dir="ltr">de · LTR · LANGUAGE FIXTURE</p></div><div data-box="" style="position:absolute;left:65px;top:143px;width:1143px;height:196px;"><h1 style="font-size:55px;letter-spacing:0;line-height:1.35">Nicht nur Worte. Zusammenhänge.</h1></div><div data-box="" style="position:absolute;left:69px;top:342px;width:1130px;height:81px;"><p>Prüfen Sie nach der Übersetzung auch Satz und Diagramme.</p></div><div data-box="" style="position:absolute;left:68px;top:486px;width:1132px;height:107px;"><div style="display:flex;justify-content:space-between;gap:28px;direction:ltr"><div style="min-width:25%;border-top:2px solid var(--ink);padding-top:20px"><span dir="ltr" style="font-size:21px;display:block;margin-bottom:12px">01</span><h3>Beobachten</h3></div><div style="min-width:25%;border-top:2px solid var(--ink);padding-top:20px"><span dir="ltr" style="font-size:21px;display:block;margin-bottom:12px">02</span><h3>Vergleichen</h3></div><div style="min-width:25%;border-top:2px solid var(--ink);padding-top:20px"><span dir="ltr" style="font-size:21px;display:block;margin-bottom:12px">03</span><h3>Erklären</h3></div></div></div><div data-box="" style="position:absolute;left:69px;top:641px;width:1090px;height:23px;"><p class="caption" dir="ltr"><bdi dir="ltr">1280 × 720</bdi> · 12.345,67</p></div><span class="demo-label">DESIGN STUDY · SYNTHETIC CONTENT</span></section>
-<section class="slide supplemental" id="language-fr" role="group" aria-roledescription="slide" aria-label="Montrer les relations, pas seulement les mots." aria-hidden="true" lang="fr" dir="ltr"><div data-box="" style="position:absolute;left:62px;top:43px;width:1147px;height:49px;"><p class="small" dir="ltr">fr · LTR · LANGUAGE FIXTURE</p></div><div data-box="" style="position:absolute;left:65px;top:143px;width:1143px;height:196px;"><h1 style="font-size:55px;letter-spacing:0;line-height:1.35">Montrer les relations, pas seulement les mots.</h1></div><div data-box="" style="position:absolute;left:69px;top:342px;width:1130px;height:81px;"><p>Après la traduction, revoyez la composition du texte et des figures.</p></div><div data-box="" style="position:absolute;left:68px;top:486px;width:1132px;height:107px;"><div style="display:flex;justify-content:space-between;gap:28px;direction:ltr"><div style="min-width:25%;border-top:2px solid var(--ink);padding-top:20px"><span dir="ltr" style="font-size:21px;display:block;margin-bottom:12px">01</span><h3>Observer</h3></div><div style="min-width:25%;border-top:2px solid var(--ink);padding-top:20px"><span dir="ltr" style="font-size:21px;display:block;margin-bottom:12px">02</span><h3>Comparer</h3></div><div style="min-width:25%;border-top:2px solid var(--ink);padding-top:20px"><span dir="ltr" style="font-size:21px;display:block;margin-bottom:12px">03</span><h3>Expliquer</h3></div></div></div><div data-box="" style="position:absolute;left:69px;top:641px;width:1090px;height:23px;"><p class="caption" dir="ltr"><bdi dir="ltr">1280 × 720</bdi> · 12 345,67</p></div><span class="demo-label">DESIGN STUDY · SYNTHETIC CONTENT</span></section>
-<section class="slide supplemental" id="language-es" role="group" aria-roledescription="slide" aria-label="Muestra las relaciones, no solo las palabras." aria-hidden="true" lang="es" dir="ltr"><div data-box="" style="position:absolute;left:62px;top:43px;width:1147px;height:49px;"><p class="small" dir="ltr">es · LTR · LANGUAGE FIXTURE</p></div><div data-box="" style="position:absolute;left:65px;top:143px;width:1143px;height:196px;"><h1 style="font-size:55px;letter-spacing:0;line-height:1.35">Muestra las relaciones, no solo las palabras.</h1></div><div data-box="" style="position:absolute;left:69px;top:342px;width:1130px;height:81px;"><p>Revisa la composición del texto y los diagramas después de traducir.</p></div><div data-box="" style="position:absolute;left:68px;top:486px;width:1132px;height:107px;"><div style="display:flex;justify-content:space-between;gap:28px;direction:ltr"><div style="min-width:25%;border-top:2px solid var(--ink);padding-top:20px"><span dir="ltr" style="font-size:21px;display:block;margin-bottom:12px">01</span><h3>Observar</h3></div><div style="min-width:25%;border-top:2px solid var(--ink);padding-top:20px"><span dir="ltr" style="font-size:21px;display:block;margin-bottom:12px">02</span><h3>Comparar</h3></div><div style="min-width:25%;border-top:2px solid var(--ink);padding-top:20px"><span dir="ltr" style="font-size:21px;display:block;margin-bottom:12px">03</span><h3>Explicar</h3></div></div></div><div data-box="" style="position:absolute;left:69px;top:641px;width:1090px;height:23px;"><p class="caption" dir="ltr"><bdi dir="ltr">1280 × 720</bdi> · 12.345,67</p></div><span class="demo-label">DESIGN STUDY · SYNTHETIC CONTENT</span></section></main><nav class="studio-controls" aria-label="Slide"><button id="studio-prev" type="button" aria-label="Previous" >←</button><span id="studio-position" class="studio-position"></span><button id="studio-next" type="button" aria-label="Next" >→</button><select id="studio-jump" aria-label="Slide"><option value="0">1. Read the relation, not just the words.</option><option value="1">2. 文字だけでなく、関係を伝える。</option><option value="2">3. 不只读文字，还要看见关系。</option><option value="3">4. 不只讀文字，還要看見關係。</option><option value="4">5. 글자뿐 아니라 관계를 전달합니다.</option><option value="5">6. وضّح العلاقة، لا الكلمات فقط.</option><option value="6">7. केवल शब्द नहीं, संबंध भी दिखाएँ।</option><option value="7">8. Nicht nur Worte. Zusammenhänge.</option><option value="8">9. Montrer les relations, pas seulement les mots.</option><option value="9">10. Muestra las relaciones, no solo las palabras.</option></select><button id="studio-overview" type="button" aria-label="Overview" >Overview</button><button id="studio-notes-btn" type="button" aria-label="Notes" aria-expanded="false" aria-controls="studio-notes">Notes</button><button id="studio-reset" type="button" aria-label="Reset" >Reset</button><button id="studio-full" type="button" aria-label="Fullscreen" >Fullscreen</button></nav><aside id="studio-notes" class="studio-notes" aria-label="Notes"></aside><div id="studio-announcer" class="sr-only studio-announcer" aria-live="polite"></div><script type="application/json" id="slide-studio-meta">{"version":3,"width":1280,"height":720,"title":"Languages studies","language":"en","direction":"ltr","readingMode":"reference","sample":true,"mode":"workshop","copyRules":[{"id":"ja-stage-direction","level":"error","pattern":"(?:学会|口頭|研究)?発表(?:時|中)(?:に|で|は)?[ 　]*(?:切[り]?替[え]?|切替|クリック|再生|操作)|ここで(?:クリック|切[り]?替[え]?|動画を再生)|(?:要差し替え|後で修正|仮置きのまま)"},{"id":"en-stage-direction","level":"error","pattern":"\\b(?:switch|click|play|toggle) (?:here|during (?:the )?(?:conference|presentation|talk))\\b|\\b(?:replace this (?:text|title|image)|insert (?:your )?(?:title|content) here|speaker cue:)","flags":"i"},{"id":"placeholder","level":"error","pattern":"\\b(?:Lorem ipsum|TODO|FIXME|TBD)\\b|(?:ここにタイトル|ここに本文|テキストを入力)","flags":"i"},{"id":"ja-empty-claim","level":"warning","pattern":"(?:さらなる価値提供|革新的なソリューション|未来を切り拓く|シームレスな体験|圧倒的な価値)"},{"id":"en-empty-claim","level":"warning","pattern":"\\b(?:unlock (?:the )?(?:full )?potential|revolutionary solution|seamless experience|game-changing|transform the future)\\b","flags":"i"},{"id":"ja-export-production-cue","level":"error","pattern":"配布用メモ[：:]|(?:印刷[・／/]PDF|印刷・PDF|PDF・印刷)(?:では|時は)[^。\\n]{0,60}(?:表示が残|固定され|操作用)|(?:投影時|発表時)の操作用"},{"id":"en-export-production-cue","level":"error","pattern":"\\b(?:presenter-only cue|production note|export-only instruction)\\s*:","flags":"i"},{"id":"ja-performed-sincerity","level":"warning","pattern":"正直に(?:言います|お知らせ|お伝え)|本当の価値|価値を紡ぐ"},{"id":"ja-status-label","level":"error","pattern":"(?:登壇用|発表用|社内用|作業用|提出用)(?:ドラフト|下書き)"}],"slides":[{"id":"language-en","title":"Read the relation, not just the words.","notes":"Original instructional fixture. Adapt framing and native language to the audience. No native-speaker certification is claimed; font coverage must be checked locally. Image-fixture media are original synthetic still-life geometry, not photography or evidence.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"language-ja","title":"文字だけでなく、関係を伝える。","notes":"Original instructional fixture. Adapt framing and native language to the audience. No native-speaker certification is claimed; font coverage must be checked locally. Image-fixture media are original synthetic still-life geometry, not photography or evidence.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"language-zh-Hans","title":"不只读文字，还要看见关系。","notes":"Original instructional fixture. Adapt framing and native language to the audience. No native-speaker certification is claimed; font coverage must be checked locally. Image-fixture media are original synthetic still-life geometry, not photography or evidence.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"language-zh-Hant","title":"不只讀文字，還要看見關係。","notes":"Original instructional fixture. Adapt framing and native language to the audience. No native-speaker certification is claimed; font coverage must be checked locally. Image-fixture media are original synthetic still-life geometry, not photography or evidence.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"language-ko","title":"글자뿐 아니라 관계를 전달합니다.","notes":"Original instructional fixture. Adapt framing and native language to the audience. No native-speaker certification is claimed; font coverage must be checked locally. Image-fixture media are original synthetic still-life geometry, not photography or evidence.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"language-ar","title":"وضّح العلاقة، لا الكلمات فقط.","notes":"Original instructional fixture. Adapt framing and native language to the audience. No native-speaker certification is claimed; font coverage must be checked locally. Image-fixture media are original synthetic still-life geometry, not photography or evidence.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"language-hi","title":"केवल शब्द नहीं, संबंध भी दिखाएँ।","notes":"Original instructional fixture. Adapt framing and native language to the audience. No native-speaker certification is claimed; font coverage must be checked locally. Image-fixture media are original synthetic still-life geometry, not photography or evidence.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"language-de","title":"Nicht nur Worte. Zusammenhänge.","notes":"Original instructional fixture. Adapt framing and native language to the audience. No native-speaker certification is claimed; font coverage must be checked locally. Image-fixture media are original synthetic still-life geometry, not photography or evidence.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"language-fr","title":"Montrer les relations, pas seulement les mots.","notes":"Original instructional fixture. Adapt framing and native language to the audience. No native-speaker certification is claimed; font coverage must be checked locally. Image-fixture media are original synthetic still-life geometry, not photography or evidence.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"language-es","title":"Muestra las relaciones, no solo las palabras.","notes":"Original instructional fixture. Adapt framing and native language to the audience. No native-speaker certification is claimed; font coverage must be checked locally. Image-fixture media are original synthetic still-life geometry, not photography or evidence.","sources":[],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""}]}</script><script>/* Deterministic presentation states. Widgets own their content, not global navigation.
- * A transition never owns the final state: target styles are committed before animating.
- * Exports and reduced-motion enter the same stable states without cosmetic movement. */
-(()=>{'use strict';
- const meta=JSON.parse(document.getElementById('slide-studio-meta').textContent);
- const slides=[...document.querySelectorAll('.slide')],mq=matchMedia('(prefers-reduced-motion: reduce)');
- const warnings=[],widgets=new Map(),tracks=new WeakMap(),animations=new Set(),lastSteps=Array(slides.length).fill(0);
- let current=0,step=0,exporting=new URLSearchParams(location.search).has('static'),overview=false,restore=null,enteredIndex=null;
- const $=id=>document.getElementById(id),warn=e=>{warnings.push(String(e));console.warn('[Slide Studio]',e)};
- const call=(widget,method,...args)=>{try{return widget?.[method]?.(...args)}catch(e){warn(`${method}: ${e.message}`)}};
- const max=i=>Math.max(0,...[...slides[i].querySelectorAll('[data-step],[data-states]')].flatMap(el=>{
-  const v=[Number(el.dataset.step)||0];try{if(el.dataset.states)v.push(...Object.keys(JSON.parse(el.dataset.states)).map(Number))}catch{}return v.filter(Number.isFinite)}));
- for(const slide of slides)for(const el of slide.querySelectorAll('[data-states]')){
-  try{const map=JSON.parse(el.dataset.states),keys=Object.keys(map).map(Number).sort((a,b)=>a-b);if(!map['0']||keys.some(k=>!Number.isInteger(k)||k<0))throw Error('state 0 and nonnegative integer keys required');const base={};for(const state of Object.values(map)){
-   if(!state||typeof state!=='object'||Array.isArray(state))throw Error('CSS property map required');
-   for(const key of Object.keys(state)){if(!(key in el.style)&&!key.startsWith('--'))throw Error(`unknown CSS property ${key}`);base[key]=key.startsWith('--')?el.style.getPropertyValue(key):el.style[key]||getComputedStyle(el)[key];}}
-   tracks.set(el,{map,keys,base});
-  }catch(e){warn(`${slide.id}: ${e.message}`)}
- }
- function finish(){for(const a of animations){try{a.finish();a.cancel()}catch{a.cancel()}}animations.clear()}
- function transition(el,to,animate,entryFrom=null){
-  const from={};for(const [k,v]of Object.entries(to)){from[k]=k.startsWith('--')?getComputedStyle(el).getPropertyValue(k):getComputedStyle(el)[k];k.startsWith('--')?el.style.setProperty(k,String(v)):el.style[k]=String(v)}
-  if(!animate||mq.matches||exporting||!el.animate)return;
-  const requested=el.dataset.duration===undefined?500:Number(el.dataset.duration);const duration=Number.isFinite(requested)?Math.min(1600,Math.max(0,requested)):500;
-  try{const a=el.animate([entryFrom||from,to],{duration,easing:el.dataset.easing||'cubic-bezier(.22,.68,.2,1)',fill:'none'});animations.add(a);a.finished.then(()=>{animations.delete(a);a.cancel()}).catch(()=>animations.delete(a))}catch(e){warn(e.message)}
- }
- // Entry effects are a decoration on a committed state, never a second navigator.
- const entryEffects={
-  reveal:[{opacity:0},{opacity:1}],
-  lift:[{opacity:0,transform:'translateY(20px)'},{opacity:1,transform:'translateY(0px)'}],
-  slide:[{opacity:0,transform:'translateX(-28px)'},{opacity:1,transform:'translateX(0px)'}],
-  wipe:[{clipPath:'inset(0 100% 0 0)'},{clipPath:'inset(0 0% 0 0)'}],
-  trace:[{strokeDashoffset:'1'},{strokeDashoffset:'0'}],
-  focus:[{opacity:0.2},{opacity:1}],
-  settle:[{opacity:0,transform:'scale(.96)'},{opacity:1,transform:'scale(1)'}]
- };
- function context(i=current){return {slide:slides[i],index:i,step:i===current?step:lastSteps[i],exporting,reducedMotion:mq.matches,active:i===current&&!overview&&!exporting}}
- function apply(i,at,animate){
-  const slide=slides[i];
-  for(const el of slide.querySelectorAll('[data-step]')){
-   const on=at>=Number(el.dataset.step)&&(el.dataset.until===undefined||at<=Number(el.dataset.until));
-   const was=el.dataset.studioHidden==='false';
-   el.dataset.studioHidden=String(!on);el.setAttribute('aria-hidden',String(!on));el.inert=!on;
-   if(on&&el.dataset.motion&&!el.hasAttribute('data-states')){
-    const effect=entryEffects[el.dataset.motion];
-    if(effect)transition(el,effect[1],animate&&!was,effect[0]);
-    else if(!el.dataset.motionWarned){warn('Unknown entry effect: '+el.dataset.motion);el.dataset.motionWarned='true'}
-   }
+/* Headline: the page's claim, in the deck's display face. */
+.st-head { position: absolute; left: var(--st-x); top: var(--st-top); max-width: 1040px; font: 650 38px/1.14 var(--ss-font-display, var(--ss-font-sans, Inter, sans-serif)); letter-spacing: -.012em; text-wrap: balance; }
+.st-head em { font-style: normal; color: var(--ss-accent, #2457c5); }
+.st-head .st-quiet { color: var(--ss-muted, #5a6676); font-weight: 500; }
+.st-dek { position: absolute; left: var(--st-x); top: calc(var(--st-top) + 98px); max-width: 900px; font: 400 20px/1.45 var(--ss-font-sans, Inter, sans-serif); color: var(--ss-muted, #5a6676); text-wrap: pretty; }
+.st-head.st-one + .st-dek { top: calc(var(--st-top) + 56px); }
+
+/* Evidence region: figures are authored at the region's size so labels render ~1:1. */
+.st-fig { position: absolute; left: var(--st-x); right: var(--st-x); top: var(--st-fig-top); bottom: var(--st-bottom); display: flex; align-items: center; justify-content: center; }
+.st-fig > svg { width: 100%; height: 100%; display: block; overflow: visible; }
+.st-fig.st-top { align-items: flex-start; }
+
+/* Layout variants */
+.st--rail .st-fig { right: calc(var(--st-x) + 352px); }
+.st-rail { position: absolute; right: var(--st-x); top: var(--st-fig-top); bottom: var(--st-bottom); width: 312px; display: flex; flex-direction: column; justify-content: center; gap: 26px; }
+.st--left .st-fig { left: calc(var(--st-x) + 352px); }
+.st--left .st-rail { left: var(--st-x); right: auto; }
+.st--full .st-fig { left: 0; right: 0; top: 0; bottom: 0; }
+.st--tall .st-fig { top: 132px; }
+
+/* Rail content: one number or short finding per block, never a card stack. */
+.st-kpi { display: grid; gap: 6px; }
+.st-kpi b { font: 650 54px/1 var(--ss-font-display, var(--ss-font-sans, Inter, sans-serif)); letter-spacing: -.02em; font-variant-numeric: tabular-nums lining-nums; color: var(--ss-ink, #17202b); }
+.st-kpi b.st-accent { color: var(--ss-accent, #2457c5); }
+.st-kpi span { font: 400 18px/1.4 var(--ss-font-sans, Inter, sans-serif); color: var(--ss-muted, #5a6676); }
+.st-text { font: 400 19px/1.5 var(--ss-font-sans, Inter, sans-serif); color: var(--ss-ink, #17202b); }
+.st-text strong { font-weight: 650; }
+.st-text.st-muted { color: var(--ss-muted, #5a6676); }
+.st-rule { height: 1px; background: var(--ss-rule, #d5dbe3); border: 0; margin: 0; }
+
+/* Big type */
+.st-num { font: 650 128px/.9 var(--ss-font-display, var(--ss-font-sans, Inter, sans-serif)); letter-spacing: -.035em; font-variant-numeric: tabular-nums lining-nums; }
+.st-num small { font-size: .38em; letter-spacing: 0; font-weight: 500; margin-left: .12em; color: var(--ss-muted, #5a6676); }
+.st-kpi .st-num, .st-kpi b.st-num { font: 650 128px/.9 var(--ss-font-display, var(--ss-font-sans, Inter, sans-serif)); letter-spacing: -.035em; } /* a hero number inside a KPI block keeps hero size */
+
+/* Source line: honest provenance, readable size. */
+.st-source { position: absolute; left: var(--st-x); right: var(--st-x); bottom: 22px; display: flex; justify-content: space-between; gap: 24px; font: 400 15px/1.3 var(--ss-font-sans, Inter, sans-serif); color: var(--ss-muted, #5a6676); }
+.st-source b { font-weight: 600; color: var(--ss-ink, #17202b); }
+
+/* Japanese and other CJK pages: looser leading, no negative tracking. */
+.st:lang(ja) .st-head, .st:lang(zh) .st-head, .st:lang(ko) .st-head { line-height: 1.32; letter-spacing: 0; font-weight: 700; font-size: 36px; }
+.st:lang(ja) .st-dek, .st:lang(ja) .st-text { line-height: 1.65; }
+
+/* Motion helpers: elements that move keep their geometry box as the origin. */
+.st [data-states], .st [data-motion] { transform-box: fill-box; }
+.st .st-origin-left { transform-origin: 0% 50%; }
+.st .st-origin-bottom { transform-origin: 50% 100%; }
+.st .st-origin-center { transform-origin: 50% 50%; }
+
+/* Japanese: break headlines and short text between phrases (Chromium; others fall back to normal breaking). */
+.st:lang(ja) .st-head, .st:lang(ja) .st-dek, .st:lang(ja) .st-text, .st:lang(ja) .st-kpi span { word-break: auto-phrase; line-break: strict; }
+
+/* Civic Calm — light */
+.cs-civic-calm{--ss-paper:#f7f9f9;--ss-surface:#e9f0f0;--ss-ink:#1c262a;--ss-muted:#465559;--ss-rule:#c9d5d6;--ss-grid:#dee5e6;--ss-accent:#226b66;--ss-on-accent:#ffffff;--ss-positive:#2b6e3f;--ss-negative:#a6392f;--ss-highlight:#226b66;--ss-context:#c2cfd0;--ss-cat-1:#226b66;--ss-on-cat-1:#f7f9f9;--ss-cat-2:#a8642a;--ss-on-cat-2:#f7f9f9;--ss-cat-3:#4a4f8c;--ss-on-cat-3:#f7f9f9;--ss-cat-4:#226b66;--ss-on-cat-4:#f7f9f9;--ss-cat-5:#a8642a;--ss-on-cat-5:#f7f9f9;--ss-cat-6:#4a4f8c;--ss-on-cat-6:#f7f9f9;--ss-cat-7:#226b66;--ss-on-cat-7:#f7f9f9;--ss-cat-8:#a8642a;--ss-on-cat-8:#f7f9f9;--ss-seq-1:#e2efee;--ss-on-seq-1:#1c262a;--ss-seq-2:#bfdddb;--ss-on-seq-2:#1c262a;--ss-seq-3:#99c8c4;--ss-on-seq-3:#1c262a;--ss-seq-4:#6fb0ab;--ss-on-seq-4:#1c262a;--ss-seq-5:#4c928d;--ss-on-seq-5:#1c262a;--ss-seq-6:#2e706c;--ss-on-seq-6:#f7f9f9;--ss-seq-7:#174a47;--ss-on-seq-7:#f7f9f9;--ss-div-1:#a6392f;--ss-on-div-1:#f7f9f9;--ss-div-2:#cf8377;--ss-on-div-2:#1c262a;--ss-div-3:#e8c1b8;--ss-on-div-3:#1c262a;--ss-div-4:#f0f2f1;--ss-on-div-4:#1c262a;--ss-div-5:#b2d8d4;--ss-on-div-5:#1c262a;--ss-div-6:#6daba6;--ss-on-div-6:#1c262a;--ss-div-7:#226b66;--ss-on-div-7:#f7f9f9;--ss-font-sans:"Segoe UI","Helvetica Neue","Liberation Sans",Arial,sans-serif,"BIZ UDPGothic","Hiragino Sans","Noto Sans JP","Yu Gothic","Meiryo","IPAPGothic",sans-serif;--ss-font-display:"Segoe UI","Helvetica Neue","Liberation Sans",Arial,"BIZ UDPGothic","Hiragino Sans","Noto Sans JP","Meiryo",sans-serif,"BIZ UDPGothic","Hiragino Sans","Noto Sans JP","Yu Gothic","Meiryo","IPAPGothic",sans-serif;--ss-font-serif:"Iowan Old Style","Charter","Bitstream Charter",Georgia,Caladea,"Hiragino Mincho ProN","Noto Serif JP","Yu Mincho",serif;--ss-font-mono:"JetBrains Mono","SFMono-Regular",Menlo,Consolas,"DejaVu Sans Mono",monospace;color-scheme:light}
+/* ---- One page, ten languages ---- */
+/* Running text: each script's own face first, so a headline's digits and letters share one weight.
+   Figures and the big number: the Latin face first, so numerals match across all ten versions. */
+.lp { --latin: "Inter","Helvetica Neue",Arial; --ss-font-sans: var(--latin),sans-serif; --ss-font-display: "Inter Display",var(--latin),sans-serif; }
+.lp:lang(ja) { --script: "Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Noto Sans CJK JP","Yu Gothic UI","Yu Gothic",Meiryo,"IPAPGothic"; }
+.lp:lang(zh-Hans) { --script: "PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC","Noto Sans CJK SC","WenQuanYi Zen Hei"; }
+.lp:lang(zh-Hant) { --script: "PingFang TC","Microsoft JhengHei","Noto Sans TC","Noto Sans CJK TC","WenQuanYi Zen Hei"; }
+.lp:lang(ko) { --script: "Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR","Noto Sans CJK KR","WenQuanYi Zen Hei"; }
+.lp:lang(ar) { --script: "Geeza Pro","Noto Naskh Arabic","Segoe UI","Tahoma","DejaVu Sans"; }
+.lp:lang(hi) { --script: "Kohinoor Devanagari","Devanagari Sangam MN","Noto Sans Devanagari","Nirmala UI","FreeSans"; }
+.lp:is(:lang(ja), :lang(zh), :lang(ko), :lang(ar), :lang(hi)) { --ss-font-sans: var(--script),sans-serif; --ss-font-display: var(--ss-font-sans); }
+.lp:is(:lang(ja), :lang(zh), :lang(ko), :lang(ar), :lang(hi)) :is(.st-fig, .st-kpi b) { --ss-font-sans: var(--latin),var(--script),sans-serif; --ss-font-display: "Inter Display",var(--ss-font-sans); }
+
+/* Type scale. Latin: headline 40, text 19, labels 18. CJK sets smaller and looser; Arabic and
+   Devanagari larger and taller, never letter-spaced. Every headline takes two lines. */
+.lp .st-head { font-size: 40px; line-height: 1.12; letter-spacing: -.015em; max-width: 1080px; }
+.lp .st-rail { justify-content: flex-start; padding-top: 35px; }   /* the big number's cap line sits on the plot's top gridline */
+.lp .st-kpi b { font-size: 56px; color: var(--ss-accent); }
+.lp .st-kpi b small { font-size: .46em; font-weight: 600; letter-spacing: 0; margin-inline-start: .2em; }
+.lp .st-kpi span { color: var(--ss-ink); }
+.lp .nb { white-space: nowrap; }
+
+.lp:is(:lang(ja), :lang(zh), :lang(ko)) .st-head { font-size: 38px; line-height: 1.42; letter-spacing: 0; font-weight: 700; max-width: 720px; word-break: keep-all; }
+/* Japanese: phrase breaking where supported (Chromium); other browsers keep keep-all and the <wbr> marks. */
+.lp:lang(ja) .st-head { word-break: auto-phrase; font-feature-settings: "palt" 1; letter-spacing: .02em; }
+.lp:is(:lang(ja), :lang(zh), :lang(ko)) :is(.st-text, .st-kpi span) { font-size: 18px; line-height: 1.75; line-break: strict; }
+.lp:lang(zh) :is(.st-text, .st-kpi span) { word-break: keep-all; }
+.lp:is(:lang(ja), :lang(zh)) .st-kpi b small { margin-inline-start: .06em; }
+.lp:lang(ko) { word-break: keep-all; }
+
+.lp:lang(ar) .st-head { font-size: 40px; line-height: 1.4; letter-spacing: 0; font-weight: 700; right: var(--st-x); left: auto; }
+.lp:lang(ar) :is(.st-text, .st-kpi span) { font-size: 21px; line-height: 1.7; }
+.lp:lang(hi) .st-head { font-size: 40px; line-height: 1.45; letter-spacing: 0; font-weight: 700; max-width: 820px; }
+.lp:lang(hi) :is(.st-text, .st-kpi span) { font-size: 19px; line-height: 1.75; }
+.lp:is(:lang(ar), :lang(hi)) .st-kpi b { letter-spacing: 0; }
+.lp:lang(de) { hyphens: manual; }
+</style></head><body><main class="studio-stage"><section class="slide st st--rail cs-civic-calm lp" id="language-en" role="group" aria-roledescription="slide" aria-label="E-book loans have outnumbered print every month since March 2025" aria-hidden="true" lang="en" dir="ltr"><h1 class="st-head" data-region="title">E-book loans have outnumbered print every month since March 2025</h1>
+<figure class="st-fig" data-region="primary" dir="ltr"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 482" width="800" height="482" role="img" aria-labelledby="language-en-fig-title language-en-fig-desc" id="language-en-fig" class="ss-fig" direction="ltr" style="overflow:visible;direction:ltr;font-family:var(--ss-font-sans,&quot;Inter&quot;,&quot;Helvetica Neue&quot;,&quot;Segoe UI&quot;,&quot;Hiragino Sans&quot;,&quot;Noto Sans JP&quot;,&quot;Yu Gothic&quot;,system-ui,sans-serif);"><title id="language-en-fig-title">Library loans per month by format</title><desc id="language-en-fig-desc">E-book loans have outnumbered print every month since March 2025</desc><rect x="385.15" y="44" width="255.47" height="398" style="fill:var(--ss-surface,#f3f5f8);"/><text x="393.15" y="61.1" font-size="15" font-weight="600" style="fill:var(--ss-muted,#5a6676);">3 branches closed</text><g class="ss-axis"><line x1="44.52" x2="640.63" y1="442" y2="442" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><text x="36.52" y="447.4" font-size="15" text-anchor="end" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">0</text><line x1="44.52" x2="640.63" y1="342.5" y2="342.5" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><text x="36.52" y="347.9" font-size="15" text-anchor="end" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">50</text><line x1="44.52" x2="640.63" y1="243" y2="243" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><text x="36.52" y="248.4" font-size="15" text-anchor="end" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">100</text><line x1="44.52" x2="640.63" y1="143.5" y2="143.5" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><text x="36.52" y="148.9" font-size="15" text-anchor="end" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">150</text><line x1="44.52" x2="640.63" y1="44" y2="44" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><text x="36.52" y="49.4" font-size="15" text-anchor="end" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">200</text></g><text x="4" y="15.1" font-size="15" class="ss-unit" style="fill:var(--ss-muted,#5a6676);">Loans per month, thousands</text><line x1="44.52" x2="44.52" y1="442" y2="447" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="44.52" y="465.1" font-size="15" text-anchor="middle" style="fill:var(--ss-muted,#5a6676);">Jan 2023</text><line x1="248.9" x2="248.9" y1="442" y2="447" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="248.9" y="465.1" font-size="15" text-anchor="middle" style="fill:var(--ss-muted,#5a6676);">Jan 2024</text><line x1="453.28" x2="453.28" y1="442" y2="447" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="453.28" y="465.1" font-size="15" text-anchor="middle" style="fill:var(--ss-muted,#5a6676);">Jan 2025</text><line x1="640.63" x2="640.63" y1="442" y2="447" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="640.63" y="465.1" font-size="15" text-anchor="middle" style="fill:var(--ss-muted,#5a6676);">Dec 2025</text><path d="M44.52 385.88L61.55 389.27L78.58 384.49L95.62 384.29L112.65 385.29L129.68 382.1L146.71 375.53L163.74 374.94L180.77 379.71L197.81 377.13L214.84 375.14L231.87 371.95L248.9 366.38L265.93 370.96L282.96 365.78L299.99 367.97L317.03 367.38L334.06 364.39L351.09 357.62L368.12 356.43L385.15 361.21L402.18 359.22L419.22 355.83L436.25 353.45L453.28 349.27L470.31 355.04L487.34 350.26L504.37 349.27L521.4 349.47L538.44 346.48L555.47 339.32L572.5 337.53L589.53 345.88L606.56 340.71L623.59 338.92L640.63 335.73" fill="none" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" class="ss-line" style="stroke:var(--ss-context,#c3cad4);"/><circle cx="640.63" cy="335.73" r="4" stroke-width="2" style="fill:var(--ss-context,#c3cad4);stroke:var(--ss-paper,#ffffff);"/><path d="M44.52 148.08L61.55 161.21L78.58 153.25L95.62 161.21L112.65 167.18L129.68 154.05L146.71 135.54L163.74 142.7L180.77 170.96L197.81 168.57L214.84 168.77L231.87 181.91L248.9 162.21L265.93 177.73L282.96 167.38L299.99 176.53L317.03 182.31L334.06 167.18L351.09 155.84L368.12 160.81L385.15 205.99L402.18 204L419.22 208.57L436.25 214.74L453.28 200.61L470.31 212.55L487.34 204.99L504.37 211.96L521.4 215.14L538.44 205.79L555.47 194.44L572.5 198.82L589.53 221.71L606.56 218.13L623.59 221.51L640.63 231.06" fill="none" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" class="ss-line" style="stroke:var(--ss-ink,#17202b);"/><circle cx="640.63" cy="231.06" r="6" stroke-width="2" style="fill:var(--ss-ink,#17202b);stroke:var(--ss-paper,#ffffff);"/><path d="M44.52 280.21L61.55 289.96L78.58 280.01L95.62 281.8L112.65 282.4L129.68 275.44L146.71 260.31L163.74 258.92L180.77 272.85L197.81 265.09L214.84 260.51L231.87 254.34L248.9 243.4L265.93 254.54L282.96 244.79L299.99 246.78L317.03 249.17L334.06 238.62L351.09 219.52L368.12 217.73L385.15 234.84L402.18 226.88L419.22 223.5L436.25 216.53L453.28 203.6L470.31 216.33L487.34 203.2L504.37 208.37L521.4 209.37L538.44 196.63L555.47 179.72L572.5 176.14L589.53 196.63L606.56 188.08L623.59 183.1L640.63 175.54" fill="none" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" class="ss-line" style="stroke:var(--ss-accent,#2457c5);"/><circle cx="640.63" cy="175.54" r="6" stroke-width="2" style="fill:var(--ss-accent,#2457c5);stroke:var(--ss-paper,#ffffff);"/><text x="656.63" y="341.85" font-size="17" font-weight="500" style="white-space:pre;fill:var(--ss-muted,#5a6676);">Audiobooks  53</text><text x="656.63" y="237.18" font-size="17" font-weight="700" style="white-space:pre;fill:var(--ss-ink,#17202b);">Print books  106</text><text x="656.63" y="181.66" font-size="17" font-weight="700" style="white-space:pre;fill:var(--ss-accent,#2457c5);">E-books  134</text><g class="ss-callout"><circle cx="487.34" cy="203.2" r="4.5" stroke-width="2" style="fill:var(--ss-ink,#17202b);stroke:var(--ss-paper,#ffffff);"/><path d="M487.34 203.2V111.2H429.34" fill="none" stroke-width="1.3" style="stroke:var(--ss-muted,#5a6676);"/><text x="423.34" y="96.16" font-size="16" text-anchor="end" font-weight="700" stroke-width="4.48" stroke-linejoin="round" paint-order="stroke" style="fill:var(--ss-ink,#17202b);stroke:var(--ss-paper,#ffffff);">March 2025</text><text x="423.34" y="116.96" font-size="16" text-anchor="end" stroke-width="4.48" stroke-linejoin="round" paint-order="stroke" style="fill:var(--ss-ink,#17202b);stroke:var(--ss-paper,#ffffff);"><tspan x="423.34" y="116.96">120,000 e-books,</tspan><tspan x="423.34" dy="20.8">119,100 print</tspan></text></g></svg></figure>
+<div class="st-rail" data-region="support">
+  <div class="st-kpi"><b class="st-accent">1.49<small>million</small></b><span>E-book loans in 2025, 19% more than in 2024</span></div>
+  <hr class="st-rule">
+  <p class="st-text">Three branches (<bdi>B04</bdi>, <bdi>B09</bdi>, and <bdi>B12</bdi>) have been closed for renovation since September 2024, which holds print loans down. Will e‑books stay ahead when they reopen in March 2026?</p>
+</div>
+<p class="st-source" data-region="source"><span>Illustrative data · fictional city library network of 14 branches; loans per calendar month, January 2023 to December 2025</span><span lang="en">English</span></p></section>
+<section class="slide st st--rail cs-civic-calm lp" id="language-ja" role="group" aria-roledescription="slide" aria-label="電子書籍の貸出は2025年3月以降、毎月紙の本を上回っている" aria-hidden="true" lang="ja" dir="ltr"><h1 class="st-head" data-region="title">電子書籍の貸出は<wbr><span class="nb">2025年3月</span>以降、<wbr>毎月<wbr>紙の本を<wbr>上回っている</h1>
+<figure class="st-fig" data-region="primary" dir="ltr"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 482" width="800" height="482" role="img" aria-labelledby="language-ja-fig-title language-ja-fig-desc" id="language-ja-fig" class="ss-fig" direction="ltr" style="overflow:visible;direction:ltr;font-family:var(--ss-font-sans,&quot;Inter&quot;,&quot;Helvetica Neue&quot;,&quot;Segoe UI&quot;,&quot;Hiragino Sans&quot;,&quot;Noto Sans JP&quot;,&quot;Yu Gothic&quot;,system-ui,sans-serif);"><title id="language-ja-fig-title">形態別の月間貸出数</title><desc id="language-ja-fig-desc">電子書籍の貸出は2025年3月以降、毎月紙の本を上回っている</desc><rect x="356.73" y="44" width="240.79" height="398" style="fill:var(--ss-surface,#f3f5f8);"/><text x="364.73" y="61.1" font-size="15" font-weight="600" style="fill:var(--ss-muted,#5a6676);">分館3館が休館中</text><g class="ss-axis"><line x1="35.68" x2="597.52" y1="442" y2="442" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><text x="27.68" y="447.4" font-size="15" text-anchor="end" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">0</text><line x1="35.68" x2="597.52" y1="342.5" y2="342.5" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><text x="27.68" y="347.9" font-size="15" text-anchor="end" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">5</text><line x1="35.68" x2="597.52" y1="243" y2="243" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><text x="27.68" y="248.4" font-size="15" text-anchor="end" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">10</text><line x1="35.68" x2="597.52" y1="143.5" y2="143.5" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><text x="27.68" y="148.9" font-size="15" text-anchor="end" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">15</text><line x1="35.68" x2="597.52" y1="44" y2="44" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><text x="27.68" y="49.4" font-size="15" text-anchor="end" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">20</text></g><text x="4" y="15.1" font-size="15" class="ss-unit" style="fill:var(--ss-muted,#5a6676);">月間貸出数（万件）</text><line x1="35.68" x2="35.68" y1="442" y2="447" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="35.68" y="465.1" font-size="15" text-anchor="middle" style="fill:var(--ss-muted,#5a6676);">2023年1月</text><line x1="228.31" x2="228.31" y1="442" y2="447" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="228.31" y="465.1" font-size="15" text-anchor="middle" style="fill:var(--ss-muted,#5a6676);">2024年1月</text><line x1="420.94" x2="420.94" y1="442" y2="447" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="420.94" y="465.1" font-size="15" text-anchor="middle" style="fill:var(--ss-muted,#5a6676);">2025年1月</text><line x1="597.52" x2="597.52" y1="442" y2="447" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="597.52" y="465.1" font-size="15" text-anchor="middle" style="fill:var(--ss-muted,#5a6676);">2025年12月</text><path d="M35.68 385.88L51.73 389.27L67.79 384.49L83.84 384.29L99.89 385.29L115.94 382.1L132 375.53L148.05 374.94L164.1 379.71L180.15 377.13L196.21 375.14L212.26 371.95L228.31 366.38L244.37 370.96L260.42 365.78L276.47 367.97L292.52 367.38L308.58 364.39L324.63 357.62L340.68 356.43L356.73 361.21L372.79 359.22L388.84 355.83L404.89 353.45L420.94 349.27L437 355.04L453.05 350.26L469.1 349.27L485.16 349.47L501.21 346.48L517.26 339.32L533.31 337.53L549.37 345.88L565.42 340.71L581.47 338.92L597.52 335.73" fill="none" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" class="ss-line" style="stroke:var(--ss-context,#c3cad4);"/><circle cx="597.52" cy="335.73" r="4" stroke-width="2" style="fill:var(--ss-context,#c3cad4);stroke:var(--ss-paper,#ffffff);"/><path d="M35.68 148.08L51.73 161.21L67.79 153.25L83.84 161.21L99.89 167.18L115.94 154.05L132 135.54L148.05 142.7L164.1 170.96L180.15 168.57L196.21 168.77L212.26 181.91L228.31 162.21L244.37 177.73L260.42 167.38L276.47 176.53L292.52 182.3L308.58 167.18L324.63 155.84L340.68 160.81L356.73 205.99L372.79 204L388.84 208.57L404.89 214.74L420.94 200.61L437 212.55L453.05 204.99L469.1 211.96L485.16 215.14L501.21 205.79L517.26 194.44L533.31 198.82L549.37 221.71L565.42 218.13L581.47 221.51L597.52 231.06" fill="none" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" class="ss-line" style="stroke:var(--ss-ink,#17202b);"/><circle cx="597.52" cy="231.06" r="6" stroke-width="2" style="fill:var(--ss-ink,#17202b);stroke:var(--ss-paper,#ffffff);"/><path d="M35.68 280.21L51.73 289.96L67.79 280.01L83.84 281.8L99.89 282.4L115.94 275.44L132 260.31L148.05 258.92L164.1 272.85L180.15 265.09L196.21 260.51L212.26 254.34L228.31 243.4L244.37 254.54L260.42 244.79L276.47 246.78L292.52 249.17L308.58 238.62L324.63 219.52L340.68 217.73L356.73 234.84L372.79 226.88L388.84 223.5L404.89 216.53L420.94 203.6L437 216.33L453.05 203.2L469.1 208.37L485.16 209.37L501.21 196.63L517.26 179.72L533.31 176.14L549.37 196.63L565.42 188.08L581.47 183.1L597.52 175.54" fill="none" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" class="ss-line" style="stroke:var(--ss-accent,#2457c5);"/><circle cx="597.52" cy="175.54" r="6" stroke-width="2" style="fill:var(--ss-accent,#2457c5);stroke:var(--ss-paper,#ffffff);"/><text x="613.52" y="341.85" font-size="17" font-weight="500" style="white-space:pre;fill:var(--ss-muted,#5a6676);">オーディオブック  5.3</text><text x="613.52" y="237.18" font-size="17" font-weight="700" style="white-space:pre;fill:var(--ss-ink,#17202b);">紙の本  10.6</text><text x="613.52" y="181.66" font-size="17" font-weight="700" style="white-space:pre;fill:var(--ss-accent,#2457c5);">電子書籍  13.4</text><g class="ss-callout"><circle cx="453.05" cy="203.2" r="4.5" stroke-width="2" style="fill:var(--ss-ink,#17202b);stroke:var(--ss-paper,#ffffff);"/><path d="M453.05 203.2V111.2H395.05" fill="none" stroke-width="1.3" style="stroke:var(--ss-muted,#5a6676);"/><text x="389.05" y="96.16" font-size="16" text-anchor="end" font-weight="700" stroke-width="4.48" stroke-linejoin="round" paint-order="stroke" style="fill:var(--ss-ink,#17202b);stroke:var(--ss-paper,#ffffff);">2025年3月</text><text x="389.05" y="116.96" font-size="16" text-anchor="end" stroke-width="4.48" stroke-linejoin="round" paint-order="stroke" style="fill:var(--ss-ink,#17202b);stroke:var(--ss-paper,#ffffff);"><tspan x="389.05" y="116.96">電子書籍12万件、</tspan><tspan x="389.05" dy="20.8">紙の本11万9100件</tspan></text></g></svg></figure>
+<div class="st-rail" data-region="support">
+  <div class="st-kpi"><b class="st-accent">149<small>万件</small></b><span>2025年の電子書籍の貸出数<span class="nb">（前年比19%増）</span></span></div>
+  <hr class="st-rule">
+  <p class="st-text">分館3館（<bdi>B04</bdi>、<bdi>B09</bdi>、<bdi>B12</bdi>）が<span class="nb">2024年9月</span>から改修で休館しており、紙の本の貸出を押し下げている。<span class="nb">2026年3月</span>の再開後も電子書籍が上回り続けるかは、まだ分からない。</p>
+</div>
+<p class="st-source" data-region="source"><span>架空のデータ · 14館からなる架空の市立図書館の月別貸出数（2023年1月〜2025年12月）</span><span lang="ja">日本語</span></p></section>
+<section class="slide st st--rail cs-civic-calm lp" id="language-zh-Hans" role="group" aria-roledescription="slide" aria-label="自2025年3月起，电子书借阅量每月都超过纸质书" aria-hidden="true" lang="zh-Hans" dir="ltr"><h1 class="st-head" data-region="title">自<span class="nb">2025年3月</span>起，<wbr>电子书借阅量<wbr>每月都超过<wbr>纸质书</h1>
+<figure class="st-fig" data-region="primary" dir="ltr"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 482" width="800" height="482" role="img" aria-labelledby="language-zh-Hans-fig-title language-zh-Hans-fig-desc" id="language-zh-Hans-fig" class="ss-fig" direction="ltr" style="overflow:visible;direction:ltr;font-family:var(--ss-font-sans,&quot;Inter&quot;,&quot;Helvetica Neue&quot;,&quot;Segoe UI&quot;,&quot;Hiragino Sans&quot;,&quot;Noto Sans JP&quot;,&quot;Yu Gothic&quot;,system-ui,sans-serif);"><title id="language-zh-Hans-fig-title">按载体划分的每月借阅量</title><desc id="language-zh-Hans-fig-desc">自2025年3月起，电子书借阅量每月都超过纸质书</desc><rect x="401.94" y="44" width="274.69" height="398" style="fill:var(--ss-surface,#f3f5f8);"/><text x="409.94" y="61.1" font-size="15" font-weight="600" style="fill:var(--ss-muted,#5a6676);">3家分馆闭馆</text><g class="ss-axis"><line x1="35.68" x2="676.63" y1="442" y2="442" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><text x="27.68" y="447.4" font-size="15" text-anchor="end" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">0</text><line x1="35.68" x2="676.63" y1="342.5" y2="342.5" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><text x="27.68" y="347.9" font-size="15" text-anchor="end" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">5</text><line x1="35.68" x2="676.63" y1="243" y2="243" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><text x="27.68" y="248.4" font-size="15" text-anchor="end" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">10</text><line x1="35.68" x2="676.63" y1="143.5" y2="143.5" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><text x="27.68" y="148.9" font-size="15" text-anchor="end" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">15</text><line x1="35.68" x2="676.63" y1="44" y2="44" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><text x="27.68" y="49.4" font-size="15" text-anchor="end" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">20</text></g><text x="4" y="15.1" font-size="15" class="ss-unit" style="fill:var(--ss-muted,#5a6676);">每月借阅量（万次）</text><line x1="35.68" x2="35.68" y1="442" y2="447" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="35.68" y="465.1" font-size="15" text-anchor="middle" style="fill:var(--ss-muted,#5a6676);">2023年1月</text><line x1="255.43" x2="255.43" y1="442" y2="447" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="255.43" y="465.1" font-size="15" text-anchor="middle" style="fill:var(--ss-muted,#5a6676);">2024年1月</text><line x1="475.19" x2="475.19" y1="442" y2="447" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="475.19" y="465.1" font-size="15" text-anchor="middle" style="fill:var(--ss-muted,#5a6676);">2025年1月</text><line x1="676.63" x2="676.63" y1="442" y2="447" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="676.63" y="465.1" font-size="15" text-anchor="middle" style="fill:var(--ss-muted,#5a6676);">2025年12月</text><path d="M35.68 385.88L53.99 389.27L72.31 384.49L90.62 384.29L108.93 385.29L127.24 382.1L145.56 375.53L163.87 374.94L182.18 379.71L200.5 377.13L218.81 375.14L237.12 371.95L255.43 366.38L273.75 370.96L292.06 365.78L310.37 367.97L328.69 367.38L347 364.39L365.31 357.62L383.62 356.43L401.94 361.21L420.25 359.22L438.56 355.83L456.88 353.45L475.19 349.27L493.5 355.04L511.81 350.26L530.13 349.27L548.44 349.47L566.75 346.48L585.07 339.32L603.38 337.53L621.69 345.88L640 340.71L658.32 338.92L676.63 335.73" fill="none" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" class="ss-line" style="stroke:var(--ss-context,#c3cad4);"/><circle cx="676.63" cy="335.73" r="4" stroke-width="2" style="fill:var(--ss-context,#c3cad4);stroke:var(--ss-paper,#ffffff);"/><path d="M35.68 148.08L53.99 161.21L72.31 153.25L90.62 161.21L108.93 167.18L127.24 154.05L145.56 135.54L163.87 142.7L182.18 170.96L200.5 168.57L218.81 168.77L237.12 181.91L255.43 162.21L273.75 177.73L292.06 167.38L310.37 176.53L328.69 182.3L347 167.18L365.31 155.84L383.62 160.81L401.94 205.99L420.25 204L438.56 208.57L456.88 214.74L475.19 200.61L493.5 212.55L511.81 204.99L530.13 211.96L548.44 215.14L566.75 205.79L585.07 194.44L603.38 198.82L621.69 221.71L640 218.13L658.32 221.51L676.63 231.06" fill="none" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" class="ss-line" style="stroke:var(--ss-ink,#17202b);"/><circle cx="676.63" cy="231.06" r="6" stroke-width="2" style="fill:var(--ss-ink,#17202b);stroke:var(--ss-paper,#ffffff);"/><path d="M35.68 280.21L53.99 289.96L72.31 280.01L90.62 281.8L108.93 282.4L127.24 275.44L145.56 260.31L163.87 258.92L182.18 272.85L200.5 265.09L218.81 260.51L237.12 254.34L255.43 243.4L273.75 254.54L292.06 244.79L310.37 246.78L328.69 249.17L347 238.62L365.31 219.52L383.62 217.73L401.94 234.84L420.25 226.88L438.56 223.5L456.88 216.53L475.19 203.6L493.5 216.33L511.81 203.2L530.13 208.37L548.44 209.37L566.75 196.63L585.07 179.72L603.38 176.14L621.69 196.63L640 188.08L658.32 183.1L676.63 175.54" fill="none" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" class="ss-line" style="stroke:var(--ss-accent,#2457c5);"/><circle cx="676.63" cy="175.54" r="6" stroke-width="2" style="fill:var(--ss-accent,#2457c5);stroke:var(--ss-paper,#ffffff);"/><text x="692.63" y="341.85" font-size="17" font-weight="500" style="white-space:pre;fill:var(--ss-muted,#5a6676);">有声书  5.3</text><text x="692.63" y="237.18" font-size="17" font-weight="700" style="white-space:pre;fill:var(--ss-ink,#17202b);">纸质书  10.6</text><text x="692.63" y="181.66" font-size="17" font-weight="700" style="white-space:pre;fill:var(--ss-accent,#2457c5);">电子书  13.4</text><g class="ss-callout"><circle cx="511.81" cy="203.2" r="4.5" stroke-width="2" style="fill:var(--ss-ink,#17202b);stroke:var(--ss-paper,#ffffff);"/><path d="M511.81 203.2V111.2H453.81" fill="none" stroke-width="1.3" style="stroke:var(--ss-muted,#5a6676);"/><text x="447.81" y="96.16" font-size="16" text-anchor="end" font-weight="700" stroke-width="4.48" stroke-linejoin="round" paint-order="stroke" style="fill:var(--ss-ink,#17202b);stroke:var(--ss-paper,#ffffff);">2025年3月</text><text x="447.81" y="116.96" font-size="16" text-anchor="end" stroke-width="4.48" stroke-linejoin="round" paint-order="stroke" style="fill:var(--ss-ink,#17202b);stroke:var(--ss-paper,#ffffff);"><tspan x="447.81" y="116.96">电子书12万次，</tspan><tspan x="447.81" dy="20.8">纸质书11.91万次</tspan></text></g></svg></figure>
+<div class="st-rail" data-region="support">
+  <div class="st-kpi"><b class="st-accent">149<small>万次</small></b><span>2025年<wbr>电子书借阅量，<wbr><span class="nb">比2024年增长19%</span></span></div>
+  <hr class="st-rule">
+  <p class="st-text">三家分馆（<bdi>B04</bdi>、<bdi>B09</bdi><span class="nb">和<bdi>B12</bdi></span>）<wbr>自<span class="nb">2024年9月</span>起<wbr>闭馆翻修，<wbr>拉低了<wbr>纸质书借阅量。<wbr>分馆<wbr>将于<span class="nb">2026年3月</span><wbr>重新开放，<wbr>届时<wbr>电子书<wbr>能否保持领先，<wbr>仍有待观察。</p>
+</div>
+<p class="st-source" data-region="source"><span>示例数据 · 虚构的市立图书馆网络（14家分馆）每月借阅量，2023年1月至2025年12月</span><span lang="zh-Hans">简体中文</span></p></section>
+<section class="slide st st--rail cs-civic-calm lp" id="language-zh-Hant" role="group" aria-roledescription="slide" aria-label="自2025年3月起，電子書借閱量每月都超越紙本書" aria-hidden="true" lang="zh-Hant" dir="ltr"><h1 class="st-head" data-region="title">自<span class="nb">2025年3月</span>起，<wbr>電子書借閱量<wbr>每月都超越<wbr>紙本書</h1>
+<figure class="st-fig" data-region="primary" dir="ltr"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 482" width="800" height="482" role="img" aria-labelledby="language-zh-Hant-fig-title language-zh-Hant-fig-desc" id="language-zh-Hant-fig" class="ss-fig" direction="ltr" style="overflow:visible;direction:ltr;font-family:var(--ss-font-sans,&quot;Inter&quot;,&quot;Helvetica Neue&quot;,&quot;Segoe UI&quot;,&quot;Hiragino Sans&quot;,&quot;Noto Sans JP&quot;,&quot;Yu Gothic&quot;,system-ui,sans-serif);"><title id="language-zh-Hant-fig-title">各類館藏每月借閱量</title><desc id="language-zh-Hant-fig-desc">自2025年3月起，電子書借閱量每月都超越紙本書</desc><rect x="401.94" y="44" width="274.69" height="398" style="fill:var(--ss-surface,#f3f5f8);"/><text x="409.94" y="61.1" font-size="15" font-weight="600" style="fill:var(--ss-muted,#5a6676);">3座分館閉館整修</text><g class="ss-axis"><line x1="35.68" x2="676.63" y1="442" y2="442" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><text x="27.68" y="447.4" font-size="15" text-anchor="end" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">0</text><line x1="35.68" x2="676.63" y1="342.5" y2="342.5" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><text x="27.68" y="347.9" font-size="15" text-anchor="end" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">5</text><line x1="35.68" x2="676.63" y1="243" y2="243" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><text x="27.68" y="248.4" font-size="15" text-anchor="end" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">10</text><line x1="35.68" x2="676.63" y1="143.5" y2="143.5" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><text x="27.68" y="148.9" font-size="15" text-anchor="end" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">15</text><line x1="35.68" x2="676.63" y1="44" y2="44" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><text x="27.68" y="49.4" font-size="15" text-anchor="end" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">20</text></g><text x="4" y="15.1" font-size="15" class="ss-unit" style="fill:var(--ss-muted,#5a6676);">每月借閱量（萬次）</text><line x1="35.68" x2="35.68" y1="442" y2="447" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="35.68" y="465.1" font-size="15" text-anchor="middle" style="fill:var(--ss-muted,#5a6676);">2023年1月</text><line x1="255.43" x2="255.43" y1="442" y2="447" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="255.43" y="465.1" font-size="15" text-anchor="middle" style="fill:var(--ss-muted,#5a6676);">2024年1月</text><line x1="475.19" x2="475.19" y1="442" y2="447" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="475.19" y="465.1" font-size="15" text-anchor="middle" style="fill:var(--ss-muted,#5a6676);">2025年1月</text><line x1="676.63" x2="676.63" y1="442" y2="447" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="676.63" y="465.1" font-size="15" text-anchor="middle" style="fill:var(--ss-muted,#5a6676);">2025年12月</text><path d="M35.68 385.88L53.99 389.27L72.31 384.49L90.62 384.29L108.93 385.29L127.24 382.1L145.56 375.53L163.87 374.94L182.18 379.71L200.5 377.13L218.81 375.14L237.12 371.95L255.43 366.38L273.75 370.96L292.06 365.78L310.37 367.97L328.69 367.38L347 364.39L365.31 357.62L383.62 356.43L401.94 361.21L420.25 359.22L438.56 355.83L456.88 353.45L475.19 349.27L493.5 355.04L511.81 350.26L530.13 349.27L548.44 349.47L566.75 346.48L585.07 339.32L603.38 337.53L621.69 345.88L640 340.71L658.32 338.92L676.63 335.73" fill="none" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" class="ss-line" style="stroke:var(--ss-context,#c3cad4);"/><circle cx="676.63" cy="335.73" r="4" stroke-width="2" style="fill:var(--ss-context,#c3cad4);stroke:var(--ss-paper,#ffffff);"/><path d="M35.68 148.08L53.99 161.21L72.31 153.25L90.62 161.21L108.93 167.18L127.24 154.05L145.56 135.54L163.87 142.7L182.18 170.96L200.5 168.57L218.81 168.77L237.12 181.91L255.43 162.21L273.75 177.73L292.06 167.38L310.37 176.53L328.69 182.3L347 167.18L365.31 155.84L383.62 160.81L401.94 205.99L420.25 204L438.56 208.57L456.88 214.74L475.19 200.61L493.5 212.55L511.81 204.99L530.13 211.96L548.44 215.14L566.75 205.79L585.07 194.44L603.38 198.82L621.69 221.71L640 218.13L658.32 221.51L676.63 231.06" fill="none" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" class="ss-line" style="stroke:var(--ss-ink,#17202b);"/><circle cx="676.63" cy="231.06" r="6" stroke-width="2" style="fill:var(--ss-ink,#17202b);stroke:var(--ss-paper,#ffffff);"/><path d="M35.68 280.21L53.99 289.96L72.31 280.01L90.62 281.8L108.93 282.4L127.24 275.44L145.56 260.31L163.87 258.92L182.18 272.85L200.5 265.09L218.81 260.51L237.12 254.34L255.43 243.4L273.75 254.54L292.06 244.79L310.37 246.78L328.69 249.17L347 238.62L365.31 219.52L383.62 217.73L401.94 234.84L420.25 226.88L438.56 223.5L456.88 216.53L475.19 203.6L493.5 216.33L511.81 203.2L530.13 208.37L548.44 209.37L566.75 196.63L585.07 179.72L603.38 176.14L621.69 196.63L640 188.08L658.32 183.1L676.63 175.54" fill="none" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" class="ss-line" style="stroke:var(--ss-accent,#2457c5);"/><circle cx="676.63" cy="175.54" r="6" stroke-width="2" style="fill:var(--ss-accent,#2457c5);stroke:var(--ss-paper,#ffffff);"/><text x="692.63" y="341.85" font-size="17" font-weight="500" style="white-space:pre;fill:var(--ss-muted,#5a6676);">有聲書  5.3</text><text x="692.63" y="237.18" font-size="17" font-weight="700" style="white-space:pre;fill:var(--ss-ink,#17202b);">紙本書  10.6</text><text x="692.63" y="181.66" font-size="17" font-weight="700" style="white-space:pre;fill:var(--ss-accent,#2457c5);">電子書  13.4</text><g class="ss-callout"><circle cx="511.81" cy="203.2" r="4.5" stroke-width="2" style="fill:var(--ss-ink,#17202b);stroke:var(--ss-paper,#ffffff);"/><path d="M511.81 203.2V111.2H453.81" fill="none" stroke-width="1.3" style="stroke:var(--ss-muted,#5a6676);"/><text x="447.81" y="96.16" font-size="16" text-anchor="end" font-weight="700" stroke-width="4.48" stroke-linejoin="round" paint-order="stroke" style="fill:var(--ss-ink,#17202b);stroke:var(--ss-paper,#ffffff);">2025年3月</text><text x="447.81" y="116.96" font-size="16" text-anchor="end" stroke-width="4.48" stroke-linejoin="round" paint-order="stroke" style="fill:var(--ss-ink,#17202b);stroke:var(--ss-paper,#ffffff);"><tspan x="447.81" y="116.96">電子書12萬次，</tspan><tspan x="447.81" dy="20.8">紙本書11.91萬次</tspan></text></g></svg></figure>
+<div class="st-rail" data-region="support">
+  <div class="st-kpi"><b class="st-accent">149<small>萬次</small></b><span>2025年<wbr>電子書借閱量，<wbr><span class="nb">較2024年成長19%</span></span></div>
+  <hr class="st-rule">
+  <p class="st-text">三座分館（<bdi>B04</bdi>、<bdi>B09</bdi><span class="nb">和<bdi>B12</bdi></span>）<wbr>自<span class="nb">2024年9月</span>起<wbr>閉館整修，<wbr>使紙本書<wbr>借閱量下滑。<wbr>分館<wbr>預計<span class="nb">2026年3月</span><wbr>重新開放，<wbr>屆時<wbr>電子書<wbr>能否維持領先，<wbr>仍有待觀察。</p>
+</div>
+<p class="st-source" data-region="source"><span>示意資料 · 虛構的市立圖書館（14座分館）每月借閱量，2023年1月至2025年12月</span><span lang="zh-Hant">繁體中文</span></p></section>
+<section class="slide st st--rail cs-civic-calm lp" id="language-ko" role="group" aria-roledescription="slide" aria-label="2025년 3월부터 전자책 대출이 매달 종이책보다 많았다" aria-hidden="true" lang="ko" dir="ltr"><h1 class="st-head" data-region="title"><span class="nb">2025년 3월</span>부터 전자책 대출이 매달 종이책보다 많았다</h1>
+<figure class="st-fig" data-region="primary" dir="ltr"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 482" width="800" height="482" role="img" aria-labelledby="language-ko-fig-title language-ko-fig-desc" id="language-ko-fig" class="ss-fig" direction="ltr" style="overflow:visible;direction:ltr;font-family:var(--ss-font-sans,&quot;Inter&quot;,&quot;Helvetica Neue&quot;,&quot;Segoe UI&quot;,&quot;Hiragino Sans&quot;,&quot;Noto Sans JP&quot;,&quot;Yu Gothic&quot;,system-ui,sans-serif);"><title id="language-ko-fig-title">자료 형태별 월별 대출 건수</title><desc id="language-ko-fig-desc">2025년 3월부터 전자책 대출이 매달 종이책보다 많았다</desc><rect x="397.73" y="44" width="271.54" height="398" style="fill:var(--ss-surface,#f3f5f8);"/><text x="405.73" y="61.1" font-size="15" font-weight="600" style="fill:var(--ss-muted,#5a6676);">분관 3곳 휴관</text><g class="ss-axis"><line x1="35.68" x2="669.26" y1="442" y2="442" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><text x="27.68" y="447.4" font-size="15" text-anchor="end" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">0</text><line x1="35.68" x2="669.26" y1="342.5" y2="342.5" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><text x="27.68" y="347.9" font-size="15" text-anchor="end" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">5</text><line x1="35.68" x2="669.26" y1="243" y2="243" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><text x="27.68" y="248.4" font-size="15" text-anchor="end" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">10</text><line x1="35.68" x2="669.26" y1="143.5" y2="143.5" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><text x="27.68" y="148.9" font-size="15" text-anchor="end" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">15</text><line x1="35.68" x2="669.26" y1="44" y2="44" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><text x="27.68" y="49.4" font-size="15" text-anchor="end" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">20</text></g><text x="4" y="15.1" font-size="15" class="ss-unit" style="fill:var(--ss-muted,#5a6676);">월별 대출 건수(만 건)</text><line x1="35.68" x2="35.68" y1="442" y2="447" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="35.68" y="465.1" font-size="15" text-anchor="middle" style="fill:var(--ss-muted,#5a6676);">2023년 1월</text><line x1="252.91" x2="252.91" y1="442" y2="447" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="252.91" y="465.1" font-size="15" text-anchor="middle" style="fill:var(--ss-muted,#5a6676);">2024년 1월</text><line x1="470.14" x2="470.14" y1="442" y2="447" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="470.14" y="465.1" font-size="15" text-anchor="middle" style="fill:var(--ss-muted,#5a6676);">2025년 1월</text><line x1="669.26" x2="669.26" y1="442" y2="447" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="669.26" y="465.1" font-size="15" text-anchor="middle" style="fill:var(--ss-muted,#5a6676);">2025년 12월</text><path d="M35.68 385.88L53.78 389.27L71.89 384.49L89.99 384.29L108.09 385.29L126.19 382.1L144.3 375.53L162.4 374.94L180.5 379.71L198.6 377.13L216.7 375.14L234.81 371.95L252.91 366.38L271.01 370.96L289.11 365.78L307.22 367.97L325.32 367.38L343.42 364.39L361.52 357.62L379.63 356.43L397.73 361.21L415.83 359.22L433.93 355.83L452.04 353.45L470.14 349.27L488.24 355.04L506.34 350.26L524.45 349.27L542.55 349.47L560.65 346.48L578.75 339.32L596.85 337.53L614.96 345.88L633.06 340.71L651.16 338.92L669.26 335.73" fill="none" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" class="ss-line" style="stroke:var(--ss-context,#c3cad4);"/><circle cx="669.26" cy="335.73" r="4" stroke-width="2" style="fill:var(--ss-context,#c3cad4);stroke:var(--ss-paper,#ffffff);"/><path d="M35.68 148.08L53.78 161.21L71.89 153.25L89.99 161.21L108.09 167.18L126.19 154.05L144.3 135.54L162.4 142.7L180.5 170.96L198.6 168.57L216.7 168.77L234.81 181.91L252.91 162.21L271.01 177.73L289.11 167.38L307.22 176.53L325.32 182.3L343.42 167.18L361.52 155.84L379.63 160.81L397.73 205.99L415.83 204L433.93 208.57L452.04 214.74L470.14 200.61L488.24 212.55L506.34 204.99L524.45 211.96L542.55 215.14L560.65 205.79L578.75 194.44L596.85 198.82L614.96 221.71L633.06 218.13L651.16 221.51L669.26 231.06" fill="none" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" class="ss-line" style="stroke:var(--ss-ink,#17202b);"/><circle cx="669.26" cy="231.06" r="6" stroke-width="2" style="fill:var(--ss-ink,#17202b);stroke:var(--ss-paper,#ffffff);"/><path d="M35.68 280.21L53.78 289.96L71.89 280.01L89.99 281.8L108.09 282.4L126.19 275.44L144.3 260.31L162.4 258.92L180.5 272.85L198.6 265.09L216.7 260.51L234.81 254.34L252.91 243.4L271.01 254.54L289.11 244.79L307.22 246.78L325.32 249.17L343.42 238.62L361.52 219.52L379.63 217.73L397.73 234.84L415.83 226.88L433.93 223.5L452.04 216.53L470.14 203.6L488.24 216.33L506.34 203.2L524.45 208.37L542.55 209.37L560.65 196.63L578.75 179.72L596.85 176.14L614.96 196.63L633.06 188.08L651.16 183.1L669.26 175.54" fill="none" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" class="ss-line" style="stroke:var(--ss-accent,#2457c5);"/><circle cx="669.26" cy="175.54" r="6" stroke-width="2" style="fill:var(--ss-accent,#2457c5);stroke:var(--ss-paper,#ffffff);"/><text x="685.26" y="341.85" font-size="17" font-weight="500" style="white-space:pre;fill:var(--ss-muted,#5a6676);">오디오북  5.3</text><text x="685.26" y="237.18" font-size="17" font-weight="700" style="white-space:pre;fill:var(--ss-ink,#17202b);">종이책  10.6</text><text x="685.26" y="181.66" font-size="17" font-weight="700" style="white-space:pre;fill:var(--ss-accent,#2457c5);">전자책  13.4</text><g class="ss-callout"><circle cx="506.34" cy="203.2" r="4.5" stroke-width="2" style="fill:var(--ss-ink,#17202b);stroke:var(--ss-paper,#ffffff);"/><path d="M506.34 203.2V111.2H448.34" fill="none" stroke-width="1.3" style="stroke:var(--ss-muted,#5a6676);"/><text x="442.34" y="96.16" font-size="16" text-anchor="end" font-weight="700" stroke-width="4.48" stroke-linejoin="round" paint-order="stroke" style="fill:var(--ss-ink,#17202b);stroke:var(--ss-paper,#ffffff);">2025년 3월</text><text x="442.34" y="116.96" font-size="16" text-anchor="end" stroke-width="4.48" stroke-linejoin="round" paint-order="stroke" style="fill:var(--ss-ink,#17202b);stroke:var(--ss-paper,#ffffff);"><tspan x="442.34" y="116.96">전자책 12만건,</tspan><tspan x="442.34" dy="20.8">종이책 11만 9100건</tspan></text></g></svg></figure>
+<div class="st-rail" data-region="support">
+  <div class="st-kpi"><b class="st-accent">149<small>만 건</small></b><span>2025년 전자책 대출 건수, <span class="nb">전년보다 19% 증가</span></span></div>
+  <hr class="st-rule">
+  <p class="st-text">분관 세 곳(<bdi>B04</bdi>, <bdi>B09</bdi><span class="nb"> 및 <bdi>B12</bdi></span>)이 <span class="nb">2024년 9월</span>부터 리모델링으로 휴관해 종이책 대출이 줄었다. <span class="nb">2026년 3월</span>에 다시 문을 연 뒤에도 전자책이 앞설지는 아직 알 수 없다.</p>
+</div>
+<p class="st-source" data-region="source"><span>가상 데이터 · 분관 14곳으로 이루어진 가상 시립도서관의 월별 대출 건수(2023년 1월~2025년 12월)</span><span lang="ko">한국어</span></p></section>
+<section class="slide st st--left cs-civic-calm lp" id="language-ar" role="group" aria-roledescription="slide" aria-label="منذ مارس ٢٠٢٥، تتفوّق إعارات الكتب الإلكترونية على المطبوعة كل شهر" aria-hidden="true" lang="ar" dir="rtl"><h1 class="st-head" data-region="title">منذ مارس ٢٠٢٥، تتفوّق إعارات الكتب الإلكترونية على المطبوعة كل شهر</h1>
+<figure class="st-fig" data-region="primary" dir="ltr"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 482" width="800" height="482" role="img" aria-labelledby="language-ar-fig-title language-ar-fig-desc" id="language-ar-fig" class="ss-fig" direction="ltr" style="overflow:visible;direction:ltr;font-family:var(--ss-font-sans,&quot;Inter&quot;,&quot;Helvetica Neue&quot;,&quot;Segoe UI&quot;,&quot;Hiragino Sans&quot;,&quot;Noto Sans JP&quot;,&quot;Yu Gothic&quot;,system-ui,sans-serif);"><title id="language-ar-fig-title">الإعارات الشهرية حسب نوع الكتاب</title><desc id="language-ar-fig-desc">منذ مارس ٢٠٢٥، تتفوّق إعارات الكتب الإلكترونية على المطبوعة كل شهر</desc><rect x="328.58" y="44" width="210.8" height="398" style="fill:var(--ss-surface,#f3f5f8);"/><text x="336.58" y="61.84" font-size="16" font-weight="600" style="fill:var(--ss-muted,#5a6676);">٣ فروع مغلقة</text><g class="ss-axis"><line x1="47.51" x2="539.39" y1="442" y2="442" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><text x="39.51" y="447.76" font-size="16" text-anchor="end" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">٠</text><line x1="47.51" x2="539.39" y1="342.5" y2="342.5" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><text x="39.51" y="348.26" font-size="16" text-anchor="end" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">٥٠</text><line x1="47.51" x2="539.39" y1="243" y2="243" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><text x="39.51" y="248.76" font-size="16" text-anchor="end" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">١٠٠</text><line x1="47.51" x2="539.39" y1="143.5" y2="143.5" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><text x="39.51" y="149.26" font-size="16" text-anchor="end" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">١٥٠</text><line x1="47.51" x2="539.39" y1="44" y2="44" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><text x="39.51" y="49.76" font-size="16" text-anchor="end" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">٢٠٠</text></g><text x="4" y="15.84" font-size="16" class="ss-unit" style="fill:var(--ss-muted,#5a6676);">الإعارات شهريًا (بالآلاف)</text><line x1="47.51" x2="47.51" y1="442" y2="447" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="47.51" y="465.84" font-size="16" text-anchor="middle" style="fill:var(--ss-muted,#5a6676);">يناير ٢٠٢٣</text><line x1="216.15" x2="216.15" y1="442" y2="447" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="216.15" y="465.84" font-size="16" text-anchor="middle" style="fill:var(--ss-muted,#5a6676);">يناير ٢٠٢٤</text><line x1="384.8" x2="384.8" y1="442" y2="447" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="384.8" y="465.84" font-size="16" text-anchor="middle" style="fill:var(--ss-muted,#5a6676);">يناير ٢٠٢٥</text><line x1="539.39" x2="539.39" y1="442" y2="447" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="539.39" y="465.84" font-size="16" text-anchor="middle" style="fill:var(--ss-muted,#5a6676);">ديسمبر ٢٠٢٥</text><path d="M47.51 385.88L61.56 389.27L75.62 384.49L89.67 384.29L103.72 385.29L117.78 382.1L131.83 375.53L145.89 374.94L159.94 379.71L173.99 377.13L188.05 375.14L202.1 371.95L216.15 366.38L230.21 370.96L244.26 365.78L258.31 367.97L272.37 367.38L286.42 364.39L300.48 357.62L314.53 356.43L328.58 361.21L342.64 359.22L356.69 355.83L370.74 353.45L384.8 349.27L398.85 355.04L412.9 350.26L426.96 349.27L441.01 349.47L455.06 346.48L469.12 339.32L483.17 337.53L497.23 345.88L511.28 340.71L525.33 338.92L539.39 335.73" fill="none" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" class="ss-line" style="stroke:var(--ss-context,#c3cad4);"/><circle cx="539.39" cy="335.73" r="4" stroke-width="2" style="fill:var(--ss-context,#c3cad4);stroke:var(--ss-paper,#ffffff);"/><path d="M47.51 148.08L61.56 161.21L75.62 153.25L89.67 161.21L103.72 167.18L117.78 154.05L131.83 135.54L145.89 142.7L159.94 170.96L173.99 168.57L188.05 168.77L202.1 181.91L216.15 162.21L230.21 177.73L244.26 167.38L258.31 176.53L272.37 182.31L286.42 167.18L300.48 155.84L314.53 160.81L328.58 205.99L342.64 204L356.69 208.57L370.74 214.74L384.8 200.61L398.85 212.55L412.9 204.99L426.96 211.96L441.01 215.14L455.06 205.79L469.12 194.44L483.17 198.82L497.23 221.71L511.28 218.13L525.33 221.51L539.39 231.06" fill="none" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" class="ss-line" style="stroke:var(--ss-ink,#17202b);"/><circle cx="539.39" cy="231.06" r="6" stroke-width="2" style="fill:var(--ss-ink,#17202b);stroke:var(--ss-paper,#ffffff);"/><path d="M47.51 280.21L61.56 289.96L75.62 280.01L89.67 281.8L103.72 282.4L117.78 275.44L131.83 260.31L145.89 258.92L159.94 272.85L173.99 265.09L188.05 260.51L202.1 254.34L216.15 243.4L230.21 254.54L244.26 244.79L258.31 246.78L272.37 249.17L286.42 238.62L300.48 219.52L314.53 217.73L328.58 234.84L342.64 226.88L356.69 223.5L370.74 216.53L384.8 203.6L398.85 216.33L412.9 203.2L426.96 208.37L441.01 209.37L455.06 196.63L469.12 179.72L483.17 176.14L497.23 196.63L511.28 188.08L525.33 183.1L539.39 175.54" fill="none" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" class="ss-line" style="stroke:var(--ss-accent,#2457c5);"/><circle cx="539.39" cy="175.54" r="6" stroke-width="2" style="fill:var(--ss-accent,#2457c5);stroke:var(--ss-paper,#ffffff);"/><text x="555.39" y="342.21" font-size="18" font-weight="500" style="white-space:pre;fill:var(--ss-muted,#5a6676);">الكتب الصوتية  ٥٣</text><text x="555.39" y="237.54" font-size="18" font-weight="700" style="white-space:pre;fill:var(--ss-ink,#17202b);">الكتب المطبوعة  ١٠٦</text><text x="555.39" y="182.02" font-size="18" font-weight="700" style="white-space:pre;fill:var(--ss-accent,#2457c5);">الكتب الإلكترونية  ١٣٤</text><g class="ss-callout"><circle cx="412.9" cy="203.2" r="4.5" stroke-width="2" style="fill:var(--ss-ink,#17202b);stroke:var(--ss-paper,#ffffff);"/><path d="M412.9 203.2V111.2H354.9" fill="none" stroke-width="1.3" style="stroke:var(--ss-muted,#5a6676);"/><text x="348.9" y="95.22" font-size="17" text-anchor="end" font-weight="700" stroke-width="4.76" stroke-linejoin="round" paint-order="stroke" style="fill:var(--ss-ink,#17202b);stroke:var(--ss-paper,#ffffff);">مارس ٢٠٢٥</text><text x="348.9" y="117.32" font-size="17" text-anchor="end" stroke-width="4.76" stroke-linejoin="round" paint-order="stroke" style="fill:var(--ss-ink,#17202b);stroke:var(--ss-paper,#ffffff);"><tspan x="348.9" y="117.32">١٢٠٬٠٠٠ إلكترونية</tspan><tspan x="348.9" dy="22.1">مقابل ١١٩٬١٠٠ مطبوعة</tspan></text></g></svg></figure>
+<div class="st-rail" data-region="support">
+  <div class="st-kpi"><b class="st-accent">١٫٤٩<small>مليون</small></b><span>إعارات الكتب الإلكترونية في ٢٠٢٥، بزيادة ١٩٪؜ عن ٢٠٢٤</span></div>
+  <hr class="st-rule">
+  <p class="st-text">أُغلقت ٣ فروع (<bdi>B04</bdi> و<bdi>B09</bdi> و<bdi>B12</bdi>) للتجديد منذ سبتمبر ٢٠٢٤، ما قلّل إعارات الكتب المطبوعة. فهل تبقى الكتب الإلكترونية في الصدارة بعد إعادة افتتاحها في مارس ٢٠٢٦؟</p>
+</div>
+<p class="st-source" data-region="source"><span>بيانات توضيحية · شبكة مكتبات عامة متخيَّلة من ١٤ فرعًا؛ الإعارات الشهرية من يناير ٢٠٢٣ إلى ديسمبر ٢٠٢٥</span><span lang="ar">العربية</span></p></section>
+<section class="slide st st--rail cs-civic-calm lp" id="language-hi" role="group" aria-roledescription="slide" aria-label="मार्च 2025 से हर महीने छपी किताबों से ज़्यादा ई‑बुक उधार ली गई हैं" aria-hidden="true" lang="hi" dir="ltr"><h1 class="st-head" data-region="title">मार्च 2025 से हर महीने छपी किताबों से ज़्यादा ई‑बुक उधार ली गई हैं</h1>
+<figure class="st-fig" data-region="primary" dir="ltr"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 482" width="800" height="482" role="img" aria-labelledby="language-hi-fig-title language-hi-fig-desc" id="language-hi-fig" class="ss-fig" direction="ltr" style="overflow:visible;direction:ltr;font-family:var(--ss-font-sans,&quot;Inter&quot;,&quot;Helvetica Neue&quot;,&quot;Segoe UI&quot;,&quot;Hiragino Sans&quot;,&quot;Noto Sans JP&quot;,&quot;Yu Gothic&quot;,system-ui,sans-serif);"><title id="language-hi-fig-title">हर महीने उधार ली गई किताबें, रूप के अनुसार</title><desc id="language-hi-fig-desc">मार्च 2025 से हर महीने छपी किताबों से ज़्यादा ई‑बुक उधार ली गई हैं</desc><rect x="368.92" y="44" width="241.97" height="398" style="fill:var(--ss-surface,#f3f5f8);"/><text x="376.92" y="61.84" font-size="16" font-weight="600" style="fill:var(--ss-muted,#5a6676);">3 शाखाएँ बंद</text><g class="ss-axis"><line x1="46.29" x2="610.89" y1="442" y2="442" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><text x="38.29" y="447.76" font-size="16" text-anchor="end" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">0</text><line x1="46.29" x2="610.89" y1="342.5" y2="342.5" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><text x="38.29" y="348.26" font-size="16" text-anchor="end" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">50</text><line x1="46.29" x2="610.89" y1="243" y2="243" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><text x="38.29" y="248.76" font-size="16" text-anchor="end" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">100</text><line x1="46.29" x2="610.89" y1="143.5" y2="143.5" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><text x="38.29" y="149.26" font-size="16" text-anchor="end" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">150</text><line x1="46.29" x2="610.89" y1="44" y2="44" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><text x="38.29" y="49.76" font-size="16" text-anchor="end" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">200</text></g><text x="4" y="15.84" font-size="16" class="ss-unit" style="fill:var(--ss-muted,#5a6676);">हर महीने उधार ली गई किताबें (हज़ार में)</text><line x1="46.29" x2="46.29" y1="442" y2="447" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="46.29" y="465.84" font-size="16" text-anchor="middle" style="fill:var(--ss-muted,#5a6676);">जन॰ 2023</text><line x1="239.87" x2="239.87" y1="442" y2="447" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="239.87" y="465.84" font-size="16" text-anchor="middle" style="fill:var(--ss-muted,#5a6676);">जन॰ 2024</text><line x1="433.44" x2="433.44" y1="442" y2="447" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="433.44" y="465.84" font-size="16" text-anchor="middle" style="fill:var(--ss-muted,#5a6676);">जन॰ 2025</text><line x1="610.89" x2="610.89" y1="442" y2="447" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="610.89" y="465.84" font-size="16" text-anchor="middle" style="fill:var(--ss-muted,#5a6676);">दिस॰ 2025</text><path d="M46.29 385.88L62.42 389.27L78.55 384.49L94.68 384.29L110.81 385.29L126.95 382.1L143.08 375.53L159.21 374.94L175.34 379.71L191.47 377.13L207.6 375.14L223.73 371.95L239.87 366.38L256 370.96L272.13 365.78L288.26 367.97L304.39 367.38L320.52 364.39L336.65 357.62L352.78 356.43L368.92 361.21L385.05 359.22L401.18 355.83L417.31 353.45L433.44 349.27L449.57 355.04L465.7 350.26L481.84 349.27L497.97 349.47L514.1 346.48L530.23 339.32L546.36 337.53L562.49 345.88L578.62 340.71L594.75 338.92L610.89 335.73" fill="none" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" class="ss-line" style="stroke:var(--ss-context,#c3cad4);"/><circle cx="610.89" cy="335.73" r="4" stroke-width="2" style="fill:var(--ss-context,#c3cad4);stroke:var(--ss-paper,#ffffff);"/><path d="M46.29 148.08L62.42 161.21L78.55 153.25L94.68 161.21L110.81 167.18L126.95 154.05L143.08 135.54L159.21 142.7L175.34 170.96L191.47 168.57L207.6 168.77L223.73 181.91L239.87 162.21L256 177.73L272.13 167.38L288.26 176.53L304.39 182.31L320.52 167.18L336.65 155.84L352.78 160.81L368.92 205.99L385.05 204L401.18 208.57L417.31 214.74L433.44 200.61L449.57 212.55L465.7 204.99L481.84 211.96L497.97 215.14L514.1 205.79L530.23 194.44L546.36 198.82L562.49 221.71L578.62 218.13L594.75 221.51L610.89 231.06" fill="none" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" class="ss-line" style="stroke:var(--ss-ink,#17202b);"/><circle cx="610.89" cy="231.06" r="6" stroke-width="2" style="fill:var(--ss-ink,#17202b);stroke:var(--ss-paper,#ffffff);"/><path d="M46.29 280.21L62.42 289.96L78.55 280.01L94.68 281.8L110.81 282.4L126.95 275.44L143.08 260.31L159.21 258.92L175.34 272.85L191.47 265.09L207.6 260.51L223.73 254.34L239.87 243.4L256 254.54L272.13 244.79L288.26 246.78L304.39 249.17L320.52 238.62L336.65 219.52L352.78 217.73L368.92 234.84L385.05 226.88L401.18 223.5L417.31 216.53L433.44 203.6L449.57 216.33L465.7 203.2L481.84 208.37L497.97 209.37L514.1 196.63L530.23 179.72L546.36 176.14L562.49 196.63L578.62 188.08L594.75 183.1L610.89 175.54" fill="none" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" class="ss-line" style="stroke:var(--ss-accent,#2457c5);"/><circle cx="610.89" cy="175.54" r="6" stroke-width="2" style="fill:var(--ss-accent,#2457c5);stroke:var(--ss-paper,#ffffff);"/><text x="626.89" y="342.21" font-size="18" font-weight="500" style="white-space:pre;fill:var(--ss-muted,#5a6676);">ऑडियोबुक  53</text><text x="626.89" y="237.54" font-size="18" font-weight="700" style="white-space:pre;fill:var(--ss-ink,#17202b);">छपी किताबें  106</text><text x="626.89" y="182.02" font-size="18" font-weight="700" style="white-space:pre;fill:var(--ss-accent,#2457c5);">ई-बुक  134</text><g class="ss-callout"><circle cx="465.7" cy="203.2" r="4.5" stroke-width="2" style="fill:var(--ss-ink,#17202b);stroke:var(--ss-paper,#ffffff);"/><path d="M465.7 203.2V111.2H407.7" fill="none" stroke-width="1.3" style="stroke:var(--ss-muted,#5a6676);"/><text x="401.7" y="95.22" font-size="17" text-anchor="end" font-weight="700" stroke-width="4.76" stroke-linejoin="round" paint-order="stroke" style="fill:var(--ss-ink,#17202b);stroke:var(--ss-paper,#ffffff);">मार्च 2025</text><text x="401.7" y="117.32" font-size="17" text-anchor="end" stroke-width="4.76" stroke-linejoin="round" paint-order="stroke" style="fill:var(--ss-ink,#17202b);stroke:var(--ss-paper,#ffffff);"><tspan x="401.7" y="117.32">1,20,000 ई-बुक,</tspan><tspan x="401.7" dy="22.1">1,19,100 छपी किताबें</tspan></text></g></svg></figure>
+<div class="st-rail" data-region="support">
+  <div class="st-kpi"><b class="st-accent">14.9<small>लाख</small></b><span>2025 में उधार ली गई ई‑बुक, 2024 से 19% ज़्यादा</span></div>
+  <hr class="st-rule">
+  <p class="st-text">तीन शाखाएँ (<bdi>B04</bdi>, <bdi>B09</bdi>, और <bdi>B12</bdi>) सितंबर 2024 से मरम्मत के लिए बंद हैं, इसलिए छपी किताबें कम ली गईं। मार्च 2026 में इनके दोबारा खुलने के बाद भी क्या ई‑बुक आगे रहेंगी?</p>
+</div>
+<p class="st-source" data-region="source"><span>उदाहरण के आँकड़े · 14 शाखाओं वाला एक काल्पनिक नगर पुस्तकालय; जनवरी 2023 से दिसंबर 2025 तक हर महीने उधार ली गई किताबें</span><span lang="hi">हिन्दी</span></p></section>
+<section class="slide st st--rail cs-civic-calm lp" id="language-de" role="group" aria-roledescription="slide" aria-label="Seit März 2025 werden jeden Monat mehr E‑Books ausgeliehen als gedruckte Bücher" aria-hidden="true" lang="de" dir="ltr"><h1 class="st-head" data-region="title">Seit März 2025 werden jeden Monat mehr E‑Books ausgeliehen als gedruckte Bücher</h1>
+<figure class="st-fig" data-region="primary" dir="ltr"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 482" width="800" height="482" role="img" aria-labelledby="language-de-fig-title language-de-fig-desc" id="language-de-fig" class="ss-fig" direction="ltr" style="overflow:visible;direction:ltr;font-family:var(--ss-font-sans,&quot;Inter&quot;,&quot;Helvetica Neue&quot;,&quot;Segoe UI&quot;,&quot;Hiragino Sans&quot;,&quot;Noto Sans JP&quot;,&quot;Yu Gothic&quot;,system-ui,sans-serif);"><title id="language-de-fig-title">Ausleihen pro Monat nach Medienart</title><desc id="language-de-fig-desc">Seit März 2025 werden jeden Monat mehr E‑Books ausgeliehen als gedruckte Bücher</desc><rect x="351.68" y="44" width="230.37" height="398" style="fill:var(--ss-surface,#f3f5f8);"/><text x="359.68" y="61.1" font-size="15" font-weight="600" style="fill:var(--ss-muted,#5a6676);">3 Zweigstellen geschlossen</text><g class="ss-axis"><line x1="44.52" x2="582.05" y1="442" y2="442" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><text x="36.52" y="447.4" font-size="15" text-anchor="end" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">0</text><line x1="44.52" x2="582.05" y1="342.5" y2="342.5" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><text x="36.52" y="347.9" font-size="15" text-anchor="end" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">50</text><line x1="44.52" x2="582.05" y1="243" y2="243" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><text x="36.52" y="248.4" font-size="15" text-anchor="end" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">100</text><line x1="44.52" x2="582.05" y1="143.5" y2="143.5" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><text x="36.52" y="148.9" font-size="15" text-anchor="end" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">150</text><line x1="44.52" x2="582.05" y1="44" y2="44" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><text x="36.52" y="49.4" font-size="15" text-anchor="end" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">200</text></g><text x="4" y="15.1" font-size="15" class="ss-unit" style="fill:var(--ss-muted,#5a6676);">Ausleihen pro Monat, in Tausend</text><line x1="44.52" x2="44.52" y1="442" y2="447" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="44.52" y="465.1" font-size="15" text-anchor="middle" style="fill:var(--ss-muted,#5a6676);">Jan. 2023</text><line x1="228.82" x2="228.82" y1="442" y2="447" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="228.82" y="465.1" font-size="15" text-anchor="middle" style="fill:var(--ss-muted,#5a6676);">Jan. 2024</text><line x1="413.11" x2="413.11" y1="442" y2="447" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="413.11" y="465.1" font-size="15" text-anchor="middle" style="fill:var(--ss-muted,#5a6676);">Jan. 2025</text><line x1="582.05" x2="582.05" y1="442" y2="447" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="582.05" y="465.1" font-size="15" text-anchor="middle" style="fill:var(--ss-muted,#5a6676);">Dez. 2025</text><path d="M44.52 385.88L59.88 389.27L75.24 384.49L90.6 384.29L105.95 385.29L121.31 382.1L136.67 375.53L152.03 374.94L167.39 379.71L182.74 377.13L198.1 375.14L213.46 371.95L228.82 366.38L244.18 370.96L259.53 365.78L274.89 367.97L290.25 367.38L305.61 364.39L320.97 357.62L336.32 356.43L351.68 361.21L367.04 359.22L382.4 355.83L397.76 353.45L413.11 349.27L428.47 355.04L443.83 350.26L459.19 349.27L474.55 349.47L489.9 346.48L505.26 339.32L520.62 337.53L535.98 345.88L551.34 340.71L566.69 338.92L582.05 335.73" fill="none" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" class="ss-line" style="stroke:var(--ss-context,#c3cad4);"/><circle cx="582.05" cy="335.73" r="4" stroke-width="2" style="fill:var(--ss-context,#c3cad4);stroke:var(--ss-paper,#ffffff);"/><path d="M44.52 148.08L59.88 161.21L75.24 153.25L90.6 161.21L105.95 167.18L121.31 154.05L136.67 135.54L152.03 142.7L167.39 170.96L182.74 168.57L198.1 168.77L213.46 181.91L228.82 162.21L244.18 177.73L259.53 167.38L274.89 176.53L290.25 182.31L305.61 167.18L320.97 155.84L336.32 160.81L351.68 205.99L367.04 204L382.4 208.57L397.76 214.74L413.11 200.61L428.47 212.55L443.83 204.99L459.19 211.96L474.55 215.14L489.9 205.79L505.26 194.44L520.62 198.82L535.98 221.71L551.34 218.13L566.69 221.51L582.05 231.06" fill="none" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" class="ss-line" style="stroke:var(--ss-ink,#17202b);"/><circle cx="582.05" cy="231.06" r="6" stroke-width="2" style="fill:var(--ss-ink,#17202b);stroke:var(--ss-paper,#ffffff);"/><path d="M44.52 280.21L59.88 289.96L75.24 280.01L90.6 281.8L105.95 282.4L121.31 275.44L136.67 260.31L152.03 258.92L167.39 272.85L182.74 265.09L198.1 260.51L213.46 254.34L228.82 243.4L244.18 254.54L259.53 244.79L274.89 246.78L290.25 249.17L305.61 238.62L320.97 219.52L336.32 217.73L351.68 234.84L367.04 226.88L382.4 223.5L397.76 216.53L413.11 203.6L428.47 216.33L443.83 203.2L459.19 208.37L474.55 209.37L489.9 196.63L505.26 179.72L520.62 176.14L535.98 196.63L551.34 188.08L566.69 183.1L582.05 175.54" fill="none" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" class="ss-line" style="stroke:var(--ss-accent,#2457c5);"/><circle cx="582.05" cy="175.54" r="6" stroke-width="2" style="fill:var(--ss-accent,#2457c5);stroke:var(--ss-paper,#ffffff);"/><text x="598.05" y="341.85" font-size="17" font-weight="500" style="white-space:pre;fill:var(--ss-muted,#5a6676);">Hörbücher  53</text><text x="598.05" y="237.18" font-size="17" font-weight="700" style="white-space:pre;fill:var(--ss-ink,#17202b);">Gedruckte Bücher  106</text><text x="598.05" y="181.66" font-size="17" font-weight="700" style="white-space:pre;fill:var(--ss-accent,#2457c5);">E-Books  134</text><g class="ss-callout"><circle cx="443.83" cy="203.2" r="4.5" stroke-width="2" style="fill:var(--ss-ink,#17202b);stroke:var(--ss-paper,#ffffff);"/><path d="M443.83 203.2V111.2H385.83" fill="none" stroke-width="1.3" style="stroke:var(--ss-muted,#5a6676);"/><text x="379.83" y="96.16" font-size="16" text-anchor="end" font-weight="700" stroke-width="4.48" stroke-linejoin="round" paint-order="stroke" style="fill:var(--ss-ink,#17202b);stroke:var(--ss-paper,#ffffff);">März 2025</text><text x="379.83" y="116.96" font-size="16" text-anchor="end" stroke-width="4.48" stroke-linejoin="round" paint-order="stroke" style="fill:var(--ss-ink,#17202b);stroke:var(--ss-paper,#ffffff);"><tspan x="379.83" y="116.96">120.000 E-Books,</tspan><tspan x="379.83" dy="20.8">119.100 gedruckte Bücher</tspan></text></g></svg></figure>
+<div class="st-rail" data-region="support">
+  <div class="st-kpi"><b class="st-accent">1,49<small>Mio.</small></b><span>E-Book-Ausleihen 2025, 19 % mehr als 2024</span></div>
+  <hr class="st-rule">
+  <p class="st-text">Drei Zweig&shy;stellen (<bdi>B04</bdi>, <bdi>B09</bdi> und <bdi>B12</bdi>) sind seit September 2024 wegen Sanierung geschlossen; das drückt die Ausleih&shy;zahlen gedruckter Bücher. Bleiben E‑Books auch nach der Wieder&shy;eröffnung im März 2026 vorn?</p>
+</div>
+<p class="st-source" data-region="source"><span>Illustrative Daten · fiktives Stadt&shy;bibliotheks&shy;netz mit 14 Zweigstellen; Ausleihen je Kalender&shy;monat, Januar 2023 bis Dezember 2025</span><span lang="de">Deutsch</span></p></section>
+<section class="slide st st--rail cs-civic-calm lp" id="language-fr" role="group" aria-roledescription="slide" aria-label="Depuis mars 2025, on emprunte chaque mois plus de livres numériques que de livres imprimés" aria-hidden="true" lang="fr" dir="ltr"><h1 class="st-head" data-region="title">Depuis mars 2025, on emprunte chaque mois plus de livres numériques que de livres imprimés</h1>
+<figure class="st-fig" data-region="primary" dir="ltr"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 482" width="800" height="482" role="img" aria-labelledby="language-fr-fig-title language-fr-fig-desc" id="language-fr-fig" class="ss-fig" direction="ltr" style="overflow:visible;direction:ltr;font-family:var(--ss-font-sans,&quot;Inter&quot;,&quot;Helvetica Neue&quot;,&quot;Segoe UI&quot;,&quot;Hiragino Sans&quot;,&quot;Noto Sans JP&quot;,&quot;Yu Gothic&quot;,system-ui,sans-serif);"><title id="language-fr-fig-title">Prêts mensuels par support</title><desc id="language-fr-fig-desc">Depuis mars 2025, on emprunte chaque mois plus de livres numériques que de livres imprimés</desc><rect x="350.49" y="44" width="229.47" height="398" style="fill:var(--ss-surface,#f3f5f8);"/><text x="358.49" y="61.1" font-size="15" font-weight="600" style="fill:var(--ss-muted,#5a6676);">3 annexes fermées</text><g class="ss-axis"><line x1="44.52" x2="579.96" y1="442" y2="442" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><text x="36.52" y="447.4" font-size="15" text-anchor="end" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">0</text><line x1="44.52" x2="579.96" y1="342.5" y2="342.5" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><text x="36.52" y="347.9" font-size="15" text-anchor="end" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">50</text><line x1="44.52" x2="579.96" y1="243" y2="243" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><text x="36.52" y="248.4" font-size="15" text-anchor="end" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">100</text><line x1="44.52" x2="579.96" y1="143.5" y2="143.5" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><text x="36.52" y="148.9" font-size="15" text-anchor="end" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">150</text><line x1="44.52" x2="579.96" y1="44" y2="44" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><text x="36.52" y="49.4" font-size="15" text-anchor="end" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">200</text></g><text x="4" y="15.1" font-size="15" class="ss-unit" style="fill:var(--ss-muted,#5a6676);">Prêts par mois, en milliers</text><line x1="44.52" x2="44.52" y1="442" y2="447" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="44.52" y="465.1" font-size="15" text-anchor="middle" style="fill:var(--ss-muted,#5a6676);">janv. 2023</text><line x1="228.1" x2="228.1" y1="442" y2="447" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="228.1" y="465.1" font-size="15" text-anchor="middle" style="fill:var(--ss-muted,#5a6676);">janv. 2024</text><line x1="411.68" x2="411.68" y1="442" y2="447" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="411.68" y="465.1" font-size="15" text-anchor="middle" style="fill:var(--ss-muted,#5a6676);">janv. 2025</text><line x1="579.96" x2="579.96" y1="442" y2="447" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="579.96" y="465.1" font-size="15" text-anchor="middle" style="fill:var(--ss-muted,#5a6676);">déc. 2025</text><path d="M44.52 385.88L59.82 389.27L75.12 384.49L90.42 384.29L105.71 385.29L121.01 382.1L136.31 375.53L151.61 374.94L166.91 379.71L182.21 377.13L197.5 375.14L212.8 371.95L228.1 366.38L243.4 370.96L258.7 365.78L274 367.97L289.29 367.38L304.59 364.39L319.89 357.62L335.19 356.43L350.49 361.21L365.79 359.22L381.08 355.83L396.38 353.45L411.68 349.27L426.98 355.04L442.28 350.26L457.58 349.27L472.87 349.47L488.17 346.48L503.47 339.32L518.77 337.53L534.07 345.88L549.36 340.71L564.66 338.92L579.96 335.73" fill="none" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" class="ss-line" style="stroke:var(--ss-context,#c3cad4);"/><circle cx="579.96" cy="335.73" r="4" stroke-width="2" style="fill:var(--ss-context,#c3cad4);stroke:var(--ss-paper,#ffffff);"/><path d="M44.52 148.08L59.82 161.21L75.12 153.25L90.42 161.21L105.71 167.18L121.01 154.05L136.31 135.54L151.61 142.7L166.91 170.96L182.21 168.57L197.5 168.77L212.8 181.91L228.1 162.21L243.4 177.73L258.7 167.38L274 176.53L289.29 182.31L304.59 167.18L319.89 155.84L335.19 160.81L350.49 205.99L365.79 204L381.08 208.57L396.38 214.74L411.68 200.61L426.98 212.55L442.28 204.99L457.58 211.96L472.87 215.14L488.17 205.79L503.47 194.44L518.77 198.82L534.07 221.71L549.36 218.13L564.66 221.51L579.96 231.06" fill="none" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" class="ss-line" style="stroke:var(--ss-ink,#17202b);"/><circle cx="579.96" cy="231.06" r="6" stroke-width="2" style="fill:var(--ss-ink,#17202b);stroke:var(--ss-paper,#ffffff);"/><path d="M44.52 280.21L59.82 289.96L75.12 280.01L90.42 281.8L105.71 282.4L121.01 275.44L136.31 260.31L151.61 258.92L166.91 272.85L182.21 265.09L197.5 260.51L212.8 254.34L228.1 243.4L243.4 254.54L258.7 244.79L274 246.78L289.29 249.17L304.59 238.62L319.89 219.52L335.19 217.73L350.49 234.84L365.79 226.88L381.08 223.5L396.38 216.53L411.68 203.6L426.98 216.33L442.28 203.2L457.58 208.37L472.87 209.37L488.17 196.63L503.47 179.72L518.77 176.14L534.07 196.63L549.36 188.08L564.66 183.1L579.96 175.54" fill="none" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" class="ss-line" style="stroke:var(--ss-accent,#2457c5);"/><circle cx="579.96" cy="175.54" r="6" stroke-width="2" style="fill:var(--ss-accent,#2457c5);stroke:var(--ss-paper,#ffffff);"/><text x="595.96" y="341.85" font-size="17" font-weight="500" style="white-space:pre;fill:var(--ss-muted,#5a6676);">Livres audio  53</text><text x="595.96" y="237.18" font-size="17" font-weight="700" style="white-space:pre;fill:var(--ss-ink,#17202b);">Livres imprimés  106</text><text x="595.96" y="181.66" font-size="17" font-weight="700" style="white-space:pre;fill:var(--ss-accent,#2457c5);">Livres numériques  134</text><g class="ss-callout"><circle cx="442.28" cy="203.2" r="4.5" stroke-width="2" style="fill:var(--ss-ink,#17202b);stroke:var(--ss-paper,#ffffff);"/><path d="M442.28 203.2V111.2H384.28" fill="none" stroke-width="1.3" style="stroke:var(--ss-muted,#5a6676);"/><text x="378.28" y="96.16" font-size="16" text-anchor="end" font-weight="700" stroke-width="4.48" stroke-linejoin="round" paint-order="stroke" style="fill:var(--ss-ink,#17202b);stroke:var(--ss-paper,#ffffff);">Mars 2025</text><text x="378.28" y="116.96" font-size="16" text-anchor="end" stroke-width="4.48" stroke-linejoin="round" paint-order="stroke" style="fill:var(--ss-ink,#17202b);stroke:var(--ss-paper,#ffffff);"><tspan x="378.28" y="116.96">120 000 numériques</tspan><tspan x="378.28" dy="20.8">contre 119 100 imprimés</tspan></text></g></svg></figure>
+<div class="st-rail" data-region="support">
+  <div class="st-kpi"><b class="st-accent">1,49<small>million</small></b><span>Prêts de livres numériques en 2025, soit 19 % de plus qu’en 2024</span></div>
+  <hr class="st-rule">
+  <p class="st-text">Trois annexes (<bdi>B04</bdi>, <bdi>B09</bdi> et <bdi>B12</bdi>) sont fermées pour travaux depuis septembre 2024 : les prêts de livres imprimés en pâtissent. Les livres numériques garderont-ils l’avance après leur réouverture, en mars 2026 ?</p>
+</div>
+<p class="st-source" data-region="source"><span>Données fictives · réseau fictif de 14 bibliothèques municipales ; prêts par mois civil, de janvier 2023 à décembre 2025</span><span lang="fr">Français</span></p></section>
+<section class="slide st st--rail cs-civic-calm lp" id="language-es" role="group" aria-roledescription="slide" aria-label="Desde marzo de 2025, cada mes se prestan más libros electrónicos que impresos" aria-hidden="true" lang="es" dir="ltr"><h1 class="st-head" data-region="title">Desde marzo de 2025, cada mes se prestan más libros electrónicos que impresos</h1>
+<figure class="st-fig" data-region="primary" dir="ltr"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 482" width="800" height="482" role="img" aria-labelledby="language-es-fig-title language-es-fig-desc" id="language-es-fig" class="ss-fig" direction="ltr" style="overflow:visible;direction:ltr;font-family:var(--ss-font-sans,&quot;Inter&quot;,&quot;Helvetica Neue&quot;,&quot;Segoe UI&quot;,&quot;Hiragino Sans&quot;,&quot;Noto Sans JP&quot;,&quot;Yu Gothic&quot;,system-ui,sans-serif);"><title id="language-es-fig-title">Préstamos mensuales por formato</title><desc id="language-es-fig-desc">Desde marzo de 2025, cada mes se prestan más libros electrónicos que impresos</desc><rect x="348.67" y="44" width="228.11" height="398" style="fill:var(--ss-surface,#f3f5f8);"/><text x="356.67" y="61.1" font-size="15" font-weight="600" style="fill:var(--ss-muted,#5a6676);">3 sedes cerradas</text><g class="ss-axis"><line x1="44.52" x2="576.79" y1="442" y2="442" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><text x="36.52" y="447.4" font-size="15" text-anchor="end" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">0</text><line x1="44.52" x2="576.79" y1="342.5" y2="342.5" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><text x="36.52" y="347.9" font-size="15" text-anchor="end" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">50</text><line x1="44.52" x2="576.79" y1="243" y2="243" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><text x="36.52" y="248.4" font-size="15" text-anchor="end" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">100</text><line x1="44.52" x2="576.79" y1="143.5" y2="143.5" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><text x="36.52" y="148.9" font-size="15" text-anchor="end" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">150</text><line x1="44.52" x2="576.79" y1="44" y2="44" stroke-width="1" class="ss-grid" style="stroke:var(--ss-grid,#e7ebf0);"/><text x="36.52" y="49.4" font-size="15" text-anchor="end" class="ss-axis-label" font-variant-numeric="tabular-nums" style="fill:var(--ss-muted,#5a6676);">200</text></g><text x="4" y="15.1" font-size="15" class="ss-unit" style="fill:var(--ss-muted,#5a6676);">Préstamos al mes, en miles</text><line x1="44.52" x2="44.52" y1="442" y2="447" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="44.52" y="465.1" font-size="15" text-anchor="middle" style="fill:var(--ss-muted,#5a6676);">ene 2023</text><line x1="227.01" x2="227.01" y1="442" y2="447" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="227.01" y="465.1" font-size="15" text-anchor="middle" style="fill:var(--ss-muted,#5a6676);">ene 2024</text><line x1="409.5" x2="409.5" y1="442" y2="447" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="409.5" y="465.1" font-size="15" text-anchor="middle" style="fill:var(--ss-muted,#5a6676);">ene 2025</text><line x1="576.79" x2="576.79" y1="442" y2="447" style="stroke:var(--ss-rule,#d5dbe3);"/><text x="576.79" y="465.1" font-size="15" text-anchor="middle" style="fill:var(--ss-muted,#5a6676);">dic 2025</text><path d="M44.52 385.88L59.73 389.27L74.94 384.49L90.14 384.29L105.35 385.29L120.56 382.1L135.77 375.53L150.97 374.94L166.18 379.71L181.39 377.13L196.6 375.14L211.8 371.95L227.01 366.38L242.22 370.96L257.43 365.78L272.63 367.97L287.84 367.38L303.05 364.39L318.26 357.62L333.47 356.43L348.67 361.21L363.88 359.22L379.09 355.83L394.3 353.45L409.5 349.27L424.71 355.04L439.92 350.26L455.13 349.27L470.33 349.47L485.54 346.48L500.75 339.32L515.96 337.53L531.16 345.88L546.37 340.71L561.58 338.92L576.79 335.73" fill="none" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" class="ss-line" style="stroke:var(--ss-context,#c3cad4);"/><circle cx="576.79" cy="335.73" r="4" stroke-width="2" style="fill:var(--ss-context,#c3cad4);stroke:var(--ss-paper,#ffffff);"/><path d="M44.52 148.08L59.73 161.21L74.94 153.25L90.14 161.21L105.35 167.18L120.56 154.05L135.77 135.54L150.97 142.7L166.18 170.96L181.39 168.57L196.6 168.77L211.8 181.91L227.01 162.21L242.22 177.73L257.43 167.38L272.63 176.53L287.84 182.31L303.05 167.18L318.26 155.84L333.47 160.81L348.67 205.99L363.88 204L379.09 208.57L394.3 214.74L409.5 200.61L424.71 212.55L439.92 204.99L455.13 211.96L470.33 215.14L485.54 205.79L500.75 194.44L515.96 198.82L531.16 221.71L546.37 218.13L561.58 221.51L576.79 231.06" fill="none" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" class="ss-line" style="stroke:var(--ss-ink,#17202b);"/><circle cx="576.79" cy="231.06" r="6" stroke-width="2" style="fill:var(--ss-ink,#17202b);stroke:var(--ss-paper,#ffffff);"/><path d="M44.52 280.21L59.73 289.96L74.94 280.01L90.14 281.8L105.35 282.4L120.56 275.44L135.77 260.31L150.97 258.92L166.18 272.85L181.39 265.09L196.6 260.51L211.8 254.34L227.01 243.4L242.22 254.54L257.43 244.79L272.63 246.78L287.84 249.17L303.05 238.62L318.26 219.52L333.47 217.73L348.67 234.84L363.88 226.88L379.09 223.5L394.3 216.53L409.5 203.6L424.71 216.33L439.92 203.2L455.13 208.37L470.33 209.37L485.54 196.63L500.75 179.72L515.96 176.14L531.16 196.63L546.37 188.08L561.58 183.1L576.79 175.54" fill="none" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" class="ss-line" style="stroke:var(--ss-accent,#2457c5);"/><circle cx="576.79" cy="175.54" r="6" stroke-width="2" style="fill:var(--ss-accent,#2457c5);stroke:var(--ss-paper,#ffffff);"/><text x="592.79" y="341.85" font-size="17" font-weight="500" style="white-space:pre;fill:var(--ss-muted,#5a6676);">Audiolibros  53</text><text x="592.79" y="237.18" font-size="17" font-weight="700" style="white-space:pre;fill:var(--ss-ink,#17202b);">Libros impresos  106</text><text x="592.79" y="181.66" font-size="17" font-weight="700" style="white-space:pre;fill:var(--ss-accent,#2457c5);">Libros electrónicos  134</text><g class="ss-callout"><circle cx="439.92" cy="203.2" r="4.5" stroke-width="2" style="fill:var(--ss-ink,#17202b);stroke:var(--ss-paper,#ffffff);"/><path d="M439.92 203.2V111.2H381.92" fill="none" stroke-width="1.3" style="stroke:var(--ss-muted,#5a6676);"/><text x="375.92" y="96.16" font-size="16" text-anchor="end" font-weight="700" stroke-width="4.48" stroke-linejoin="round" paint-order="stroke" style="fill:var(--ss-ink,#17202b);stroke:var(--ss-paper,#ffffff);">Marzo de 2025</text><text x="375.92" y="116.96" font-size="16" text-anchor="end" stroke-width="4.48" stroke-linejoin="round" paint-order="stroke" style="fill:var(--ss-ink,#17202b);stroke:var(--ss-paper,#ffffff);"><tspan x="375.92" y="116.96">120.000 electrónicos</tspan><tspan x="375.92" dy="20.8">frente a 119.100 impresos</tspan></text></g></svg></figure>
+<div class="st-rail" data-region="support">
+  <div class="st-kpi"><b class="st-accent">1,49<small>millones</small></b><span>Préstamos de libros electrónicos en 2025, un 19 % más que en 2024</span></div>
+  <hr class="st-rule">
+  <p class="st-text">Tres sedes (<bdi>B04</bdi>, <bdi>B09</bdi> y <bdi>B12</bdi>) están cerradas por obras desde septiembre de 2024, lo que reduce los préstamos de libros impresos. ¿Seguirán por delante los libros electrónicos cuando reabran, en marzo de 2026?</p>
+</div>
+<p class="st-source" data-region="source"><span>Datos ilustrativos · red ficticia de 14 bibliotecas municipales; préstamos por mes natural, de enero de 2023 a diciembre de 2025</span><span lang="es">Español</span></p></section></main><nav class="studio-controls" aria-label="Slide"><button id="studio-prev" type="button" aria-label="Previous" >←</button><span id="studio-position" class="studio-position"></span><button id="studio-next" type="button" aria-label="Next" >→</button><select id="studio-jump" aria-label="Slide"><option value="0">1. E-book loans have outnumbered print every month since March 2025</option><option value="1">2. 電子書籍の貸出は2025年3月以降、毎月紙の本を上回っている</option><option value="2">3. 自2025年3月起，电子书借阅量每月都超过纸质书</option><option value="3">4. 自2025年3月起，電子書借閱量每月都超越紙本書</option><option value="4">5. 2025년 3월부터 전자책 대출이 매달 종이책보다 많았다</option><option value="5">6. منذ مارس ٢٠٢٥، تتفوّق إعارات الكتب الإلكترونية على المطبوعة كل شهر</option><option value="6">7. मार्च 2025 से हर महीने छपी किताबों से ज़्यादा ई‑बुक उधार ली गई हैं</option><option value="7">8. Seit März 2025 werden jeden Monat mehr E‑Books ausgeliehen als gedruckte Bücher</option><option value="8">9. Depuis mars 2025, on emprunte chaque mois plus de livres numériques que de livres imprimés</option><option value="9">10. Desde marzo de 2025, cada mes se prestan más libros electrónicos que impresos</option></select><button id="studio-overview" type="button" aria-label="Overview" >Overview</button><button id="studio-notes-btn" type="button" aria-label="Notes" aria-expanded="false" aria-controls="studio-notes">Notes</button><button id="studio-presenter" type="button" aria-label="Presenter view" >Presenter view</button><button id="studio-reset" type="button" aria-label="Reset" >Reset</button><button id="studio-full" type="button" aria-label="Fullscreen" >Fullscreen</button><button id="studio-help-btn" type="button" aria-label="Keyboard shortcuts" aria-expanded="false">?</button></nav><aside id="studio-notes" class="studio-notes" aria-label="Notes"></aside><div id="studio-announcer" class="sr-only studio-announcer" aria-live="polite"></div><script type="application/json" id="slide-studio-meta">{"version":4,"width":1280,"height":720,"title":"One page in ten languages","language":"en","direction":"ltr","labels":{"prev":"Previous","next":"Next","jump":"Slide","overview":"Overview","notes":"Notes","reset":"Reset","full":"Fullscreen","presenter":"Presenter view","help":"Keyboard shortcuts","blank":"Black screen","goto":"Go to slide"},"transition":"none","readingMode":"reference","sample":true,"mode":"workshop","copyRules":[{"id":"ja-stage-direction","level":"error","pattern":"(?:学会|口頭|研究)?発表(?:時|中)(?:に|で|は)?[ 　]*(?:切[り]?替[え]?|切替|クリック|再生|操作)|ここで(?:クリック|切[り]?替[え]?|動画を再生)|(?:要差し替え|後で修正|仮置きのまま)"},{"id":"en-stage-direction","level":"error","pattern":"\\b(?:switch|click|play|toggle) (?:here|during (?:the )?(?:conference|presentation|talk))\\b|\\b(?:replace this (?:text|title|image)|insert (?:your )?(?:title|content) here|speaker cue:)","flags":"i"},{"id":"placeholder","level":"error","pattern":"\\b(?:Lorem ipsum|TODO|FIXME|TBD)\\b|(?:ここにタイトル|ここに本文|テキストを入力)","flags":"i"},{"id":"ja-empty-claim","level":"warning","pattern":"(?:さらなる価値提供|革新的なソリューション|未来を切り拓く|シームレスな体験|圧倒的な価値)"},{"id":"en-empty-claim","level":"warning","pattern":"\\b(?:unlock (?:the )?(?:full )?potential|revolutionary solution|seamless experience|game-changing|transform the future)\\b","flags":"i"},{"id":"ja-export-production-cue","level":"error","pattern":"配布用メモ[：:]|(?:印刷[・／/]PDF|印刷・PDF|PDF・印刷)(?:では|時は)[^。\\n]{0,60}(?:表示が残|固定され|操作用)|(?:投影時|発表時)の操作用"},{"id":"en-export-production-cue","level":"error","pattern":"\\b(?:presenter-only cue|production note|export-only instruction)\\s*:","flags":"i"},{"id":"ja-performed-sincerity","level":"warning","pattern":"正直に(?:言います|お知らせ|お伝え)|本当の価値|価値を紡ぐ"},{"id":"ja-status-label","level":"error","pattern":"(?:登壇用|発表用|社内用|作業用|提出用)(?:ドラフト|下書き)"}],"slides":[{"id":"language-en","title":"E-book loans have outnumbered print every month since March 2025","notes":"Latin reference page. Display face with slight negative tracking and a balanced two-line headline; tabular figures in the chart; dates, lists and plurals come from Intl, not from typing.\nModify: change the data at the top; every number, date, plural and list on all ten pages recomputes. Have a native editor review new copy.","sources":[{"type":"illustrative-data","file":"examples/languages/deck.mjs"}],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"language-ja","title":"電子書籍の貸出は2025年3月以降、毎月紙の本を上回っている","notes":"Japanese: headline broken between phrases (auto-phrase in Chromium, keep-all + \u003cwbr> elsewhere), strict kinsoku, no negative tracking, looser leading. Exact counts in myriads (e.g. 11万9100件); the axis counts in 万件.\nModify: change the data at the top; every number, date, plural and list on all ten pages recomputes. Have a native editor review new copy.","sources":[{"type":"illustrative-data","file":"examples/languages/deck.mjs"}],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"language-zh-Hans","title":"自2025年3月起，电子书借阅量每月都超过纸质书","notes":"Simplified Chinese: Simplified forms and a Simplified font (Han unification needs lang + the right font), full-width punctuation, phrase breaks marked with \u003cwbr>, 万 for large counts, decimals in 万 (e.g. 11.91万次).\nModify: change the data at the top; every number, date, plural and list on all ten pages recomputes. Have a native editor review new copy.","sources":[{"type":"illustrative-data","file":"examples/languages/deck.mjs"}],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"language-zh-Hant","title":"自2025年3月起，電子書借閱量每月都超越紙本書","notes":"Traditional Chinese written as Taiwan writes it (紙本書, 借閱, 成長, 萬), not converted from Simplified; the font stack names Traditional faces first so punctuation sits centred.\nModify: change the data at the top; every number, date, plural and list on all ten pages recomputes. Have a native editor review new copy.","sources":[{"type":"illustrative-data","file":"examples/languages/deck.mjs"}],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"language-ko","title":"2025년 3월부터 전자책 대출이 매달 종이책보다 많았다","notes":"Korean: words are separated by spaces, so word-break: keep-all stops breaks inside words; myriad counts (e.g. 11만 9100건); tilde for ranges in the source line.\nModify: change the data at the top; every number, date, plural and list on all ten pages recomputes. Have a native editor review new copy.","sources":[{"type":"illustrative-data","file":"examples/languages/deck.mjs"}],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"language-ar","title":"منذ مارس ٢٠٢٥، تتفوّق إعارات الكتب الإلكترونية على المطبوعة كل شهر","notes":"Arabic: right-to-left page (headline right, rail left, source mirrored) but the time axis still runs left to right — a number line, not a reading order. Arabic-Indic digits from ar-EG, plural nouns from Intl.PluralRules (٣ فروع, ١٤ فرعًا), codes isolated with \u003cbdi>, larger size and leading, no letter-spacing.\nModify: change the data at the top; every number, date, plural and list on all ten pages recomputes. Have a native editor review new copy.","sources":[{"type":"illustrative-data","file":"examples/languages/deck.mjs"}],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"language-hi","title":"मार्च 2025 से हर महीने छपी किताबों से ज़्यादा ई‑बुक उधार ली गई हैं","notes":"Hindi: Devanagari needs taller leading for marks above and below the headline bar and never takes letter-spacing; Indian digit grouping (e.g. 1,20,000) and lakh for the big number (e.g. 14.9 लाख); danda (।) ends the sentence.\nModify: change the data at the top; every number, date, plural and list on all ten pages recomputes. Have a native editor review new copy.","sources":[{"type":"illustrative-data","file":"examples/languages/deck.mjs"}],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"language-de","title":"Seit März 2025 werden jeden Monat mehr E‑Books ausgeliehen als gedruckte Bücher","notes":"German: long compounds carry soft hyphens (U+00AD) at their joints (Zweig-stellen, Ausleih-zahlen, Wieder-eröffnung), so they break where an editor would; decimal comma, \"19 %\" with a no-break space, \"Mio.\" for millions, E-Books never split after the E.\nModify: change the data at the top; every number, date, plural and list on all ten pages recomputes. Have a native editor review new copy.","sources":[{"type":"illustrative-data","file":"examples/languages/deck.mjs"}],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"language-fr","title":"Depuis mars 2025, on emprunte chaque mois plus de livres numériques que de livres imprimés","notes":"French: a helper inserts the no-break spaces before : ; ? (fine space before ; ! ?), typographic apostrophes, narrow no-break space as thousands separator (e.g. 120 000), million/millions by plural rule.\nModify: change the data at the top; every number, date, plural and list on all ten pages recomputes. Have a native editor review new copy.","sources":[{"type":"illustrative-data","file":"examples/languages/deck.mjs"}],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""},{"id":"language-es","title":"Desde marzo de 2025, cada mes se prestan más libros electrónicos que impresos","notes":"Spanish: opening ¿ for the question, decimal comma, \"19 %\" with a space as the RAE recommends, \"y\" before the last list item from Intl.ListFormat, \"millones\" by plural rule.\nModify: change the data at the top; every number, date, plural and list on all ten pages recomputes. Have a native editor review new copy.","sources":[{"type":"illustrative-data","file":"examples/languages/deck.mjs"}],"exportPolicy":"final","copyWaivers":[],"readingMode":"reference","spaceIntent":""}]}</script><script>/* Slide Studio player — deterministic presentation states.
+ *
+ * Contract
+ * - A slide's state is (slide index, build step). Every route (button, key,
+ *   swipe, API, presenter window, URL hash) calls show(i, step).
+ * - Target styles are committed synchronously; animation is a removable layer
+ *   on top. finish() completes every running animation at its target, so a
+ *   direct jump, reverse navigation, reduced motion and export all reach the
+ *   same committed state.
+ * - Widgets own their content; global navigation never consumes keys from
+ *   inputs, sliders, editors, media or [data-interactive] regions.
+ *
+ * Authoring hooks (see references/motion-and-interaction.md)
+ *   data-step="n"            visible from build n (0 = start); data-until="m" hides after m (alone: visible 0..m)
+ *   data-motion="preset"     entry effect when the element appears
+ *   data-delay="ms"          wait before the entry effect or data-states change (stagger by hand)
+ *   data-stagger="ms"        animate the element's children one after another
+ *   data-duration="ms"       effect length (default 500, max 1600)
+ *   data-easing="name|css"   standard | emphasized | decelerate | accelerate | linear | smooth | any CSS easing
+ *   data-states='{"0":{…},"2":{…}}'  cumulative CSS state per build (transformations)
+ */
+(() => {
+  'use strict';
+  const meta = JSON.parse(document.getElementById('slide-studio-meta').textContent);
+  const slides = [...document.querySelectorAll('.slide')];
+  const mq = matchMedia('(prefers-reduced-motion: reduce)');
+  const warnings = [], widgets = new Map(), tracks = new WeakMap(), animations = new Set(), counting = new Set();
+  const lastSteps = Array(slides.length).fill(0);
+  const labels = meta.labels || {};
+  let current = 0, step = 0, overview = false, restore = null, enteredIndex = null;
+  let exporting = new URLSearchParams(location.search).has('static');
+  const $ = id => document.getElementById(id);
+  const warn = e => { warnings.push(String(e)); console.warn('[Slide Studio]', e); };
+  const call = (widget, method, ...args) => { try { return widget?.[method]?.(...args); } catch (e) { warn(`${method}: ${e.message}`); } };
+  const rtl = () => document.documentElement.dir === 'rtl';
+
+  // ------------------------------------------------------------ build bookkeeping
+
+  const max = i => Math.max(0, ...[...slides[i].querySelectorAll('[data-step],[data-until],[data-states]')].flatMap(el => {
+    const v = [Number(el.dataset.step) || 0];
+    // data-until="m" hides the element after build m, so build m + 1 must exist.
+    if (el.dataset.until !== undefined) v.push(Number(el.dataset.until) + 1);
+    try { if (el.dataset.states) v.push(...Object.keys(JSON.parse(el.dataset.states)).map(Number)); } catch { /* reported below */ }
+    return v.filter(Number.isFinite);
+  }));
+
+  function parseTrack(el) {
+    const map = JSON.parse(el.dataset.states), keys = Object.keys(map).map(Number).sort((a, b) => a - b);
+    if (!map['0'] || keys.some(k => !Number.isInteger(k) || k < 0)) throw Error('state 0 and nonnegative integer keys required');
+    const base = {};
+    for (const state of Object.values(map)) {
+      if (!state || typeof state !== 'object' || Array.isArray(state)) throw Error('CSS property map required');
+      for (const key of Object.keys(state)) {
+        if (!(key in el.style) && !key.startsWith('--')) throw Error(`unknown CSS property ${key}`);
+        base[key] = key.startsWith('--') ? el.style.getPropertyValue(key) : el.style[key] || getComputedStyle(el)[key];
+      }
+    }
+    return { map, keys, base };
   }
-  for(const el of slide.querySelectorAll('[data-states]')){const track=tracks.get(el);if(!track)continue;const to={...track.base};for(const k of track.keys)if(k<=at)Object.assign(to,track.map[k]);transition(el,to,animate);const hidden=el.dataset.studioHidden==='true'||to.opacity===0||to.opacity==='0'||to.visibility==='hidden';el.setAttribute('aria-hidden',String(hidden));el.inert=hidden}
-  lastSteps[i]=at;slide.dataset.currentStep=String(at);for(const [id,w] of widgets)if(slide.contains($(id)))call(w,'onStep',{...context(i),step:at});
- }
- function scale(){const bar=document.querySelector('.studio-controls').getBoundingClientRect().height;document.documentElement.style.setProperty('--studio-bar',bar+'px');const r=Math.min(innerWidth/meta.width,Math.max(1,innerHeight-bar)/meta.height);document.documentElement.style.setProperty('--studio-scale',String(r));if(overview)document.querySelectorAll('.studio-thumb').forEach(w=>w.style.setProperty('--thumb-scale',w.clientWidth/meta.width))}
- function pauseSlide(i){if(enteredIndex===i)enteredIndex=null;for(const el of slides[i].querySelectorAll('video,audio'))el.pause();for(const [id,w]of widgets)if(slides[i].contains($(id)))call(w,'onLeave',context(i))}
- function show(i,n=0,{animate=false}={}){
-  finish();const previous=current;current=Math.max(0,Math.min(slides.length-1,Math.floor(Number(i)||0)));step=Math.max(0,Math.min(max(current),Math.floor(Number(n)||0)));if(exporting)step=max(current);
-  if(previous!==current){pauseSlide(previous);for(const el of slides[current].querySelectorAll('[data-step]'))el.dataset.studioHidden='true'}document.body.dataset.export=String(exporting);
-  slides.forEach((sl,j)=>{const active=j===current;sl.classList.toggle('is-current',active);sl.setAttribute('aria-hidden',String(!active));sl.inert=!active||overview;if(active||exporting)apply(j,exporting?max(j):step,animate&&active)});
-  $('studio-position').textContent=`${current+1} / ${slides.length} · ${step} / ${max(current)}`;$('studio-prev').disabled=!current&&!step;$('studio-next').disabled=current===slides.length-1&&(exporting||step===max(current));
-  const s=meta.slides[current];$('studio-notes').textContent=(s.notes||'')+(s.sources?.length?'\n\n'+s.sources.map(x=>typeof x==='string'?x:JSON.stringify(x)).join('\n'):'');$('studio-announcer').textContent=s.title;
-  $('studio-jump').value=String(current);history.replaceState(null,'','#'+encodeURIComponent(s.id));
-  for(const [id,w]of widgets)if(slides[current].contains($(id))){if(exporting)call(w,'onExport',context());else if(enteredIndex!==current&&!overview&&!document.hidden)call(w,'onEnter',context())}
-  enteredIndex=(!exporting&&!overview&&!document.hidden)?current:null;
-  window.dispatchEvent(new CustomEvent('studio:state',{detail:context()}));scale();
- }
- function next(){if(!exporting&&step<max(current))show(current,step+1,{animate:true});else if(current<slides.length-1)show(current+1,0,{animate:true})}
- function prev(){if(!exporting&&step>0)show(current,step-1,{animate:true});else if(current)show(current-1,max(current-1),{animate:true})}
- function toggleOverview(){
-  overview=!overview;document.body.classList.toggle('overview',overview);finish();
-  if(overview)pauseSlide(current);
-  slides.forEach((sl,i)=>{let w=sl.parentElement;if(overview){w=document.createElement('div');w.className='studio-thumb';w.tabIndex=0;w.setAttribute('role','button');w.setAttribute('aria-label',meta.slides[i].title);sl.before(w);w.append(sl);sl.inert=true;apply(i,max(i),false);w.onclick=()=>{toggleOverview();show(i)};w.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggleOverview();show(i)}}}else if(w.classList.contains('studio-thumb')){w.before(sl);w.remove()}});
-  if(!overview)show(current,step);scale();
- }
- function setExport(on){exporting=!!on;if(overview)toggleOverview();if(exporting)for(let i=0;i<slides.length;i++)pauseSlide(i);show(current,step)}
- function prepareExport(){setExport(true);for(const [id,w] of widgets){const i=slides.findIndex(sl=>sl.contains($(id)));call(w,'onExport',context(i<0?current:i));}window.dispatchEvent(new CustomEvent('studio:export'))}
- function reset(){for(const [id,w]of widgets)if(slides[current].contains($(id)))call(w,'reset');show(current,0)}
- $('studio-prev').onclick=prev;$('studio-next').onclick=next;$('studio-overview').onclick=toggleOverview;$('studio-reset').onclick=reset;
- $('studio-jump').onchange=e=>show(Number(e.target.value));
- $('studio-notes-btn').onclick=()=>{const on=$('studio-notes').classList.toggle('open');$('studio-notes-btn').setAttribute('aria-expanded',String(on))};
- $('studio-full').onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await document.documentElement.requestFullscreen()}catch{warn('Fullscreen unavailable')}};
- // Navigation buttons are not content widgets. Arrow/Page keys still navigate when
- // those buttons keep focus after a mouse click; Space/Enter retain native activation.
- document.addEventListener('keydown',e=>{
-  if(e.defaultPrevented||e.ctrlKey||e.metaKey||e.altKey||e.isComposing||e.keyCode===229)return;
-  const target=e.composedPath().find(x=>x instanceof Element)||document.body;
-  if(e.key==='Escape'){
-   if(overview){e.preventDefault();toggleOverview();return}
-   if($('studio-notes').classList.contains('open')){e.preventDefault();$('studio-notes').classList.remove('open');$('studio-notes-btn').setAttribute('aria-expanded','false');return}
+  for (const slide of slides) for (const el of slide.querySelectorAll('[data-states]')) {
+    try { tracks.set(el, parseTrack(el)); } catch (e) { warn(`${slide.id}: ${e.message}`); }
   }
-  const navigationKey=['ArrowRight','ArrowLeft','PageDown','PageUp',' ','Enter','Home','End'].includes(e.key);
-  if(e.repeat&&navigationKey){
-   // Do not steal a slider's held arrow key. Only suppress presentation navigation.
-   if(!target.closest('input,textarea,select,[contenteditable],[data-interactive]'))e.preventDefault();
-   return;
+  const stateAt = (track, at) => { const to = { ...track.base }; for (const k of track.keys) if (k <= at) Object.assign(to, track.map[k]); return to; };
+
+  // ------------------------------------------------------------ animation layer
+
+  const EASE = {
+    standard: 'cubic-bezier(.2,0,0,1)', emphasized: 'cubic-bezier(.3,0,0,1)', decelerate: 'cubic-bezier(0,0,0,1)',
+    accelerate: 'cubic-bezier(.3,0,1,1)', linear: 'linear', smooth: 'cubic-bezier(.45,0,.2,1)',
+  };
+  const DEFAULT_EASE = 'cubic-bezier(.22,.68,.2,1)';
+  const easing = el => { const e = el.dataset.easing; return e ? EASE[e] || e : DEFAULT_EASE; };
+  const durationOf = (el, fallback = 500) => {
+    const requested = el.dataset.duration === undefined ? fallback : Number(el.dataset.duration);
+    return Number.isFinite(requested) ? Math.min(1600, Math.max(0, requested)) : fallback;
+  };
+  const delayOf = el => { const d = Number(el.dataset.delay); return Number.isFinite(d) ? Math.min(2400, Math.max(0, d)) : 0; };
+  const motionAllowed = animate => animate && !mq.matches && !exporting;
+
+  function track(a) {
+    animations.add(a);
+    a.finished?.then(() => { animations.delete(a); a.cancel?.(); }).catch(() => animations.delete(a));
+    return a;
   }
-  if(overview)return;
-  const onNav=!!target.closest('.studio-controls');
-  if(target.closest('input,textarea,select,video,audio,[contenteditable],[data-interactive],[role="slider"],[role="textbox"],[role="combobox"],[role="grid"]'))return;
-  if(target.closest('button,a,summary,[role="button"]')&&(!onNav||[' ','Enter'].includes(e.key)))return;
-  if(['ArrowRight','PageDown',' ','Enter'].includes(e.key)){e.preventDefault();next()}
-  else if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();prev()}
-  else if(e.key==='Home'){e.preventDefault();show(0)}
-  else if(e.key==='End'){e.preventDefault();show(slides.length-1,max(slides.length-1))}
-  else if(e.key.toLowerCase()==='o'){e.preventDefault();toggleOverview()}
-  else if(e.key.toLowerCase()==='r'){e.preventDefault();reset()}
-  else if(e.key.toLowerCase()==='n'){e.preventDefault();$('studio-notes-btn').click()}
- });
- document.addEventListener('visibilitychange',()=>{if(document.hidden)pauseSlide(current);else show(current,step)});
- window.addEventListener('resize',scale);mq.addEventListener('change',()=>{finish();for(let i=0;i<slides.length;i++)pauseSlide(i);show(current,step)});
- window.addEventListener('beforeprint',()=>{restore={current,step,exporting,widgets:[...widgets].map(([id,w])=>[id,call(w,'snapshot')])};prepareExport()});
- window.addEventListener('afterprint',()=>{if(!restore)return;exporting=restore.exporting;for(const [id,s]of restore.widgets)call(widgets.get(id),'restore',s);show(restore.current,restore.step);restore=null});
- const api={kind:'craft',version:3,meta,show,next,prev,finish,reset,setExport,prepareExport,showAllBuilds:prepareExport,overview:toggleOverview,
-  register(id,widget){if(widgets.has(id))throw Error('Duplicate widget ID: '+id);if(!$(id))throw Error('Missing widget root: '+id);widgets.set(id,widget);if(slides[current].contains($(id)))call(widget,exporting?'onExport':'onEnter',context());return()=>{call(widget,'dispose');widgets.delete(id)}},
-  getWidgetState:id=>call(widgets.get(id),'snapshot'),getState:()=>({current,step,maxBuild:max(current),exporting,overview,reducedMotion:mq.matches,warnings:[...warnings],widgets:[...widgets.keys()]})};
- window.slideStudio=window.SlideStudio=api;let id='';try{id=decodeURIComponent(location.hash.slice(1))}catch{}const initial=meta.slides.findIndex(s=>s.id===id);show(initial<0?0:initial);document.body.dataset.studioReady='true';
+  function finish() {
+    for (const a of animations) { try { a.finish(); a.cancel?.(); } catch { a.cancel?.(); } }
+    animations.clear();
+  }
+
+  /** Commit `to` on the element now; optionally animate from `from` (or the old value) as a removable layer. */
+  function transition(el, to, animate, from = null, { delay = 0, duration, keyframes } = {}) {
+    const old = {};
+    for (const [k, v] of Object.entries(to)) {
+      old[k] = k.startsWith('--') ? getComputedStyle(el).getPropertyValue(k) : getComputedStyle(el)[k];
+      if (k.startsWith('--')) el.style.setProperty(k, String(v)); else el.style[k] = String(v);
+    }
+    if (!motionAllowed(animate) || !el.animate) return;
+    try {
+      const frames = keyframes || [from || old, to];
+      track(el.animate(frames, { duration: duration ?? durationOf(el), delay, easing: easing(el), fill: delay ? 'backwards' : 'none' }));
+    } catch (e) { warn(e.message); }
+  }
+
+  // Entry presets use individual transform properties (translate/scale), so they
+  // compose with an element's own transform attribute instead of replacing it.
+  const ENTRY = {
+    reveal: [{ opacity: 0 }, { opacity: 1 }],
+    focus: [{ opacity: 0.2 }, { opacity: 1 }],
+    lift: [{ opacity: 0, translate: '0 20px' }, { opacity: 1, translate: '0 0' }],
+    rise: [{ opacity: 0, translate: '0 48px' }, { opacity: 1, translate: '0 0' }],
+    slide: [{ opacity: 0, translate: '-28px 0' }, { opacity: 1, translate: '0 0' }],
+    settle: [{ opacity: 0, scale: '0.96' }, { opacity: 1, scale: '1' }],
+    zoom: [{ opacity: 0, scale: '0.86' }, { opacity: 1, scale: '1' }],
+    blur: [{ opacity: 0, filter: 'blur(10px)' }, { opacity: 1, filter: 'blur(0px)' }],
+    'grow-x': [{ scale: '0 1' }, { scale: '1 1' }],
+    'grow-y': [{ scale: '1 0' }, { scale: '1 1' }],
+    wipe: [{ clipPath: 'inset(0 100% 0 0)' }, { clipPath: 'inset(0 0% 0 0)' }],
+    'wipe-up': [{ clipPath: 'inset(100% 0 0 0)' }, { clipPath: 'inset(0% 0 0 0)' }],
+    trace: [{ strokeDashoffset: '1' }, { strokeDashoffset: '0' }],
+    draw: null, count: null, // special-cased below
+  };
+  const GEOMETRY = 'path,line,polyline,polygon,circle,ellipse,rect';
+  const hasStroke = el => { const s = getComputedStyle(el); return s.stroke && s.stroke !== 'none' && parseFloat(s.strokeWidth) > 0; };
+
+  /** Draw strokes on: dash offset for solid strokes, a left-to-right wipe for dashed ones. */
+  function drawOn(el, animate, delay) {
+    const targets = el instanceof SVGGeometryElement ? [el] : [...el.querySelectorAll(GEOMETRY)];
+    if (!motionAllowed(animate)) return;
+    const duration = durationOf(el, 900);
+    for (const t of targets) {
+      if (!t.animate) continue;
+      try {
+        if (!hasStroke(t)) { track(t.animate([{ opacity: 0 }, { opacity: 1 }], { duration: duration * 0.6, delay: delay + duration * 0.4, easing: easing(el), fill: 'backwards' })); continue; }
+        const dashed = getComputedStyle(t).strokeDasharray !== 'none';
+        if (!t.hasAttribute('pathLength') && !dashed) t.setAttribute('pathLength', '1');
+        const frames = dashed
+          ? [{ clipPath: rtl() ? 'inset(0 0 0 100%)' : 'inset(0 100% 0 0)' }, { clipPath: 'inset(0 0 0 0)' }]
+          : [{ strokeDasharray: '1 1', strokeDashoffset: '1' }, { strokeDasharray: '1 1', strokeDashoffset: '0' }];
+        track(t.animate(frames, { duration, delay, easing: easing(el), fill: 'backwards' }));
+      } catch (e) { warn(e.message); }
+    }
+  }
+
+  /** Count a number up to its committed text. The DOM always holds the final text except mid-animation. */
+  function countUp(el, animate, delay) {
+    if (!motionAllowed(animate)) return;
+    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    let node;
+    while ((node = walker.nextNode()) && !/\d/.test(node.data));
+    if (!node) return;
+    const final = node.data;
+    const m = /([-−+]?)(\d[\d,  ]*)(\.\d+)?/.exec(final);
+    if (!m) return;
+    const [all, sign, int, dec = ''] = m, head = final.slice(0, m.index), tail = final.slice(m.index + all.length);
+    const target = Number(int.replace(/[^\d]/g, '') + dec) * (sign === '-' || sign === '−' ? -1 : 1);
+    if (!Number.isFinite(target)) return;
+    const from = Number(el.dataset.countFrom ?? 0), digits = Math.max(0, dec.length - 1), grouped = /[,  ]/.test(int);
+    const sep = (int.match(/[,  ]/) || [','])[0];
+    const format = v => {
+      const abs = Math.abs(v).toFixed(digits);
+      let [ip, fp] = abs.split('.');
+      if (grouped) ip = ip.replace(/\B(?=(\d{3})+(?!\d))/g, sep);
+      const s = v < 0 ? (sign === '-' ? '-' : '−') : sign === '+' ? '+' : '';
+      return head + s + ip + (fp ? '.' + fp : '') + tail;
+    };
+    const duration = durationOf(el, 1100), start = performance.now() + delay;
+    let raf = 0, done;
+    const finished = new Promise(r => { done = r; });
+    const record = { node, final };
+    const stop = () => { cancelAnimationFrame(raf); node.data = final; counting.delete(record); done(); };
+    counting.add(record);
+    const frame = now => {
+      const t = Math.min(1, Math.max(0, (now - start) / duration)), e = 1 - (1 - t) ** 3;
+      node.data = t >= 1 ? final : format(from + (target - from) * e);
+      if (t < 1) raf = requestAnimationFrame(frame); else stop();
+    };
+    node.data = format(from);
+    raf = requestAnimationFrame(frame);
+    track({ finish: stop, cancel: stop, finished });
+  }
+
+  function enter(el, animate, extraDelay = 0) {
+    const name = el.dataset.motion, delay = delayOf(el) + extraDelay;
+    if (!(name in ENTRY)) { if (!el.dataset.motionWarned) { warn('Unknown entry effect: ' + name); el.dataset.motionWarned = 'true'; } return; }
+    if (el.dataset.stagger !== undefined) {
+      const gap = Math.max(0, Number(el.dataset.stagger) || 0);
+      [...el.children].forEach((child, i) => {
+        child.dataset.motion ??= name;
+        if (child.dataset.duration === undefined && el.dataset.duration !== undefined) child.dataset.duration = el.dataset.duration;
+        if (child.dataset.easing === undefined && el.dataset.easing !== undefined) child.dataset.easing = el.dataset.easing;
+        enter(child, animate, delay + i * gap);
+      });
+      return;
+    }
+    if (name === 'draw') return drawOn(el, animate, delay);
+    if (name === 'count') return countUp(el, animate, delay);
+    const [from, to] = ENTRY[name];
+    transition(el, to, animate, from, { delay });
+  }
+
+  // ------------------------------------------------------------ applying states
+
+  function context(i = current) {
+    return { slide: slides[i], index: i, step: i === current ? step : lastSteps[i], exporting, reducedMotion: mq.matches, active: i === current && !overview && !exporting };
+  }
+
+  /** Static state for a slide root (also used on presenter clones). */
+  function applyStatic(root, at, original = root) {
+    for (const el of root.querySelectorAll('[data-step],[data-until]')) {
+      const on = at >= Number(el.dataset.step ?? 0) && (el.dataset.until === undefined || at <= Number(el.dataset.until));
+      el.dataset.studioHidden = String(!on);
+    }
+    const originals = [...original.querySelectorAll('[data-states]')];
+    [...root.querySelectorAll('[data-states]')].forEach((el, k) => {
+      const tr = tracks.get(originals[k]);
+      if (!tr) return;
+      for (const [key, v] of Object.entries(stateAt(tr, at))) { if (key.startsWith('--')) el.style.setProperty(key, String(v)); else el.style[key] = String(v); }
+    });
+  }
+
+  function apply(i, at, animate) {
+    const slide = slides[i];
+    for (const el of slide.querySelectorAll('[data-step],[data-until]')) {
+      const on = at >= Number(el.dataset.step ?? 0) && (el.dataset.until === undefined || at <= Number(el.dataset.until));
+      const was = el.dataset.studioHidden === 'false';
+      el.dataset.studioHidden = String(!on);
+      el.setAttribute('aria-hidden', String(!on));
+      el.inert = !on;
+      if (on && el.dataset.motion && !el.hasAttribute('data-states')) {
+        if (!(el.dataset.motion in ENTRY)) { if (!el.dataset.motionWarned) { warn('Unknown entry effect: ' + el.dataset.motion); el.dataset.motionWarned = 'true'; } }
+        else if (animate && !was) enter(el, animate);
+        else if (!was && ENTRY[el.dataset.motion]) transition(el, ENTRY[el.dataset.motion][1], false);
+      }
+    }
+    for (const el of slide.querySelectorAll('[data-states]')) {
+      const tr = tracks.get(el);
+      if (!tr) continue;
+      const to = stateAt(tr, at);
+      // data-delay (and a parent's data-stagger) sequence transformations the same way as entries.
+      const parent = el.parentElement, gap = parent && parent.dataset.stagger !== undefined ? Math.max(0, Number(parent.dataset.stagger) || 0) : 0;
+      const delay = Math.min(2400, delayOf(el) + (gap ? [...parent.children].indexOf(el) * gap : 0));
+      transition(el, to, animate, null, { delay });
+      const hidden = el.dataset.studioHidden === 'true' || to.opacity === 0 || to.opacity === '0' || to.visibility === 'hidden';
+      el.setAttribute('aria-hidden', String(hidden));
+      el.inert = hidden;
+    }
+    lastSteps[i] = at;
+    slide.dataset.currentStep = String(at);
+    for (const [id, w] of widgets) if (slide.contains($(id))) call(w, 'onStep', { ...context(i), step: at });
+  }
+
+  // ------------------------------------------------------------ slide transitions
+
+  const TRANSITIONS = {
+    fade: () => [{ opacity: 0 }, { opacity: 1 }],
+    rise: () => [{ opacity: 0, translate: '0 24px' }, { opacity: 1, translate: '0 0' }],
+    push: forward => [{ opacity: 0, translate: `${(forward !== rtl() ? 1 : -1) * 4}% 0` }, { opacity: 1, translate: '0 0' }],
+    zoom: () => [{ opacity: 0, scale: '0.97' }, { opacity: 1, scale: '1' }],
+  };
+  function slideTransition(i, forward) {
+    const kind = meta.slides[i]?.transition || meta.transition || 'none';
+    if (kind === 'none') return;
+    const make = TRANSITIONS[kind];
+    if (!make) { warn('Unknown slide transition: ' + kind); return; }
+    try { track(slides[i].animate(make(forward), { duration: kind === 'fade' ? 340 : 460, easing: EASE.standard })); } catch (e) { warn(e.message); }
+  }
+
+  // ------------------------------------------------------------ navigation
+
+  function scale() {
+    const fs = document.body.classList.contains('studio-fullscreen');
+    const bar = fs ? 0 : document.querySelector('.studio-controls').getBoundingClientRect().height;
+    document.documentElement.style.setProperty('--studio-bar', bar + 'px');
+    const r = Math.min(innerWidth / meta.width, Math.max(1, innerHeight - bar) / meta.height);
+    document.documentElement.style.setProperty('--studio-scale', String(r));
+    if (overview) document.querySelectorAll('.studio-thumb').forEach(w => w.style.setProperty('--thumb-scale', w.clientWidth / meta.width));
+  }
+  function pauseSlide(i) {
+    if (enteredIndex === i) enteredIndex = null;
+    for (const el of slides[i].querySelectorAll('video,audio')) el.pause();
+    for (const [id, w] of widgets) if (slides[i].contains($(id))) call(w, 'onLeave', context(i));
+  }
+  function show(i, n = 0, { animate = false } = {}) {
+    finish();
+    const previous = current;
+    current = Math.max(0, Math.min(slides.length - 1, Math.floor(Number(i) || 0)));
+    step = Math.max(0, Math.min(max(current), Math.floor(Number(n) || 0)));
+    if (exporting) step = max(current);
+    const changed = previous !== current;
+    if (changed) { pauseSlide(previous); for (const el of slides[current].querySelectorAll('[data-step],[data-until]')) el.dataset.studioHidden = 'true'; }
+    document.body.dataset.export = String(exporting);
+    slides.forEach((sl, j) => {
+      const active = j === current;
+      sl.classList.toggle('is-current', active);
+      sl.setAttribute('aria-hidden', String(!active));
+      sl.inert = !active || overview;
+      if (active || exporting) apply(j, exporting ? max(j) : step, animate && active);
+    });
+    if (changed && motionAllowed(animate) && !overview) slideTransition(current, current > previous);
+    $('studio-position').textContent = `${current + 1} / ${slides.length} · ${step} / ${max(current)}`;
+    $('studio-prev').disabled = !current && !step;
+    $('studio-next').disabled = current === slides.length - 1 && (exporting || step === max(current));
+    const s = meta.slides[current];
+    $('studio-notes').textContent = (s.notes || '') + (s.sources?.length ? '\n\n' + s.sources.map(x => (typeof x === 'string' ? x : JSON.stringify(x))).join('\n') : '');
+    $('studio-announcer').textContent = s.title;
+    $('studio-jump').value = String(current);
+    try { history.replaceState(null, '', '#' + encodeURIComponent(s.id)); } catch { /* sandboxed frames */ }
+    for (const [id, w] of widgets) if (slides[current].contains($(id))) {
+      if (exporting) call(w, 'onExport', context());
+      else if (enteredIndex !== current && !overview && !document.hidden) call(w, 'onEnter', context());
+    }
+    enteredIndex = !exporting && !overview && !document.hidden ? current : null;
+    window.dispatchEvent(new CustomEvent('studio:state', { detail: context() }));
+    scale();
+  }
+  function next() { if (!exporting && step < max(current)) show(current, step + 1, { animate: true }); else if (current < slides.length - 1) show(current + 1, 0, { animate: true }); }
+  function prev() { if (!exporting && step > 0) show(current, step - 1, { animate: true }); else if (current) show(current - 1, max(current - 1), { animate: true }); }
+
+  function toggleOverview() {
+    overview = !overview;
+    document.body.classList.toggle('overview', overview);
+    finish();
+    if (overview) pauseSlide(current);
+    slides.forEach((sl, i) => {
+      let w = sl.parentElement;
+      if (overview) {
+        w = document.createElement('div');
+        w.className = 'studio-thumb'; w.tabIndex = 0; w.setAttribute('role', 'button'); w.setAttribute('aria-label', meta.slides[i].title);
+        sl.before(w); w.append(sl); sl.inert = true; apply(i, max(i), false);
+        w.onclick = () => { toggleOverview(); show(i); };
+        w.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleOverview(); show(i); } };
+      } else if (w.classList.contains('studio-thumb')) { w.before(sl); w.remove(); }
+    });
+    if (!overview) show(current, step);
+    scale();
+  }
+  function setExport(on) { exporting = !!on; if (overview) toggleOverview(); if (exporting) for (let i = 0; i < slides.length; i++) pauseSlide(i); show(current, step); }
+  function prepareExport() {
+    setExport(true);
+    for (const [id, w] of widgets) { const i = slides.findIndex(sl => sl.contains($(id))); call(w, 'onExport', context(i < 0 ? current : i)); }
+    window.dispatchEvent(new CustomEvent('studio:export'));
+  }
+  function reset() { for (const [id, w] of widgets) if (slides[current].contains($(id))) call(w, 'reset'); show(current, 0); }
+
+  // ------------------------------------------------------------ chrome: blackout, help, toast
+
+  function toggleBlackout(force) {
+    let el = $('studio-blackout');
+    if (!el) { el = document.createElement('div'); el.id = 'studio-blackout'; el.className = 'studio-blackout'; el.setAttribute('aria-hidden', 'true'); el.onclick = () => toggleBlackout(false); document.body.append(el); }
+    const on = force ?? !el.classList.contains('on');
+    el.classList.toggle('on', on);
+    return on;
+  }
+  function toggleHelp(force) {
+    let el = $('studio-help');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'studio-help'; el.className = 'studio-help'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'false'); el.setAttribute('aria-label', labels.help || 'Keyboard shortcuts');
+      const rows = [
+        ['→  Space  PgDn', labels.next || 'Next'], ['←  PgUp', labels.prev || 'Previous'], ['Home  End', `1 / ${slides.length}`],
+        ['O', labels.overview || 'Overview'], ['N', labels.notes || 'Notes'], ['P', labels.presenter || 'Presenter view'],
+        ['B', labels.blank || 'Black screen'], ['F', labels.full || 'Fullscreen'], ['R', labels.reset || 'Reset'], ['12 Enter', labels.goto || 'Go to slide'], ['Esc', '×'],
+      ];
+      el.innerHTML = '<div class="studio-help-card"><h2></h2><dl></dl></div>';
+      el.querySelector('h2').textContent = labels.help || 'Keyboard shortcuts';
+      const dl = el.querySelector('dl');
+      for (const [k, v] of rows) { const dt = document.createElement('dt'), dd = document.createElement('dd'); dt.textContent = k; dd.textContent = v; dl.append(dt, dd); }
+      el.onclick = e => { if (e.target === el) toggleHelp(false); };
+      document.body.append(el);
+    }
+    const on = force ?? !el.classList.contains('open');
+    el.classList.toggle('open', on);
+    $('studio-help-btn')?.setAttribute('aria-expanded', String(on));
+    return on;
+  }
+  let toastTimer = 0;
+  function toast(text) {
+    let el = $('studio-toast');
+    if (!el) { el = document.createElement('div'); el.id = 'studio-toast'; el.className = 'studio-toast'; el.setAttribute('role', 'status'); document.body.append(el); }
+    el.textContent = text; el.classList.add('on');
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('on'), 1400);
+  }
+
+  // ------------------------------------------------------------ presenter window
+
+  let presenter = null, presenterStart = 0, presenterPaused = 0;
+  const pad2 = v => String(v).padStart(2, '0');
+  const elapsed = () => { const s = Math.max(0, Math.floor(((presenterPaused || Date.now()) - presenterStart) / 1000)); return `${Math.floor(s / 60)}:${pad2(s % 60)}`; };
+
+  function cloneSlide(i, at) {
+    const src = slides[i];
+    // Clone committed text, not a number caught mid-count.
+    const live = [...counting].map(r => [r, r.node.data]);
+    for (const [r] of live) r.node.data = r.final;
+    const c = src.cloneNode(true);
+    for (const [r, v] of live) r.node.data = v;
+    // IDs stay: the clone lives in the presenter document, and SVG url(#…) references need them.
+    c.inert = true; c.classList.add('is-current'); c.setAttribute('aria-hidden', 'true');
+    if (at !== null) applyStatic(c, at, src);
+    const srcCanvas = src.querySelectorAll('canvas'), dstCanvas = c.querySelectorAll('canvas');
+    dstCanvas.forEach((cv, k) => { try { cv.getContext('2d')?.drawImage(srcCanvas[k], 0, 0); } catch { /* tainted or webgl */ } });
+    c.querySelectorAll('video,audio').forEach(m => { m.removeAttribute('autoplay'); m.muted = true; });
+    return c;
+  }
+  function renderPresenter() {
+    if (!presenter || presenter.closed) return;
+    const d = presenter.document, s = meta.slides[current], last = max(current);
+    const cur = d.getElementById('pv-current'), nxt = d.getElementById('pv-next');
+    if (!cur) return;
+    cur.replaceChildren(cloneSlide(current, null));
+    let nextLabel;
+    if (step < last) { nxt.replaceChildren(cloneSlide(current, step + 1)); nextLabel = `${labels.next || 'Next'} · ${step + 1} / ${last}`; }
+    else if (current < slides.length - 1) { nxt.replaceChildren(cloneSlide(current + 1, 0)); nextLabel = `${labels.next || 'Next'} · ${current + 2} / ${slides.length}`; }
+    else { nxt.replaceChildren(); nextLabel = '—'; }
+    d.getElementById('pv-next-label').textContent = nextLabel;
+    d.getElementById('pv-position').textContent = `${current + 1} / ${slides.length}` + (last ? `  ·  ${step} / ${last}` : '');
+    d.getElementById('pv-title').textContent = s.title;
+    d.getElementById('pv-notes').textContent = s.notes || '';
+    fitPresenter();
+  }
+  function fitPresenter() {
+    if (!presenter || presenter.closed) return;
+    for (const frame of presenter.document.querySelectorAll('.pv-frame')) frame.style.setProperty('--pv-scale', String(frame.clientWidth / meta.width));
+  }
+  function openPresenter() {
+    if (presenter && !presenter.closed) { presenter.focus(); renderPresenter(); return presenter; }
+    const w = window.open('', 'slide-studio-presenter', 'popup,width=1280,height=800');
+    if (!w) { toast('Pop-up blocked'); return null; }
+    presenter = w; presenterStart = Date.now(); presenterPaused = 0;
+    const d = w.document;
+    d.open();
+    d.write(`<!doctype html><html lang="${document.documentElement.lang}" dir="${document.documentElement.dir}"><head><meta charset="utf-8"><title></title></head><body class="pv-body">
+<header class="pv-bar"><strong id="pv-position"></strong><span id="pv-title" class="pv-title"></span><span class="pv-time"><button type="button" id="pv-timer" class="pv-btn"></button><span id="pv-clock"></span></span></header>
+<main class="pv-main"><section class="pv-current-wrap"><div id="pv-current" class="pv-frame"></div></section>
+<aside class="pv-side"><p id="pv-next-label" class="pv-label"></p><div id="pv-next" class="pv-frame pv-next"></div><p class="pv-label" id="pv-notes-label"></p><div id="pv-notes" class="pv-notes" tabindex="0"></div></aside></main>
+<footer class="pv-foot"><button type="button" id="pv-prev" class="pv-btn">←</button><button type="button" id="pv-nextbtn" class="pv-btn">→</button></footer></body></html>`);
+    d.close();
+    d.title = `${labels.presenter || 'Presenter view'} — ${meta.title}`;
+    for (const st of document.querySelectorAll('style')) d.head.append(st.cloneNode(true));
+    d.getElementById('pv-notes-label').textContent = labels.notes || 'Notes';
+    d.getElementById('pv-prev').setAttribute('aria-label', labels.prev || 'Previous');
+    d.getElementById('pv-nextbtn').setAttribute('aria-label', labels.next || 'Next');
+    d.getElementById('pv-prev').onclick = () => prev();
+    d.getElementById('pv-nextbtn').onclick = () => next();
+    d.getElementById('pv-timer').onclick = () => { if (presenterPaused) { presenterStart += Date.now() - presenterPaused; presenterPaused = 0; } else presenterPaused = Date.now(); };
+    d.getElementById('pv-timer').ondblclick = () => { presenterStart = Date.now(); presenterPaused = 0; };
+    d.addEventListener('keydown', e => {
+      if (e.ctrlKey || e.metaKey || e.altKey || e.isComposing) return;
+      if (['ArrowRight', 'PageDown', ' ', 'Enter'].includes(e.key) && !e.target.closest?.('button')) { e.preventDefault(); next(); }
+      else if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); prev(); }
+      else if (e.key === 'Home') { e.preventDefault(); show(0); }
+      else if (e.key === 'End') { e.preventDefault(); show(slides.length - 1, max(slides.length - 1)); }
+      else if (e.key.toLowerCase() === 'b') { e.preventDefault(); toggleBlackout(); }
+    });
+    const tick = () => {
+      if (!presenter || presenter.closed) return;
+      d.getElementById('pv-timer').textContent = elapsed() + (presenterPaused ? ' ‖' : '');
+      d.getElementById('pv-clock').textContent = new Date().toLocaleTimeString(document.documentElement.lang || undefined, { hour: '2-digit', minute: '2-digit' });
+    };
+    tick();
+    const interval = w.setInterval(tick, 1000);
+    w.addEventListener('resize', fitPresenter);
+    w.addEventListener('beforeunload', () => w.clearInterval(interval));
+    renderPresenter();
+    return w;
+  }
+  window.addEventListener('studio:state', renderPresenter);
+  window.addEventListener('pagehide', () => { if (presenter && !presenter.closed) presenter.close(); });
+
+  // ------------------------------------------------------------ fullscreen & idle controls
+
+  let idleTimer = 0;
+  function wake() {
+    document.body.classList.remove('studio-idle');
+    clearTimeout(idleTimer);
+    if (document.body.classList.contains('studio-fullscreen')) idleTimer = setTimeout(() => document.body.classList.add('studio-idle'), 2200);
+  }
+  document.addEventListener('fullscreenchange', () => { document.body.classList.toggle('studio-fullscreen', !!document.fullscreenElement); wake(); scale(); });
+  document.addEventListener('pointermove', wake, { passive: true });
+  async function toggleFullscreen() {
+    try { if (document.fullscreenElement) await document.exitFullscreen(); else await document.documentElement.requestFullscreen(); } catch { toast(labels.full ? `${labels.full}: ✕` : 'Fullscreen unavailable'); }
+  }
+
+  // ------------------------------------------------------------ input
+
+  $('studio-prev').onclick = prev;
+  $('studio-next').onclick = next;
+  $('studio-overview').onclick = toggleOverview;
+  $('studio-reset').onclick = reset;
+  $('studio-jump').onchange = e => show(Number(e.target.value));
+  $('studio-notes-btn').onclick = () => { const on = $('studio-notes').classList.toggle('open'); $('studio-notes-btn').setAttribute('aria-expanded', String(on)); };
+  $('studio-full').onclick = toggleFullscreen;
+  if ($('studio-presenter')) $('studio-presenter').onclick = openPresenter;
+  if ($('studio-help-btn')) $('studio-help-btn').onclick = () => toggleHelp();
+
+  let digits = '', digitTimer = 0;
+  const INTERACTIVE = 'input,textarea,select,video,audio,[contenteditable],[data-interactive],[role="slider"],[role="textbox"],[role="combobox"],[role="grid"]';
+
+  // Navigation buttons are not content widgets. Arrow/Page keys still navigate when
+  // those buttons keep focus after a mouse click; Space/Enter keep native activation.
+  document.addEventListener('keydown', e => {
+    if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey || e.isComposing || e.keyCode === 229) return;
+    const target = e.composedPath().find(x => x instanceof Element) || document.body;
+    if (e.key === 'Escape') {
+      if ($('studio-help')?.classList.contains('open')) { e.preventDefault(); toggleHelp(false); return; }
+      if ($('studio-blackout')?.classList.contains('on')) { e.preventDefault(); toggleBlackout(false); return; }
+      if (overview) { e.preventDefault(); toggleOverview(); return; }
+      if ($('studio-notes').classList.contains('open')) { e.preventDefault(); $('studio-notes').classList.remove('open'); $('studio-notes-btn').setAttribute('aria-expanded', 'false'); return; }
+    }
+    const navigationKey = ['ArrowRight', 'ArrowLeft', 'PageDown', 'PageUp', ' ', 'Enter', 'Home', 'End'].includes(e.key);
+    if (e.repeat && navigationKey) {
+      // Do not steal a slider's held arrow key. Only suppress presentation navigation.
+      if (!target.closest('input,textarea,select,[contenteditable],[data-interactive]')) e.preventDefault();
+      return;
+    }
+    if (overview) return;
+    const onNav = !!target.closest('.studio-controls');
+    if (target.closest(INTERACTIVE)) return;
+    if (target.closest('button,a,summary,[role="button"]') && (!onNav || [' ', 'Enter'].includes(e.key))) return;
+    if (/^[0-9]$/.test(e.key)) {
+      digits += e.key; clearTimeout(digitTimer); digitTimer = setTimeout(() => { digits = ''; }, 1600);
+      toast(`${labels.goto || 'Go to slide'}: ${digits}`);
+      return;
+    }
+    if (e.key === 'Enter' && digits) {
+      e.preventDefault(); const k = Number(digits) - 1; digits = ''; clearTimeout(digitTimer);
+      if (k >= 0 && k < slides.length) show(k, 0, { animate: true });
+      return;
+    }
+    if (['ArrowRight', 'PageDown', ' ', 'Enter'].includes(e.key)) { e.preventDefault(); next(); }
+    else if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); prev(); }
+    else if (e.key === 'Home') { e.preventDefault(); show(0); }
+    else if (e.key === 'End') { e.preventDefault(); show(slides.length - 1, max(slides.length - 1)); }
+    else if (e.key.toLowerCase() === 'o') { e.preventDefault(); toggleOverview(); }
+    else if (e.key.toLowerCase() === 'r') { e.preventDefault(); reset(); }
+    else if (e.key.toLowerCase() === 'n') { e.preventDefault(); $('studio-notes-btn').click(); }
+    else if (e.key.toLowerCase() === 'p') { e.preventDefault(); openPresenter(); }
+    else if (e.key.toLowerCase() === 'b' || e.key === '.') { e.preventDefault(); toggleBlackout(); }
+    else if (e.key.toLowerCase() === 'f') { e.preventDefault(); toggleFullscreen(); }
+    else if (e.key === '?') { e.preventDefault(); toggleHelp(); }
+  });
+
+  // Touch swipe: horizontal flicks navigate; interactive regions keep their gestures.
+  let swipe = null;
+  const stage = document.querySelector('.studio-stage');
+  stage.addEventListener('pointerdown', e => {
+    if (e.pointerType === 'mouse' || overview || e.target.closest(INTERACTIVE + ',button,a')) { swipe = null; return; }
+    swipe = { x: e.clientX, y: e.clientY, t: performance.now() };
+  }, { passive: true });
+  stage.addEventListener('pointerup', e => {
+    if (!swipe) return;
+    const dx = e.clientX - swipe.x, dy = e.clientY - swipe.y, dt = performance.now() - swipe.t;
+    swipe = null;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > 1.5 * Math.abs(dy) && dt < 800) { if ((dx < 0) !== rtl()) next(); else prev(); }
+  }, { passive: true });
+  stage.addEventListener('pointercancel', () => { swipe = null; }, { passive: true });
+
+  document.addEventListener('visibilitychange', () => { if (document.hidden) pauseSlide(current); else show(current, step); });
+  window.addEventListener('resize', scale);
+  // Reduced motion switched on: settle running motion and media now. Switched off: nothing is
+  // animating, and the next build animates again, so leave a running build alone.
+  mq.addEventListener('change', () => { if (!mq.matches) return; finish(); for (let i = 0; i < slides.length; i++) pauseSlide(i); show(current, step); });
+  window.addEventListener('beforeprint', () => { restore = { current, step, exporting, widgets: [...widgets].map(([id, w]) => [id, call(w, 'snapshot')]) }; prepareExport(); });
+  window.addEventListener('afterprint', () => {
+    if (!restore) return;
+    exporting = restore.exporting;
+    document.body.dataset.export = String(exporting);
+    for (const [id, s] of restore.widgets) call(widgets.get(id), 'restore', s);
+    show(restore.current, restore.step);
+    restore = null;
+  });
+
+  // ------------------------------------------------------------ public API
+
+  const api = {
+    kind: 'craft', version: 4, meta, show, next, prev, finish, reset, setExport, prepareExport, showAllBuilds: prepareExport,
+    overview: toggleOverview, presenter: openPresenter, blackout: toggleBlackout, help: toggleHelp,
+    register(id, widget) {
+      if (widgets.has(id)) throw Error('Duplicate widget ID: ' + id);
+      if (!$(id)) throw Error('Missing widget root: ' + id);
+      widgets.set(id, widget);
+      if (slides[current].contains($(id))) call(widget, exporting ? 'onExport' : 'onEnter', context());
+      return () => { call(widget, 'dispose'); widgets.delete(id); };
+    },
+    getWidgetState: id => call(widgets.get(id), 'snapshot'),
+    getState: () => ({ current, step, maxBuild: max(current), exporting, overview, reducedMotion: mq.matches, warnings: [...warnings], widgets: [...widgets.keys()], presenter: !!(presenter && !presenter.closed) }),
+  };
+  window.slideStudio = window.SlideStudio = api;
+  let id = '';
+  try { id = decodeURIComponent(location.hash.slice(1)); } catch { /* malformed hash */ }
+  const initial = meta.slides.findIndex(s => s.id === id);
+  show(initial < 0 ? 0 : initial);
+  document.body.dataset.studioReady = 'true';
 })();
 </script></body></html>

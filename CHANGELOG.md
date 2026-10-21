@@ -1,6 +1,100 @@
 # Changelog
 
-## Unreleased
+## 4.0.0 — 2026-10-19
+
+A rebuild of the craft layer: the agent now draws evidence with an engine, composes on
+a page grammar with role-based color, moves only to explain, and reviews against a
+stricter definition of the machine-made look. Every library page was remade as a
+finished example with computed headlines.
+
+- **Intake**: before the first page the agent asks once, in up to six short
+  multiple-choice questions, what the request leaves open — spoken or read, files to
+  hand over (HTML, PDF, editable or picture PowerPoint), keys-only presenting, template
+  pack / company template / from scratch, look, writing style — each with a
+  recommendation and "up to you". `references/intake.md` maps every answer to a route,
+  pack, color system and rules; `brief.md` starts with the answers and chosen defaults.
+- **Figure engine** (`assets/runtime/figure.mjs` + `fig-core/stats/charts/stats-charts/diagrams/patterns.mjs`):
+  45 chart and diagram types from data; nice scales, measured labels, CJK phrase
+  wrapping with kinsoku, callouts kept inside the frame, validated waterfall totals,
+  layered flow layout with collision checks, statistics (OLS band, KDE, ECDF, ROC/PR/AUC,
+  calibration), seeded textures and contour/vector fields. Themes through `--ss-*`
+  CSS tokens or literal color-system JSON; standalone SVG export. Derived label sizes
+  never drop below 15 px. `references/figures.md` documents the API.
+- **Player 4** (`assets/runtime/player.js`, rewritten readably): presets `draw`, `count`,
+  `grow-x`, `grow-y`, `blur`, `zoom`, `rise`, `wipe-up`; `data-delay`, `data-stagger`,
+  `data-easing`; `data-states` transformations committed synchronously with a removable
+  animation layer; deck/slide transitions (`fade`, `rise`, `push`, `zoom`); presenter
+  window with next build, notes and timer; black screen, shortcut sheet, number jump,
+  swipe, idle-hiding fullscreen controls. 12 UI languages.
+- **Page grammar** (`assets/runtime/study-frame.css`, `st-*`) and **color systems as CSS**
+  (`cs-<id>` classes generated into `assets/color-systems/color-systems.css`).
+- **Libraries rebuilt** as finished pages with specific fictional content: 104 diagram
+  studies (each also a standalone SVG), 64 motion studies, 24 interactions, 36
+  compositions, 12 template packs (72 pages, redesigned from scratch with their own art
+  direction), and the worked example decks (research narrative, from-scratch derivation,
+  constraint layout, ten languages, image handling, repair lab, period comparison,
+  transfer talk, brand proof).
+- **Machine-made look**: `slop_check.py` reads computed styles in HTML decks — tiled
+  dot/grid backgrounds, glows and blurs, gradient text, frosted glass, shadowed cards,
+  letter-spaced caps labels, separator chains, emoji, chips, giant faded numerals,
+  stacked letters, a colored headline phrase that matches no mark, ▲ used for
+  increases in Japanese. SKILL.md and `references/visual-design.md` ("Identity without
+  ornament") say what to do instead.
+- **Tooling**: `craft.mjs init` copies the engine, theme and a computed starter deck;
+  `catalog.mjs take` copies a study with its dependencies, trimmed CSS, media and SVG
+  twin; `preview.mjs` (with `--css`); `contact-sheet.py` (craft and structured decks,
+  `--steps`, `--frames`); `build-studies.mjs` (CSS bundles incl. compositions,
+  standalone SVGs, `--css-only`); `build-thumbs.py`; a searchable visual gallery index.
+- **Engine options found by building the libraries**: flow diagrams merge fan-in edges on
+  a trunk (one arrowhead) and split fan-outs from one, spread other shared ports and
+  squeeze crowded layers; Gantt baselines with slip labels; waterfall `colors:'neutral'`,
+  `highlight`, outlined plan bars, a baseline and sub-labels; `heatmap` blank cells for
+  cohort triangles; `quadrantChart` in data units with thresholds; `forestPlot` table
+  columns and marker shapes; ROC/PR operating points with thinned paths; calibration
+  before/after series, Wilson intervals and log counts; line-chart tick values, solid
+  reference lines, band colours and annotations by x value; `columnChart` without
+  category labels; `theme({css: true, system})`. Japanese wrapping keeps a number with
+  its counter or unit and kanji compounds whole, and balanced wrapping never splits a
+  word.
+- **QA measures what is seen**: text clipped by SVG clip paths or nested `<svg>`
+  viewports is not off-slide; screen-reader-only text and empty, unpainted containers
+  neither cover nor are covered; text over a painted sibling goes to pixel review; a
+  tight-leaded hero numeral is measured by its line box. `slop_check.py` reads SVG lines
+  and fills, judges hue by Lab chroma (navy ink is ink), treats table rules as typography
+  and honours a slide's `copyWaivers`.
+- **Structured route (native, editable PowerPoint)** rebuilt to the same standard:
+  `scripts/core.mjs` is readable code with a 12-column page system, headline 36–44 px,
+  body ≥ 20 px, labels ≥ 16 px, contrast-derived muted text and the accent kept for the
+  highlighted item. All 25 layouts were recomposed — round axis ticks, direct labels, real
+  tables, native donut sectors, labelled scatter points, opt-in numbering instead of
+  decorative ordinals. `export-pptx.mjs` writes title placeholders, native tables and
+  freeform charts, `ja-JP` text and the deck's theme fonts, and repairs pptxgenjs XML. The
+  seven example decks were rewritten; new schema fields are optional, old decks compile.
+- **PDF text layer**: exports stay searchable when a font gives alternate glyphs private-use
+  code points (Inter's figure punctuation and tabular digits: the page is printed again
+  with those substitutions off) or when a CJK font shares a glyph between a radical and its
+  ideograph (the text layer is rewritten from ⽉/⻑ to 月/長). The fallback also reaches
+  figures a widget redraws while the page prints.
+- **Interactions with real subjects**: the 24 studies are pages from fictional decks (a
+  sepsis alert threshold, a dosing curve, a tide gauge during a typhoon, a bus network
+  with a closed bridge, a parcel-rate matrix, a measured model ablation…), six in
+  Japanese, each computing its headline from the data it passes to the widget.
+  `widgets.js` takes richer, optional config per kind — control labels with units, axes,
+  per-kind data, status and readout templates, documented parameter models (`dosing`,
+  `decay`, `logistic`), a figure under a `tabs` section — draws real axes and direct
+  labels, and renders meshes with a depth buffer so hidden surfaces are exact at every angle. Decks that pass no data get
+  the original fixtures and behaviour (a browser check keeps it so).
+- Player: switching reduced motion *off* no longer settles a build that is still running
+  (only switching it on does); a late media-change event used to cut a delayed build short.
+- Tests: figure-engine suite (every chart renders a finite, accessible SVG with unique
+  ids), HTML style-signal tests for `slop_check.py`, Player 4 browser suite
+  (`tests/player_browser.py`), integrity regressions for clipped, hidden and
+  tight-leaded text, searchable-PDF checks for Inter and Japanese, and a gallery-index
+  check (every study has a card and a thumbnail; search, kind and language filters
+  return the counts computed from the catalog).
+
+### Also in 4.0 (prepared after 3.4)
+
 
 - 37 role-based color systems (`assets/color-systems/`, `gallery/color-systems.html`)
   for business, public sector, research, engineering, education and expressive/cultural

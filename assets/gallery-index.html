@@ -1,9 +1,126 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Slide Studio — the workshop</title><style>
-*{box-sizing:border-box}body{margin:0;background:#f5f2e9;color:#172b35;font:17px/1.5 Arial,sans-serif}main{max-width:1180px;margin:auto;padding:60px 32px}h1{font:clamp(48px,8vw,90px)/1.03 Georgia,serif;letter-spacing:-2px;margin:0 0 28px}h2{font:32px Georgia,serif;margin:52px 0 18px}p{max-width:850px}a{color:#245f74;text-underline-offset:4px}.lead{font-size:23px}.paths{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;margin-top:42px}.featured{display:grid;grid-template-columns:auto 1fr;gap:6px 26px;align-items:baseline;margin-top:42px;padding:26px 28px;background:#172b35;color:#f5f2e9}.featured strong{font:64px/1 Georgia,serif;grid-row:span 2}.featured a{color:#f3c9a8;font-size:26px}.featured p{margin:0;color:#dfe5e3}.path{border-top:2px solid #172b35;padding-top:20px}.path strong{font:48px Georgia,serif;display:block}.path a{font-size:22px}.tools{display:flex;gap:14px;margin:26px 0;flex-wrap:wrap}input,select{font:inherit;padding:13px 16px;border:1px solid #8c9ba0;background:#fff;max-width:100%}input{flex:1;min-width:200px}table{border-collapse:collapse;width:100%;background:#fff9}th,td{text-align:left;border-bottom:1px solid #cad0ce;padding:16px;vertical-align:top}th{font-weight:600}td small{display:block;margin-top:4px;color:#48616b}td:first-child{width:25%}td:last-child{width:18%}code{font-size:14px}footer{margin-top:50px;border-top:1px solid #8c9ba0;padding-top:18px;font-size:15px}:focus-visible{outline:3px solid #b75132;outline-offset:3px}@media(max-width:750px){main{padding:35px 20px}.featured{grid-template-columns:1fr}.featured strong{grid-row:auto}.paths{grid-template-columns:repeat(2,1fr)}td,th{padding:11px 8px}td:last-child,th:last-child{display:none}.lead{font-size:20px}}
-</style></head><body><main><h1>Author the idea.<br>Shape the explanation.</h1><p class="lead">A workshop of practical template packs, editable diagrams, motion, interactions and complete-slide designs. These are materials to transform, not layouts you must follow.</p><p><a href="../README.md">Start here</a> · <a href="../README.ja.md">日本語ガイド</a> · <a href="../SKILL.md">Agent instructions</a> · <a href="../VERIFICATION.md">Verification & boundaries</a></p>
-<div class="featured"><strong>{{COUNT_templates}}</strong><a href="templates.html">Practical template packs</a><p>Complete, richly designed page sets — pitch, business review, strategy, research talk, architecture review, ML report, lecture, editorial, impact report, product launch, project status and keynote — in English and Japanese. Adapt them to real content; the data are synthetic.</p></div>
-<div class="paths"><div class="path"><strong>{{COUNT_diagrams}}</strong><a href="diagrams.html">Diagrams & geometry</a><p>Relations, quantities, structures and original illustration.</p></div><div class="path"><strong>{{COUNT_motion}}</strong><a href="motion.html">Motion studies</a><p>Stable identities and explanatory state changes.</p></div><div class="path"><strong>{{COUNT_interactions}}</strong><a href="interactions.html">Interactive studies</a><p>Real input, computation, media and mesh inspection.</p></div><div class="path"><strong>{{COUNT_compositions}}</strong><a href="compositions.html">Whole-canvas design</a><p>Images, typography, visual rhythm and deliberate density.</p></div></div>
-<h2>Color, repair and transfer</h2><p><a href="color-systems.html">{{COUNT_colorsystems}} role-based color systems</a> — palettes defined by role with usage rules, contrast and color-vision checks.</p><p><a href="repair-lab.html">12 before/after repair pairs</a> · <a href="period-comparison.html">Period-dependent comparison</a> · <a href="transfer-talk.html">A three-page original explanation</a> · <a href="../references/writing-and-editing.md">Natural copy</a> · <a href="../references/verification-and-delivery.md">Verified PDF typography</a></p><h2>Beyond individual components</h2><p><a href="research.html">An eight-page research argument</a> · <a href="images.html">12 image-framing studies</a> · <a href="languages.html">10 multilingual text fixtures</a> · <a href="from-scratch.html">A new composition from entities and geometry</a></p><p>Open the HTML directly. Use arrow keys or the slide selector. The final PDF/PPTX routes are static; controls, video and 3D are HTML features. Sample data are explicitly illustrative.</p>
-<h2>Find a useful explanation</h2><div class="tools"><input id="q" type="search" aria-label="Search by explanatory purpose" placeholder="Try uncertainty, image, threshold, decomposition…"><select id="kind" aria-label="Resource type"><option value="">All material</option> <option>templates</option><option>diagrams</option><option>motion</option><option>interactions</option><option>compositions</option></select></div><p id="count" aria-live="polite"></p><table><thead><tr><th>Study</th><th>Communication job</th><th>Editable source</th></tr></thead><tbody id="results"></tbody></table><footer>Original studies: MIT. Two photographs retain separate CC0/public-domain provenance. No font binaries or user profile data. <a href="../THIRD_PARTY_NOTICES.md">Rights and credits</a>.</footer><section><h2>Refinement tools</h2><p><a href="brand.html">Identity proof</a> · <a href="constraint-layout.html">Geometry from constraints</a> · <a href="../references/writing-and-editing.md">Audience-copy boundary</a> · <a href="../references/visual-design.md">Space diagnosis</a></p></section></main><script>
-const rows={{CATALOG}};const esc=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));function filter(){let q=document.querySelector('#q').value.toLowerCase().trim(),k=document.querySelector('#kind').value;let filtered=rows.filter(r=>(!k||r.kind===k)&&(!q||[r.title,r.id,r.purpose].join(' ').toLowerCase().includes(q)));document.querySelector('#count').textContent=filtered.length+' editable studies';document.querySelector('#results').innerHTML=filtered.map(r=>`<tr><td><a href="${esc(r.gallery.replace('gallery/',''))}">${esc(r.title)}</a><small>${esc(r.kind)}</small></td><td>${esc(r.purpose)}</td><td><a href="../${esc(r.source)}"><code>${esc(r.id)}</code></a></td></tr>`).join('')}document.querySelector('#q').addEventListener('input',filter);document.querySelector('#kind').addEventListener('change',filter);filter();
-</script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Slide Studio gallery</title>
+<style>
+:root{--paper:#fbfaf7;--ink:#15181c;--muted:#5b6169;--rule:#dddad3;--surface:#f0eee8;--accent:#1d4ed8;
+  --sans:"Inter","Helvetica Neue",Arial,"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic UI",Meiryo,sans-serif;
+  --display:"Inter Display","Inter","Helvetica Neue",Arial,"Hiragino Sans","Noto Sans JP",sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--paper:#111315;--ink:#ebe9e4;--muted:#a2a7ad;--rule:#2b2f34;--surface:#1a1d20;--accent:#8db0ff}}
+*{box-sizing:border-box}
+html{background:var(--paper)}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.55 var(--sans);-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-underline-offset:3px}
+.wrap{max-width:1240px;margin:0 auto;padding:0 32px}
+header{padding:64px 0 28px}
+h1{font:650 clamp(36px,5.2vw,60px)/1.06 var(--display);letter-spacing:-.025em;margin:0 0 18px;max-width:860px;text-wrap:balance}
+.lead{font-size:19px;line-height:1.55;color:var(--muted);max-width:720px;margin:0 0 20px}
+.links{display:flex;flex-wrap:wrap;gap:6px 22px;font-size:16px}
+.kinds{display:flex;flex-wrap:wrap;gap:0;margin:40px 0 0;border-top:1px solid var(--ink)}
+.kinds button{all:unset;cursor:pointer;padding:16px 28px 14px 0;margin-right:28px;display:grid;gap:2px;border-top:3px solid transparent;margin-top:-2px}
+.kinds button:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
+.kinds b{font:600 30px/1 var(--display);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.kinds span{color:var(--muted);font-size:15px}
+.kinds button[aria-pressed=true]{border-top-color:var(--accent)}
+.kinds button[aria-pressed=true] span{color:var(--ink)}
+.bar{position:sticky;top:0;z-index:3;background:color-mix(in srgb,var(--paper) 94%,transparent);backdrop-filter:none;border-bottom:1px solid var(--rule)}
+.bar .wrap{display:flex;gap:16px;align-items:center;padding-top:12px;padding-bottom:12px}
+.bar input{flex:1;min-width:0;font:inherit;padding:10px 12px;border:1px solid var(--rule);border-radius:6px;background:var(--paper);color:var(--ink)}
+.bar input:focus{outline:2px solid var(--accent);outline-offset:-1px}
+.bar select{font:inherit;padding:9px 10px;border:1px solid var(--rule);border-radius:6px;background:var(--paper);color:var(--ink)}
+#count{color:var(--muted);font-size:15px;white-space:nowrap;font-variant-numeric:tabular-nums}
+main{padding:28px 0 96px}
+section{margin:0 0 56px}
+section>h2{font:650 24px/1.25 var(--display);letter-spacing:-.01em;margin:0 0 4px}
+section>p{color:var(--muted);margin:0 0 20px;max-width:760px}
+.pack{margin:0 0 36px}
+.pack h3{font:600 17px/1.3 var(--sans);margin:0 0 12px;display:flex;gap:12px;align-items:baseline}
+.pack h3 small{font-weight:400;color:var(--muted);font-size:15px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(232px,1fr));gap:26px 22px}
+.item a{display:block;color:inherit;text-decoration:none}
+.item img{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;background:var(--surface);border:1px solid var(--rule)}
+.item a:hover img,.item a:focus-visible img{border-color:var(--ink)}
+.item a:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
+.item h4{font:600 15px/1.35 var(--sans);margin:10px 0 3px}
+.item p{margin:0;color:var(--muted);font-size:14px;line-height:1.45;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.empty{color:var(--muted);padding:40px 0}
+footer{border-top:1px solid var(--rule);padding:24px 0 48px;color:var(--muted);font-size:14px}
+@media (max-width:640px){.wrap{padding:0 16px}header{padding-top:40px}.kinds button{padding-right:0;margin-right:22px}.kinds b{font-size:24px}.grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:20px 14px}}
+</style>
+</head>
+<body>
+<header class="wrap">
+  <h1>Slide Studio gallery</h1>
+  <p class="lead">Finished example pages for agents and people to adapt: {{COUNT_all}} studies built from data with the skill’s figure engine and player, plus worked example decks. Every number is computed in code; replace the data and the pages recompute.</p>
+  <div class="links"><a href="../README.md">Read me</a><a href="../README.ja.md">日本語ガイド</a><a href="../SKILL.md">Agent instructions</a><a href="../VERIFICATION.md">Verification</a><a href="color-systems.html">{{COUNT_colorsystems}} color systems</a></div>
+  <div class="kinds" role="group" aria-label="Show a library">
+    <button type="button" data-kind="" aria-pressed="true"><b>{{COUNT_all}}</b><span>Everything</span></button>
+    <button type="button" data-kind="templates" aria-pressed="false"><b>{{COUNT_templates}}</b><span>Template packs</span></button>
+    <button type="button" data-kind="diagrams" aria-pressed="false"><b>{{COUNT_diagrams}}</b><span>Charts &amp; diagrams</span></button>
+    <button type="button" data-kind="motion" aria-pressed="false"><b>{{COUNT_motion}}</b><span>Motion</span></button>
+    <button type="button" data-kind="interactions" aria-pressed="false"><b>{{COUNT_interactions}}</b><span>Interactions</span></button>
+    <button type="button" data-kind="compositions" aria-pressed="false"><b>{{COUNT_compositions}}</b><span>Compositions</span></button>
+    <button type="button" data-kind="examples" aria-pressed="false"><b>{{COUNT_examples}}</b><span>Example decks</span></button>
+  </div>
+</header>
+<div class="bar"><div class="wrap">
+  <input id="q" type="search" placeholder="Search by what you need to explain — uncertainty, before/after, 加重平均, cohort…" aria-label="Search the gallery">
+  <select id="lang" aria-label="Language"><option value="">All languages</option><option value="en">English</option><option value="ja">日本語</option></select>
+  <span id="count" aria-live="polite"></span>
+</div></div>
+<main class="wrap" id="results"></main>
+<footer class="wrap">Illustrative data and fictional organisations throughout. Thumbnails show each page’s final build; open a page to see its motion and controls. Rebuild with <code>npm run build:galleries</code> and <code>python scripts/build-thumbs.py</code>.</footer>
+<script>
+const rows = {{CATALOG}};
+const examples = {{EXAMPLES}};
+const LIB = {
+  templates: ['Template packs', 'Complete six-page decks for real occasions, each with its own visual system. Copy a pack with catalog.mjs take and replace the content.'],
+  diagrams: ['Charts & diagrams', 'One explanation per page, drawn from data by the figure engine; each also exports a standalone SVG.'],
+  motion: ['Motion', 'Builds and transformations that explain a change; every build is a complete page and the last build is the static page.'],
+  interactions: ['Interactions', 'Controls that change a real model, with reset, keyboard routes and a meaningful static export.'],
+  compositions: ['Compositions', 'Page layouts and visual languages, each shown with real content.'],
+  examples: ['Example decks', 'Complete decks to read as models of authoring: data, derived values, figures and copy in one module.'],
+};
+const esc = x => String(x ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const packOf = r => (r.source.match(/templates\/(tpl-[^/]+)\//) || [])[1];
+const state = { kind: '', q: '', lang: '' };
+function matches(r) {
+  if (state.kind && r.kind !== state.kind) return false;
+  if (state.lang && (r.language || 'en') !== state.lang) return false;
+  if (!state.q) return true;
+  const hay = [r.title, r.id, r.purpose, ...(r.tags || [])].join(' ').toLowerCase();
+  return state.q.split(/\s+/).every(w => hay.includes(w));
+}
+const card = r => `<div class="item"><a href="${esc(r.href)}"><img loading="lazy" src="thumbs/${esc(r.thumb)}.webp" width="320" height="180" alt=""><h4>${esc(r.title)}</h4><p>${esc(r.purpose)}</p></a></div>`;
+function render() {
+  const all = [...rows.map(r => ({ ...r, href: r.gallery.replace(/^gallery\//, ''), thumb: r.id })),
+               ...examples.map(e => ({ ...e, kind: 'examples', href: e.href, thumb: 'deck-' + e.id }))];
+  const hit = all.filter(matches);
+  document.getElementById('count').textContent = `${hit.length} of ${all.length}`;
+  const out = [];
+  for (const kind of Object.keys(LIB)) {
+    const list = hit.filter(r => r.kind === kind);
+    if (!list.length) continue;
+    let body = '';
+    if (kind === 'templates') {
+      const packs = [...new Set(list.map(packOf))];
+      body = packs.map(p => { const items = list.filter(r => packOf(r) === p); return `<div class="pack"><h3>${esc(items[0].pack || p)}<small>${items.length} pages</small></h3><div class="grid">${items.map(card).join('')}</div></div>`; }).join('');
+    } else body = `<div class="grid">${list.map(card).join('')}</div>`;
+    out.push(`<section><h2>${LIB[kind][0]}</h2><p>${LIB[kind][1]}</p>${body}</section>`);
+  }
+  document.getElementById('results').innerHTML = out.join('') || '<p class="empty">Nothing matches. Try a broader word — the gallery is searched by title, purpose and tags.</p>';
+}
+document.querySelectorAll('.kinds button').forEach(b => b.addEventListener('click', () => {
+  state.kind = b.dataset.kind;
+  document.querySelectorAll('.kinds button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+  render();
+}));
+document.getElementById('q').addEventListener('input', e => { state.q = e.target.value.toLowerCase().trim(); render(); });
+document.getElementById('lang').addEventListener('change', e => { state.lang = e.target.value; render(); });
+try { const k = new URLSearchParams(location.search).get('kind'); if (k && LIB[k]) document.querySelector(`.kinds button[data-kind="${k}"]`).click(); } catch {}
+render();
+</script>
+</body>
+</html>

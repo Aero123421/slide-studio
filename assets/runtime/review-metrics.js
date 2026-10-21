@@ -38,7 +38,8 @@
   const e=bn.parentElement;if(!e||!bn.textContent.trim()||!shown(e)||e.closest('script,style,template,option'))continue;
   const style=getComputedStyle(e),range=document.createRange();range.selectNodeContents(bn);
   const raw=[...range.getClientRects()].filter(r=>r.width>0&&r.height>0);
-  if(!e.closest('footer,figcaption,.g-footer,.c-foot,.studio-demo,[data-region="source"],[data-role="source"],h1,h2,h3')){
+  // Body = running text: headings, sources and figure labels (SVG text, which has its own 16 px floor) are not body.
+  if(!e.closest('footer,figcaption,.g-footer,.c-foot,.studio-demo,[data-region="source"],[data-role="source"],h1,h2,h3,svg')){
     for(const r of raw)bodyRuns.push({text:bn.textContent.trim().slice(0,90),chars:bn.textContent.trim().length/Math.max(1,raw.length),font:+style.fontSize.replace('px',''),box:box(r)});
   }
   if(!e.closest('[data-qa-text-clip]'))for(const r of raw){

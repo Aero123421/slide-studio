@@ -6,7 +6,11 @@ deck (Playwright) and reports concrete, located signals: accent stripes on cards
 title underlines, decorative ordinals, one skeleton repeated across the deck,
 English eyebrows in a CJK deck, a color identity reused for unrelated items,
 near-duplicate pages, small live text, production/status labels on the canvas and
-tool metadata in speaker notes.
+tool metadata in speaker notes. For HTML decks it also reads computed styles for the
+decorations that make a deck look machine-made: tiled dot/grid backgrounds, glows and
+blurs, gradient text, frosted glass, shadowed cards, letter-spaced caps labels,
+separator chains, emoji, chips, giant faded numerals, stacked letters, a colored
+headline phrase that labels nothing, and ▲ used for increases in Japanese decks.
 
 These are review prompts with a suggested repair, not a taste score. Each warning
 needs either a fix or a one-line reason why the pattern carries meaning here.
@@ -35,6 +39,10 @@ def hue_bucket(c):
     if not rgb:return None
     h,l,s=colorsys.rgb_to_hls(*rgb)
     if s<.3 or l<.12 or l>.92:return None
+    # HLS saturation is unstable for dark colors: judge hue by Lab chroma, so a navy or
+    # brown ink (#182a3e, chroma 15) reads as ink, not as a color identity.
+    L,a,b=lab(c);C=(a*a+b*b)**.5
+    if C<20 or (L<25 and C<30):return None
     return int(((h*360)+15)//30)%12
 def saturated(c):return hue_bucket(c) is not None
 def lab(c):
@@ -110,11 +118,53 @@ HTML_JS=r'''()=>{const out=[];const slides=[...document.querySelectorAll('.slide
   for(const el of s.querySelectorAll('*')){const cs=getComputedStyle(el);if(cs.visibility==='hidden'||cs.display==='none'||+cs.opacity===0)continue;const r=el.getBoundingClientRect();if(!r.width&&!r.height)continue;
    const box={x:(r.left-r0.left)*k,y:(r.top-r0.top)*k,w:r.width*k,h:r.height*k};
    const own=[...el.childNodes].filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim();
-   if(own&&!(el instanceof SVGElement&&el.tagName!=='text'&&el.tagName!=='tspan'))els.push({...box,kind:'text',text:el.innerText?.trim()||own,size:parseFloat(cs.fontSize)*k,color:rgb(cs.color)});
+   if(own&&!(el instanceof SVGElement&&el.tagName!=='text'&&el.tagName!=='tspan'))els.push({...box,kind:'text',text:el.innerText?.trim()||own,size:parseFloat(cs.fontSize)*k,color:rgb(cs.color),inFigure:!!el.closest('svg[role="img"]')});
    const bg=rgb(cs.backgroundColor);if(bg&&!(el===s))els.push({...box,kind:'shape',fill:bg});
-   for(const side of ['Top','Right','Bottom','Left']){const bw=parseFloat(cs['border'+side+'Width']);const bc=rgb(cs['border'+side+'Color']);if(bw>=2&&bc&&cs['border'+side+'Style']!=='none'){const others=['Top','Right','Bottom','Left'].filter(x=>x!==side).every(x=>parseFloat(cs['border'+x+'Width'])<1);if(others){const t=bw*k;const b=side==='Top'?{x:box.x,y:box.y,w:box.w,h:t}:side==='Bottom'?{x:box.x,y:box.y+box.h-t,w:box.w,h:t}:side==='Left'?{x:box.x,y:box.y,w:t,h:box.h}:{x:box.x+box.w-t,y:box.y,w:t,h:box.h};els.push({...b,kind:'shape',fill:bc,edgeOf:{...box}})}}}
-   if(el instanceof SVGGeometryElement){const f=rgb(cs.fill)||rgb(cs.stroke);if(f&&['rect','line'].includes(el.tagName))els.push({...box,kind:el.tagName==='line'?'line':'shape',fill:f,svg:true})}}
-  out.push({id:s.id||('slide-'+(i+1)),title:s.getAttribute('aria-label')||'',notes:s.dataset.notes||'',elements:els})}return out}'''
+   for(const side of ['Top','Right','Bottom','Left']){const bw=parseFloat(cs['border'+side+'Width']);const bc=rgb(cs['border'+side+'Color']);if(bw>=2&&bc&&cs['border'+side+'Style']!=='none'){const others=['Top','Right','Bottom','Left'].filter(x=>x!==side).every(x=>parseFloat(cs['border'+x+'Width'])<1);if(others&&!/^(TABLE|THEAD|TBODY|TFOOT|TR|TH|TD|COL|COLGROUP|CAPTION|HR)$/.test(el.tagName)){const t=bw*k;const b=side==='Top'?{x:box.x,y:box.y,w:box.w,h:t}:side==='Bottom'?{x:box.x,y:box.y+box.h-t,w:box.w,h:t}:side==='Left'?{x:box.x,y:box.y,w:t,h:box.h}:{x:box.x+box.w-t,y:box.y,w:t,h:box.h};
+     // A one-sided rule is a card stripe only on something that looks like a card (tinted, rounded or shadowed); on a table or a plain block it is typography.
+     const cardish=(bg&&el!==s)||parseFloat(cs.borderTopLeftRadius)>0||cs.boxShadow!=='none';els.push({...b,kind:'shape',fill:bc,...(cardish?{edgeOf:{...box}}:{})})}}}
+   if(el instanceof SVGGeometryElement){const f=el.tagName==='line'?rgb(cs.stroke):(rgb(cs.fill)||rgb(cs.stroke));if(f&&['rect','line'].includes(el.tagName))els.push({...box,kind:el.tagName==='line'?'line':'shape',fill:f,svg:true})}}
+  out.push({id:s.id||('slide-'+(i+1)),title:s.getAttribute('aria-label')||'',notes:s.dataset.notes||'',elements:els,style:styleSignals(s,r0,k)})}return out;
+ // Style signals of the machine-made look: ornament, glow, chips, spaced caps, emoji, an accent phrase that labels nothing.
+ function styleSignals(s,r0,k){
+  const rgba=c=>{const m=c&&c.match(/rgba?\(([\d.]+),\s*([\d.]+),\s*([\d.]+)(?:,\s*([\d.]+))?/);return m?{hex:'#'+[m[1],m[2],m[3]].map(v=>(+v|0).toString(16).padStart(2,'0')).join(''),a:m[4]===undefined?1:+m[4]}:null};
+  const label=el=>{const t=(el.textContent||'').trim().replace(/\s+/g,' ').slice(0,32);return el.tagName.toLowerCase()+(el.classList&&el.classList.length?'.'+[...el.classList].slice(0,2).join('.'):'')+(t?' "'+t+'"':'')};
+  const st={pattern:[],glow:[],gradientText:[],glass:[],shadows:[],spacedCaps:[],dotChains:[],emoji:[],pills:[],faded:[],stacked:[],accent:null,marks:[],texts:[]};
+  const area=r0.width*r0.height,h1=s.querySelector('h1');
+  for(const el of [s,...s.querySelectorAll('*')]){
+   const cs=getComputedStyle(el);if(cs.visibility==='hidden'||cs.display==='none'||+cs.opacity===0)continue;
+   // A horizontal or vertical SVG line has a zero-width box but is still a mark.
+   const r=el.getBoundingClientRect();if((!r.width||!r.height)&&!(el instanceof SVGGeometryElement&&(r.width||r.height)))continue;
+   const own=[...el.childNodes].filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim(),fs=parseFloat(cs.fontSize)*k;
+   const bi=cs.backgroundImage||'none';
+   if(bi!=='none'&&/gradient\(/.test(bi)){
+    const tiled=cs.backgroundSize.split(',').some(v=>{const q=v.trim().split(/\s+/).map(parseFloat);return q[0]>0&&q[0]*k<=48&&(q.length<2||isNaN(q[1])||q[1]*k<=48)});
+    if(tiled||/repeating-/.test(bi))st.pattern.push(label(el));
+    else if(/radial-gradient/.test(bi)&&r.width*r.height>=.15*area)st.glow.push(label(el)+' (radial wash)');}
+   const f=cs.filter||'',bl=f.match(/blur\(([\d.]+)px\)/);
+   if(bl&&+bl[1]>=6&&el.tagName!=='IMG')st.glow.push(label(el)+' (blur)');
+   if(/drop-shadow/.test(f))st.glow.push(label(el)+' (drop-shadow)');
+   if(el.tagName==='feGaussianBlur'&&+el.getAttribute('stdDeviation')>=4)st.glow.push('svg blur filter');
+   if(cs.textShadow&&cs.textShadow!=='none'){const n=(cs.textShadow.match(/(-?[\d.]+)px/g)||[]).map(parseFloat);if(n.length>=3&&n[2]>=8)st.glow.push(label(el)+' (text glow)')}
+   if(cs.webkitBackgroundClip==='text'||cs.backgroundClip==='text')st.gradientText.push(label(el));
+   if(cs.backdropFilter&&cs.backdropFilter!=='none')st.glass.push(label(el));
+   if(cs.boxShadow&&cs.boxShadow!=='none'){const n=(cs.boxShadow.match(/(-?[\d.]+)px/g)||[]).map(parseFloat);if(n.length>=3&&n[2]>=12)st.shadows.push(label(el))}
+   if(own){
+    const ls=parseFloat(cs.letterSpacing)||0,caps=cs.textTransform==='uppercase'||(/[A-Z]{3}/.test(own)&&own===own.toUpperCase());
+    if(caps&&fs<=20&&ls/parseFloat(cs.fontSize)>=.08)st.spacedCaps.push(own.slice(0,40));
+    if(fs<=20&&(own.match(/\s[·•|]\s/g)||[]).length>=2)st.dotChains.push(own.slice(0,60));
+    if(/\p{Emoji_Presentation}|\uFE0F/u.test(own))st.emoji.push(own.slice(0,30));
+    const rad=parseFloat(cs.borderTopLeftRadius)||0,boxed=(rgba(cs.backgroundColor)?.a||0)>.05||parseFloat(cs.borderTopWidth)>=1;
+    if(boxed&&r.height*k<=44&&rad>=r.height/2-1&&own.length<=28)st.pills.push(own.slice(0,28));
+    const col=el instanceof SVGElement?(rgba(cs.fill)||rgba(cs.color)):rgba(cs.color);if(fs>=140&&((col&&col.a<=.35)||+cs.opacity<=.35))st.faded.push(own.slice(0,12));
+    if(!(h1&&h1.contains(el))&&col)st.texts.push(col.hex);}
+   if(el.children.length===0){const lines=(el.innerText||'').split('\n').map(x=>x.trim()).filter(Boolean);if(lines.length>=3&&lines.every(l=>l.length===1&&/[A-Za-z]/.test(l)))st.stacked.push(lines.join(''))}
+   if(h1&&h1.contains(el))continue;
+   if(el instanceof SVGGeometryElement){for(const p of (el.tagName==='line'?[cs.stroke]:[cs.fill,cs.stroke])){const c=rgba(p);if(c&&c.a>.3)st.marks.push(c.hex)}}
+   else if(el!==s){const c=rgba(cs.backgroundColor);if(c&&c.a>.3)st.marks.push(c.hex);for(const sd of ['Top','Left','Bottom','Right'])if(parseFloat(cs['border'+sd+'Width'])>=1){const c2=rgba(cs['border'+sd+'Color']);if(c2&&c2.a>.3)st.marks.push(c2.hex)}}}
+  if(h1){const hc=rgba(getComputedStyle(h1).color),kids=[...h1.querySelectorAll('*')].filter(e=>{const c=rgba(getComputedStyle(e).color);return c&&hc&&c.hex!==hc.hex&&(e.textContent||'').trim()});
+   if(kids.length)st.accent={text:kids.map(e=>e.textContent.trim()).join(' ').slice(0,48),color:rgba(getComputedStyle(kids[0]).color).hex,head:hc&&hc.hex};}
+  st.marks=[...new Set(st.marks)].slice(0,300);st.texts=[...new Set(st.texts)].slice(0,100);return st}}'''
 
 def load_html(path):
     import glob
@@ -123,12 +173,19 @@ def load_html(path):
     with sync_playwright() as p:
         b=p.chromium.launch(**({'executable_path':exe} if exe else {}))
         try:
-            pg=b.new_page(viewport={'width':1280,'height':800});pg.route('http*://**',lambda r:r.abort());pg.goto(Path(path).resolve().as_uri());pg.wait_for_timeout(300)
+            pg=b.new_page(viewport={'width':1280,'height':800});pg.route('http*://**',lambda r:r.abort());pg.goto(Path(path).resolve().as_uri())
+            # Wait for the player (as qa.py does) so every slide is measured at its final build;
+            # a plain HTML page without Slide Studio metadata is measured as loaded.
+            pg.wait_for_function("(!document.getElementById('slide-studio-meta')&&!document.getElementById('slide-studio-scene'))||(window.slideStudio&&(document.body.dataset.studioReady==='true'||!window.slideStudio.kind))",timeout=20000)
+            pg.evaluate('document.fonts.ready');pg.wait_for_timeout(150)
             slides=pg.evaluate(HTML_JS)
             try:
                 meta=pg.evaluate('()=>{const m=document.getElementById("slide-studio-meta")||document.getElementById("slide-studio-scene");return m?JSON.parse(m.textContent):null}')
                 if meta and isinstance(meta.get('slides'),list):
-                    for s,m in zip(slides,meta['slides']):s['notes']=m.get('notes','') or s['notes'];s['title']=m.get('title') or s['title']
+                    for s,m in zip(slides,meta['slides']):
+                        s['notes']=m.get('notes','') or s['notes'];s['title']=m.get('title') or s['title']
+                        s['workshop']=meta.get('mode')=='workshop'
+                        s['copyWaivers']=[w for w in (m.get('copyWaivers') or []) if isinstance(w,dict)]
             except Exception:pass
             return slides
         finally:b.close()
@@ -165,8 +222,9 @@ def accent_stripes(s):
     return found
 
 def ordinals(s):
+    # Numbers drawn inside a figure (cell counts, node degrees) are data, not decoration.
     ts=texts(s);body=statistics.median([t['size'] for t in ts]) if ts else 16
-    return [t for t in ts if ORDINAL.match(t['text']) and t['size']>=max(24,1.4*body)]
+    return [t for t in ts if ORDINAL.match(t['text']) and t['size']>=max(24,1.4*body) and not t.get('inFigure')]
 
 def card_row(s):
     """Largest set of >=3 equal-width boxes (filled cards or text columns) side by side on one baseline."""
@@ -201,7 +259,9 @@ def review(slides,source,palette=None):
             add('warning','accent-stripe',sid,f"Thin colored bar {round(e['w'])}×{round(e['h'])}px at ({round(e['x'])},{round(e['y'])}) {'on a card edge' if kind=='card-edge' else 'beside a label or under a title'}.",
                 'Delete it. Separate cards with space or a tint; mark a real category with a direct label or the data mark itself.')
         o=ordinals(s)
-        if len(o)>=2:add('warning','decorative-ordinals',sid,f"{len(o)} large ordinal numbers ({', '.join(t['text'] for t in o[:4])}).",
+        # Decorative ordinals count items: a leading zero (01 02) or a run that starts 1, 2. Counts such as 3 and 13 are data.
+        vals={int(re.sub(r'\D','',t['text'])) for t in o}
+        if len(o)>=2 and (any(re.match(r'^\s*0\d',t['text']) for t in o) or {1,2}<=vals):add('warning','decorative-ordinals',sid,f"{len(o)} large ordinal numbers ({', '.join(t['text'] for t in o[:4])}).",
             'Keep numbers only for a real sequence the audience must follow; otherwise let the headings carry the order.')
         for t in texts(s):
             if cjk_deck and t['y']<0.14*H and t['size']<=18 and EYEBROW.match(t['text']) and sum(c.isalpha() for c in t['text'])>=4:
@@ -211,6 +271,8 @@ def review(slides,source,palette=None):
             for rid,rx,lvl in rules:
                 if rid=='ja-status-label':continue  # reported as status-on-canvas above
                 mm=rx.search(t['text'])
+                # A slide's declared copyWaivers (rule + exact quote + reason) excuse that one quote, as in QA.
+                if mm and any(w.get('rule')==rid and w.get('quote')==mm.group(0) for w in s.get('copyWaivers') or []):mm=None
                 if mm:add('error' if lvl=='error' else 'warning',f'copy:{rid}',sid,f"'{mm.group(0)}' in '{t['text'][:50]}'.",'Rewrite for the audience; see references/writing-and-editing.md.')
         if TOOL_NOTES.search(s.get('notes') or ''):
             add('error','tool-metadata-in-notes',sid,'Speaker notes contain export/tool metadata.','Delete it; notes are spoken or read by the presenter.')
@@ -262,14 +324,56 @@ def review(slides,source,palette=None):
             if len(a)>=12 and len(b)>=12:
                 jac=len(a&b)/len(a|b)
                 if jac>=0.45:add('warning','near-duplicate-pages',f"{slides[i]['id']}+{slides[j]['id']}",f"The two pages share {round(jac*100)}% of their words.",'Merge them, or give the second page a different question to answer.')
+    # machine-made style signals (HTML decks): aggregated per signal across the deck
+    STYLE={
+      'pattern':('ornamental-pattern','Tiled dot/grid/stripe background','Delete it. A slide background is paper: flat, quiet, carrying nothing the reader must decode.'),
+      'glow':('glow-or-blur','Glow, blur or radial wash','Delete it. Emphasis comes from position, size, weight or the one accent color on the thing that matters.'),
+      'gradientText':('gradient-text','Gradient-filled text','Set the text in ink or the single accent color.'),
+      'glass':('glass-panel','Frosted-glass panel (backdrop-filter)','Remove the panel; put text on genuine negative space or a flat field.'),
+      'spacedCaps':('spaced-caps-labels','Letter-spaced UPPERCASE labels','Use sentence case at the label size; keep caps for real abbreviations. Delete labels that only decorate.'),
+      'dotChains':('separator-chain','Chain of "·" or "|" separators','Say less: keep the one fact the reader needs, or set the facts as a short sentence.'),
+      'emoji':('emoji','Emoji on the canvas','Delete it; if an image is needed, draw a precise one that explains something.'),
+      'pills':('chips','Pill-shaped chips/badges','Replace chips with plain words in the sentence or a table column; keep at most one status mark per page.'),
+      'faded':('faded-numeral','Giant faded numeral used as decoration','Delete it; if the number matters, set it at full contrast and say what it counts.'),
+      'stacked':('stacked-letters','Latin letters stacked vertically','Set the label horizontally or rotate the whole word; never stack letters.'),
+    }
+    for key,(sig,what,fix) in STYLE.items():
+        hits=[(s['id'],x) for s in slides for x in (s.get('style') or {}).get(key,[])]
+        if key=='spacedCaps':hits=[(sid,x) for sid,x in hits if sum(1 for t,_ in hits if t==sid)>=2]
+        if key=='pills':hits=[(sid,x) for sid,x in hits if sum(1 for t,_ in hits if t==sid)>=3]
+        if hits:
+            ids=sorted({h[0] for h in hits},key=lambda x:[s['id'] for s in slides].index(x) if x in [s['id'] for s in slides] else 0)
+            add('warning',sig,', '.join(ids[:6])+(' …' if len(ids)>6 else ''),f"{what} on {len(ids)} slide(s), e.g. {hits[0][1]}.",fix)
+    shadow_slides=[s['id'] for s in slides if len((s.get('style') or {}).get('shadows',[]))>=3]
+    if shadow_slides:add('warning','shadowed-cards',', '.join(shadow_slides[:6]),f"Soft drop shadows on 3+ boxes on {len(shadow_slides)} slide(s).",
+        'Remove the shadows and most of the boxes; group with space and hairline rules. A box should represent an object.')
+    for s in slides:
+        a=(s.get('style') or {}).get('accent')
+        if not a or not saturated(a['color']):continue
+        anchored=[c for c in (s['style'].get('marks',[])+s['style'].get('texts',[])) if hexrgb(c) and delta_e(c,a['color'])<=12]
+        if not anchored:add('warning','headline-accent-unanchored',s['id'],f"The colored headline phrase '{a['text']}' matches no mark or label on the page.",
+            'Set the headline in one color, or color the phrase only when it names the same-colored mark it refers to.')
+    tri=[]
+    for s in slides:
+        joined=' '.join(t['text'] for t in texts(s))
+        m=re.search(r'▲\s*[+＋]\s*\d|[+＋]\s*\d[\d.,]*\s*%?\s*▲',joined)
+        if m and (cjk_deck or CJK.search(joined)):tri.append((s['id'],m.group(0)))
+    if True:
+        if tri:add('warning','ja-triangle-for-increase',', '.join(sorted({x[0] for x in tri})[:6]),f"▲ used with a plus sign ('{tri[0][1][:30]}'). In Japanese business documents ▲ marks a negative number.",
+            'Write increases as +1.2 and decreases as −1.2 (or ▲1.2 in an accounting table, explained once).')
     sizes=[t['size'] for s in slides for t in texts(s) if t['y']<0.9*H]
     if sizes:
         small=[x for x in sizes if x<14]
         if len(small)>=0.3*len(sizes):add('warning','small-live-text','deck',f"{len(small)} of {len(sizes)} text runs are under 14px on a 1280px canvas (about 10.5pt on a 13.33in slide).",
             'Cut duplicated words and enlarge what remains; move optional detail to notes or an appendix page.')
+    # A workshop gallery is a collection of independent studies, each with its own system:
+    # deck-level consistency signals do not apply to it (page-level signals still do).
+    limits=['Geometry and text heuristics; they locate candidates, they do not judge taste or truth.','A warning is resolved by a fix or by a one-line reason the pattern carries meaning on that page.']
+    if slides and all(s.get('workshop') for s in slides):
+        findings[:]=[f for f in findings if f['signal'] not in {'repeated-skeleton','card-rows-everywhere','color-identity-reused','rainbow-text','near-duplicate-pages'}]
+        limits.append('Workshop gallery: deck-level consistency checks (skeleton, card rows, identity colors, text hues, near-duplicates) were skipped.')
     errors=[f for f in findings if f['severity']=='error']
-    return {'source':source,'slides':len(slides),'errors':len(errors),'warnings':len(findings)-len(errors),'findings':findings,
-            'limits':['Geometry and text heuristics; they locate candidates, they do not judge taste or truth.','A warning is resolved by a fix or by a one-line reason the pattern carries meaning on that page.']}
+    return {'source':source,'slides':len(slides),'errors':len(errors),'warnings':len(findings)-len(errors),'findings':findings,'limits':limits}
 
 def main():
     a=argparse.ArgumentParser(description=__doc__,formatter_class=argparse.RawDescriptionHelpFormatter);a.add_argument('input');a.add_argument('--check',action='store_true',help='exit 2 when errors are found')

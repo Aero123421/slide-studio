@@ -1,17 +1,38 @@
-// Original editable study. Read notes for purpose, modifications, and invariants.
-// Asset placeholders are embedded by scripts/craft-core.mjs. Change content and geometry freely.
+// Diagram study · Forest plot — estimates with intervals against a null reference.
+// Rows, pooled diamond, the right-hand column and the headline all come from `sites`.
+import { forestPlot, fmt } from '../runtime/figure.mjs';
+
+const sites = [ // difference in recovery days, treatment − control, 95% CI (illustrative)
+  { label: '札幌 (n = 120)', estimate: -1.8, low: -3.1, high: -0.5, weight: 120 },
+  { label: '仙台 (n = 64)', estimate: -0.6, low: -2.4, high: 1.2, weight: 64 },
+  { label: '名古屋 (n = 210)', estimate: -2.3, low: -3.2, high: -1.4, weight: 210 },
+  { label: '広島 (n = 45)', estimate: 0.4, low: -1.9, high: 2.7, weight: 45 },
+  { label: '福岡 (n = 98)', estimate: -1.2, low: -2.6, high: 0.2, weight: 98 },
+];
+const pooled = { label: '統合推定', estimate: -1.5, low: -2.1, high: -0.9 };
+const clear = sites.filter(s => s.high < 0).length;
+
+export function figure(theme = 'css') {
+  return forestPlot({
+    id: 'forest-plot-fig', theme, width: 1152, height: 478, locale: 'ja',
+    title: '施設別の回復日数の差（治療群−対照群）と95%信頼区間',
+    desc: `5施設のうち${clear}施設で区間全体が0より小さい。統合推定は${fmt(pooled.estimate, { digits: 1 })}日（${fmt(pooled.low, { digits: 1 })}〜${fmt(pooled.high, { digits: 1 })}）。`,
+    rows: sites, summary: pooled, reference: 0, format: { digits: 1 },
+    labelTitle: '施設', columnTitle: '差（日） [95% CI]', xLabel: '回復までの日数の差（日）',
+    favors: ['治療群で短い', '対照群で短い'], hollowIfCrossing: true,
+  });
+}
+
 export default {
   study: true,
-  "id": "forest-plot",
-  "title": "Effects and intervals",
-  "notes": "Purpose: Compare effects against a no-effect reference\nModify: Rewrite labels, recompute geometry from source data, adapt framing and orientation.\nInvariant: Use compatible estimands; distinguish confidence interval from study weight.\nStatic: Already static; preserve semantic labels and readable strokes.",
-  "sources": [
-    {
-      "type": "original-example",
-      "file": "assets/svg/forest-plot.svg"
-    }
-  ],
-  "exportPolicy": "final",
-  "className": "",
-  "content": "<h1 class=\"g-title\">Effects and intervals</h1><p class=\"g-purpose\">Compare effects against a no-effect reference</p><div class=\"g-demo\"><svg aria-labelledby=\"g-forest-plot-forest-plot-title g-forest-plot-forest-plot-desc\" role=\"img\" viewbox=\"0 0 800 440\" xmlns=\"http://www.w3.org/2000/svg\"><title id=\"g-forest-plot-forest-plot-title\">Effects and intervals</title><desc id=\"g-forest-plot-forest-plot-desc\">Compare effects against a no-effect reference. Original schematic. Values are illustrative, not measured.</desc><g data-part=\"drawing\"><line stroke=\"#718594\" stroke-dasharray=\"5 4\" stroke-width=\"2\" x1=\"440\" x2=\"440\" y1=\"65\" y2=\"355\"></line><text fill=\"#17252d\" font-family=\"Arial, sans-serif\" font-size=\"18\" text-anchor=\"start\" x=\"85\" y=\"113\">Study 1</text><line stroke=\"#28617b\" stroke-width=\"3\" x1=\"270\" x2=\"520\" y1=\"105\" y2=\"105\"></line><rect fill=\"#ae4f31\" height=\"14\" rx=\"0\" stroke=\"none\" stroke-width=\"2\" width=\"14\" x=\"383\" y=\"98\"></rect><text fill=\"#17252d\" font-family=\"Arial, sans-serif\" font-size=\"18\" text-anchor=\"start\" x=\"85\" y=\"179\">Study 2</text><line stroke=\"#28617b\" stroke-width=\"3\" x1=\"360\" x2=\"590\" y1=\"171\" y2=\"171\"></line><rect fill=\"#ae4f31\" height=\"14\" rx=\"0\" stroke=\"none\" stroke-width=\"2\" width=\"14\" x=\"468\" y=\"164\"></rect><text fill=\"#17252d\" font-family=\"Arial, sans-serif\" font-size=\"18\" text-anchor=\"start\" x=\"85\" y=\"245\">Study 3</text><line stroke=\"#28617b\" stroke-width=\"3\" x1=\"250\" x2=\"400\" y1=\"237\" y2=\"237\"></line><rect fill=\"#ae4f31\" height=\"14\" rx=\"0\" stroke=\"none\" stroke-width=\"2\" width=\"14\" x=\"318\" y=\"230\"></rect><text fill=\"#17252d\" font-family=\"Arial, sans-serif\" font-size=\"18\" text-anchor=\"start\" x=\"85\" y=\"311\">Study 4</text><line stroke=\"#28617b\" stroke-width=\"3\" x1=\"420\" x2=\"640\" y1=\"303\" y2=\"303\"></line><rect fill=\"#ae4f31\" height=\"14\" rx=\"0\" stroke=\"none\" stroke-width=\"2\" width=\"14\" x=\"528\" y=\"296\"></rect><text fill=\"#17252d\" font-family=\"Arial, sans-serif\" font-size=\"18\" text-anchor=\"middle\" x=\"440\" y=\"395\">Reference</text></g></svg>\n</div><div class=\"g-footer\">Original instructional study · schematic / synthetic content <code>assets/svg/forest-plot.svg</code></div>"
+  id: 'forest-plot',
+  language: 'ja',
+  title: 'Forest plot: estimates with intervals',
+  className: 'st cs-clinical-trial',
+  notes: 'Purpose: Compare effect estimates across sites or subgroups with their uncertainty, and show the pooled estimate.\nModify: Replace `sites` and `pooled` with your own analysis output; the hollow markers flag intervals that cross the reference automatically.\nInvariant: One scale and one null reference for every row; interval definition stated in the column title; sample sizes visible; the pooled diamond spans its own interval.\nStatic: Already static. Do not reorder rows by effect size unless the analysis did.',
+  sources: [{ type: 'original-example', file: 'assets/svg/forest-plot.mjs' }],
+  exportPolicy: 'final',
+  content: `<h1 class="st-head">治療群の回復は平均<em>${fmt(Math.abs(pooled.estimate), { digits: 1 })}日</em>早い。<br><span class="st-quiet">5施設中${clear}施設では、区間全体が0を下回る</span></h1>
+<figure class="st-fig" data-region="primary">${figure()}</figure>
+<p class="st-source" data-region="source"><span>架空のデータ · 中空の印は区間が0をまたぐ施設</span><span>フォレストプロット</span></p>`,
 };

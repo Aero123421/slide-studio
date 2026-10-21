@@ -17,6 +17,14 @@ test('source provenance and build groups survive compilation',()=>{const s=compi
 
 test("Japanese punctuation does not start a wrapped line",()=>{for(const text of ["一つの論点を二つの視点から比較する。","画像の意味を説明し、読み手に次の行動を伝える。"]){const result=wrap(text,170,24);assert(!result.some(line=>/^[。、，．！？）］】」』]/.test(line)));}});
 
+test('freeform text runs reject injected styles and nonfinite typography', () => {
+  const run = { text: 'safe <text>', color: '#000000', size: 24, weight: 400, tracking: 0 };
+  const make = r => compile(deck({ layout: 'freeform', title: 'Runs', elements: [{ type: 'text', text: 'safe', x: 100, y: 200, w: 300, size: 24, runs: [r] }] }), theme);
+  assert(renderHTML(make(run)).includes('safe &lt;text&gt;'));
+  for (const field of ['color', 'size', 'weight', 'tracking']) assert.throws(() => make({ ...run, [field]: '\"><img src=x onerror=alert(1)>' }), /invalid run/);
+  for (const field of ['size', 'weight', 'tracking']) assert.throws(() => make({ ...run, [field]: Infinity }), /invalid run/);
+});
+
 // ---------------------------------------------------------------- the page standard
 
 const examples = async () => Promise.all((await fs.readdir(path.join(ROOT, 'assets/examples'))).filter(f => f.endsWith('.json')).map(async f => {

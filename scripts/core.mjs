@@ -1072,6 +1072,16 @@ function validateElements(e, where) {
     n.step ??= 0;
     for (const c of ['color', 'fill', 'stroke']) if (n[c] !== undefined) color(n[c], c);
     if (n.type === 'table') for (const r of n.rows) { if (r.fill) color(r.fill, 'fill'); if (r.rule) color(r.rule.color, 'stroke'); for (const c of r.cells) color(c.color, 'color'); }
+    if (n.runs !== undefined) {
+      assert(Array.isArray(n.runs), `${where}: runs must be a list`);
+      for (const r of n.runs) {
+        assert(r && typeof r.text === 'string', `${where}: invalid run text`);
+        color(r.color, 'run color');
+        assert(Number.isFinite(r.size) && r.size > 0, `${where}: invalid run size`);
+        assert(Number.isFinite(r.weight) && r.weight >= 1 && r.weight <= 1000, `${where}: invalid run weight`);
+        if (r.tracking !== undefined) assert(Number.isFinite(r.tracking), `${where}: invalid run tracking`);
+      }
+    }
     if (n.font) assert(/^[\p{L}\p{N} _,.-]+$/u.test(n.font), `${where}: invalid font`);
     assert(Number.isInteger(n.step) && n.step >= 0, `${where}: step must be a nonnegative integer`);
     for (const k of ['x', 'y', 'w', 'h']) assert(Number.isFinite(n[k]), `${where}: invalid ${n.id}.${k}`);

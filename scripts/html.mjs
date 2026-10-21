@@ -34,7 +34,7 @@ export function svgPath(d, ox = 0, oy = 0) {
 
 /** Runs share one line (a figure and its unit); paragraphs get `paraGap` instead of an empty line. */
 function textContent(n) {
-  if (n.runs?.length) return n.runs.map(r => `<span style="font-size:${r.size}px;font-weight:${r.weight};color:${r.color}${r.tracking ? `;letter-spacing:${r.tracking}em` : ''}">${esc(r.text)}</span>`).join('');
+  if (n.runs?.length) return n.runs.map(r => `<span style="${esc(`font-size:${r.size}px;font-weight:${r.weight};color:${r.color}${r.tracking ? `;letter-spacing:${r.tracking}em` : ''}`)}">${esc(r.text)}</span>`).join('');
   if (n.paraGap) return n.text.split('\n\n').map((p, i) => `<span style="display:block${i ? `;margin-top:${n.paraGap}px` : ''}">${esc(p)}</span>`).join('');
   return esc(n.text);
 }

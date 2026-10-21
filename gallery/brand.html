@@ -742,6 +742,7 @@ body.overview .slide { display: block; transform-origin: top left; transform: sc
   window.addEventListener('afterprint', () => {
     if (!restore) return;
     exporting = restore.exporting;
+    document.body.dataset.export = String(exporting);
     for (const [id, s] of restore.widgets) call(widgets.get(id), 'restore', s);
     show(restore.current, restore.step);
     restore = null;

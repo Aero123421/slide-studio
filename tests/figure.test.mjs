@@ -7,6 +7,19 @@ import path from 'node:path';
 import * as F from '../assets/runtime/figure.mjs';
 import { ROOT } from '../scripts/craft-core.mjs';
 
+test('box plots reserve space for tied observations and reject cramped explicit heights', () => {
+  for (const count of [30, 40, 100]) for (const groupCount of [1, 2]) {
+    const options = { id: 'ties', title: 'Tied observations', groups: Array.from({ length: groupCount }, (_, i) => ({ label: String(i), values: Array(count).fill(1) })) };
+    const svg = F.boxPlot(options);
+    const height = Number(svg.match(/viewBox="0 0 [\d.]+ ([\d.]+)"/)[1]);
+    const circles = [...svg.matchAll(/<circle[^>]*cy="([\d.-]+)"[^>]*r="3.2"/g)];
+    assert.equal(circles.length, count * groupCount);
+    for (const [, cy] of circles) assert(Number(cy) >= 3.2 && Number(cy) <= height - 3.2);
+    for (const m of svg.matchAll(/<rect[^>]*y="([\d.-]+)"[^>]*height="([\d.-]+)"/g)) assert(Number(m[1]) >= 0 && Number(m[1]) + Number(m[2]) <= height);
+    assert.throws(() => F.boxPlot({ ...options, height: 200 }), /height must be at least/);
+  }
+});
+
 const finite = svg => !/NaN|Infinity|undefined/.test(svg);
 const ids = svg => [...svg.matchAll(/\sid="([^"]+)"/g)].map(m => m[1]);
 function checkSvg(name, svg) {

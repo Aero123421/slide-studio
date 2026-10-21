@@ -174,6 +174,14 @@ def main():
     # The static view shows the chosen setting in words where the inputs were.
     expect(f"{label(cfg,'threshold')}: 7 or above" in r.locator('.w-export-summary').inner_text());expect(not r.locator('.w-controls').is_visible());page.evaluate('SlideStudio.setExport(false)');reset('threshold')
    check('widget selection survives re-entry and static export mode',reentry)
+   def quiz_export_restore():
+    r=show('quiz');reset('quiz');before=state('quiz')
+    def hidden():
+     expect(r.locator('.is-answer').count()==0,'export leaked the correct answer');expect(r.locator('[data-checked="true"]').count()==0,'export left the quiz checked');expect(state('quiz')==before,'export changed quiz state');expect(not r.locator('.w-explain').is_visible(),'export leaked the explanation')
+    hidden();page.evaluate('SlideStudio.prepareExport()');expect(r.locator('.is-answer').count()>0);page.evaluate('SlideStudio.setExport(false)');hidden()
+    page.evaluate('dispatchEvent(new Event("beforeprint"));dispatchEvent(new Event("afterprint"))');hidden()
+    show('parameter');page.evaluate('dispatchEvent(new Event("beforeprint"));dispatchEvent(new Event("afterprint"))');r=show('quiz');hidden()
+   check('quiz answers stay hidden after export and print, including an inactive quiz',quiz_export_restore)
    def config_paths():
     # controls[key]=false hides a control; text templates (with plurals) and readouts fill from derived values; plain years have no digit grouping.
     r=show('bootstrap');expect(r.get_by_label('Sample size').count()==0);expect(r.get_by_role('button',name='Draw 100 more').count()==1)

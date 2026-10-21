@@ -132,8 +132,14 @@ export function boxPlot(o) {
   const xPre = linear(o.domain || niceDomain(extent(all), 6), [lw, ctx.W - 30]);
   const dodgeOf = xs => { const lv = []; return [...xs].sort((a, b) => a - b).map(px => { let L = 0; while ((lv[L] ?? -Infinity) > px - 6.6) L++; lv[L] = px; return { x: px, level: L }; }); };
   const levelsMax = o.points === 'none' ? 0 : Math.max(0, ...o.groups.map(gp => Math.max(0, ...dodgeOf(gp.values.map(xPre)).map(p => p.level))));
-  const box = plotBox(ctx.W, ctx.H, { left: lw, right: 30, top: 10, bottom: 44 + (o.xLabel ? 24 : 0) });
   const stripH = o.points === 'none' ? 0 : 9 + levelsMax * 6.4 + 10; // room for the last group's dots above the axis
+  // Keep the dot strip inside the canvas and out of the next group's box.
+  // With inner=.45, the inter-box gap is .45 of the band step.
+  const minStep = Math.max(60, stripH / 0.45);
+  const minHeight = Math.ceil(54 + (o.xLabel ? 24 : 0) + stripH + minStep * Math.max(1, o.groups.length - 0.15));
+  if (o.height == null) ctx.H = Math.max(ctx.H, minHeight);
+  else if (ctx.H < minHeight) throw Error(`boxPlot(): height must be at least ${minHeight}; increase height or use points: 'none'`);
+  const box = plotBox(ctx.W, ctx.H, { left: lw, right: 30, top: 10, bottom: 44 + (o.xLabel ? 24 : 0) });
   const x = linear(o.domain || niceDomain(extent(all), 6), [box.x, box.x + box.w]);
   const dodge = o.groups.map(gp => (o.points === 'none' ? [] : dodgeOf(gp.values.map(x))));
   const yb = band(o.groups.map(gp => gp.label), [box.y, box.y + box.h - stripH], { inner: 0.45, outer: 0.15 });

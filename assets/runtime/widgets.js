@@ -260,7 +260,7 @@ function mount(config, defaultAssets) {
   const locale = config.locale || root.closest('[lang]')?.getAttribute('lang') || document.documentElement.lang || 'en';
   const ui = { ...(UI[locale.slice(0, 2)] || UI.en), ...(config.text || {}) };
   const assets = { ...defaultAssets, ...(config.assets || {}) };
-  let state = clone(config.initial), lastSize = '', family = null;
+  let state = clone(config.initial), lastSize = '', lastExport = '', family = null;
   const bindings = [];
 
   panel.dataset.static = 'hide';
@@ -397,6 +397,7 @@ function mount(config, defaultAssets) {
 
   function render() {
     lastSize = `${plot.clientWidth}x${plot.clientHeight}`;
+    lastExport = document.body.dataset.export;
     syncControls();
     const out = view.render ? view.render(state) : '';
     const message = typeof out === 'string' ? out : out?.status ?? '';
@@ -414,7 +415,7 @@ function mount(config, defaultAssets) {
     reset,
     snapshot: () => clone(state),
     restore: s => { if (s) { state = clone(s); view.restore?.(); render(); } },
-    onEnter: () => { if (`${plot.clientWidth}x${plot.clientHeight}` !== lastSize) render(); },
+    onEnter: () => { if (`${plot.clientWidth}x${plot.clientHeight}` !== lastSize || document.body.dataset.export !== lastExport) render(); },
     onStep: () => {},
     onLeave: () => view.leave?.(),
     onExport: () => { view.leave?.(); render(); },

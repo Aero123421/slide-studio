@@ -20,3 +20,13 @@ test('catalog take copies a study or a whole template pack that builds on its ow
  const b=run(['scripts/craft.mjs','build',path.join(pack,'deck.mjs'),'--out',path.join(pack,'deck.html'),'--allow-draft']);assert.equal(b.status,0,b.stderr);
  const html=await fs.readFile(path.join(pack,'deck.html'),'utf8');assert.equal((html.match(/<section[^>]*class="[^"]*\bslide\b/g)||[]).length,6);
 }finally{await fs.rm(dir,{recursive:true,force:true})}});
+test('init writes a brief that starts with the intake answers',async()=>{const dir=await fs.mkdtemp(path.join(os.tmpdir(),'ss-intake-'));try{const project=path.join(dir,'p');assert.equal(run(['scripts/craft.mjs','init',project]).status,0);
+ const brief=await fs.readFile(path.join(project,'brief.md'),'utf8');assert.match(brief,/## Intake/);
+ for(const field of ['Used for','Files to hand over','Presenter control','Starting point','Look','Writing style'])assert(brief.includes(field),field);
+ assert(brief.indexOf('## Intake')<brief.indexOf('## Claim outline'));}finally{await fs.rm(dir,{recursive:true,force:true})}});
+test('the intake guide names only template packs and color systems that exist',async()=>{const guide=await fs.readFile(path.join(ROOT,'references/intake.md'),'utf8');
+ const packs=[...new Set(guide.match(/tpl-[a-z]+(?:-[a-z]+)*/g))].filter(p=>p!=='tpl-');assert(packs.length>=12);
+ for(const p of packs)await fs.access(path.join(ROOT,'assets/templates',p));
+ const look=guide.slice(guide.indexOf('### 5 · Look'),guide.indexOf('### 6 · Words'));const systems=[...look.matchAll(/`([a-z]+(?:-[a-z]+)*)`/g)].map(m=>m[1]);assert(systems.length>=10);
+ for(const s of systems)await fs.access(path.join(ROOT,'assets/color-systems',s+'.json'));
+ const skill=await fs.readFile(path.join(ROOT,'SKILL.md'),'utf8');assert(skill.includes('references/intake.md'));});

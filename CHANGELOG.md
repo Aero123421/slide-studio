@@ -7,6 +7,12 @@ a page grammar with role-based color, moves only to explain, and reviews against
 stricter definition of the machine-made look. Every library page was remade as a
 finished example with computed headlines.
 
+- **Intake**: before the first page the agent asks once, in up to six short
+  multiple-choice questions, what the request leaves open — spoken or read, files to
+  hand over (HTML, PDF, editable or picture PowerPoint), keys-only presenting, template
+  pack / company template / from scratch, look, writing style — each with a
+  recommendation and "up to you". `references/intake.md` maps every answer to a route,
+  pack, color system and rules; `brief.md` starts with the answers and chosen defaults.
 - **Figure engine** (`assets/runtime/figure.mjs` + `fig-core/stats/charts/stats-charts/diagrams/patterns.mjs`):
   45 chart and diagram types from data; nice scales, measured labels, CJK phrase
   wrapping with kinsoku, callouts kept inside the frame, validated waterfall totals,

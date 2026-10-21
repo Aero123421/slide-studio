@@ -86,11 +86,15 @@ A library of entrances cannot replace these contracts.
 
 ### Autonomy without randomness
 
-The agent decides reversible visual choices, makes two meaningful prototypes,
-uses actual rendering to discover failure, and repairs the cause. More questions,
-more decorations or more drafts are not automatic signs of quality. It should ask
-when evidence, audience or an irreversible choice cannot be determined safely.
-It should not ask the user to choose a template because the library exists.
+The agent asks once at the start, in a few short multiple-choice questions, about what
+changes the whole deck and is still open — use, files, presenter control, starting
+point, look, writing style ([intake](intake.md)) — with a recommendation for each.
+After that it decides reversible visual choices itself, makes two meaningful
+prototypes, uses actual rendering to discover failure, and repairs the cause. More
+questions, more decorations or more drafts are not automatic signs of quality. Later it
+asks only when evidence, audience or an irreversible choice cannot be determined
+safely. A template is offered because it fits the occasion (recommended by name), never
+as a menu of everything the library holds.
 
 A small model benefits from a limited number of retrieved studies, explicit repair
 orders, executable helpers, shape/data bounds, examples of good and weak copy, and

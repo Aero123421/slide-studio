@@ -17,8 +17,8 @@
     },
     {
       "path": "CHANGELOG.md",
-      "bytes": 14618,
-      "sha256": "2dfa71e1fde4b5fa204e7ae35cec34ccda85a0f861f28e3a26983f93b0736053"
+      "bytes": 15122,
+      "sha256": "d2fe9c840e57ae8cf208f82ddaa2bad8d7a32e7535a3e01873e23e9adc931b21"
     },
     {
       "path": "CONTRIBUTING.md",
@@ -42,8 +42,8 @@
     },
     {
       "path": "SKILL.md",
-      "bytes": 14760,
-      "sha256": "ec605aa420a288980f41332a56ac6a232cf5650acf19820f7e73b64c628ee59f"
+      "bytes": 15640,
+      "sha256": "3b68b12d2d619e359ff7220f3ef7a788a940d4fe861c6ee23374f176cde1b303"
     },
     {
       "path": "THIRD_PARTY_NOTICES.md",
@@ -52,8 +52,8 @@
     },
     {
       "path": "VERIFICATION.md",
-      "bytes": 9247,
-      "sha256": "df86433a6559fe30f62576f8a731c7a7244c44103b69a2c1442c1d5a85e9145e"
+      "bytes": 9364,
+      "sha256": "5ccefe5ea25c30174fc7df20ebe7ffa742132d7d800ad11a00b2ab5cb0b3888f"
     },
     {
       "path": "VERSION",
@@ -4392,8 +4392,8 @@
     },
     {
       "path": "references/working-agreements.md",
-      "bytes": 16554,
-      "sha256": "9668db187676cffb39f9df7d250a7d9de57bad0fc168f428757315d35fae65e3"
+      "bytes": 16874,
+      "sha256": "81181de3e1d1a983ddcf9d1328a3e1c8ea2cc781d04ca600a98266a8371843ec"
     },
     {
       "path": "references/writing-and-editing.md",
@@ -4507,8 +4507,8 @@
     },
     {
       "path": "scripts/craft.mjs",
-      "bytes": 7703,
-      "sha256": "01c78071964ff52f8c0e9d0b1b9aa06d812f1d65536b227c1dd50f655b32c241"
+      "bytes": 8088,
+      "sha256": "56b46e2d3bb0dba0150636b15f9583e39289c9f4da91368fb4e2f29b7a79d65a"
     },
     {
       "path": "scripts/css-check.mjs",
@@ -4637,8 +4637,8 @@
     },
     {
       "path": "tests/cli.test.mjs",
-      "bytes": 3290,
-      "sha256": "3742df17fd5efdab6d3fe5dc287c9cfd2ca5283fb77b898adb56d75a7a12ab97"
+      "bytes": 4666,
+      "sha256": "4ed81c8746c6dedee1deedd70f0b37357b5f82a9ecacfae6ec36b646cc00d428"
     },
     {
       "path": "tests/color-systems.test.mjs",
@@ -4713,7 +4713,7 @@
     {
       "path": "tests/release-results.json",
       "bytes": 24365,
-      "sha256": "610a70a42d9a5e8cf837215e6de90ba79ad0af93a35b96f08ca10ce98dce34d3"
+      "sha256": "b7ad3adf1e34deff103da1856e1c79c79f94b54321179ff7b9d094fd66255da1"
     },
     {
       "path": "tests/rendered_review.py",

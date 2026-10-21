@@ -9,7 +9,7 @@ measured (see [limits](#deliberate-limits)). Machine-readable results are in
 
 | Suite | Command | Result |
 |---|---|---:|
-| Figure engine, structured route (compile, HTML, native PPTX), craft build, catalog, CSS preflight | `node --test tests/*.test.mjs` | 97 / 97 |
+| Figure engine, structured route (compile, HTML, native PPTX), craft build, catalog, CSS preflight | `node --test tests/*.test.mjs` | 99 / 99 |
 | Safety, brand, evidence, source tables, final review, machine-made-look signals | `python -B -m unittest discover -s tests -p 'test_*.py'` | 68 / 68 |
 | Rendered integrity, QA integration, searchable PDF (Inter, Japanese, redrawn widgets) | `python -B tests/integrity_browser.py` | 36 / 36 |
 | Widgets with default and real data, media, mesh, motion galleries, gallery index | `python -B tests/browser.py` | 37 / 37 |
@@ -18,7 +18,7 @@ measured (see [limits](#deliberate-limits)). Machine-readable results are in
 | Japanese field pages: font contract, PDF text and fonts | `python -B tests/field_browser.py` | 23 / 23 |
 | Player 4: presets, transitions, presenter window, reduced motion | `python -B tests/player_browser.py` | 13 / 13 |
 
-Total: **299 executed regression checks passed**. Browser suites ran in Chromium
+Total: **301 executed regression checks passed** (the Node suite was rerun after the intake guide added two checks; nothing it touches is used by the browser suites). Browser suites ran in Chromium
 with external requests blocked; `tests/browser.py` also ran with the decks loaded
 inline (`SLIDE_STUDIO_INLINE=1`). The PDF checks and the Python unit tests also passed
 with the pinned `pypdf==5.9.0` from `requirements.txt` as well as with pypdf 6.17.0.

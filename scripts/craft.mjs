@@ -82,9 +82,13 @@ try {
     await fs.writeFile(path.join(out, 'deck.mjs'), starterDeck(language, colors));
     await fs.writeFile(path.join(out, 'brief.md'), [
       '# Brief', '',
+      '## Intake (answers, or the default you chose — see references/intake.md)', '',
+      'Used for (spoken / read / both):', 'Files to hand over (HTML / PDF / editable PPTX / picture PPTX):',
+      'Presenter control (keys only / presenter touches controls / audience touches):', 'Starting point (template pack / company template / from scratch):',
+      'Look (color system or brand):', 'Writing style and amount of text:', '', '## Context', '',
       'Audience (what they already know):', 'Question this deck answers / decision it supports:', 'Reading mode (live / read / reference / hybrid):',
       'Language and register:', 'Duration or length budget:', 'Evidence available (files, tables, versions):', 'Unknowns and assumptions:',
-      'Delivery formats (HTML / PDF / PPTX):', 'Color system or brand:', '', '## Claim outline', '', '| Page | Claim (one sentence) | Evidence | Status |', '|---|---|---|---|', '',
+      '', '## Claim outline', '', '| Page | Claim (one sentence) | Evidence | Status |', '|---|---|---|---|', '',
     ].join('\n'));
     console.log(JSON.stringify({ project: out, colors, next: 'Write the brief and claim outline, then author deck.mjs. Preview with build --allow-draft; clear draft only after review.' }, null, 2));
   } else if (cmd === 'build' || cmd === 'validate') {

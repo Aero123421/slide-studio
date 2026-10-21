@@ -33,17 +33,27 @@ delivery. A beautiful false claim is worse than a plain true one.
 
 ## Workflow
 
-**0 · Set up a project** (never edit the installed skill):
+**0 · Read, then ask a few short questions.** Read the request and the material.
+Then ask once, in at most six multiple-choice questions, only what is still open:
+where the deck is used (spoken / read / both), the files to hand over (HTML, PDF,
+editable or picture PowerPoint), whether the presenter advances with keys only, a
+template pack or the company template or from scratch, the look, and the writing
+style — each with your recommendation first and "up to you". Each answer selects a
+route, a pack, a color system and rules: [Intake](references/intake.md). Skip the
+questions when told to proceed, when nobody can answer, or for edits to an existing
+deck; then use your recommendations and say which you chose.
+
+**1 · Set up a project** (never edit the installed skill), with the chosen language
+and color system — or `catalog.mjs take tpl-…` for a template pack, or `studio.mjs init`
+for editable PowerPoint:
 ```sh
 node "$SKILL_DIR/scripts/craft.mjs" init ./deck --language en --colors laboratory
 ```
 It copies the figure engine, layout/number helpers, the page grammar (`theme.css`)
-with one color system, a draft `deck.mjs` and `brief.md`. `SKILL_DIR` is this file's folder.
-
-**1 · Brief.** Read the supplied material first. Fill `brief.md`: audience and what
-they know, the question or decision, reading mode (`live`, `read`, `reference`,
-`hybrid`), language, length, formats, brand. Decide reversible details yourself;
-ask only when a wrong guess would change correctness or touch private material.
+with one color system, a draft `deck.mjs` and `brief.md`. `SKILL_DIR` is this file's
+folder. Fill `brief.md`: the intake answers and defaults, audience and what they know,
+the question or decision, language, length. Decide everything else yourself; ask
+again only when a wrong guess would change correctness or touch private material.
 
 **2 · Claim outline.** Write the page titles as a sequence of claims and read them
 in order. Cut pages that repeat; add the missing step. Keep facts, inferences,
@@ -209,6 +219,7 @@ guarantees quality.
 
 | Need | Read |
 |---|---|
+| Questions to ask before starting, and what each answer selects | [Intake](references/intake.md) |
 | Copy, headlines, density, channels (audience vs notes) | [Writing and editing](references/writing-and-editing.md) |
 | Numbers, sources, relationship semantics, research figures | [Evidence and diagrams](references/evidence-and-diagrams.md) |
 | Chart and diagram API, theming, standalone SVG | [Figures](references/figures.md) |

@@ -2,7 +2,7 @@
   "version": "4.0.0",
   "recorded": "2026-10-19",
   "nodeTests": {
-    "passed": 97,
+    "passed": 99,
     "failed": 0
   },
   "pythonTests": {
@@ -590,8 +590,8 @@
       ]
     }
   ],
-  "executedRegressionChecks": 299,
-  "passedRegressionChecks": 299,
+  "executedRegressionChecks": 301,
+  "passedRegressionChecks": 301,
   "alsoRun": [
     "tests/browser.py with SLIDE_STUDIO_INLINE=1",
     "integrity, field and Python unit tests with pypdf 5.9.0 (requirements.txt)"
